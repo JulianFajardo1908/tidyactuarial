@@ -1,0 +1,92 @@
+---
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+
+## Overview
+
+**tidyactuarial** is a comprehensive R package for financial mathematics and life contingencies. It bridges the gap between classical actuarial notation (SOA/CAS standards) and the modern **tidyverse** workflow.
+
+The package is designed for actuaries, students, and researchers who need reproducible, vectorized, and "tidy" actuarial calculations.
+
+## Key Features
+
+  * **Life Contingencies:** Valuation of life insurance, annuities, and premiums for single and multiple lives.
+  * **Flexible Assumptions:** Supports UDD (Uniform Distribution of Deaths), Constant Force, and Balducci assumptions for fractional ages.
+  * **Financial Math:** Bond pricing (including callable bonds), yield curve interpolation (Spot/Forward rates), and immunization (Redington/Full).
+  * **Tidy Design:** All main functions return `tibble` objects and are compatible with the native R pipe `|>` or `%>%`.
+
+## Installation
+
+Once the package is on CRAN, you can install it with:
+
+```{r}
+install.packages("tidyactuarial")
+```
+
+Alternatively, you can install the development version from [GitHub](https://www.google.com/search?q=https://github.com/jfajardo1908/tidyactuarial) with:
+
+```{r, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("julian.fajardo1908/tidyactuarial")
+```
+
+## Quick Start
+
+### 1\. Life Tables and Premiums
+
+Building a life table and calculating a net level premium for a 20-year endowment insurance:
+
+```{r example_life}
+library(tidyactuarial)
+
+# 1. Create a life table (ensure qx has the same length as x)
+ages <- 0:110
+probs <- rep(0.002, length(ages)) 
+
+lt <- lifetable(x = ages, qx = probs, radix = 100000)
+
+# 2. Calculate net premium for a 35-year-old (20-year endowment)
+# Added benefit = 100000
+premium_x(
+  lt = lt, 
+  x = 35, 
+  n = 20, 
+  i = 0.05, 
+  product = "endowment", 
+  benefit = 100000,
+  tidy = TRUE
+)
+
+```
+
+### 2\. Bond Cash Flows
+
+Generate a tidy schedule for a coupon bond:
+
+```{r example_bond}
+bond_cash_flows(
+  face = 1000, 
+  coupon_rate = 0.06, 
+  years_to_maturity = 5, 
+  coupons_per_year = 2
+)
+```
+
+## References
+
+Mathematical formulas and actuarial notation follow:
+
+  * Finan, M. B. *A Reading of the Theory of Life Contingencies*.
+  * Kellison, S. G. *The Theory of Interest*.
+  * Dickson, D. C., Hardy, M. R., & Waters, H. R. *Actuarial Mathematics for Life Contingent Risks*.
+

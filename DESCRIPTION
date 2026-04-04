@@ -1,0 +1,30 @@
+Package: tidyactuarial
+Type: Package
+Title: Tidy Tools for Actuarial Mathematics and Life Contingencies
+Version: 0.1.0
+Authors@R: 
+    person(
+      "Julian", "Fajardo",
+      email = "julian.fajardo1908@gmail.com",
+      role = c("aut", "cre")
+    )
+Description: Provides tidyverse-aligned tools for actuarial mathematics and
+    life contingencies, including life tables, survival probabilities,
+    actuarial present values of cash flows, life annuities, multi-life
+    benefits, and related quantities. The package emphasizes clear actuarial
+    notation consistent with standard curricula (e.g. SOA exams) and supports
+    reproducible workflows using modern R.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports:
+    ggplot2,
+    dplyr,
+    tibble,
+    utils,
+    stats,
+    rlang,
+    scales
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Suggests: 
+    purrr
