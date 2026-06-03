@@ -1,30 +1,33 @@
 Package: tidyactuarial
 Type: Package
 Title: Tidy Tools for Actuarial Mathematics and Life Contingencies
-Version: 0.1.0
-Authors@R: 
-    person(
-      "Julian", "Fajardo",
-      email = "julian.fajardo1908@gmail.com",
-      role = c("aut", "cre")
-    )
-Description: Provides tidyverse-aligned tools for actuarial mathematics and
-    life contingencies, including life tables, survival probabilities,
-    actuarial present values of cash flows, life annuities, multi-life
-    benefits, and related quantities. The package emphasizes clear actuarial
-    notation consistent with standard curricula (e.g. SOA exams) and supports
-    reproducible workflows using modern R.
+Version: 0.1.5
+Authors@R: person(given = "Julian", family = "Fajardo", email = "julian.fajardo1908@gmail.com", role = c("aut", "cre"))
+Description: Provides tidyverse-aligned tools for actuarial mathematics
+    and life contingencies, including life tables, survival probabilities,
+    actuarial present values of cash flows, life annuities, life insurance,
+    premiums, reserves, multiple-life calculations, Monte Carlo simulation,
+    and deterministic cash-flow diagrams. The package emphasizes clear
+    actuarial notation, reproducible workflows, and pipe-friendly tools for
+    actuarial education and applied actuarial analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Depends: R (>= 4.1.0)
 Imports:
-    ggplot2,
     dplyr,
-    tibble,
-    utils,
-    stats,
+    ggplot2,
     rlang,
-    scales
+    scales,
+    stats,
+    tibble,
+    utils
+Suggests:
+    purrr,
+    testthat (>= 3.0.0)
+LazyData: true
+LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Suggests: 
-    purrr
+Config/testthat/edition: 3
+URL: https://github.com/JulianFajardo1908/tidyactuarial
+BugReports: https://github.com/JulianFajardo1908/tidyactuarial/issues
