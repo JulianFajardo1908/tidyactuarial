@@ -1,0 +1,505 @@
+---
+title: "bond_callable_price(): manual técnico"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+
+# Nombre de la función
+
+`bond_callable_price`
+
+# Firma exacta
+
+```r
+bond_callable_price(
+    face,
+    coupon_rate,
+    years_to_maturity,
+    coupons_per_year = 1L,
+    call_times,
+    call_prices,
+    y_effective_per_period = NULL,
+    y_rate = NULL,
+    y_type = "effective",
+    y_m = 1L,
+    redemption = NULL,
+    tol = 1e-10,
+    check = TRUE
+)
+```
+
+# Descripción general
+
+`bond_callable_price()` calcula el **precio máximo** que un inversionista debería pagar por un bono callable para garantizar una **rentabilidad mínima objetivo**.
+
+La idea del código es esta:
+
+* el bono se valora bajo cada posible escenario de redención;
+* esos escenarios son:
+
+  * cada fecha callable con su precio de call,
+  * y el vencimiento final con su valor de redención;
+* para cada escenario se calcula el precio del bono al rendimiento objetivo;
+* la función devuelve el **menor** de esos precios.
+
+Ese mínimo representa el escenario menos favorable para el inversionista. Si el inversionista paga como máximo ese valor, garantiza al menos el rendimiento exigido cualquiera que sea la fecha de redención ejercida por el emisor. 
+
+# Parámetros
+
+## `face`
+
+Escalar numérico. Valor nominal del bono.
+
+Restricciones del código:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+## `coupon_rate`
+
+Escalar numérico. Tasa anual del cupón en proporción.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+## `years_to_maturity`
+
+Escalar numérico. Tiempo total al vencimiento, en años.
+
+Restricciones relevantes:
+
+* debe ser numérico finito no negativo por validación general;
+* para bonos callable, el código además exige que sea **estrictamente positivo**.
+
+Además, debe cumplirse:
+
+$$
+years_to_maturity \times coupons_per_year \in \mathbb{Z}
+$$
+
+## `coupons_per_year`
+
+Escalar entero positivo. Número de cupones por año.
+
+Ejemplos habituales:
+
+* `1` anual,
+* `2` semestral,
+* `4` trimestral.
+
+## `call_times`
+
+Vector numérico. Fechas, en años desde emisión, en las que el bono puede ser rescatado anticipadamente.
+
+Restricciones:
+
+* debe suministrarse;
+* debe ser numérico finito;
+* debe tener al menos un elemento;
+* cada valor debe estar estrictamente entre `0` y `years_to_maturity`;
+* no puede contener duplicados;
+* cada valor debe alinearse con la malla de cupones:
+
+$$
+call_times \times coupons_per_year \in \mathbb{Z}
+$$
+
+## `call_prices`
+
+Vector numérico. Precios de rescate correspondientes a `call_times`.
+
+Restricciones:
+
+* debe suministrarse;
+* debe ser numérico finito;
+* debe tener la misma longitud que `call_times`;
+* debe ser no negativo.
+
+## `y_effective_per_period`
+
+Escalar numérico opcional. Rendimiento efectivo por periodo de cupón.
+
+Si se suministra, **tiene prioridad** sobre `y_rate`, `y_type` y `y_m`.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser mayor que `-1`.
+
+## `y_rate`
+
+Escalar numérico opcional. Tasa anual de rendimiento objetivo.
+
+Solo se usa si `y_effective_per_period = NULL`.
+
+## `y_type`
+
+Cadena de caracteres. Tipo de tasa anual de rendimiento.
+
+Valores esperados por diseño:
+
+* `"effective"`
+* `"nominal_interest"`
+* `"nominal_discount"`
+* `"force"`
+
+Valor por defecto:
+
+* `"effective"`
+
+## `y_m`
+
+Escalar entero positivo. Frecuencia de capitalización para tasas nominales anuales.
+
+Valor por defecto:
+
+* `1L`
+
+## `redemption`
+
+Escalar numérico. Valor de redención final al vencimiento.
+
+Si es `NULL`, el código fija:
+
+```r
+redemption <- face
+```
+
+Restricciones:
+
+* debe ser numérico finito no negativo.
+
+## `tol`
+
+Escalar numérico positivo. Tolerancia usada en validaciones de alineación.
+
+Valor por defecto:
+
+* `1e-10`
+
+## `check`
+
+Escalar lógico.
+
+* `TRUE`: realiza validaciones de entrada;
+* `FALSE`: omite parte de las validaciones y asume coherencia interna.
+
+# Supuestos explícitos del código
+
+La función asume:
+
+* cupones pagados en arrears y a intervalos regulares;
+* `years_to_maturity * coupons_per_year` entero;
+* cada `call_times * coupons_per_year` entero;
+* no hay stub periods;
+* la valuación se hace en fecha de cupón;
+* el precio es dirty price, sin interés corrido separado.
+
+# Fórmulas y lógica implementadas
+
+## 1. Resolución del rendimiento objetivo
+
+La función usa una utilidad interna que produce:
+
+* `ip`: rendimiento efectivo por periodo de cupón,
+* `i_annual`: rendimiento efectivo anual equivalente.
+
+### Si `y_effective_per_period` se suministra
+
+Entonces:
+
+$$
+i_p = y_effective_per_period
+$$
+
+### Si no se suministra
+
+Primero se convierte `y_rate` a tasa efectiva anual mediante `standardize_interest()` y luego a tasa efectiva por periodo de cupón:
+
+$$
+i = \text{standardize_interest}(\cdot)
+$$
+
+$$
+i_p = (1+i)^{1/m_c} - 1
+$$
+
+donde (m_c = coupons_per_year).
+
+## 2. Escenarios de redención
+
+El código construye una tabla de escenarios:
+
+* uno por cada fecha callable con su respectivo `call_price`,
+* uno adicional para el vencimiento final con `redemption`.
+
+Si los escenarios se indexan por (j = 1, \dots, J), entonces cada escenario queda descrito por:
+
+* tiempo de redención (t_j),
+* valor de redención (R_j).
+
+## 3. Precio por escenario al rendimiento objetivo
+
+Para cada escenario (j), la función llama a `bond_price()` usando:
+
+* el mismo nominal,
+* la misma tasa cupón,
+* vencimiento truncado en (t_j),
+* redención igual a (R_j),
+* rendimiento por periodo igual a (i_p).
+
+Denotando por (P_j(y)) el precio del bono bajo el escenario (j) al rendimiento objetivo (y), el código calcula todos esos valores.
+
+## 4. Precio callable en peor escenario
+
+La salida principal es:
+
+$$
+\min_j P_j(y)
+$$
+
+Ese mínimo es el precio máximo que el inversionista puede pagar para garantizar como mínimo el rendimiento objetivo bajo el escenario menos favorable. fileciteturn9file0
+
+# Valor de salida
+
+La función devuelve un **escalar numérico**.
+
+## Tipo
+
+* `numeric`
+
+## Estructura
+
+* un único número;
+* corresponde al mínimo de la columna `price_at_target_yield` generada internamente sobre todos los escenarios.
+
+## Interpretación
+
+Es el peor precio compatible con la rentabilidad objetivo entre todas las posibilidades de rescate. En lenguaje actuarial y financiero introductorio: es el precio máximo prudente que asegura la yield mínima requerida frente al ejercicio óptimo del call por parte del emisor. fileciteturn9file0
+
+# Validaciones relevantes
+
+La función detiene la ejecución si ocurre alguno de estos casos:
+
+* `years_to_maturity <= 0` para bono callable;
+* faltan `call_times` o `call_prices`;
+* `call_times` no es vector numérico finito;
+* `call_prices` no es vector numérico finito;
+* `call_times` y `call_prices` tienen longitudes distintas;
+* `call_times` tiene longitud cero;
+* alguna fecha callable no está estrictamente entre `0` y `years_to_maturity`;
+* alguna fecha callable se repite;
+* algún `call_price` es negativo;
+* `years_to_maturity * coupons_per_year` no es entero;
+* alguna `call_times * coupons_per_year` no es entera;
+* no se suministra ni `y_effective_per_period` ni `y_rate`;
+* `y_effective_per_period <= -1` cuando se usa directamente.
+
+Además, hereda las validaciones de las utilidades internas de bonos y de `standardize_interest()` cuando corresponde.
+
+# Inconsistencias o matices detectados
+
+## 1. La función requiere al menos una fecha callable
+
+Eso es coherente con el concepto de bono callable, pero conviene decirlo explícitamente: si `call_times` tiene longitud cero, la función lanza error en vez de degradarse a un bono no callable.
+
+## 2. Puede haber más de un peor caso
+
+El valor devuelto es el mínimo escalar, pero en la versión tabular el código marca como `is_worst_case = TRUE` todos los escenarios cuyo precio coincide con el mínimo dentro de una tolerancia `sqrt(tol)`. O sea, puede haber empate.
+
+# Ejemplo 1: uso mínimo correcto
+
+```{r ejemplo-sencillo}
+library(tidyactuarial)
+bond_callable_price(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 10,
+  coupons_per_year = 2,
+  call_times = c(5, 7),
+  call_prices = c(105, 102),
+  y_rate = 0.06,
+  y_type = "effective"
+)
+```
+
+# Ejemplo 2: uso con la mayoría de los parámetros
+
+```{r ejemplo-mayoria-parametros}
+bond_callable_price(
+  face = 1000,
+  coupon_rate = 0.05,
+  years_to_maturity = 12,
+  coupons_per_year = 2,
+  call_times = c(4, 8),
+  call_prices = c(1030, 1015),
+  y_effective_per_period = 0.028,
+  redemption = 1000,
+  tol = 1e-10,
+  check = TRUE
+)
+```
+
+# Ejemplo tidy-friendly
+
+Aquí no vale la pena forzarlo. La función es escalar y conceptualmente se entiende mejor en llamadas directas por bono que dentro de un flujo tidy más artificial.
+
+# Verificación analítica
+
+## Referencia conceptual
+
+El concepto encaja de forma natural con la teoría introductoria de bonos callable: el inversionista compara el precio del bono bajo cada posible fecha de rescate y se protege con el escenario de menor precio al rendimiento requerido.
+
+Eso equivale a valorar el bono como el mínimo entre los precios por yield en cada escenario callable y en el vencimiento final. Ese es justamente el principio que implementa el código. fileciteturn9file0
+
+## Planteamiento
+
+Considérese un bono con:
+
+* nominal 100,
+* cupón anual 8%,
+* vencimiento final a 10 años,
+* cupones anuales,
+* callable en año 5 por 105,
+* callable en año 7 por 102,
+* valor de redención final 100,
+* rendimiento objetivo efectivo anual 6%.
+
+Debemos calcular el precio bajo cada escenario:
+
+1. call en año 5 a 105,
+2. call en año 7 a 102,
+3. vencimiento final en año 10 a 100.
+
+Luego tomamos el mínimo.
+
+## Fórmulas teóricas
+
+Si el bono se rescata en tiempo (n) por valor (R), con cupón anual (C) y rendimiento anual (i), entonces el precio de ese escenario es:
+
+$$
+P(n,R) = C a_{\overline{n|i}} + R(1+i)^{-n}
+$$
+
+Aquí:
+
+$$
+C = 100 \times 0.08 = 8
+$$
+
+Por tanto:
+
+$$
+P_5 = 8 a_{\overline{5|0.06}} + 105(1.06)^{-5}
+$$
+
+$$
+P_7 = 8 a_{\overline{7|0.06}} + 102(1.06)^{-7}
+$$
+
+$$
+P_{10} = 8 a_{\overline{10|0.06}} + 100(1.06)^{-10}
+$$
+
+y el precio callable prudente es:
+
+$$
+P^* = \min{P_5, P_7, P_{10}}
+$$
+
+## Solución analítica sencilla
+
+```{r verificacion-analitica-manual}
+i <- 0.06
+C <- 8
+
+a5 <- (1 - (1 + i)^(-5)) / i
+a7 <- (1 - (1 + i)^(-7)) / i
+a10 <- (1 - (1 + i)^(-10)) / i
+
+P5 <- C * a5 + 105 * (1 + i)^(-5)
+P7 <- C * a7 + 102 * (1 + i)^(-7)
+P10 <- C * a10 + 100 * (1 + i)^(-10)
+
+P_star <- min(P5, P7, P10)
+
+tibble::tibble(
+  P5 = P5,
+  P7 = P7,
+  P10 = P10,
+  callable_price = P_star
+)
+```
+
+## Comparación con la salida de la función
+
+```{r verificacion-analitica-funcion}
+out <- bond_callable_price(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 10,
+  coupons_per_year = 1,
+  call_times = c(5, 7),
+  call_prices = c(105, 102),
+  y_rate = 0.06,
+  y_type = "effective"
+)
+
+out
+```
+
+```{r verificacion-analitica-comparacion}
+all.equal(P_star, out)
+```
+
+La comparación debe coincidir, porque el código hace exactamente ese mínimo entre precios por escenario.
+
+## Ejemplo explícito tipo Finan
+
+Aquí sí encaja bien un ejemplo del estilo FM/Finan: un bono callable se valora como el mínimo entre los precios obtenidos si el emisor llama el bono en cada fecha permitida o si lo deja llegar al vencimiento. Ese es precisamente el criterio prudencial del inversionista en bonos rescatables.
+
+```{r ejemplo-finan}
+
+bond_callable_price(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 10,
+  coupons_per_year = 1,
+  call_times = c(5, 7),
+  call_prices = c(105, 102),
+  y_rate = 0.06,
+  y_type = "effective"
+)
+```
+
+# Comentario final
+
+`bond_callable_price()` es una función clara y bien alineada con la lógica actuarial básica de bonos callable.
+
+Sus puntos fuertes son:
+
+* separa con claridad los escenarios de redención;
+* permite introducir la yield objetivo por periodo o en base anual;
+* devuelve directamente el precio prudente relevante para el inversionista;
+* se apoya en una lógica estándar de peor escenario.
+
+Además, el vínculo entre fórmula, escenario mínimo y rendimiento objetivo queda muy limpio para docencia y para verificación manual.

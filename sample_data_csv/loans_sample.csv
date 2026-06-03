@@ -1,0 +1,5 @@
+loan_id,principal,annual_effective_rate,term_months,payments_per_year,loan_type,payment
+LOAN_A,10000,0.08,24,12,consumer_loan,451.0007644415882
+LOAN_B,25000,0.105,36,12,vehicle_loan,806.9870788356832
+LOAN_C,80000,0.06,120,12,education_loan,881.7922091301784
+LOAN_D,120000,0.075,180,12,mortgage_style_loan,1095.699471427816

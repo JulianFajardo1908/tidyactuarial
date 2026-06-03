@@ -2,91 +2,155 @@
 % Please edit documentation in R/plot_cash_flow.R
 \name{plot_cash_flow}
 \alias{plot_cash_flow}
-\title{Plot a cash flow diagram}
+\title{Plot a cash-flow diagram}
 \usage{
 plot_cash_flow(
-  payment,
-  time = NULL,
+  .data = NULL,
+  C,
+  t = NULL,
   date = NULL,
   i = NULL,
+  i_type = "effective",
+  m = 1L,
+  PV = NULL,
+  payment = NULL,
+  time = NULL,
+  rate = NULL,
   pv = NULL,
   title = NULL,
+  subtitle = NULL,
+  x_label = NULL,
+  amount_label = "Cash flow",
   financial = TRUE,
+  normalize = FALSE,
+  aggregate = TRUE,
+  show_labels = TRUE,
+  label_size = 3.5,
+  arrow_size = 0.8,
+  timeline_size = 0.7,
+  label_digits = 2L,
+  currency = "",
   col_inflow = "#1B9E77",
   col_outflow = "#D95F02",
-  day_count = c("act/365", "act/360")
+  date_labels = "\%Y-\%m-\%d",
+  day_count = c("act/365", "act/360"),
+  ...
 )
 }
 \arguments{
-\item{payment}{Numeric vector of cash flows.}
+\item{.data}{Optional data.frame or tibble containing cash-flow columns.}
 
-\item{time}{Optional numeric vector of times.}
+\item{C}{Numeric vector of cash flows, or a column name when \code{.data} is supplied.}
 
-\item{date}{Optional vector of dates. If supplied, the earliest date is
-treated as time 0 for present-value calculations.}
+\item{t}{Optional numeric vector of times in years, or a column name when \code{.data} is supplied.}
 
-\item{i}{Optional annual effective interest rate used to compute PV if
-\code{pv} is \code{NULL}.}
+\item{date}{Optional date vector, or a column name when \code{.data} is supplied.}
 
-\item{pv}{Optional numeric present value to display.}
+\item{i}{Optional annual interest-rate input used to compute present value if \code{PV} is \code{NULL}.}
 
-\item{title}{Optional character title for the plot.}
+\item{i_type}{Character string indicating the interest-rate type.}
 
-\item{financial}{Logical. If \code{TRUE} (default), uses financial
-convention: inflows point up and outflows point down. If \code{FALSE},
-all arrows point up with height proportional to absolute value.}
+\item{m}{Positive integer. Conversion frequency for nominal rates.}
+
+\item{PV}{Optional numeric present value to display.}
+
+\item{payment}{Deprecated. Use \code{C}.}
+
+\item{time}{Deprecated. Use \code{t}. Kept explicit to avoid partial matching with \code{timeline_size}.}
+
+\item{rate}{Deprecated. Use \code{i}.}
+
+\item{pv}{Deprecated. Use \code{PV}.}
+
+\item{title}{Optional plot title.}
+
+\item{subtitle}{Optional plot subtitle.}
+
+\item{x_label}{Optional x-axis label.}
+
+\item{amount_label}{Optional y-axis label when \code{normalize = FALSE}.}
+
+\item{financial}{Logical. If \code{TRUE}, positive cash flows point upward and negative cash flows point downward.}
+
+\item{normalize}{Logical. If \code{TRUE}, arrow heights are normalized.}
+
+\item{aggregate}{Logical. If \code{TRUE}, cash flows occurring at the same time or date are summed before plotting.}
+
+\item{show_labels}{Logical. If \code{TRUE}, labels are shown next to cash-flow arrows.}
+
+\item{label_size}{Numeric text size for labels.}
+
+\item{arrow_size}{Numeric line width for arrows.}
+
+\item{timeline_size}{Numeric line width for the time axis.}
+
+\item{label_digits}{Integer number of decimal digits for cash-flow labels.}
+
+\item{currency}{Optional currency or unit prefix, such as \code{$}.}
 
 \item{col_inflow}{Character color for inflow arrows.}
 
 \item{col_outflow}{Character color for outflow arrows.}
 
-\item{day_count}{Day-count convention used when \code{date} is supplied.
-One of \code{"act/365"} or \code{"act/360"}.}
+\item{date_labels}{Character date-label format passed to \code{ggplot2::scale_x_date()}.}
+
+\item{day_count}{Day-count convention used when \code{date} is supplied.}
+
+\item{...}{Reserved for future extensions.}
 }
 \value{
 A \code{ggplot2} object.
 }
 \description{
-Creates a visual cash-flow diagram with arrows representing inflows
-(positive payments, upward) and outflows (negative payments, downward).
+Creates a professional cash-flow diagram with arrows representing inflows
+and outflows over time, using compact actuarial notation.
 }
 \details{
-The vertical height of each arrow is proportional to the absolute
-payment amount, normalized so the largest payment reaches unit height.
-Each arrow is labeled with the formatted payment amount.
-
-If an interest rate \code{i} is supplied and \code{pv} is \code{NULL},
-the present value is computed as
-\eqn{PV = \sum_k C_k (1+i)^{-t_k}}{PV = sum(C_k * (1+i)^(-t_k))}
-and displayed in the subtitle.
+This function uses compact actuarial notation: \code{C} denotes cash-flow amounts,
+\code{t} denotes times in years, \code{i} denotes the interest-rate input, and \code{PV}
+denotes present value.
 }
 \examples{
-# Time-based diagram
+plot_cash_flow(
+  C = c(-1000, 300, 400, 500),
+  t = c(0, 1, 2, 3),
+  i = 0.08,
+  currency = "$"
+)
+
+cashflows <- tibble::tibble(
+  t = c(0, 1, 2, 3),
+  C = c(-1000, 300, 400, 500)
+)
+
+cashflows |>
+  plot_cash_flow(C = C, t = t, i = 0.08)
+
+dated_flows <- tibble::tibble(
+  date = as.Date(c("2026-01-01", "2026-07-01", "2027-01-01")),
+  C = c(-1000, 450, 700)
+)
+
+dated_flows |>
+  plot_cash_flow(C = C, date = date, i = 0.08)
+
 plot_cash_flow(
   payment = c(-1000, 300, 400, 500),
   time = c(0, 1, 2, 3),
-  i = 0.08
-)
-
-# Date-based diagram
-plot_cash_flow(
-  payment = c(-1000, 300, 400, 500),
-  date = as.Date(c("2026-01-01", "2027-01-01", "2028-01-01", "2029-01-01"))
+  rate = 0.08,
+  currency = "$"
 )
 
 }
 \seealso{
-\code{\link{pv_flow}}, \code{\link{fv_flow}},
-\code{\link{irr_flow}}
+\code{pv_flow}, \code{fv_flow}, \code{irr_flow}, \code{standardize_interest}
 
 Other time-value: 
 \code{\link{future_value}()},
-\code{\link{future_value_tbl}()},
 \code{\link{fv_flow}()},
 \code{\link{irr_flow}()},
 \code{\link{irr_flow_multi}()},
 \code{\link{present_value}()},
-\code{\link{present_value_tbl}()},
 \code{\link{pv_flow}()}
 }
 \concept{time-value}

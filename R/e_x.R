@@ -21,83 +21,33 @@
 #'
 #' @details
 #' **Curtate life expectancy** (Finan, Section 23.7):
-#' \deqn{e_x = \sum_{k=1}^{\omega - x} {}_kp_x = \frac{1}{\ell_x}
+#' \deqn{e_x = \sum_{k=1}^{\omega - x} {}_k p_x = \frac{1}{\ell_x}
 #'   \sum_{k=1}^{\omega - x} \ell_{x+k}.}
 #'
 #' The \eqn{t}-year temporary curtate expectancy is (Finan, Sec. 23.7):
-#' \deqn{e_{x:\overline{t}|} = \sum_{k=1}^{t} {}_kp_x.}
+#' \deqn{e_{x:\overline{t}|} = \sum_{k=1}^{t} {}_k p_x.}
 #'
 #' **Complete life expectancy** (Finan, Section 23.3):
-#' \deqn{\mathring{e}_x = \int_0^{\omega - x} {}_tp_x \, dt =
+#' \deqn{\breve{e}_x = \int_0^{\omega - x} {}_t p_x \, dt =
 #'   \frac{T_x}{\ell_x}.}
 #'
 #' The integral is decomposed year-by-year. Within each year, the
-#' within-year survival integral \eqn{\int_0^s {}_up_y \, du} is evaluated
+#' within-year survival integral \eqn{\int_0^s {}_u p_y \, du} is evaluated
 #' in closed form under the selected fractional-age assumption
 #' (Finan, Section 24):
 #' \itemize{
-#'   \item UDD (Sec. 24.1): \eqn{\int_0^s {}_up_y \, du = s - \tfrac{1}{2}
-#'     s^2 q_y}
-#'   \item CF (Sec. 24.2): \eqn{\int_0^s {}_up_y \, du = (1 - p_y^s) /
-#'     (-\ln p_y)}
-#'   \item Balducci (Sec. 24.3): \eqn{\int_0^s {}_up_y \, du = (p_y / q_y)
-#'     \ln((p_y + q_y s) / p_y)}
+#'   \item UDD (Sec. 24.1): \eqn{\int_0^s {}_u p_y \, du = s - \frac{1}{2} s^2 q_y}
+#'   \item CF (Sec. 24.2): \eqn{\int_0^s {}_u p_y \, du = (1 - p_y^s) / (-\ln p_y)}
+#'   \item Balducci (Sec. 24.3): \eqn{\int_0^s {}_u p_y \, du = \frac{p_y}{q_y} \ln \left( \frac{p_y + q_y s}{p_y} \right)}
 #' }
 #'
 #' Under UDD, the complete expectancy satisfies the well-known approximation
 #' (Finan, Example 20.24):
-#' \deqn{\mathring{e}_x \approx e_x + \tfrac{1}{2}.}
+#' \deqn{\breve{e}_x \approx e_x + \frac{1}{2}.}
 #'
 #' @return A numeric vector of expected future lifetimes, or a tibble if
 #'   \code{tidy = TRUE} with columns \code{x}, \code{t}, \code{type},
 #'   \code{frac}, \code{ex}.
-#'
-#' @seealso \code{\link{t_px}} for survival probabilities,
-#'   \code{\link{t_qx}} for death probabilities,
-#'   \code{\link{lifetable}} for building the life table,
-#'   \code{\link{e_xy}} for joint-life expectancy.
-#'
-#' @examples
-#' x  <- 0:5
-#' lx <- c(100000, 99500, 99000, 98200, 97000, 95000)
-#' lt <- lifetable(x = x, lx = lx, close = TRUE)
-#'
-#' # Whole-life curtate expectancy
-#' e_x(lt, x = 0, type = "curtate")
-#'
-#' # Whole-life complete expectancy under UDD
-#' e_x(lt, x = 0, type = "complete", frac = "UDD")
-#'
-#' # Finan Example 23.24: e_80 = 2.3
-#' lt_80 <- lifetable(
-#'   x  = 80:86,
-#'   lx = c(250, 217, 161, 107, 62, 28, 0)
-#' )
-#' e_x(lt_80, x = 80, type = "curtate")  # 2.3
-#'
-#' # Finan Example 23.24d: e_{80:3} = 1.94 (temporary)
-#' e_x(lt_80, x = 80, t = 3, type = "curtate")
-#'
-#' # Verify UDD approximation (Finan, Example 20.24):
-#' # complete ≈ curtate + 0.5
-#' curt <- e_x(lt, x = 0, type = "curtate")
-#' comp <- e_x(lt, x = 0, type = "complete", frac = "UDD")
-#' c(curtate = curt, complete = comp, diff = comp - curt)  # diff ≈ 0.5
-#'
-#' # Temporary complete expectancy with fractional horizon
-#' e_x(lt, x = 0, t = 2.5, type = "complete", frac = "CF")
-#'
-#' # Vectorized: multiple ages
-#' e_x(lt, x = 0:4, type = "curtate", tidy = TRUE)
-#'
-#' # Use in a tidy pipeline
-#' if (requireNamespace("dplyr", quietly = TRUE)) {
-#'   lt_80 |>
-#'     dplyr::distinct(x) |>
-#'     dplyr::filter(x <= 84) |>
-#'     dplyr::mutate(ex = e_x(lt_80, x = x, type = "curtate"))
-#' }
-#'
 #' @export
 e_x <- function(
     lt,
@@ -232,7 +182,7 @@ e_x <- function(
       next
     }
 
-    # --- Complete: ė_{x:n} = int_0^n t_p_x dt (Finan, Sec. 23.3) ---
+    # --- Complete: \breve{e}_{x:n} = int_0^n t_p_x dt (Finan, Sec. 23.3) ---
     if (n_int == 0) {
       if (s == 0) {
         ex[m] <- 0

@@ -4,26 +4,33 @@
 \alias{discount_factor_spot}
 \title{Spot discount factor}
 \usage{
-discount_factor_spot(time, spot_rate, spot_type = "effective", spot_m = 1L)
+discount_factor_spot(t, i, i_type = "effective", m = 1L, tidy = FALSE)
 }
 \arguments{
-\item{time}{Numeric vector of times in years.
-Each value must be greater than or equal to 0.}
+\item{t}{Numeric vector of times in years. Each value must be greater than
+or equal to 0.}
 
-\item{spot_rate}{Numeric vector of spot-rate values.}
+\item{i}{Numeric vector of spot-rate values.}
 
-\item{spot_type}{Character vector indicating the spot-rate type.
-Allowed values are \code{"effective"}, \code{"nominal_interest"},
+\item{i_type}{Character vector indicating the spot-rate type. Allowed values
+are \code{"effective"}, \code{"nominal_interest"},
 \code{"nominal_discount"}, and \code{"force"}.}
 
-\item{spot_m}{Positive integer vector giving the compounding frequency for
-nominal spot-rate inputs.}
+\item{m}{Positive integer vector giving the conversion frequency for nominal
+spot-rate inputs.}
+
+\item{tidy}{Logical scalar. If \code{FALSE}, returns a numeric discount
+factor. If \code{TRUE}, returns a tibble with intermediate calculations.}
 }
 \value{
-Numeric vector of discount factors.
+If \code{tidy = FALSE}, a numeric vector of discount factors.
+
+If \code{tidy = TRUE}, a tibble with input values, standardized rates, and
+discount factors.
 }
 \description{
-Computes the discount factor implied by a spot rate for a given time.
+Computes the discount factor implied by a spot rate for a given time, using
+compact actuarial notation.
 }
 \details{
 The spot rate may be supplied in FM-style notation:
@@ -37,46 +44,55 @@ The spot rate may be supplied in FM-style notation:
 Internally, the supplied spot rate is first converted to the equivalent
 annual effective rate using \code{\link{standardize_interest}}. The discount
 factor is then computed as
-\deqn{v(t) = (1+i)^{-t}}{v(t) = (1+i)^(-t)}
+\deqn{v(t) = (1+i)^{-t}.}
+
+This function follows the compact actuarial notation used throughout
+\code{tidyactuarial}: \code{t} denotes time, \code{i} denotes the spot-rate
+input, \code{i_type} denotes the interest-rate type, and \code{m} denotes the
+conversion frequency for nominal rates.
 
 If \eqn{t = 0}, the discount factor is 1.
 
-Input vectors must have length 1 or a common length.
-Missing values are propagated.
+Input vectors must have length 1 or a common length. Missing values are
+propagated.
 }
 \examples{
-# Simple scalar example
+# Numeric discount factor
 discount_factor_spot(
-  time = 3,
-  spot_rate = 0.05,
-  spot_type = "effective"
+  t = 3,
+  i = 0.05
 )
 
 # Vectorized example
 discount_factor_spot(
-  time = c(1, 2, 3),
-  spot_rate = c(0.05, 0.055, 0.06),
-  spot_type = "effective"
+  t = c(1, 2, 3),
+  i = c(0.05, 0.055, 0.06)
 )
 
 # FM-style input with nominal annual interest
 discount_factor_spot(
-  time = 2,
-  spot_rate = 0.08,
-  spot_type = "nominal_interest",
-  spot_m = 2
+  t = 2,
+  i = 0.08,
+  i_type = "nominal_interest",
+  m = 2
+)
+
+# Tibble output for teaching or auditing
+discount_factor_spot(
+  t = c(1, 2, 3),
+  i = c(0.05, 0.055, 0.06),
+  tidy = TRUE
 )
 
 }
 \seealso{
-\code{\link{discount_factor_spot_tbl}},
-\code{\link{standardize_interest}}, \code{\link{present_value}}
+\code{\link{standardize_interest}}, \code{\link{present_value}},
+\code{\link{pv_flow}}
 
 Other interest: 
-\code{\link{discount_factor_spot_tbl}()},
-\code{\link{forward_rate_tbl}()},
+\code{\link{forward_rate}()},
 \code{\link{interest_equivalents}()},
 \code{\link{standardize_interest}()},
-\code{\link{yield_curve_tbl}()}
+\code{\link{yield_curve}()}
 }
 \concept{interest}

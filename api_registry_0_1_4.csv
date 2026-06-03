@@ -1,0 +1,71 @@
+function_name,current_args,family,action
+a_angle,"n_years, payments_per_year, rate, rate_type, m, deferral_years, timing, perpetuity, payment, output",FM_annuities,standardize_args
+A_xj,"md, x, i, cause, product, benefit, n, m, tidy, check, tol",multiple_decrements,review_or_keep
+amort_schedule,"principal, n, rate, rate_type, m, periods_per_year, timing, payment, extra_principal, adjust, tol",UNCLASSIFIED,review_manually
+annuity_arith,"n_years, payments_per_year, rate, rate_type, m, deferral_years, timing, pattern, first_payment, increment, valuation, output",UNCLASSIFIED,review_manually
+annuity_geom,"n_years, payments_per_year, rate, rate_type, m, growth_rate, growth_rate_type, growth_m, deferral_years, timing, first_payment, perpetuity, valuation, output",UNCLASSIFIED,review_manually
+annuity_multi,"lt, ages, annuity, cohort, alpha, n, m, k, timing, woolhouse, i",life_multi_life_products,standardize_args
+annuity_x,"mortality_table, age, rate, rate_type, m, term_years, deferral_years, payments_per_year, timing, woolhouse, output",life_single_products,standardize_args
+annuity_xy,"mortality_table, age_x, age_y, rate, rate_type, m, cohort, benefit, term_years, deferment_years, payments_per_year, timing, woolhouse, frac, output",life_two_life_products,standardize_args
+apv_life_flow,"lt, ages, time, date, start_date, cf, i, status, alpha, plot",UNCLASSIFIED,review_manually
+bond_book_value,"face, coupon_rate, years_to_maturity, valuation_time, coupons_per_year, yield_effective_per_period, yield_rate, yield_rate_type, yield_m, redemption, tol, check, output",FM_bonds,standardize_args
+bond_callable_price,"face, coupon_rate, years_to_maturity, coupons_per_year, call_times, call_prices, yield_effective_per_period, yield_rate, yield_rate_type, yield_m, redemption, tol, check, output",FM_bonds,standardize_args
+bond_cash_flows,"face, coupon_rate, years_to_maturity, coupons_per_year, redemption, tol, check",FM_bonds,standardize_args
+bond_convexity,"face, coupon_rate, years_to_maturity, coupons_per_year, y_effective_per_period, y_rate, y_type, y_m, redemption, tol, check",FM_bonds,standardize_args
+bond_duration,"face, coupon_rate, years_to_maturity, coupons_per_year, y_effective_per_period, y_rate, y_type, y_m, redemption, tol, check",FM_bonds,standardize_args
+bond_price,"face, coupon_rate, years_to_maturity, coupons_per_year, y_effective_per_period, y_rate, y_type, y_m, redemption, tol, check",FM_bonds,standardize_args
+bond_ytm,"price, face, coupon_rate, years_to_maturity, coupons_per_year, redemption, interval, tol, maxiter, check",FM_bonds,standardize_args
+commutation_table,"lt, i, check",life_tables,review_or_keep
+discount_factor_spot,"time, rate, rate_type, m, output",FM_time_value,standardize_args
+e_x,"lt, x, t, type, frac, tidy, check, tol",life_survival_primitives,review_or_keep
+e_xy,"lt, x, y, t, type, frac, cohort, tidy, check, tol",life_survival_primitives,review_or_keep
+forward_rate,".data, term, spot, t_start, t_end, col_term, col_spot, col_t_start, col_t_end, method, plot, .out, .out_plot, .keep, .na",FM_time_value,standardize_args
+future_value,"amount, rate, rate_type, m, time, output",FM_time_value,standardize_args
+fv_flow,"payment, rate, type, m, time, date, day_count, tol",FM_time_value,standardize_args
+immunize_duration,"liabilities, t_liabilities, pv_assets, duration_assets, i",FM_immunization,review_or_keep
+immunize_duration_convexity,"liabilities, t_liabilities, pv_assets, duration_assets, convexity_assets, i",FM_immunization,review_or_keep
+insurance_variable_k,"lt, x, i, benefit, n, m, k, frac, tidy, check",UNCLASSIFIED,review_manually
+insurance_x,"mortality_table, age, rate, rate_type, m, term_years, deferral_years, insurance_type, benefit, output",life_single_products,standardize_args
+insurance_xj,"md, x, i, cause, product, benefit, n, m, tidy, check, tol",multiple_decrements,review_or_keep
+insurance_xy,"mortality_table, age_x, age_y, rate, rate_type, m, insurance_type, cohort, term_years, deferment_years, benefit, output",life_two_life_products,standardize_args
+interest_equivalents,"type, rate, m",FM_time_value,standardize_args
+irr_flow,"payment, time, date, nominal_m, interval, tol, maxiter, day_count",FM_time_value,standardize_args
+irr_flow_multi,"payment, time, date, search_interval, grid_points, nominal_m, tol, maxiter, day_count",FM_time_value,standardize_args
+km_lifetable,"time, status, entry, breaks, radix, conf_level, assumption",life_tables,review_or_keep
+life_contract,"mortality_table, lives, age, age_x, age_y, rate, rate_type, m, ...",UNCLASSIFIED,review_manually
+lifetable,"x, lx, qx, px, mx, radix, omega, close, ax, type, frac, check, tol",life_tables,review_or_keep
+lt_tau,"md, ...",multiple_decrements,review_or_keep
+mc_annuity,"data, rate, payment, payments_per_year, annuity, term, deferral_years, guarantee_years, timing, interest_type, m, k_col, tx_col, annuity_col",monte_carlo,standardize_args
+mc_insurance,"data, rate, benefit, insurance, term, deferral_years, payment_timing, interest_type, m, k_col, tx_col, benefit_col",monte_carlo,standardize_args
+mc_loss,"data, benefit_col, annuity_col, premium_col, loss_col, premium",monte_carlo,standardize_args
+mc_multilife_status,"data, status, k, sim_col, life_col, k_col, tx_col, k_status_col, t_status_col, keep_lifetimes",monte_carlo,standardize_args
+mc_premium,"data, benefit_col, annuity_col, premium_col, by, na_rm",monte_carlo,standardize_args
+mc_reserve,"data, duration, rate, premium, premium_col, benefit, payment, payments_per_year, insurance, annuity, term, deferral_years, guarantee_years, payment_timing, premium_timing, reserve_timing, interest_type, m, k_col, tx_col, in_force_basis, not_in_force, reserve_col",monte_carlo,standardize_args
+md_table,"qx_df, age_col, cause_cols, radix, close, check, tol",multiple_decrements,review_or_keep
+mortality_law_table,"law, x_min, x_max, ..., params, frac, radix, close, ax, check, tol",life_tables,review_or_keep
+plot_cash_flow,".data, payment, time, date, rate, i, pv, title, subtitle, x_label, amount_label, financial, normalize, aggregate, show_labels, label_size, arrow_size, timeline_size, label_digits, currency, col_inflow, col_outflow, date_labels, day_count",visualization,review_or_keep
+plot_immunization_gap,"liabilities, t_liabilities, asset_cashflows, weights, i0, delta, n_grid",FM_immunization,review_or_keep
+plot_km,"km, time_col, surv_col, lower_col, upper_col, conf_int, title",visualization,review_or_keep
+portfolio_convexity,".data, portfolio_id, market_value, convexity, col_portfolio, col_market_value, col_convexity, .out, .out_value, .out_n, .na",FM_bonds,standardize_args
+portfolio_duration,".data, portfolio_id, market_value, duration, col_portfolio, col_market_value, col_duration, .out, .out_value, .out_n, .na",FM_bonds,standardize_args
+premium_gross,"prem, alpha, beta, gamma, output",UNCLASSIFIED,review_manually
+premium_x,"mortality_table, age, rate, rate_type, m, insurance_type, benefit, term_years, deferral_years, payments_per_year, frac, premium_timing, premium_start, premium_term_years, woolhouse, output, check",life_single_products,standardize_args
+premium_xy,"mortality_table, age_x, age_y, rate, rate_type, m, insurance_type, benefit, term_years, deferment_years, payments_per_year, frac, premium_timing, premium_start, premium_term_years, cohort, output, check, tol",life_two_life_products,standardize_args
+present_value,"amount, rate, rate_type, m, time, output",FM_time_value,standardize_args
+pv_flow,"payment, rate, type, m, time, date, day_count",FM_time_value,standardize_args
+reserve_x,"mortality_table, age, rate, rate_type, m, insurance_type, term_years, benefit, premium, premium_term_years, durations, method, output",life_single_products,standardize_args
+reserve_xy,"mortality_table, age_x, age_y, rate, rate_type, m, insurance_type, cohort, term_years, benefit, premium, premium_term_years, payments_per_year, premium_timing, at, method, output",life_two_life_products,standardize_args
+s_angle,"n_years, payments_per_year, rate, rate_type, m, deferral_years, timing, payment, output",FM_annuities,standardize_args
+simulate_annuity_x,"mortality_table, age, rate, rate_type, m, term_years, payments_per_year, timing, payment, method, n_sim, seed, output",monte_carlo,standardize_args
+simulate_insurance_x,"mortality_table, age, rate, rate_type, m, insurance_type, term_years, benefit, method, n_sim, seed, output",monte_carlo,standardize_args
+simulate_lifetime,"data, age, n_sim, age_col, qx_col, method, fractional, seed, include_distribution",monte_carlo,standardize_args
+simulate_lifetimes,"data, ages, n_sim, life_id, age_col, qx_col, method, fractional, seed",monte_carlo,standardize_args
+sinking_fund_schedule,"principal, n, i_loan, i_fund, deposit, tol",UNCLASSIFIED,review_manually
+standardize_interest,"type, rate, m",FM_time_value,standardize_args
+summary_mc,".data, value_col, group_cols, by, probs, var_probs, na_rm",monte_carlo,standardize_args
+t_Ex,"lt, x, t, i, frac, tidy, check, tol",life_survival_primitives,review_or_keep
+t_px,"lt, x, t, frac, tidy, check, tol",life_survival_primitives,review_or_keep
+t_pxy,"lt, x, y, t, frac, status",life_survival_primitives,review_or_keep
+t_qx,"lt, x, t, frac, tidy, check, tol",life_survival_primitives,review_or_keep
+t_qxj,"md, x, t, cause, frac, tidy, check, tol",life_survival_primitives,review_or_keep
+yield_curve,".data, term, spot, col_term, col_spot, plot, .out, .out_plot, .keep, .na",FM_time_value,standardize_args

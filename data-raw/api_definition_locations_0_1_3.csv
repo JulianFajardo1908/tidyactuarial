@@ -1,0 +1,23 @@
+function_name,file,line,definition
+Da_angle,R/Da_angle.R,95,Da_angle <- function(
+Da_angle_tbl,R/Da_angle.R,311,Da_angle_tbl <- function(
+Ia_angle,R/Ia_angle.R,112,Ia_angle <- function(
+Var_annuity_x,R/Var_annuity_x.R,78,Var_annuity_x <- function(
+a_angle_tbl,R/a_angle.R,399,a_angle_tbl <- function(
+arithmetic_annuity_av_tbl,R/arithmetic_annuity_av_tbl.R,90,arithmetic_annuity_av_tbl <- function(
+arithmetic_annuity_pv_tbl,R/arithmetic_annuity_pv_tbl.R,112,arithmetic_annuity_pv_tbl <- function(
+ga_angle,R/ga_angle_n.R,124,ga_angle <- function(
+ga_angle_tbl,R/ga_angle_n.R,407,ga_angle_tbl <- function(
+gs_angle,R/gs_angle_n.R,122,gs_angle <- function(
+gs_angle_tbl,R/gs_angle_n.R,366,gs_angle_tbl <- function(
+s_angle_tbl,R/s_angle.R,338,s_angle_tbl <- function(
+bond_book_value_tbl,R/bond_book_value.R,213,bond_book_value_tbl <- function(
+bond_callable_price_tbl,R/bond_callable_price.R,246,bond_callable_price_tbl <- function(
+portfolio_convexity_tbl,R/portfolio_convexity_tbl.R,77,portfolio_convexity_tbl <- function(
+portfolio_duration_tbl,R/portfolio_duration_tbl.R,77,portfolio_duration_tbl <- function(
+discount_factor_spot_tbl,R/discount_factor_spot.R,206,discount_factor_spot_tbl <- function(
+forward_rate_tbl,R/forward_rate_tbl.R,91,forward_rate_tbl <- function(
+future_value_tbl,R/future_value.R,236,future_value_tbl <- function(
+present_value_tbl,R/present_value.R,240,present_value_tbl <- function(
+yield_curve_tbl,R/yield_curve.R,80,yield_curve_tbl <- function(
+Var_insurance_x,R/Var_insurance_x.R,95,Var_insurance_x <- function(

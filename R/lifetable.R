@@ -126,7 +126,7 @@
 #' lt5 <- lifetable(x = 0:10, lx = 100000 * exp(-0.01 * (0:10)), omega = 7, close = TRUE)
 #' lt5
 #'
-#' # Example 6: Finan Example 22.1 — exponential survival s(x) = exp(-0.005x)
+#' # Example 6: Finan Example 22.1 - exponential survival s(x) = exp(-0.005x)
 #' lt_exp <- lifetable(
 #'   x  = 0:7,
 #'   lx = 1000 * exp(-0.005 * (0:7)),
@@ -138,7 +138,7 @@
 #' # 2_p_2 = l_4 / l_2 = 97000 / 99000
 #' lt1$lx[lt1$x == 4] / lt1$lx[lt1$x == 2]
 #'
-#' # Example 8: without closure — qx at omega is not forced to 1
+#' # Example 8: without closure - qx at omega is not forced to 1
 #' lt_open <- lifetable(x = 0:3, lx = c(1000, 900, 750, 500), close = FALSE)
 #' lt_open$qx  # last element is NA
 #'

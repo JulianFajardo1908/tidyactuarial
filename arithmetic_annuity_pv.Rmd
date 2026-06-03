@@ -1,0 +1,567 @@
+---
+
+title: "arithmetic_annuity_pv_tbl(): manual técnico"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+
+# Nombre de la función
+
+`arithmetic_annuity_pv_tbl`
+
+# Firma exacta
+
+```r
+arithmetic_annuity_pv_tbl(
+    .data = NULL,
+    amount = NULL,
+    step = NULL,
+    n = NULL,
+    i = NULL,
+    timing = c("immediate", "due", "vencida", "anticipada"),
+    perpetuity = FALSE,
+    col_amount = "amount",
+    col_step = "step",
+    col_n = "n",
+    col_i = "i",
+    .out = "pv",
+    .keep = c("all", "used", "none"),
+    .na = c("propagate", "error", "drop")
+)
+```
+
+# Descripción general
+
+`arithmetic_annuity_pv_tbl()` calcula el **valor presente** de una anualidad cuyos pagos siguen una **progresión aritmética**.
+
+La estructura del flujo es:
+
+* primer pago: `amount`,
+* segundo pago: `amount + step`,
+* tercer pago: `amount + 2 * step`,
+* y así sucesivamente.
+
+La función admite:
+
+* anualidad vencida o inmediata;
+* anualidad anticipada;
+* anualidad finita;
+* perpetuidad aritmética, siempre que sea válida.
+
+Además, sigue un enfoque **tibble-first**:
+
+* si `.data = NULL`, trabaja con escalares o vectores compatibles;
+* si `.data` es un `data.frame` o `tibble`, cada fila se trata como un caso y se agrega una columna con el valor presente.
+
+# Parámetros
+
+## `.data`
+
+`data.frame` o `tibble` opcional.
+
+* Si es `NULL`, deben suministrarse directamente los argumentos necesarios.
+* Si no es `NULL`, la función toma de `.data` las columnas indicadas por `col_amount`, `col_step`, `col_i` y, si `perpetuity = FALSE`, también `col_n`.
+
+## `amount`
+
+Primer pago cuando `.data = NULL`.
+
+Debe ser numérico.
+
+## `step`
+
+Incremento aritmético por periodo cuando `.data = NULL`.
+
+Debe ser numérico.
+
+Puede ser:
+
+* positivo, si los pagos crecen;
+* cero, si la anualidad es nivelada;
+* negativo, si decrecen, siempre que los pagos finitos no se vuelvan negativos.
+
+Para perpetuidades, el código exige `step >= 0`.
+
+## `n`
+
+Número de pagos cuando `.data = NULL` y `perpetuity = FALSE`.
+
+Restricciones del código:
+
+* debe ser numérico;
+* debe ser finito;
+* debe ser entero;
+* debe ser mayor o igual que 0.
+
+Si `perpetuity = TRUE`, este argumento se ignora.
+
+## `i`
+
+Tasa efectiva por periodo de pago cuando `.data = NULL`.
+
+Restricciones:
+
+* debe ser numérica;
+* debe ser finita;
+* debe ser estrictamente mayor que `-1` en general;
+* si `perpetuity = TRUE`, además debe cumplirse `i > 0`.
+
+## `timing`
+
+Momento de pago.
+
+Valores aceptados:
+
+* `"immediate"`
+* `"due"`
+* `"vencida"`
+* `"anticipada"`
+
+Internamente se normaliza así:
+
+* `"immediate"` y `"vencida"` se convierten a `"immediate"`;
+* `"due"` y `"anticipada"` se convierten a `"due"`.
+
+## `perpetuity`
+
+Lógico.
+
+* `FALSE`: calcula una anualidad finita.
+* `TRUE`: calcula una perpetuidad aritmética.
+
+Valor por defecto:
+
+* `FALSE`
+
+## `col_amount`
+
+Nombre de la columna del primer pago cuando `.data` no es `NULL`.
+
+Valor por defecto:
+
+* `"amount"`
+
+## `col_step`
+
+Nombre de la columna del incremento aritmético.
+
+Valor por defecto:
+
+* `"step"`
+
+## `col_n`
+
+Nombre de la columna del número de pagos.
+
+Valor por defecto:
+
+* `"n"`
+
+Solo se usa si `perpetuity = FALSE`.
+
+## `col_i`
+
+Nombre de la columna de la tasa efectiva por periodo.
+
+Valor por defecto:
+
+* `"i"`
+
+## `.out`
+
+Nombre de la columna de salida.
+
+Debe ser una cadena no vacía.
+
+Valor por defecto:
+
+* `"pv"`
+
+## `.keep`
+
+Controla qué columnas conservar en la salida.
+
+Valores permitidos:
+
+* `"all"`
+* `"used"`
+* `"none"`
+
+Interpretación:
+
+* `"all"`: conserva todas las columnas originales y agrega la de salida;
+* `"used"`: conserva solo las columnas usadas por la función y la salida;
+* `"none"`: devuelve solo la columna de salida.
+
+## `.na`
+
+Política de manejo de valores perdidos.
+
+Valores permitidos:
+
+* `"propagate"`
+* `"error"`
+* `"drop"`
+
+Interpretación:
+
+* `"propagate"`: deja `NA` en la salida para filas incompletas;
+* `"error"`: detiene la ejecución si hay faltantes en entradas requeridas;
+* `"drop"`: elimina esas filas con advertencia.
+
+# Supuestos explícitos del código
+
+La función asume:
+
+* tiempo discreto;
+* `i` como tasa efectiva por periodo de pago;
+* si `perpetuity = FALSE`, `n` es el número de pagos;
+* si `perpetuity = TRUE`, `n` se ignora;
+* los pagos deben mantenerse no negativos.
+
+Para anualidades finitas, el código exige:
+
+$$
+amount + (n-1) \cdot step \ge 0
+$$
+
+Para perpetuidades, exige:
+
+$$
+step \ge 0
+$$
+
+y
+
+$$
+i > 0
+$$
+
+# Fórmulas implementadas
+
+## Caso finito, anualidad vencida o inmediata
+
+Sea:
+
+* primer pago (P),
+* incremento aritmético (Q),
+* número de pagos (n),
+* tasa efectiva por periodo (i),
+* factor de descuento (v = 1/(1+i)).
+
+Entonces:
+
+$$
+a_{\overline{n|}} = \frac{1-v^n}{i}
+$$
+
+La función construye el componente del gradiente como:
+
+$$
+\frac{a_{\overline{n|}} - n v^n}{i}
+$$
+
+y calcula el valor presente total como:
+
+$$
+PV = P , a_{\overline{n|}} + Q , \frac{a_{\overline{n|}} - n v^n}{i}
+$$
+
+## Caso finito, anualidad anticipada
+
+El código calcula primero el valor presente de la anualidad vencida y luego multiplica por:
+
+$$
+1+i
+$$
+
+Es decir:
+
+$$
+PV_{due} = (1+i) PV_{immediate}
+$$
+
+## Caso finito con (i = 0)
+
+Si la tasa es prácticamente cero, la función usa:
+
+$$
+PV = nP + Q \frac{n(n-1)}{2}
+$$
+
+## Caso perpetuidad vencida
+
+Si `perpetuity = TRUE`, la función usa:
+
+$$
+PV = \frac{P}{i} + \frac{Q}{i^2}
+$$
+
+## Caso perpetuidad anticipada
+
+Para anualidad anticipada perpetua, el código multiplica el caso vencido por (1+i):
+
+$$
+PV = (1+i)\left(\frac{P}{i} + \frac{Q}{i^2}\right)
+$$
+
+Esto es equivalente a:
+
+$$
+PV = \frac{P}{d} + \frac{Q}{id}
+$$
+
+con
+
+$$
+d = \frac{i}{1+i}
+$$
+
+# Valor de salida
+
+La función devuelve un `tibble` con una nueva columna numérica nombrada según `.out`.
+
+## Tipo
+
+* `tibble::tibble`
+
+## Estructura
+
+La salida contiene:
+
+* todas las columnas originales, o una selección de ellas, según `.keep`;
+* una columna nueva con el valor presente calculado.
+
+## Interpretación
+
+Cada fila representa un caso de anualidad aritmética y la columna de salida contiene el valor presente del flujo correspondiente bajo la convención temporal indicada.
+
+# Validaciones relevantes del código
+
+La función detiene la ejecución si ocurre alguno de estos casos:
+
+* `.out` no es una cadena válida;
+* `perpetuity` no es lógico escalar;
+* `.data` no es `data.frame` o `tibble` cuando se suministra;
+* faltan columnas requeridas en `.data`;
+* falta alguno de `amount`, `step`, `i` o `n` cuando corresponde y `.data = NULL`;
+* los insumos directos no son escalares o vectores de longitud común;
+* `amount`, `step`, `i` o `n` no son numéricos;
+* `i` no es finita o satisface `i <= -1`;
+* `n` no es entero finito mayor o igual que 0 en el caso finito;
+* el último pago implícito es negativo en el caso finito;
+* en perpetuidades, `i <= 0`;
+* en perpetuidades, `step < 0`.
+
+# Inconsistencias o matices detectados
+
+## 1. `n = 0` sí está permitido en el caso finito
+
+El código admite `n = 0` y en ese caso devuelve `0`. Eso está bien implementado, pero conviene decirlo explícitamente porque no siempre se menciona en la teoría estándar.
+
+## 2. `n` se ignora cuando `perpetuity = TRUE`
+
+Esto es coherente con la documentación y con el código. Aun así, vale la pena remarcarlo para que el usuario no espere que influya en el resultado.
+
+## 3. En perpetuidad decreciente no se permite `step < 0`
+
+Eso también es coherente con la lógica del código: una progresión aritmética decreciente acabaría generando pagos negativos en una perpetuidad.
+
+# Ejemplo 1: uso mínimo correcto
+
+```{r ejemplo-sencillo}
+library(tidyactuarial)
+arithmetic_annuity_pv_tbl(
+  amount = 100,
+  step = 5,
+  n = 5,
+  i = 0.05,
+  timing = "immediate"
+)
+
+```
+
+Interpretación: calcula el valor presente de los pagos 100, 105, 110, 115 y 120 al final de cada periodo.
+
+# Ejemplo 2: uso con la mayoría de los parámetros
+
+```{r ejemplo-mayoria-parametros}
+
+cases <- tibble::tibble(
+  amount = c(100, 200),
+  step   = c(5, 10),
+  n      = c(5, 4),
+  i      = c(0.05, 0.04)
+)
+
+arithmetic_annuity_pv_tbl(
+  .data = cases,
+  timing = "anticipada",
+  perpetuity = FALSE,
+  .out = "pv_due",
+  .keep = "all",
+  .na = "propagate"
+)
+```
+
+# Ejemplo 3: uso tidy-friendly
+
+Enunciado: se quiere agregar a una base pequeña una columna con el valor presente de cada anualidad aritmética.
+
+```{r ejemplo-tidy-friendly}
+library(tibble)
+
+portfolio <- tibble(
+  amount = c(100, 150, 80),
+  step = c(5, 0, 10),
+  n = c(5, 6, 4),
+  i = c(0.05, 0.04, 0.03)
+)
+
+arithmetic_annuity_pv_tbl(
+  .data = portfolio,
+  timing = "vencida",
+  perpetuity = FALSE,
+  .out = "present_value"
+)
+```
+
+# Verificación analítica
+
+## Referencia conceptual
+
+La verificación se apoya en el capítulo de anualidades variables de Finan, donde las anualidades con pagos en progresión aritmética se descomponen en:
+
+* una anualidad nivelada, y
+* un componente creciente.
+
+En particular, Finan desarrolla para anualidades inmediatas fórmulas del tipo:
+
+$$
+(Ia)_n = \frac{a_n - n v^n}{i}
+$$
+
+lo que permite construir fácilmente el valor presente de pagos del tipo
+
+$$
+P, P+Q, P+2Q, \ldots
+$$
+
+como la suma de un componente nivelado y uno creciente.
+
+## Planteamiento
+
+Consideremos otra vez el flujo clásico:
+
+$$
+500, 520, 540, \ldots, 800
+$$
+
+con tasa efectiva anual del 2%.
+
+Como antes:
+
+$$
+500 + 20(n-1) = 800
+$$
+
+$$
+n = 16
+$$
+
+Así, el flujo queda descrito por:
+
+* `amount = 500`,
+* `step = 20`,
+* `n = 16`,
+* `i = 0.02`.
+
+## Fórmula teórica
+
+Para anualidad vencida finita:
+
+$$
+PV = P , a_{\overline{n|}} + Q , \frac{a_{\overline{n|}} - n v^n}{i}
+$$
+
+con
+
+$$
+v = \frac{1}{1+i},
+\qquad
+a_{\overline{n|}} = \frac{1-v^n}{i}
+$$
+
+## Solución analítica sencilla
+
+```{r verificacion-analitica-manual}
+P <- 500
+Q <- 20
+i <- 0.02
+n <- 16
+
+v <- 1 / (1 + i)
+a_n <- (1 - v^n) / i
+PV_teorico <- P * a_n + Q * (a_n - n * v^n) / i
+PV_teorico
+```
+
+## Comparación con la salida de la función
+
+```{r verificacion-analitica-funcion}
+out <- arithmetic_annuity_pv_tbl(
+  amount = 500,
+  step = 20,
+  n = 16,
+  i = 0.02,
+  timing = "immediate",
+  perpetuity = FALSE
+)
+
+out
+```
+
+```{r verificacion-analitica-comparacion}
+all.equal(PV_teorico, out$pv)
+```
+
+La comparación debe coincidir, porque la función implementa exactamente esa fórmula para el caso finito vencido.
+
+## Ejemplo explícito tipo Finan
+
+El mismo flujo aritmético creciente de Finan puede resolverse como anualidad nivelada más componente creciente, pero aquí la función lo resuelve directamente en una sola llamada:
+
+```{r ejemplo-finan}
+arithmetic_annuity_pv_tbl(
+  amount = 500,
+  step = 20,
+  n = 16,
+  i = 0.02,
+  timing = "immediate",
+  perpetuity = FALSE
+)
+```
+
+Ese resultado corresponde al valor presente del flujo (500, 520, 540, \ldots, 800) evaluado un periodo antes del primer pago.
+
+# Comentario final
+
+`arithmetic_annuity_pv_tbl()` es una función clara y útil para anualidades con pagos en progresión aritmética cuando se quiere trabajar en formato tibble.
+
+Sus principales fortalezas son:
+
+* admite anualidades finitas y perpetuas;
+* distingue bien entre anualidad vencida y anticipada;
+* acepta insumos directos o tabulares;
+* controla adecuadamente valores perdidos;
+* valida que la progresión de pagos sea financieramente coherente.
+
+Además, permite reproducir con limpieza ejemplos clásicos del estilo Finan sin necesidad de descomponer manualmente el flujo en cada uso.

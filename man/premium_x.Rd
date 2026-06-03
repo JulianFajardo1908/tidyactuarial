@@ -2,105 +2,125 @@
 % Please edit documentation in R/premium_x.R
 \name{premium_x}
 \alias{premium_x}
-\title{Net premium for life insurance by the equivalence principle}
+\title{Net premium for single-life insurance by the equivalence principle}
 \usage{
 premium_x(
   lt,
   x,
   i,
-  product = c("whole", "term", "endowment", "variable_k"),
-  benefit,
-  n = NULL,
-  m = 0,
-  k = 1,
+  i_type = "effective",
+  m = 1L,
+  type = c("whole", "term", "endowment", "variable_k"),
+  benefit = 1,
+  n = Inf,
+  h = 0L,
+  k = 1L,
   frac = c("UDD", "CF", "CML", "Balducci"),
-  premium_timing = c("due", "immediate"),
-  prem_start = c("issue", "deferred"),
+  timing = c("due", "immediate"),
+  premium_start = c("issue", "deferred"),
   n_prem = NULL,
   woolhouse = c("none", "first", "second"),
   tidy = FALSE,
-  check = TRUE
+  check = TRUE,
+  ...
 )
 }
 \arguments{
-\item{lt}{A life table data frame containing at least columns \code{x}
-and \code{lx}.}
+\item{lt}{A life table data frame containing at least columns \code{x} and
+\code{lx}.}
 
 \item{x}{Integer actuarial age at issue.}
 
-\item{i}{Effective annual interest rate (must be \code{> -1}).}
+\item{i}{Numeric scalar. Annual interest-rate input.}
 
-\item{product}{Type of insurance: \code{"whole"}, \code{"term"},
-\code{"endowment"}, or \code{"variable_k"}.}
+\item{i_type}{Character string indicating the interest-rate type. Allowed
+values are \code{"effective"}, \code{"nominal_interest"},
+\code{"nominal_discount"}, and \code{"force"}.}
 
-\item{benefit}{Benefit amount. For standard products, a single numeric
-value. For \code{"variable_k"}, a numeric vector or a function of time.}
+\item{m}{Positive integer. Conversion frequency for nominal interest-rate
+inputs. Ignored for \code{i_type = "effective"} and
+\code{i_type = "force"}.}
 
-\item{n}{Optional insurance term in years. Required for \code{"term"}
-and \code{"endowment"}.}
+\item{type}{Character string. Type of insurance contract. One of
+\code{"whole"}, \code{"term"}, \code{"endowment"}, or
+\code{"variable_k"}.}
 
-\item{m}{Nonnegative integer deferral period in years (default \code{0}).}
+\item{benefit}{Benefit amount. For standard products, a single nonnegative
+numeric value. For \code{type = "variable_k"}, a numeric vector or a
+function of time may be supplied and is passed to
+\code{\link{insurance_variable_k}}.}
 
-\item{k}{Number of premium payments per year (default \code{1}).}
+\item{n}{Insurance term in years. Use \code{Inf} for whole-life insurance.
+Required as a finite value for term and endowment insurance. For
+\code{type = "variable_k"}, \code{n = Inf} allows the term to be inferred
+from a numeric \code{benefit} vector.}
 
-\item{frac}{Fractional-age assumption for survival probabilities:
-\code{"UDD"}, \code{"CF"}, \code{"CML"}, or \code{"Balducci"}.}
+\item{h}{Integer deferment period in years.}
 
-\item{premium_timing}{Timing of premium payments:
-\code{"due"} (in advance, default) or \code{"immediate"} (in arrears).}
+\item{k}{Positive integer. Number of premium payments per year.}
 
-\item{prem_start}{Start of premium payments:
-\code{"issue"} (start at issue, time 0) or \code{"deferred"} (start at
-time \code{m}).}
+\item{frac}{Fractional-age assumption used only for
+\code{type = "variable_k"}. One of \code{"UDD"}, \code{"CF"},
+\code{"CML"}, or \code{"Balducci"}.}
+
+\item{timing}{Timing of premium payments. Use \code{"due"} for payments in
+advance or \code{"immediate"} for payments in arrears.}
+
+\item{premium_start}{Start of premium payments. Use \code{"issue"} for
+premiums starting at issue, or \code{"deferred"} for premiums starting
+after \code{h}.}
 
 \item{n_prem}{Optional premium-paying term in years, counted from
-\code{prem_start}. If \code{NULL}, defaults to whole-life to the end of
-the table (for \code{"whole"}) or to the insurance term \code{n}
-(for temporary products).}
+\code{premium_start}. If \code{NULL}, it defaults to whole life for
+whole-life insurance and to \code{n} for temporary products. For finite
+term contracts, premiums must not extend beyond the end of coverage.}
 
-\item{woolhouse}{Woolhouse order for the premium annuity when \code{k > 1}:
-\code{"none"} (exact UDD, default), \code{"first"}, or \code{"second"}.
-Passed to \code{\link{annuity_x}}.}
+\item{woolhouse}{Woolhouse order for the premium annuity when \code{k > 1}.
+One of \code{"none"}, \code{"first"}, or \code{"second"}.}
 
-\item{tidy}{Logical. If \code{TRUE}, returns a one-row tibble with details.}
+\item{tidy}{Logical scalar. If \code{FALSE}, returns a numeric premium. If
+\code{TRUE}, returns a one-row tibble with details.}
 
-\item{check}{Logical. If \code{TRUE}, performs basic input validation.}
+\item{check}{Logical. If \code{TRUE}, performs input validation.}
+
+\item{...}{Transitional compatibility for older calls using
+\code{mortality_table}, \code{age}, \code{rate}, \code{rate_type},
+\code{insurance_type}, \code{term_years}, \code{deferral_years},
+\code{payments_per_year}, \code{premium_timing},
+\code{premium_term_years}, and \code{output}.}
 }
 \value{
-A numeric net premium per payment, or a one-row tibble if
-\code{tidy = TRUE}.
+If \code{tidy = FALSE}, a numeric scalar with the net premium per payment.
+
+If \code{tidy = TRUE}, a one-row tibble with the main inputs, APV of
+benefits, APV of premiums, premium per payment, and annualized premium.
 }
 \description{
-Computes the net benefit premium of a life insurance contract using the
-equivalence principle (Finan, Section 41):
-\deqn{P = \frac{\text{APV of benefits}}{\text{APV of premium annuity}}.}
+Computes the net benefit premium of a single-life insurance contract using
+the equivalence principle:
+\deqn{
+P = \frac{APV(\text{benefits})}{APV(\text{premium annuity})}.
+}
 }
 \details{
-The premium returned corresponds to one premium payment
-(annual if \code{k = 1}, monthly if \code{k = 12}, etc.).
+The premium returned corresponds to one premium payment. For example, when
+\code{k = 12}, the returned value is the monthly premium.
 
-The benefit premium is the level payment that satisfies the equivalence
+This function follows the compact actuarial notation used throughout
+\code{tidyactuarial}: \code{lt} is the life table, \code{x} is the age at
+issue, \code{i} is the interest-rate input, \code{i_type} is the
+interest-rate type, \code{m} is the conversion frequency for nominal rates,
+\code{n} is the insurance term, \code{h} is the deferment period, and
+\code{k} is the premium payment frequency.
+
+The benefit premium is the level payment satisfying the equivalence
 principle: the APV of premiums equals the APV of benefits at issue.
 
-For standard products, the APV of benefits is (Finan, Sections 27 and 41):
-\itemize{
-\item Whole life: \eqn{A_x} (Finan, Sec. 41.1)
-\item n-year term: \eqn{A^1_{x:\overline{n}|}} (Finan, Sec. 41.2)
-\item n-year endowment: \eqn{A_{x:\overline{n}|}} (Finan, Sec. 41.4)
-}
-
-The APV of the premium annuity is computed via \code{\link{annuity_x}},
-supporting \code{k}-thly payments and Woolhouse approximations.
-
-\strong{Premium payment start} (Finan, Sec. 41.5):
-\itemize{
-\item \code{prem_start = "issue"}: premiums start at age \eqn{x}
-(time 0). The premium annuity is \eqn{\ddot{a}_{x:\overline{n_p}|}}.
-\item \code{prem_start = "deferred"}: premiums start at age \eqn{x+m}
-(after the deferral period). The premium annuity, valued at time 0,
-is \eqn{v^m \cdot {}_mp_x \cdot \ddot{a}_{x+m:\overline{n_p}|}}
-which equals a deferred annuity with \code{m} years of deferral.
-}
+For standard products, the APV of benefits is computed with
+\code{\link{insurance_x}}. For \code{type = "variable_k"}, it is computed
+with \code{\link{insurance_variable_k}}. The APV of the premium annuity is
+computed with \code{\link{annuity_x}}, supporting k-thly payments and
+Woolhouse approximations.
 }
 \examples{
 lt <- data.frame(
@@ -108,44 +128,85 @@ lt <- data.frame(
   lx = c(100000, 99000, 97500, 95500, 93000, 90000, 86000)
 )
 
-# Whole life insurance, annual premium (Finan, Sec. 41.1):
-# P(A_x) = A_x / ä_x
-premium_x(lt, x = 60, i = 0.05, product = "whole", benefit = 100000)
+# Whole-life insurance, annual premium
+premium_x(
+  lt = lt,
+  x = 60,
+  i = 0.05,
+  type = "whole",
+  benefit = 100000
+)
 
-# Verify manually: P = A / ä
-A  <- insurance_x(lt, x = 60, i = 0.05, type = "whole")
-ad <- annuity_x(lt, x = 60, i = 0.05, timing = "due")
-100000 * A / ad
+# Verify manually: P = A / a-double-dot
+A <- insurance_x(
+  lt = lt,
+  x = 60,
+  i = 0.05,
+  type = "whole",
+  benefit = 100000
+)
 
-# 5-year term insurance, annual premium (Finan, Sec. 41.2):
-# P(A^1_{x:n}) = A^1_{x:n} / ä_{x:n}
-premium_x(lt, x = 60, i = 0.05, product = "term", n = 5, benefit = 100000)
+ad <- annuity_x(
+  lt = lt,
+  x = 60,
+  i = 0.05,
+  timing = "due"
+)
 
-# 5-year endowment insurance (Finan, Sec. 41.4):
-# P(A_{x:n}) = A_{x:n} / ä_{x:n}
-premium_x(lt, x = 60, i = 0.05, product = "endowment", n = 5,
-          benefit = 100000)
+A / ad
 
-# Deferred whole life: premiums start after deferral (Finan, Sec. 41.5)
-premium_x(lt, x = 60, i = 0.05, product = "whole", benefit = 100000,
-          m = 2, prem_start = "deferred")
+# Five-year term insurance
+premium_x(
+  lt = lt,
+  x = 60,
+  i = 0.05,
+  type = "term",
+  n = 5,
+  benefit = 100000
+)
 
-# t-payment whole life: 3 years of premiums for whole life coverage
-premium_x(lt, x = 60, i = 0.05, product = "whole", benefit = 100000,
-          n_prem = 3)
+# Tidy output
+premium_x(
+  lt = lt,
+  x = 60,
+  i = 0.05,
+  type = "term",
+  n = 5,
+  benefit = 100000,
+  tidy = TRUE
+)
 
-# Monthly premiums with Woolhouse
-premium_x(lt, x = 60, i = 0.05, product = "whole", benefit = 100000,
-          k = 12, woolhouse = "first")
-
-# Tidy output with all details
-premium_x(lt, x = 60, i = 0.05, product = "term", n = 5,
-          benefit = 100000, tidy = TRUE)
+# Monthly premiums paid for a shorter period than the coverage term
+premium_x(
+  lt = lt,
+  x = 60,
+  i = 0.05,
+  type = "term",
+  n = 5,
+  benefit = 100000,
+  k = 12,
+  n_prem = 3
+)
 
 }
 \seealso{
-\code{\link{insurance_x}} for the APV of benefits,
-\code{\link{annuity_x}} for the APV of the premium annuity,
-\code{\link{premium_xy}} for two-life premiums,
-\code{\link{premium_gross}} for gross premiums with expenses.
+\code{\link{insurance_x}}, \code{\link{insurance_variable_k}},
+\code{\link{annuity_x}}, \code{\link{premium_xy}},
+\code{\link{premium_gross}}
+
+Other life-contingencies: 
+\code{\link{annuity_multi}()},
+\code{\link{annuity_x}()},
+\code{\link{annuity_xy}()},
+\code{\link{insurance_variable_k}()},
+\code{\link{insurance_x}()},
+\code{\link{insurance_xy}()},
+\code{\link{life_contract}()},
+\code{\link{premium_gross}()},
+\code{\link{premium_xy}()},
+\code{\link{reserve_x}()},
+\code{\link{reserve_xy}()},
+\code{\link{simulate_annuity_x}()},
+\code{\link{simulate_insurance_x}()}
 }
+\concept{life-contingencies}

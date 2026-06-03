@@ -1,0 +1,426 @@
+---
+title: "bond_cash_flows(): manual técnico"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+
+# Nombre de la función
+
+`bond_cash_flows`
+
+# Firma exacta
+
+```r
+bond_cash_flows(
+    face,
+    coupon_rate,
+    years_to_maturity,
+    coupons_per_year = 1L,
+    redemption = NULL,
+    tol = 1e-10,
+    check = TRUE
+)
+```
+
+# Descripción general
+
+`bond_cash_flows()` construye la **estructura de flujos de caja** de un bono con cupones nivelados y un único pago de redención al vencimiento.
+
+La función no descuenta ni valora el bono. Solo arma el cronograma de pagos:
+
+* cupones periódicos constantes;
+* un pago final de redención en la fecha de vencimiento.
+
+La salida queda en formato tabular, lo cual la hace útil como insumo para funciones de precio, valor en libros, duración o convexidad.
+
+# Parámetros
+
+## `face`
+
+Escalar numérico. Valor nominal del bono.
+
+Restricciones del código:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+## `coupon_rate`
+
+Escalar numérico. Tasa anual del cupón.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+## `years_to_maturity`
+
+Escalar numérico. Tiempo al vencimiento en años.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+Además, el producto
+
+$$
+years_to_maturity \times coupons_per_year
+$$
+
+debe ser entero. El código no admite stub periods.
+
+## `coupons_per_year`
+
+Escalar entero positivo. Número de pagos de cupón por año.
+
+Ejemplos usuales:
+
+* `1` para bono anual,
+* `2` para bono semestral,
+* `4` para bono trimestral.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser positivo;
+* debe ser entero dentro de la tolerancia `tol`.
+
+Valor por defecto:
+
+* `1L`
+
+## `redemption`
+
+Escalar numérico. Valor de redención final.
+
+Si es `NULL`, el código fija:
+
+```r
+redemption <- face
+```
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+## `tol`
+
+Escalar numérico positivo. Tolerancia usada para verificar integridad del número total de periodos.
+
+Valor por defecto:
+
+* `1e-10`
+
+## `check`
+
+Escalar lógico.
+
+* `TRUE`: activa validaciones de entrada;
+* `FALSE`: omite validaciones y asume que los argumentos ya son coherentes.
+
+# Lógica y fórmulas implementadas
+
+## Número total de periodos
+
+La función define:
+
+$$
+N = years_to_maturity \times coupons_per_year
+$$
+
+Si `N` no es entero dentro de la tolerancia, la función produce error.
+
+## Cupón por periodo
+
+El cupón periódico es:
+
+$$
+C = \frac{face \cdot coupon_rate}{coupons_per_year}
+$$
+
+## Caso general: `N > 0`
+
+Si hay al menos un periodo, el cronograma contiene:
+
+* `N` flujos de cupón, todos iguales a (C), en los periodos (1,2,\dots,N);
+* un flujo adicional de redención en el periodo (N), de magnitud `redemption`.
+
+Los tiempos en años son:
+
+$$
+time_j = \frac{j}{coupons_per_year}, \qquad j=1,2,\dots,N
+$$
+
+## Caso especial: vencimiento inmediato
+
+Si `N = 0`, el código devuelve un único flujo:
+
+* periodo `0`,
+* tiempo `0`,
+* `cash_flow = redemption`,
+* `type = "redemption"`.
+
+Es decir, si el bono vence inmediatamente, no hay cupones futuros: solo existe el pago de redención instantáneo.
+
+# Valor de salida
+
+La función devuelve un `tibble` con el cronograma de flujos del bono.
+
+## Tipo
+
+* `tibble::tibble`
+
+## Estructura
+
+Las columnas son:
+
+### `cashflow_id`
+
+Identificador secuencial del flujo.
+
+### `period`
+
+Índice del periodo del flujo.
+
+* para cupones: `1, 2, ..., N`;
+* para redención final: `N`;
+* para vencimiento inmediato: `0`.
+
+### `time`
+
+Tiempo en años al que ocurre el flujo.
+
+### `cash_flow`
+
+Monto del flujo de caja.
+
+### `type`
+
+Tipo de flujo:
+
+* `"coupon"`
+* `"redemption"`
+
+## Interpretación
+
+La tabla describe todos los pagos futuros del bono. En un bono estándar con cupones, en la última fecha aparecen dos flujos distintos:
+
+* el último cupón,
+* la redención.
+
+Ambos comparten el mismo tiempo, pero aparecen en filas separadas.
+
+# Validaciones relevantes
+
+La función detiene la ejecución si ocurre alguno de estos casos:
+
+* `face` no es un número finito no negativo;
+* `coupon_rate` no es un número finito no negativo;
+* `years_to_maturity` no es un número finito no negativo;
+* `coupons_per_year` no es entero positivo;
+* `redemption` no es un número finito no negativo;
+* `tol` no es positivo;
+* `years_to_maturity * coupons_per_year` no es entero.
+
+# Inconsistencias o matices detectados
+
+## 1. El archivo se llama `bond_cash_flow.R`, pero la función se llama `bond_cash_flows`
+
+No es un error funcional, pero conviene tenerlo presente para evitar problemas con `source()` o con referencias manuales al archivo.
+
+## 2. `face = 0` está permitido
+
+El código permite `face >= 0`, no `face > 0`. Eso produce cronogramas válidos desde el punto de vista técnico, aunque no sea el caso típico de un bono real.
+
+## 3. La redención final se devuelve en fila separada del último cupón
+
+Esto es correcto y útil, pero hay que tenerlo claro: el flujo total del último periodo no está agregado en una sola fila.
+
+# Ejemplo 1: uso mínimo correcto
+
+```{r ejemplo-sencillo}
+
+bond_cash_flows(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 5,
+  coupons_per_year = 1
+)
+```
+
+# Ejemplo 2: uso con la mayoría de los parámetros
+
+```{r ejemplo-mayoria-parametros}
+
+bond_cash_flows(
+  face = 1000,
+  coupon_rate = 0.06,
+  years_to_maturity = 4,
+  coupons_per_year = 2,
+  redemption = 1020,
+  tol = 1e-10,
+  check = TRUE
+)
+```
+
+# Ejemplo tidy-friendly
+
+Aquí sí aporta, pero debe ser sencillo: usar la función sobre una pequeña tabla de bonos y guardar el cronograma como columna lista.
+
+```{r ejemplo-tidy-friendly}
+
+library(tibble)
+library(dplyr)
+library(purrr)
+
+bonds <- tibble(
+  face = c(100, 1000),
+  coupon_rate = c(0.08, 0.05),
+  years_to_maturity = c(5, 4),
+  coupons_per_year = c(1L, 2L)
+)
+
+bonds %>%
+  mutate(
+    schedule = pmap(
+      list(face, coupon_rate, years_to_maturity, coupons_per_year),
+      ~ bond_cash_flows(
+          face = ..1,
+          coupon_rate = ..2,
+          years_to_maturity = ..3,
+          coupons_per_year = ..4
+        )
+    )
+  )
+```
+
+# Verificación analítica
+
+## Referencia conceptual
+
+Esta función no calcula un precio ni un valor actuarial, sino la estructura básica de flujos del bono. El concepto sí encaja con la teoría elemental de bonos en Finan: un bono de cupón nivelado paga cupones periódicos constantes y un valor de redención al vencimiento.
+
+## Planteamiento
+
+Consideremos un bono con:
+
+* nominal 100,
+* tasa cupón anual 8%,
+* vencimiento a 5 años,
+* cupones anuales,
+* redención final al par.
+
+Entonces el cupón anual es:
+
+$$
+C = 100 \times 0.08 = 8
+$$
+
+El cronograma esperado es:
+
+* cinco cupones de 8 en los años 1, 2, 3, 4 y 5;
+* una redención de 100 en el año 5.
+
+## Fórmula teórica
+
+Para este bono:
+
+$$
+C = face \cdot coupon_rate = 100 \times 0.08 = 8
+$$
+
+y los flujos deben ser:
+
+$$
+(8,8,8,8,8,100)
+$$
+
+con tiempos:
+
+$$
+(1,2,3,4,5,5)
+$$
+
+## Solución analítica sencilla
+
+```{r verificacion-analitica-manual}
+face <- 100
+coupon_rate <- 0.08
+years_to_maturity <- 5
+coupons_per_year <- 1
+
+coupon <- face * coupon_rate / coupons_per_year
+coupon
+```
+
+## Comparación con la salida de la función
+
+```{r verificacion-analitica-funcion}
+out <- bond_cash_flows(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 5,
+  coupons_per_year = 1,
+  redemption = 100
+)
+
+out
+```
+
+```{r verificacion-analitica-comparacion}
+all.equal(out$cash_flow, c(8, 8, 8, 8, 8, 100))
+all.equal(out$time, c(1, 2, 3, 4, 5, 5))
+```
+
+# Ejemplo explícito tipo Finan
+
+Sí encaja aquí, pero de forma básica: antes de valorar un bono, la teoría de Finan exige identificar correctamente sus cupones y su redención final. Esta función hace exactamente esa construcción del flujo contractual.
+
+```{r ejemplo-finan}
+bond_cash_flows(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 5,
+  coupons_per_year = 1,
+  redemption = 100
+)
+```
+
+# Comentario final
+
+`bond_cash_flows()` es una función operativa y clara. Su papel no es valorar, sino **construir el flujo contractual** del bono.
+
+Eso la hace útil como base para:
+
+* precio,
+* valor en libros,
+* duración,
+* convexidad,
+* y verificaciones manuales sencillas.
+
+Además, la decisión de separar el último cupón y la redención en filas distintas hace el cronograma más limpio para reutilización posterior. fileciteturn10file0

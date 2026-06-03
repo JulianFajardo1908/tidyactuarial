@@ -1,7 +1,8 @@
 #' Price of a callable bond at a target minimum yield
 #'
 #' Computes the maximum price an investor should pay for a callable bond in
-#' order to guarantee a specified minimum yield.
+#' order to guarantee a specified minimum yield, using compact actuarial
+#' notation.
 #'
 #' The bond is evaluated under each possible redemption scenario:
 #' \itemize{
@@ -9,10 +10,10 @@
 #'   \item final maturity with its final redemption value.
 #' }
 #'
-#' For each scenario, the bond price is computed using the target yield.
-#' The callable-bond price returned by this function is the smallest of those
-#' scenario prices, that is, the maximum price consistent with the target
-#' yield under the least favorable redemption scenario for the investor.
+#' For each scenario, the bond price is computed using the target yield. The
+#' callable-bond price returned by this function is the smallest of those
+#' scenario prices, that is, the maximum price consistent with the target yield
+#' under the least favorable redemption scenario for the investor.
 #'
 #' This follows the standard actuarial/financial interpretation used in
 #' introductory fixed-income mathematics: when a bond is callable at the
@@ -22,47 +23,58 @@
 #' Assumptions:
 #' \itemize{
 #'   \item Coupons are paid in arrears at regular intervals.
-#'   \item \code{years_to_maturity * coupons_per_year} must be an integer.
-#'   \item Each \code{call_times * coupons_per_year} must be an integer.
+#'   \item \code{n * k} must be an integer.
+#'   \item Each \code{call_t * k} must be an integer.
 #'   \item Stub periods are not supported.
-#'   \item Pricing is performed at a coupon date (dirty price, no accrued interest).
+#'   \item Pricing is performed at a coupon date; no accrued interest is included.
 #' }
 #'
 #' Yield input conventions:
 #' \itemize{
 #'   \item If \code{y_effective_per_period} is supplied, it takes precedence over
-#'         \code{y_rate}, \code{y_type}, and \code{y_m}, and is interpreted as the effective
-#'         yield per coupon period.
-#'   \item Otherwise, \code{y_rate}, \code{y_type}, and \code{y_m} define an annual yield
-#'         specification, which is converted first to annual effective yield and
-#'         then to effective yield per coupon period.
+#'         \code{y}, \code{y_type}, and \code{y_m}, and is interpreted as the
+#'         effective yield per coupon period.
+#'   \item Otherwise, \code{y}, \code{y_type}, and \code{y_m} define an annual
+#'         yield specification, which is converted first to annual effective
+#'         yield and then to effective yield per coupon period.
 #' }
 #'
-#' @param face Numeric scalar. Face (par) value of the bond.
-#' @param coupon_rate Numeric scalar. Annual coupon rate as a proportion.
-#' @param years_to_maturity Numeric scalar. Final maturity in years.
-#'   Must be strictly positive (a callable bond needs at least one call date
-#'   before maturity).
-#' @param coupons_per_year Positive integer. Number of coupon payments per year.
-#' @param call_times Numeric vector of callable times in years.
-#'   Each value must be strictly between \code{0} and \code{years_to_maturity},
-#'   and must align with coupon dates.
-#' @param call_prices Numeric vector of call prices corresponding to \code{call_times}.
+#' @param face Numeric scalar. Face or par value of the bond.
+#' @param c Numeric scalar. Annual coupon rate as a proportion.
+#' @param n Numeric scalar. Final maturity in years. Must be strictly positive.
+#' @param k Positive integer. Number of coupon payments per year.
+#' @param call_t Numeric vector of callable times in years. Each value must be
+#'   strictly between \code{0} and \code{n}, and must align with coupon dates.
+#' @param call_R Numeric vector of call prices corresponding to \code{call_t}.
 #' @param y_effective_per_period Optional numeric scalar. Effective yield per
 #'   coupon period. If supplied, it is used directly.
-#' @param y_rate Optional numeric scalar. Annual yield rate value.
+#' @param y Optional numeric scalar. Annual yield rate value.
 #' @param y_type Character string indicating the annual yield type:
-#'   \code{"effective"}, \code{"nominal_interest"}, \code{"nominal_discount"}, or \code{"force"}.
-#' @param y_m Positive integer. Compounding frequency for nominal annual yields.
-#' @param redemption Numeric scalar. Redemption value at final maturity.
-#'   If \code{NULL}, defaults to \code{face}.
+#'   \code{"effective"}, \code{"nominal_interest"}, \code{"nominal_discount"},
+#'   or \code{"force"}.
+#' @param y_m Positive integer. Conversion frequency for nominal annual yields.
+#' @param R Numeric scalar. Redemption value at final maturity. If \code{NULL},
+#'   defaults to \code{face}.
 #' @param tol Numeric scalar. Tolerance used in alignment checks.
 #' @param check Logical scalar. If \code{TRUE}, performs input validation.
+#' @param tidy Logical scalar. If \code{FALSE}, returns the worst-case
+#'   callable-bond price. If \code{TRUE}, returns a tibble with all redemption
+#'   scenarios.
 #'
-#' @return Numeric scalar: the worst-case callable-bond price consistent with
-#'   the target yield.
+#' @return
+#' If \code{tidy = FALSE}, a numeric scalar: the worst-case callable-bond price
+#' consistent with the target yield.
+#'
+#' If \code{tidy = TRUE}, a tibble with one row per redemption scenario,
+#' including scenario prices and the worst-case indicator.
 #'
 #' @details
+#' This function follows the compact bond notation used in
+#' \code{tidyactuarial}: \code{face} is the face value, \code{c} is the annual
+#' coupon rate, \code{n} is maturity, \code{k} is coupon frequency, \code{y} is
+#' the target yield, \code{R} is the final redemption value, \code{call_t} is
+#' the vector of call times, and \code{call_R} is the vector of call prices.
+#'
 #' Let the callable bond have possible redemption scenarios indexed by
 #' \eqn{j = 1, \dots, J}, where each scenario corresponds either to a call date
 #' or to final maturity. For scenario \eqn{j}, let \eqn{P_j(y)} denote the bond
@@ -71,12 +83,12 @@
 #'
 #' Then this function returns
 #' \deqn{\min_j P_j(y)}{min_j P_j(y)}
-#' that is, the smallest price across all redemption scenarios.
+#' when \code{tidy = FALSE}.
 #'
-#' This is the maximum price an investor can pay while still guaranteeing
-#' at least the target yield under the least favorable redemption scenario.
+#' This is the maximum price an investor can pay while still guaranteeing at
+#' least the target yield under the least favorable redemption scenario.
 #'
-#' @seealso \code{\link{bond_callable_price_tbl}}, \code{\link{bond_price}}, \code{\link{bond_cash_flows}},
+#' @seealso \code{\link{bond_price}}, \code{\link{bond_cash_flows}},
 #'   \code{\link{bond_book_value}}, \code{\link{bond_ytm}}
 #'
 #' @family bonds
@@ -85,313 +97,216 @@
 #' # Callable bond with two possible call dates
 #' bond_callable_price(
 #'   face = 100,
-#'   coupon_rate = 0.08,
-#'   years_to_maturity = 10,
-#'   coupons_per_year = 2,
-#'   call_times = c(5, 7),
-#'   call_prices = c(105, 102),
-#'   y_rate = 0.06,
+#'   c = 0.08,
+#'   n = 10,
+#'   k = 2,
+#'   call_t = c(5, 7),
+#'   call_R = c(105, 102),
+#'   y = 0.06,
 #'   y_type = "effective"
+#' )
+#'
+#' # Tidy output with all redemption scenarios
+#' bond_callable_price(
+#'   face = 100,
+#'   c = 0.08,
+#'   n = 10,
+#'   k = 2,
+#'   call_t = c(5, 7),
+#'   call_R = c(105, 102),
+#'   y = 0.06,
+#'   y_type = "effective",
+#'   tidy = TRUE
 #' )
 #'
 #' # Target yield given directly per coupon period
 #' bond_callable_price(
 #'   face = 1000,
-#'   coupon_rate = 0.05,
-#'   years_to_maturity = 12,
-#'   coupons_per_year = 2,
-#'   call_times = c(4, 8),
-#'   call_prices = c(1030, 1015),
+#'   c = 0.05,
+#'   n = 12,
+#'   k = 2,
+#'   call_t = c(4, 8),
+#'   call_R = c(1030, 1015),
 #'   y_effective_per_period = 0.028
 #' )
 #'
 #' @export
 bond_callable_price <- function(
     face,
-    coupon_rate,
-    years_to_maturity,
-    coupons_per_year = 1L,
-    call_times,
-    call_prices,
+    c,
+    n,
+    k = 1L,
+    call_t,
+    call_R,
     y_effective_per_period = NULL,
-    y_rate = NULL,
+    y = NULL,
     y_type = "effective",
     y_m = 1L,
-    redemption = NULL,
+    R = NULL,
     tol = 1e-10,
-    check = TRUE
+    check = TRUE,
+    tidy = FALSE
 ) {
+  if (!is.logical(tidy) || length(tidy) != 1L || is.na(tidy)) {
+    stop("`tidy` must be a logical scalar.", call. = FALSE)
+  }
+
   out <- .bond_callable_price_scenarios(
     face = face,
-    coupon_rate = coupon_rate,
-    years_to_maturity = years_to_maturity,
-    coupons_per_year = coupons_per_year,
-    call_times = call_times,
-    call_prices = call_prices,
+    c = c,
+    n = n,
+    k = k,
+    call_t = call_t,
+    call_R = call_R,
     y_effective_per_period = y_effective_per_period,
-    y_rate = y_rate,
+    y = y,
     y_type = y_type,
     y_m = y_m,
-    redemption = redemption,
+    R = R,
     tol = tol,
     check = check
   )
 
-  min(out$price_at_target_yield)
-}
+  if (!tidy) {
+    return(min(out$price_at_target_yield))
+  }
 
-
-#' Callable-bond pricing table at a target minimum yield
-#'
-#' Computes the price of a callable bond under each possible redemption
-#' scenario implied by the call schedule and final maturity.
-#'
-#' This is a reporting wrapper around the callable-bond pricing logic.
-#' It returns one row per scenario and identifies the worst-case scenario
-#' for the investor, that is, the scenario producing the smallest price
-#' at the target yield.
-#'
-#' Assumptions:
-#' \itemize{
-#'   \item Coupons are paid in arrears at regular intervals.
-#'   \item \code{years_to_maturity * coupons_per_year} must be an integer.
-#'   \item Each \code{call_times * coupons_per_year} must be an integer.
-#'   \item Stub periods are not supported.
-#'   \item Pricing is performed at a coupon date (dirty price, no accrued interest).
-#' }
-#'
-#' Yield input conventions:
-#' \itemize{
-#'   \item If \code{y_effective_per_period} is supplied, it takes precedence over
-#'         \code{y_rate}, \code{y_type}, and \code{y_m}, and is interpreted as the effective
-#'         yield per coupon period.
-#'   \item Otherwise, \code{y_rate}, \code{y_type}, and \code{y_m} define an annual yield
-#'         specification, which is converted first to annual effective yield and
-#'         then to effective yield per coupon period.
-#' }
-#'
-#' @param face Numeric scalar. Face (par) value of the bond.
-#' @param coupon_rate Numeric scalar. Annual coupon rate as a proportion.
-#' @param years_to_maturity Numeric scalar. Final maturity in years.
-#' @param coupons_per_year Positive integer. Number of coupon payments per year.
-#' @param call_times Numeric vector of callable times in years.
-#' @param call_prices Numeric vector of call prices corresponding to \code{call_times}.
-#' @param y_effective_per_period Optional numeric scalar. Effective yield per
-#'   coupon period. If supplied, it is used directly.
-#' @param y_rate Optional numeric scalar. Annual yield rate value.
-#' @param y_type Character string indicating the annual yield type:
-#'   \code{"effective"}, \code{"nominal_interest"}, \code{"nominal_discount"}, or \code{"force"}.
-#' @param y_m Positive integer. Compounding frequency for nominal annual yields.
-#' @param redemption Numeric scalar. Redemption value at final maturity.
-#'   If \code{NULL}, defaults to \code{face}.
-#' @param tol Numeric scalar. Tolerance used in alignment checks.
-#' @param check Logical scalar. If \code{TRUE}, performs input validation.
-#'
-#' @return A tibble with columns:
-#' \describe{
-#'   \item{scenario_id}{Scenario index.}
-#'   \item{scenario_type}{\code{"call"} or \code{"maturity"}.}
-#'   \item{scenario_time}{Redemption time in years for the scenario.}
-#'   \item{redemption_value}{Call price or final redemption value.}
-#'   \item{price_at_target_yield}{Price consistent with the target yield under that scenario.}
-#'   \item{is_worst_case}{Logical flag indicating the worst-case scenario(s).}
-#'   \item{yield_per_period}{Effective yield per coupon period used in pricing.}
-#'   \item{yield_effective_annual}{Equivalent annual effective yield.}
-#'   \item{coupons_per_year}{Coupon frequency.}
-#'   \item{face}{Face value of the bond.}
-#'   \item{coupon_rate}{Annual coupon rate.}
-#'   \item{years_to_maturity}{Final maturity in years.}
-#' }
-#'
-#' @details
-#' This function evaluates the callable bond under:
-#' \itemize{
-#'   \item each call date and associated call price, and
-#'   \item final maturity and final redemption value.
-#' }
-#'
-#' For each scenario, the price consistent with the target yield is computed.
-#' The column \code{is_worst_case} marks the scenario(s) producing the smallest
-#' price, which corresponds to the least favorable redemption scenario for
-#' the investor.
-#'
-#' @seealso \code{\link{bond_callable_price}}, \code{\link{bond_price}}, \code{\link{bond_cash_flows}},
-#'   \code{\link{bond_book_value}}, \code{\link{bond_ytm}}
-#'
-#' @family bonds
-#'
-#' @examples
-#' bond_callable_price_tbl(
-#'   face = 100,
-#'   coupon_rate = 0.08,
-#'   years_to_maturity = 10,
-#'   coupons_per_year = 2,
-#'   call_times = c(5, 7),
-#'   call_prices = c(105, 102),
-#'   y_rate = 0.06,
-#'   y_type = "effective"
-#' )
-#'
-#' bond_callable_price_tbl(
-#'   face = 1000,
-#'   coupon_rate = 0.05,
-#'   years_to_maturity = 12,
-#'   coupons_per_year = 2,
-#'   call_times = c(4, 8),
-#'   call_prices = c(1030, 1015),
-#'   y_effective_per_period = 0.028
-#' )
-#'
-#' @export
-bond_callable_price_tbl <- function(
-    face,
-    coupon_rate,
-    years_to_maturity,
-    coupons_per_year = 1L,
-    call_times,
-    call_prices,
-    y_effective_per_period = NULL,
-    y_rate = NULL,
-    y_type = "effective",
-    y_m = 1L,
-    redemption = NULL,
-    tol = 1e-10,
-    check = TRUE
-) {
-  .bond_callable_price_scenarios(
-    face = face,
-    coupon_rate = coupon_rate,
-    years_to_maturity = years_to_maturity,
-    coupons_per_year = coupons_per_year,
-    call_times = call_times,
-    call_prices = call_prices,
-    y_effective_per_period = y_effective_per_period,
-    y_rate = y_rate,
-    y_type = y_type,
-    y_m = y_m,
-    redemption = redemption,
-    tol = tol,
-    check = check
-  )
+  out
 }
 
 
 # Internal helper: builds scenario table and scenario prices
 .bond_callable_price_scenarios <- function(
     face,
-    coupon_rate,
-    years_to_maturity,
-    coupons_per_year = 1L,
-    call_times,
-    call_prices,
+    c,
+    n,
+    k = 1L,
+    call_t,
+    call_R,
     y_effective_per_period = NULL,
-    y_rate = NULL,
+    y = NULL,
     y_type = "effective",
     y_m = 1L,
-    redemption = NULL,
+    R = NULL,
     tol = 1e-10,
     check = TRUE
 ) {
-  if (is.null(redemption)) {
-    redemption <- face
+  if (is.null(R)) {
+    R <- face
   }
 
   if (isTRUE(check)) {
-    # Core bond validations (shared utility)
-    .validate_bond_core(face, coupon_rate, years_to_maturity,
-                        coupons_per_year, y_m, redemption, tol)
+    .validate_bond_core(
+      face = face,
+      c = c,
+      n = n,
+      k = k,
+      y_m = y_m,
+      R = R,
+      tol = tol
+    )
 
-    # Callable bonds require strictly positive maturity
-    if (years_to_maturity <= 0) {
-      stop("`years_to_maturity` must be strictly positive for callable bonds.", call. = FALSE)
-    }
-
-    # Call schedule validations
-    if (missing(call_times) || missing(call_prices)) {
-      stop("`call_times` and `call_prices` must be provided.", call. = FALSE)
-    }
-
-    if (!is.numeric(call_times) || any(is.na(call_times)) || any(!is.finite(call_times))) {
-      stop("`call_times` must be a finite numeric vector.", call. = FALSE)
-    }
-
-    if (!is.numeric(call_prices) || any(is.na(call_prices)) || any(!is.finite(call_prices))) {
-      stop("`call_prices` must be a finite numeric vector.", call. = FALSE)
-    }
-
-    if (length(call_times) != length(call_prices)) {
-      stop("`call_times` and `call_prices` must have the same length.", call. = FALSE)
-    }
-
-    if (length(call_times) == 0L) {
-      stop("`call_times` must have length at least 1.", call. = FALSE)
-    }
-
-    if (any(call_times <= 0) || any(call_times >= years_to_maturity)) {
+    if (n <= 0) {
       stop(
-        "`call_times` must be strictly between 0 and `years_to_maturity`.",
+        "`n` must be strictly positive for callable bonds.",
         call. = FALSE
       )
     }
 
-    if (any(call_prices < 0)) {
-      stop("`call_prices` must be nonnegative.", call. = FALSE)
+    if (missing(call_t) || missing(call_R)) {
+      stop("`call_t` and `call_R` must be provided.", call. = FALSE)
     }
 
-    if (any(duplicated(call_times))) {
-      stop("`call_times` must not contain duplicates.", call. = FALSE)
+    if (!is.numeric(call_t) ||
+        any(is.na(call_t)) ||
+        any(!is.finite(call_t))) {
+      stop("`call_t` must be a finite numeric vector.", call. = FALSE)
+    }
+
+    if (!is.numeric(call_R) ||
+        any(is.na(call_R)) ||
+        any(!is.finite(call_R))) {
+      stop("`call_R` must be a finite numeric vector.", call. = FALSE)
+    }
+
+    if (length(call_t) != length(call_R)) {
+      stop("`call_t` and `call_R` must have the same length.", call. = FALSE)
+    }
+
+    if (length(call_t) == 0L) {
+      stop("`call_t` must have length at least 1.", call. = FALSE)
+    }
+
+    if (any(call_t <= 0) || any(call_t >= n)) {
+      stop(
+        "`call_t` must be strictly between 0 and `n`.",
+        call. = FALSE
+      )
+    }
+
+    if (any(call_R < 0)) {
+      stop("`call_R` must be nonnegative.", call. = FALSE)
+    }
+
+    if (any(duplicated(call_t))) {
+      stop("`call_t` must not contain duplicates.", call. = FALSE)
     }
   }
 
-  coupons_per_year <- as.integer(round(coupons_per_year))
+  k <- as.integer(round(k))
   y_m <- as.integer(round(y_m))
 
-  N_raw <- years_to_maturity * coupons_per_year
+  N_raw <- n * k
+
   if (abs(N_raw - round(N_raw)) > tol) {
     stop(
-      "`years_to_maturity * coupons_per_year` must be an integer ",
+      "`n * k` must be an integer ",
       "(stub periods are not supported).",
       call. = FALSE
     )
   }
 
-  call_N_raw <- call_times * coupons_per_year
+  call_N_raw <- call_t * k
+
   if (any(abs(call_N_raw - round(call_N_raw)) > tol)) {
     stop(
-      "Each `call_times * coupons_per_year` must be an integer ",
+      "Each `call_t * k` must be an integer ",
       "(call dates must align with coupon dates).",
       call. = FALSE
     )
   }
 
-  # --- Resolve yield (shared utility) ---
+  # --- Resolve yield ---
   yield <- .resolve_bond_yield(
     y_effective_per_period = y_effective_per_period,
-    y_rate = y_rate,
+    y = y,
     y_type = y_type,
     y_m = y_m,
-    coupons_per_year = coupons_per_year
+    k = k
   )
+
   ip <- yield$ip
   i_annual <- yield$i_annual
 
   # --- Build scenario table ---
   scenario_tbl <- tibble::tibble(
-    scenario_id = seq_along(call_times),
+    scenario_id = seq_along(call_t),
     scenario_type = "call",
-    scenario_time = as.numeric(call_times),
-    redemption_value = as.numeric(call_prices)
+    t = as.numeric(call_t),
+    redemption_value = as.numeric(call_R)
   )
 
   maturity_tbl <- tibble::tibble(
-    scenario_id = length(call_times) + 1L,
+    scenario_id = length(call_t) + 1L,
     scenario_type = "maturity",
-    scenario_time = years_to_maturity,
-    redemption_value = redemption
+    t = n,
+    redemption_value = R
   )
 
-  out <- dplyr::bind_rows(scenario_tbl, maturity_tbl) |>
-    dplyr::arrange(scenario_time, scenario_id)
+  out <- dplyr::bind_rows(scenario_tbl, maturity_tbl)
+
+  out <- out[order(out$t, out$scenario_id), , drop = FALSE]
+  rownames(out) <- NULL
 
   # --- Price each scenario ---
   out$price_at_target_yield <- vapply(
@@ -399,11 +314,11 @@ bond_callable_price_tbl <- function(
     function(j) {
       bond_price(
         face = face,
-        coupon_rate = coupon_rate,
-        years_to_maturity = out$scenario_time[[j]],
-        coupons_per_year = coupons_per_year,
+        c = c,
+        n = out$t[[j]],
+        k = k,
         y_effective_per_period = ip,
-        redemption = out$redemption_value[[j]],
+        R = out$redemption_value[[j]],
         check = FALSE,
         tol = tol
       )
@@ -412,14 +327,16 @@ bond_callable_price_tbl <- function(
   )
 
   worst_price <- min(out$price_at_target_yield)
+
   out$is_worst_case <- abs(out$price_at_target_yield - worst_price) <= sqrt(tol)
 
   out$yield_per_period <- ip
   out$yield_effective_annual <- i_annual
-  out$coupons_per_year <- coupons_per_year
+  out$k <- k
   out$face <- face
-  out$coupon_rate <- coupon_rate
-  out$years_to_maturity <- years_to_maturity
+  out$c <- c
+  out$n <- n
+  out$R <- R
 
-  out
+  tibble::as_tibble(out)
 }

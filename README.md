@@ -26,13 +26,13 @@ Once the package is on CRAN, you can install it with:
 
 ``` r
 install.packages("tidyactuarial")
-#> Installing package into 'C:/Users/LENOVO/AppData/Local/Temp/RtmpG8Qiyo/temp_libpath3c505756476c'
+#> Installing package into 'C:/Users/LENOVO/AppData/Local/Temp/RtmpAPk2YU/temp_libpath1ae0798e3dc8'
 #> (as 'lib' is unspecified)
-#> Warning: package 'tidyactuarial' is not available for this version of R
 #> 
-#> A version of this package for your version of R might be available elsewhere,
-#> see the ideas at
-#> https://cran.r-project.org/doc/manuals/r-patched/R-admin.html#Installing-packages
+#>   There is a binary version available but the source version is later:
+#>               binary source needs_compilation
+#> tidyactuarial  0.1.1  0.1.2             FALSE
+#> installing the source package 'tidyactuarial'
 ```
 
 Alternatively, you can install the development version from

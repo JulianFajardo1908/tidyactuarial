@@ -8,78 +8,113 @@ annuity_x(
   lt,
   x,
   i,
+  i_type = "effective",
+  m = 1L,
   n = NULL,
-  m = 0L,
+  h = 0L,
   k = 1L,
   timing = c("immediate", "due"),
   woolhouse = c("none", "first", "second"),
+  frac = NULL,
   tidy = FALSE
 )
 }
 \arguments{
-\item{lt}{A lifetable object as produced by \code{\link{lifetable}}.
-Must contain columns \code{x} and \code{lx}.}
+\item{lt}{A life table as produced by \code{\link{lifetable}}, or a
+\code{tidyact_life_contract} object created by \code{\link{life_contract}}.
+A life table must contain columns \code{x} and \code{lx}.}
 
-\item{x}{Integer actuarial age.}
+\item{x}{Integer actuarial age. Optional when \code{lt} is a single-life
+\code{tidyact_life_contract}.}
 
-\item{i}{Effective annual interest rate (must satisfy \code{i > -1}).}
+\item{i}{Numeric scalar. Annual interest-rate input. Optional when \code{lt}
+is a single-life \code{tidyact_life_contract}.}
 
-\item{n}{Integer term in years. If \code{NULL} (default), whole life to
-end of table.}
+\item{i_type}{Character string indicating the interest-rate type. Allowed
+values are \code{"effective"}, \code{"nominal_interest"},
+\code{"nominal_discount"}, and \code{"force"}.}
 
-\item{m}{Integer deferral in years (default \code{0}).}
+\item{m}{Positive integer. Conversion frequency for nominal interest rates.
+Ignored for \code{i_type = "effective"} and \code{i_type = "force"}.
+In \code{tidyactuarial}, \code{m} is reserved for interest conversion
+frequency, not deferment.}
 
-\item{k}{Integer payments per year (default \code{1}). Example:
-\code{k = 12} for monthly.}
+\item{n}{Integer term in years. Use \code{NULL} or \code{Inf} for a
+whole-life annuity.}
 
-\item{timing}{\code{"immediate"} (payments at end of period) or
-\code{"due"} (beginning). Default \code{"immediate"}.}
+\item{h}{Integer deferment period in years.}
 
-\item{woolhouse}{For \code{k > 1}: \code{"none"} (exact UDD),
-\code{"first"} (2-term Woolhouse), or \code{"second"} (3-term Woolhouse).}
+\item{k}{Positive integer. Number of annuity payments per year. For example,
+use \code{k = 12} for monthly payments.}
 
-\item{tidy}{Logical. If \code{TRUE}, returns a one-row tibble.}
+\item{timing}{Character string. Either \code{"immediate"} for payments at
+the end of each payment period or \code{"due"} for payments at the
+beginning of each payment period.}
+
+\item{woolhouse}{Character string. For \code{k > 1}, use \code{"none"} for
+exact fractional-age computation, \code{"first"} for the first-order
+Woolhouse approximation, or \code{"second"} for the second-order
+Woolhouse approximation.}
+
+\item{frac}{Character string. Fractional-age assumption used when
+\code{k > 1} and \code{woolhouse = "none"}. Allowed values are
+\code{"UDD"}, \code{"CF"}, \code{"CML"}, and \code{"Balducci"}. If
+\code{NULL}, the \code{frac} attribute of \code{lt} is used when available;
+otherwise \code{"UDD"} is used.}
+
+\item{tidy}{Logical. If \code{FALSE}, returns a numeric APV. If \code{TRUE},
+returns a one-row tibble with intermediate quantities.}
 }
 \value{
-A single numeric APV value, or a one-row tibble if
-\code{tidy = TRUE}.
+If \code{tidy = FALSE}, a numeric scalar containing the actuarial present
+value.
+
+If \code{tidy = TRUE}, a one-row tibble with the main input values,
+equivalent interest rate, deferment factor, pure endowment factor, and APV.
 }
 \description{
-Computes the APV of a discrete life annuity at actuarial age \eqn{x} using
-a life table. Supports term \eqn{n} (temporary), integer deferral \eqn{m},
-\eqn{k}-thly payments (exact under UDD), and Woolhouse approximations up
-to second order.
+Computes the actuarial present value of a discrete life annuity using compact
+actuarial notation.
 }
 \details{
-\strong{Annual annuity-due} (Finan, Section 37.2, Example 37.9):
-\deqn{\ddot{a}_{x:\overline{n}|} = \sum_{k=0}^{n-1} v^k \cdot {}_kp_x.}
-
-\strong{Annual annuity-immediate} (Finan, Section 37.5):
-\deqn{a_{x:\overline{n}|} = \sum_{k=1}^{n} v^k \cdot {}_kp_x.}
-
-\strong{Deferral} (Finan, Section 37.3):
-\deqn{{}_{m|}\ddot{a}_x = v^m \cdot {}_mp_x \cdot \ddot{a}_{x+m}.}
-
-\strong{k-thly exact under UDD} (Finan, Section 38): each \eqn{1/k}-year
-fractional survival is computed under UDD, giving an exact result:
-\deqn{\ddot{a}^{(k)}_{x:\overline{n}|} = \frac{1}{k}\sum_{j=0}^{kn-1}
-  v^{j/k} \cdot {}_{j/k}p_x.}
-
-\strong{Woolhouse approximations} (Finan, Problems 38.9--38.10):
+The function supports:
 \itemize{
-\item 2-term (first order):
-\eqn{\ddot{a}^{(m)}_{x:\overline{n}|} \approx
-    \ddot{a}_{x:\overline{n}|} - \frac{m-1}{2m}(1 - {}_nE_x).}
-\item 3-term (second order):
-\eqn{\ddot{a}^{(m)}_{x:\overline{n}|} \approx
-    \ddot{a}_{x:\overline{n}|} - \frac{m-1}{2m}(1 - {}_nE_x) -
-    \frac{m^2-1}{12m^2}[\delta + \mu(x) - {}_nE_x(\delta + \mu(x+n))].}
+\item whole-life annuities,
+\item temporary annuities,
+\item integer deferment,
+\item annual or k-thly payments,
+\item exact fractional survival for k-thly payments,
+\item first- and second-order Woolhouse approximations.
 }
 
-Conversion from due to immediate for k-thly temporaries
-(Finan, Problem 38.6):
-\deqn{a^{(m)}_{x:\overline{n}|} = \ddot{a}^{(m)}_{x:\overline{n}|}
-  - \frac{1}{m}(1 - {}_nE_x).}
+This function follows the compact actuarial notation used throughout
+\code{tidyactuarial}:
+
+\itemize{
+\item \code{lt}: life table;
+\item \code{x}: actuarial age;
+\item \code{i}: interest rate;
+\item \code{i_type}: interest-rate type;
+\item \code{m}: interest conversion frequency;
+\item \code{n}: annuity term;
+\item \code{h}: deferment period;
+\item \code{k}: payment frequency.
+}
+
+For annual annuities-due,
+\deqn{\ddot{a}_{x:\overline{n}|} =
+\sum_{j=0}^{n-1} v^j\,{}_jp_x.}
+
+For annual annuities-immediate,
+\deqn{a_{x:\overline{n}|} =
+\sum_{j=1}^{n} v^j\,{}_jp_x.}
+
+Deferment is handled through
+\deqn{v^h\,{}_hp_x,}
+where \eqn{h} is the deferment period.
+
+For k-thly payments with \code{woolhouse = "none"}, fractional survival is
+computed under the selected fractional-age assumption.
 }
 \examples{
 lt <- data.frame(
@@ -87,40 +122,72 @@ lt <- data.frame(
   lx = c(100000, 99000, 97500, 95500, 93000, 90000)
 )
 
-# Whole life annuity-due (Finan, Section 37.1)
-annuity_x(lt, x = 60, i = 0.06, timing = "due")
-
-# 5-year temporary annuity-due (Finan, Section 37.2)
-annuity_x(lt, x = 60, i = 0.06, n = 5, timing = "due")
-
-# Whole life annuity-immediate (Finan, Section 37.5)
-annuity_x(lt, x = 60, i = 0.06, timing = "immediate")
-
-# Finan Example 37.21: a_{x:3} with given px values
-lt_ex <- data.frame(
-  x  = 0:3,
-  lx = c(1, 0.82, 0.82 * 0.81, 0.82 * 0.81 * 0.80)
+# Annual annuity-immediate
+annuity_x(
+  lt = lt,
+  x = 60,
+  i = 0.06,
+  timing = "immediate"
 )
-annuity_x(lt_ex, x = 0, i = 1/0.78 - 1, n = 3, timing = "immediate")
-# Expected: 1.2959
 
-# 2-year deferred whole life annuity-due (Finan, Section 37.3)
-annuity_x(lt, x = 60, i = 0.06, m = 2, timing = "due")
+# Annual annuity-due
+annuity_x(
+  lt = lt,
+  x = 60,
+  i = 0.06,
+  timing = "due"
+)
 
-# Monthly (k=12) exact under UDD
-annuity_x(lt, x = 60, i = 0.06, k = 12, timing = "due", woolhouse = "none")
+# Temporary annuity
+annuity_x(
+  lt = lt,
+  x = 60,
+  i = 0.06,
+  n = 3,
+  timing = "due"
+)
 
-# Monthly with 2-term Woolhouse
-annuity_x(lt, x = 60, i = 0.06, k = 12, timing = "due", woolhouse = "first")
+# Deferred annuity
+annuity_x(
+  lt = lt,
+  x = 60,
+  i = 0.06,
+  h = 2,
+  timing = "due"
+)
 
 # Tidy output
-annuity_x(lt, x = 60, i = 0.06, n = 5, timing = "due", tidy = TRUE)
+annuity_x(
+  lt = lt,
+  x = 60,
+  i = 0.06,
+  n = 3,
+  timing = "due",
+  tidy = TRUE
+)
+
+# Pipe workflow with a life contract
+life_contract(lt = lt, lives = "single", x = 60, i = 0.06) |>
+  annuity_x(n = 3, timing = "due")
 
 }
 \seealso{
-\code{\link{insurance_x}} for life insurance APVs (derived from
-annuity values), \code{\link{premium_x}} for benefit premiums,
-\code{\link{a_angle}} for annuities-certain (no mortality),
-\code{\link{t_px}} for survival probabilities,
-\code{\link{t_Ex}} for pure endowments.
+\code{\link{insurance_x}}, \code{\link{premium_x}},
+\code{\link{reserve_x}}, \code{\link{t_px}}, \code{\link{t_Ex}}
+
+Other life-contingencies: 
+\code{\link{annuity_multi}()},
+\code{\link{annuity_xy}()},
+\code{\link{insurance_variable_k}()},
+\code{\link{insurance_x}()},
+\code{\link{insurance_xy}()},
+\code{\link{life_contract}()},
+\code{\link{premium_gross}()},
+\code{\link{premium_x}()},
+\code{\link{premium_xy}()},
+\code{\link{reserve_x}()},
+\code{\link{reserve_xy}()},
+\code{\link{simulate_annuity_x}()},
+\code{\link{simulate_insurance_x}()}
 }
+\concept{life-contingencies}

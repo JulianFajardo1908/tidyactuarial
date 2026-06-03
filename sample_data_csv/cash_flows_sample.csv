@@ -1,0 +1,20 @@
+scenario_id,time,amount,cashflow_type,description
+investment_project,0,-10000,initial_investment,Initial project outlay
+investment_project,1,2500,inflow,Year 1 project cash inflow
+investment_project,2,2800,inflow,Year 2 project cash inflow
+investment_project,3,3200,inflow,Year 3 project cash inflow
+investment_project,4,3500,inflow,Year 4 project cash inflow
+investment_project,5,4000,inflow,Year 5 project cash inflow
+retirement_savings,0,-1200,contribution,Savings contribution at time 0
+retirement_savings,1,-1200,contribution,Savings contribution at time 1
+retirement_savings,2,-1200,contribution,Savings contribution at time 2
+retirement_savings,3,-1200,contribution,Savings contribution at time 3
+retirement_savings,4,-1200,contribution,Savings contribution at time 4
+retirement_savings,5,-1200,contribution,Savings contribution at time 5
+retirement_savings,6,9000,accumulated_value,Target accumulated value at time 6
+loan_repayment,0,8000,loan_principal,Loan amount received at time 0
+loan_repayment,1,-1800,payment,Loan payment at time 1
+loan_repayment,2,-1800,payment,Loan payment at time 2
+loan_repayment,3,-1800,payment,Loan payment at time 3
+loan_repayment,4,-1800,payment,Loan payment at time 4
+loan_repayment,5,-1800,payment,Loan payment at time 5

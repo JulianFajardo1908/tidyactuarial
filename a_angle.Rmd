@@ -1,0 +1,458 @@
+
+# `a_angle()`
+
+## Firma exacta
+
+```r
+a_angle(
+    n_years = NULL,
+    payments_per_year = 1L,
+    rate,
+    type = "effective",
+    m = 1L,
+    deferral_years = 0,
+    timing = "immediate",
+    perpetuity = FALSE
+)
+```
+
+## Descripción general
+
+`a_angle()` calcula el **factor de valor presente actuarial** de una anualidad nivelada. La función devuelve **solo el factor**, no el valor presente monetario de una renta con pago distinto de 1.
+
+El código admite tres convenciones de pago:
+
+- `"immediate"`: anualidad inmediata discreta.
+- `"due"`: anualidad anticipada discreta.
+- `"continuous"`: anualidad continua.
+
+También admite:
+
+- pagos discretos `k`-ésimos mediante `payments_per_year`;
+- diferimiento mediante `deferral_years`;
+- perpetuidades mediante `perpetuity = TRUE`;
+- vectorización, siempre que los argumentos tengan longitud 1 o una longitud común.
+
+La tasa suministrada no se usa directamente en todas las fórmulas: primero se convierte a **tasa efectiva anual equivalente** con `standardize_interest()`. Después, para pagos discretos se obtiene la tasa efectiva por período de pago y para pagos continuos se usa la fuerza de interés equivalente.
+
+## Parámetros
+
+### `n_years`
+
+Vector numérico que representa la duración de los pagos en años.
+
+- Si `perpetuity = FALSE`, cada valor debe ser **positivo y finito**.
+- Si `perpetuity = TRUE`, el código no usa `n_years` en el cálculo.
+- Para anualidades discretas, además debe cumplirse que `n_years * payments_per_year` sea entero.
+
+### `payments_per_year`
+
+Vector numérico que representa el número de pagos discretos por año.
+
+- En anualidades discretas debe ser un **entero positivo**.
+- En anualidades continuas se ignora en el cálculo principal.
+- Ejemplos típicos:
+  - `1` para pagos anuales,
+  - `12` para pagos mensuales.
+
+### `rate`
+
+Vector numérico con los valores de la tasa de interés o descuento.
+
+- Es obligatorio.
+- Debe ser numérico.
+- Se transforma internamente a tasa efectiva anual equivalente usando `standardize_interest()`.
+
+### `type`
+
+Vector de caracteres que indica el tipo de tasa suministrada en `rate`.
+
+Los valores permitidos por la documentación del código son:
+
+- `"effective"`
+- `"nominal_interest"`
+- `"nominal_discount"`
+- `"force"`
+
+La interpretación concreta depende de `standardize_interest()`.
+
+### `m`
+
+Vector numérico que representa la frecuencia de capitalización asociada a tasas nominales.
+
+- El código lo pasa a `standardize_interest()`.
+- La documentación indica que se ignora cuando `type` es `"effective"` o `"force"`.
+
+### `deferral_years`
+
+Vector numérico con el tiempo de diferimiento en años.
+
+- Debe ser finito y mayor o igual que 0, salvo `NA`.
+- En anualidades discretas debe cumplirse que `deferral_years * payments_per_year` sea entero.
+- El diferimiento actúa como un descuento adicional del factor base.
+
+### `timing`
+
+Vector de caracteres que indica la convención temporal de los pagos.
+
+Valores válidos:
+
+- `"immediate"`
+- `"due"`
+- `"continuous"`
+
+El código convierte este argumento a minúsculas antes de validarlo.
+
+### `perpetuity`
+
+Vector lógico.
+
+- Si `TRUE`, calcula el factor de perpetuidad correspondiente.
+- No puede contener `NA`.
+- Si `FALSE`, la función exige un `n_years` positivo y finito.
+
+## Validaciones relevantes del código
+
+La función valida explícitamente que:
+
+1. `rate` esté presente.
+2. `rate`, `payments_per_year`, `m` y `deferral_years` sean numéricos.
+3. `type` y `timing` sean vectores de caracteres.
+4. `perpetuity` sea lógico.
+5. Todos los argumentos tengan longitud 1 o una longitud común.
+6. `deferral_years >= 0` cuando no es `NA`.
+7. `timing` pertenezca a `{"immediate", "due", "continuous"}`.
+8. Si `perpetuity = FALSE`, entonces `n_years` sea positivo y finito.
+9. En anualidades discretas:
+   - `payments_per_year` sea entero positivo;
+   - `deferral_years * payments_per_year` sea entero;
+   - `n_years * payments_per_year` sea entero.
+10. Las perpetuidades discretas requieran tasa efectiva por período estrictamente positiva.
+11. Las perpetuidades continuas requieran fuerza de interés estrictamente positiva.
+
+## Lógica de cálculo
+
+## 1. Conversión de tasa
+
+El código calcula primero:
+
+```r
+i_effective <- standardize_interest(type = type, rate = rate, m = m)
+delta <- log1p(i_effective)
+```
+
+Por tanto:
+
+- `i_effective` es la tasa efectiva anual equivalente;
+- `delta` es la fuerza de interés equivalente.
+
+## 2. Caso continuo
+
+Si `timing = "continuous"` y `perpetuity = FALSE`, el factor base es
+
+$$
+\bar{a}_{\overline{n|}}=
+\begin{cases}
+\dfrac{1-e^{-\delta n}}{\delta}, & \delta \neq 0,\\[6pt]
+n, & \delta \approx 0.
+\end{cases}
+$$
+
+Luego se aplica el diferimiento multiplicando por
+
+$$
+e^{-\delta h},
+$$
+
+donde $h = \texttt{deferral\_years}$.
+
+Así, el código implementa
+
+$$
+{}_{h}\bar{a}_{\overline{n|}}
+=
+\bar{a}_{\overline{n|}}\,e^{-\delta h}.
+$$
+
+Si `timing = "continuous"` y `perpetuity = TRUE`, el factor es
+
+$$
+{}_{h}\bar{a}_{\infty} = \frac{e^{-\delta h}}{\delta},
+$$
+
+siempre que $\delta > 0$.
+
+## 3. Caso discreto inmediato o anticipado
+
+Para `timing = "immediate"` o `timing = "due"` el código trabaja período a período.
+
+Define:
+
+- $k = \texttt{payments\_per\_year}$,
+- tasa efectiva por período:
+$$
+i^{(p)} = (1+i_{\text{eff}})^{1/k}-1,
+$$
+- factor de descuento por período:
+$$
+v^{(p)} = \frac{1}{1+i^{(p)}}.
+$$
+
+Si la anualidad es finita, con $N = n \cdot k$ pagos y $H = h \cdot k$ períodos de diferimiento, el factor base para anualidad inmediata es
+
+$$
+a_{\overline{N|}} = 
+\begin{cases}
+\dfrac{1-(v^{(p)})^N}{i^{(p)}}, & i^{(p)} \neq 0,\\[6pt]
+N, & i^{(p)} \approx 0.
+\end{cases}
+$$
+
+Para anualidad anticipada, el código multiplica por $(1+i^{(p)})$:
+
+$$
+\ddot{a}_{\overline{N|}} = (1+i^{(p)})\,a_{\overline{N|}}.
+$$
+
+Después aplica diferimiento:
+
+$$
+{}_{H}a_{\overline{N|}} = a_{\overline{N|}}(v^{(p)})^H,
+\qquad
+{}_{H}\ddot{a}_{\overline{N|}} = \ddot{a}_{\overline{N|}}(v^{(p)})^H.
+$$
+
+Si la anualidad es perpetua, el código usa:
+
+- inmediata:
+$$
+a_{\infty} = \frac{1}{i^{(p)}},
+$$
+- anticipada:
+$$
+\ddot{a}_{\infty} = \frac{1+i^{(p)}}{i^{(p)}},
+$$
+
+y luego descuenta por el diferimiento:
+
+$$
+{}_{H}a_{\infty} = \frac{(v^{(p)})^H}{i^{(p)}},
+\qquad
+{}_{H}\ddot{a}_{\infty} = \frac{1+i^{(p)}}{i^{(p)}}(v^{(p)})^H.
+$$
+
+## Valor de salida
+
+La función devuelve un **vector numérico**.
+
+### Tipo
+
+`numeric`
+
+### Estructura
+
+- La longitud del resultado es la longitud común resultante tras el reciclaje de los argumentos.
+- Cada componente corresponde al factor actuarial calculado para la combinación respectiva de entradas.
+- Los `NA` se propagan en los elementos afectados, salvo en casos donde una validación detiene la ejecución con `stop()`.
+
+### Interpretación
+
+Cada valor representa el **factor de valor presente** de una anualidad nivelada unitaria bajo la convención especificada.
+
+Eso significa:
+
+- si la renta paga 1 por período de pago, el valor presente es exactamente el factor;
+- si la renta paga una cuantía constante $R$ por período, el valor presente monetario sería
+
+$$
+PV = R \times \texttt{a\_angle(...)}.
+$$
+
+Esa última multiplicación no la hace `a_angle()`; solo devuelve el factor.
+
+## Ejemplo sencillo
+
+Anualidad inmediata anual de 10 años al 5% efectivo anual.
+
+```{r}
+library(tidyactuarial)
+a_angle(
+  n_years = 10,
+  rate = 0.05,
+  type = "effective"
+)
+
+```
+
+Interpretación: devuelve el factor de valor presente de una anualidad inmediata con 10 pagos unitarios anuales.
+
+## Ejemplo usando la mayoría de parámetros
+
+Ejemplo con pagos mensuales, tasa nominal de interés convertible mensualmente, diferimiento y anualidad anticipada.
+
+```{r}
+a_angle(
+  n_years = 15,
+  payments_per_year = 12,
+  rate = 0.06,
+  type = "nominal_interest",
+  m = 12,
+  deferral_years = 2,
+  timing = "due",
+  perpetuity = FALSE
+)
+```
+
+Interpretación:
+
+- duración total: 15 años;
+- 12 pagos por año;
+- tasa nominal anual del 6% convertible mensualmente;
+- diferimiento de 2 años;
+- pagos al inicio de cada mes.
+
+## Ejemplo tidy-friendly
+
+### Enunciado
+
+Se tiene una tabla de contratos con distintas configuraciones de anualidad. Se desea agregar, dentro de un flujo de trabajo con `tibble`, `dplyr` y pipes, el factor actuarial calculado por `a_angle()` para cada fila.
+
+```{r, eval=FALSE}
+library(dplyr)
+library(tibble)
+
+contratos <- tibble(
+  n_years = c(10, 20, 12),
+  payments_per_year = c(1, 12, 1),
+  rate = c(0.05, 0.06, 0.04),
+  type = c("effective", "nominal_interest", "force"),
+  m = c(1, 12, 1),
+  deferral_years = c(0, 2, 0),
+  timing = c("immediate", "due", "continuous"),
+  perpetuity = c(FALSE, FALSE, FALSE)
+)
+
+contratos %>%
+  mutate(
+    annuity_factor = a_angle(
+      n_years = n_years,
+      payments_per_year = payments_per_year,
+      rate = rate,
+      type = type,
+      m = m,
+      deferral_years = deferral_years,
+      timing = timing,
+      perpetuity = perpetuity
+    )
+  )
+```
+
+Este ejemplo mantiene la lógica natural de un flujo `tibble` + `mutate()` y deja claro que `a_angle()` está diseñada para trabajar de forma vectorizada.
+
+## Ejemplo de verificación analítica
+
+### Enunciado
+
+En el tratamiento clásico de anualidades ciertas de nivel, como el que aparece en los manuales de teoría del interés y anualidades, el valor presente de una anualidad inmediata de 1 pagadera al final de cada año durante $n$ años a tasa efectiva anual $i$ es
+
+$$
+a_{\overline{n|}} = \frac{1-v^n}{i}, \qquad v = \frac{1}{1+i}.
+$$
+
+Tomemos el caso estándar de una anualidad inmediata de 10 pagos unitarios con tasa efectiva anual del 5%. Este es precisamente el esquema teórico básico tratado en el material de Finan sobre anualidades inmediatas de nivel.
+
+### Desarrollo analítico
+
+Con $n=10$ e $i=0.05$,
+
+$$
+v = \frac{1}{1.05} = 0.9523809524,
+$$
+
+y por tanto
+
+$$
+a_{\overline{10|}}
+=
+\frac{1-v^{10}}{0.05}
+=
+\frac{1-(1.05)^{-10}}{0.05}
+ \approx 7.721734929.
+$$
+
+Ese es el valor teórico de referencia para una anualidad inmediata finita nivelada.
+
+### Verificación en R
+
+```{r}
+# Cálculo analítico
+i <- 0.05
+n <- 10
+v <- 1 / (1 + i)
+(1 - v^n) / i
+
+# Cálculo con la función
+a_angle(
+  n_years = 10,
+  payments_per_year = 1,
+  rate = 0.05,
+  type = "effective",
+  m = 1,
+  deferral_years = 0,
+  timing = "immediate",
+  perpetuity = FALSE
+)
+```
+
+Ambos valores deben coincidir numéricamente, salvo diferencias de redondeo de máquina.
+
+### Verificación complementaria
+
+Para la anualidad anticipada correspondiente, la relación teórica usual es
+
+$$
+\ddot{a}_{\overline{10|}} = (1.05)a_{\overline{10|}}  pprox 8.107821675.
+$$
+
+Eso también es coherente con la forma en que el código transforma el caso inmediato en anticipado para anualidades discretas.
+
+## Observaciones e inconsistencias detectadas
+
+### 1. Inconsistencia entre documentación y validación de `payments_per_year`
+
+La documentación dice:
+
+> "`payments_per_year` Positive integer vector giving the number of discrete payments per year. Ignored for continuous annuities."
+
+Pero la validación temprana exige que `payments_per_year` sea numérico incluso si `timing = "continuous"`. Es decir, en anualidades continuas se ignora en el cálculo principal, pero **no** se ignora en la validación de tipo.
+
+### 2. Inconsistencia análoga para `m`
+
+La documentación dice que `m` se ignora para `"effective"` y `"force"`. Sin embargo, el código siempre lo valida como numérico y siempre lo pasa a `standardize_interest()`. Por tanto, en la práctica no está totalmente “ignorado”; al menos debe venir en un formato válido.
+
+### 3. Restricción adicional no explicada por completo en la documentación para perpetuidades discretas
+
+La documentación menciona que si `perpetuity = TRUE` se devuelve el factor infinito. Pero el código añade una condición fuerte:
+
+- en perpetuidad discreta exige tasa efectiva por período estrictamente positiva;
+- en perpetuidad continua exige fuerza de interés estrictamente positiva.
+
+Eso está bien matemáticamente, pero conviene dejarlo explícito porque no aparece desarrollado con el mismo detalle en la descripción general.
+
+### 4. Propagación de `NA` con una excepción importante
+
+La documentación dice que los valores faltantes se propagan. Eso es esencialmente cierto a nivel elemento, pero hay una excepción deliberada:
+
+- si `perpetuity` contiene `NA`, la función **no** propaga ese `NA`, sino que detiene la ejecución con error.
+
+### 5. Ambigüedad potencial sobre la interpretación de `n_years = NULL`
+
+La firma deja `n_years = NULL`, pero el código solo tolera ese valor cuando efectivamente no se necesita, es decir, cuando `perpetuity = TRUE` para los elementos relevantes. Si `perpetuity = FALSE`, el reciclaje convierte `n_years` en `NA` y luego la validación falla. Conviene decirlo de manera frontal para evitar malentendidos.
+
+### 6. Alcance de la función frente al archivo completo
+
+El archivo también define `a_angle_tbl()`, que es un wrapper de reporte en formato tibble. Sin embargo, esta documentación se refiere a `a_angle()`, que es la función que calcula el factor numérico puro.
+
+## Comentario final
+
+`a_angle()` está escrita para cubrir, dentro de una sola interfaz, anualidades inmediatas, anticipadas, continuas, diferidas, perpetuas y con frecuencia de pago distinta de 1. Su salida siempre debe interpretarse como un **factor actuarial unitario de valor presente**, no como un valor monetario final.

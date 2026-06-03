@@ -1,0 +1,359 @@
+---
+
+title: "standardize_interest(): manual técnico"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r carga-funcion}
+source("standardize_interest.R")
+```
+
+# Nombre de la función
+
+`standardize_interest`
+
+# Firma exacta
+
+```r
+standardize_interest(
+    type = "effective",
+    rate,
+    m = 1
+)
+```
+
+# Descripción general
+
+`standardize_interest()` convierte distintas especificaciones de tasa de interés a su **tasa efectiva anual** equivalente. La salida siempre está en términos de una tasa efectiva anual `i`.
+
+Según el código, la función admite cuatro tipos de entrada:
+
+* `"effective"`
+* `"nominal_interest"`
+* `"nominal_discount"`
+* `"force"`
+
+La función es vectorizada: `type`, `rate` y `m` pueden tener longitud 1 o una longitud común. Si una entrada tiene longitud 1, se recicla hasta la longitud máxima común.
+
+# Parámetros
+
+## `type`
+
+Vector de caracteres que indica el tipo de tasa que se desea estandarizar.
+
+Valores permitidos exactamente:
+
+* `"effective"`: interpreta `rate` como tasa efectiva anual ya expresada en forma efectiva.
+* `"nominal_interest"`: interpreta `rate` como una tasa nominal de interés convertible `m` veces por año.
+* `"nominal_discount"`: interpreta `rate` como una tasa nominal de descuento convertible `m` veces por año.
+* `"force"`: interpreta `rate` como fuerza de interés anual.
+
+Detalles observados en el código:
+
+* La función convierte internamente `type` a minúsculas con `tolower()`.
+* Si aparece un valor distinto de los cuatro permitidos, la función produce error.
+* El valor por defecto es `"effective"`.
+
+## `rate`
+
+Vector numérico con los valores de tasa.
+
+Restricciones según el código:
+
+* Debe ser numérico.
+* Debe contener únicamente valores finitos o `NA`.
+* Si falta, la función produce error.
+
+Restricciones adicionales por tipo:
+
+* Si `type = "effective"`, debe cumplirse `rate > -1` para cada valor no perdido.
+* Si `type = "nominal_interest"`, debe cumplirse `1 + rate / m > 0`.
+* Si `type = "nominal_discount"`, debe cumplirse `1 - rate / m > 0`.
+* Si `type = "force"`, el código no impone una cota adicional aparte de ser numérico y finito.
+
+## `m`
+
+Vector numérico que representa la frecuencia de conversión para tasas nominales.
+
+Uso efectivo según el código:
+
+* Solo es validado y usado cuando `type` es `"nominal_interest"` o `"nominal_discount"`.
+* Para tipos `"effective"` y `"force"`, no interviene en la fórmula final.
+
+Restricciones cuando se usa con tasas nominales:
+
+* Debe estar presente para observaciones nominales.
+* Debe ser finito.
+* Debe ser positivo.
+* Debe ser entero, verificado mediante `m == floor(m)`.
+
+Valor por defecto:
+
+* `m = 1`
+
+# Fórmulas implementadas
+
+La función aplica exactamente las siguientes conversiones:
+
+## 1. Tasa efectiva anual
+
+Si `type = "effective"`, entonces:
+
+$$
+i = \text{rate}
+$$
+
+## 2. Tasa nominal de interés convertible `m` veces por año
+
+Si `type = "nominal_interest"`, entonces:
+
+$$
+i = \left(1 + \frac{\text{rate}}{m}\right)^m - 1
+$$
+
+## 3. Tasa nominal de descuento convertible `m` veces por año
+
+Si `type = "nominal_discount"`, entonces:
+
+$$
+i = \left(1 - \frac{\text{rate}}{m}\right)^{-m} - 1
+$$
+
+## 4. Fuerza de interés
+
+Si `type = "force"`, entonces:
+
+$$
+i = e^{\text{rate}} - 1
+$$
+
+# Valor de salida
+
+La función devuelve un **vector numérico** de tasas efectivas anuales.
+
+## Tipo
+
+* `numeric`
+
+## Estructura
+
+* Tiene longitud igual al tamaño común resultante de `type`, `rate` y `m`.
+* Si alguna de estas entradas tiene longitud 1, se recicla a la longitud común.
+* La salida se construye como un vector `NA_real_` y luego se rellena posición por posición según el tipo de tasa.
+
+## Interpretación
+
+Cada componente de la salida representa la **tasa efectiva anual equivalente** correspondiente a la observación de entrada en la misma posición.
+
+Por tanto, el resultado puede usarse como una tasa anual efectiva unificada para comparaciones, cálculos actuariales posteriores o transformación de bases de datos con diferentes convenciones de tasa.
+
+# Validaciones relevantes del código
+
+La función detiene la ejecución en los siguientes casos:
+
+* `rate` no fue suministrado.
+* `type` no es vector de caracteres.
+* `rate` no es numérico.
+* `m` no es numérico.
+* `type`, `rate` y `m` no tienen longitud 1 o longitud común.
+* `type` contiene valores no permitidos.
+* `rate` contiene valores no finitos distintos de `NA`.
+* falta `m` en observaciones nominales.
+* `m` no es entero positivo para observaciones nominales.
+* una tasa efectiva satisface `rate <= -1`.
+* una tasa nominal de interés viola `1 + rate/m > 0`.
+* una tasa nominal de descuento viola `1 - rate/m > 0`.
+
+# Inconsistencias o matices detectados
+
+## 1. Propagación de valores perdidos
+
+La documentación en roxygen afirma que los valores perdidos se propagan. Eso es correcto para `rate` y para salidas donde la observación puede evaluarse sin conflicto.
+
+Sin embargo, en tasas nominales, si `m` es `NA`, la función **no** propaga el faltante: produce error con el mensaje `` `m` must be provided for nominal rates. ``
+
+## 2. Uso de `m` fuera de tasas nominales
+
+La documentación dice que `m` es ignorado para `"effective"` y `"force"`. Eso coincide con la fórmula final.
+
+No obstante, el vector `m` sí participa en la determinación del tamaño común y en el reciclaje. Es decir, aunque no afecta el cálculo matemático en esos casos, sí forma parte de la lógica de vectorización.
+
+## 3. Valor por defecto de `type`
+
+El código fija explícitamente `type = "effective"`. Eso debe respetarse tal cual en la firma.
+
+# Ejemplo 1: uso mínimo correcto
+
+Este ejemplo usa la función en el caso más simple: una tasa nominal de interés convertible trimestralmente.
+
+```{r ejemplo-sencillo}
+library(tidyactuarial)
+standardize_interest(
+  type = "nominal_interest",
+  rate = 0.18,
+  m = 4
+)
+```
+
+Interpretación: una tasa nominal anual del 18% convertible trimestralmente equivale a una tasa efectiva anual mayor que 18%, porque hay capitalización intraanual.
+
+# Ejemplo 2: uso con la mayoría de los parámetros
+
+Este ejemplo muestra el comportamiento vectorizado con distintos tipos de tasa.
+
+```{r ejemplo-mayoria-parametros}
+
+standardize_interest(
+  type = c("effective", "nominal_interest", "nominal_discount", "force"),
+  rate = c(0.04, 0.12, 0.09, 0.05),
+  m = c(1, 12, 4, 1)
+)
+```
+
+Aquí se observan cuatro conversiones en una sola llamada:
+
+* una tasa efectiva que se deja igual;
+* una tasa nominal de interés mensual;
+* una tasa nominal de descuento trimestral;
+* una fuerza de interés.
+
+# Ejemplo 3: uso tidy-friendly
+
+Enunciado: suponga que una cartera contiene instrumentos financieros reportados bajo distintas convenciones de tasa. Se desea construir una columna homogénea con tasas efectivas anuales.
+
+```{r ejemplo-tidy-friendly}
+
+library(tibble)
+library(dplyr)
+
+portfolio <- tibble(
+  id = 1:4,
+  type = c("effective", "nominal_interest", "nominal_discount", "force"),
+  rate = c(0.03, 0.08, 0.06, 0.04),
+  m = c(1, 12, 4, 1)
+)
+
+portfolio %>%
+  mutate(
+    effective_rate = standardize_interest(
+      type = type,
+      rate = rate,
+      m = m
+    )
+  )
+```
+
+Este patrón es natural para trabajo con `tibble`, `mutate()` y pipes, y aprovecha la vectorización de la función sin añadir complejidad innecesaria.
+
+# Verificación analítica
+
+## Referencia conceptual
+
+La verificación corresponde al bloque clásico de **teoría del interés** sobre:
+
+* tasa efectiva anual,
+* tasa nominal convertible `m` veces por año,
+* fuerza de interés,
+* equivalencia entre distintas expresiones de una misma ley financiera.
+
+Esto coincide con el tratamiento estándar de Finan en los capítulos introductorios sobre:
+
+* **Effective Interest Rate (EIR)**,
+* **Nominal Rates of Interest and Discount**,
+* **Force of Interest**.
+
+## Planteamiento
+
+Queremos verificar analíticamente que una tasa nominal anual de interés del 12% convertible mensualmente se transforma correctamente a tasa efectiva anual.
+
+Tomamos:
+
+* tasa nominal de interés: ( j^{(12)} = 0.12 ),
+* frecuencia de conversión: ( m = 12 ).
+
+## Fórmula teórica
+
+Para una tasa nominal de interés convertible `m` veces por año, la tasa efectiva anual es:
+
+$$
+i = \left(1 + \frac{j^{(m)}}{m}\right)^m - 1
+$$
+
+Sustituyendo ( j^{(12)} = 0.12 ):
+
+$$
+i = \left(1 + \frac{0.12}{12}\right)^{12} - 1
+$$
+
+## Solución analítica sencilla
+
+```{r verificacion-analitica-manual}
+
+i_teorica <- (1 + 0.12 / 12)^12 - 1
+i_teorica
+```
+
+## Comparación con la salida de la función
+
+```{r verificacion-analitica-funcion}
+
+i_funcion <- standardize_interest(
+  type = "nominal_interest",
+  rate = 0.12,
+  m = 12
+)
+
+i_funcion
+```
+
+```{r verificacion-analitica-comparacion}
+
+all.equal(i_teorica, i_funcion)
+```
+
+La comparación debe devolver igualdad numérica, porque esta conversión está implementada exactamente con la misma fórmula teórica.
+
+## Verificación adicional con fuerza de interés
+
+También puede verificarse la equivalencia entre fuerza de interés (\delta) y tasa efectiva anual mediante:
+
+$$
+i = e^{\delta} - 1
+$$
+
+```{r verificacion-force}
+
+delta <- 0.05
+
+i_teorica_force <- exp(delta) - 1
+i_funcion_force <- standardize_interest(
+  type = "force",
+  rate = delta,
+  m = 1
+)
+
+list(
+  teorica = i_teorica_force,
+  funcion = i_funcion_force,
+  coincide = all.equal(i_teorica_force, i_funcion_force)
+)
+```
+
+# Comentario final
+
+La función `standardize_interest()` está bien definida para estandarizar convenciones usuales de tasa hacia una tasa efectiva anual. Su núcleo matemático es claro, coherente y completamente alineado con fórmulas clásicas de teoría del interés.
+
+Su mayor fortaleza práctica es que:
+
+* admite vectorización,
+* trabaja bien dentro de flujos `tidyverse`,
+* valida errores estructurales antes de calcular,
+* devuelve una representación homogénea muy útil para análisis actuarial y financiero posterior.

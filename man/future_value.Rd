@@ -4,100 +4,103 @@
 \alias{future_value}
 \title{Future value of a single payment}
 \usage{
-future_value(C, rate, type = "effective", m = 1, t)
+future_value(C, i, i_type = "effective", m = 1, t, tidy = FALSE)
 }
 \arguments{
-\item{C}{Numeric vector of initial payment amounts.}
+\item{C}{Numeric vector of initial payment amounts or capitals.}
 
-\item{rate}{Numeric vector of rate values.}
+\item{i}{Numeric vector of interest-rate values.}
 
-\item{type}{Character vector indicating the rate type.
+\item{i_type}{Character vector indicating the interest-rate type.
 Allowed values are \code{"effective"}, \code{"nominal_interest"},
 \code{"nominal_discount"}, and \code{"force"}.}
 
-\item{m}{Positive integer vector giving the compounding frequency
-for nominal rates. Ignored for \code{"effective"} and \code{"force"}.}
+\item{m}{Positive integer vector giving the conversion frequency for nominal
+rates. Ignored for \code{"effective"} and \code{"force"}.}
 
 \item{t}{Numeric vector of times in years from valuation to accumulation.}
+
+\item{tidy}{Logical scalar. If \code{FALSE}, returns a numeric future value.
+If \code{TRUE}, returns a tibble with intermediate calculations.}
 }
 \value{
-Numeric vector of future values.
+If \code{tidy = FALSE}, a numeric vector of future values.
+
+If \code{tidy = TRUE}, a tibble with input values, equivalent rates,
+accumulation factors, and future values.
 }
 \description{
-Computes the future value of a payment \code{C} invested at time 0
-and accumulated to time \code{t}, using the annual effective interest
-rate implied by the supplied rate specification.
+Computes the future value of a payment invested at time 0 and accumulated to
+a given time, using the annual effective interest rate implied by the
+supplied interest-rate specification and compact actuarial notation.
 }
 \details{
 The future value is computed as
-\deqn{FV = C (1+i)^t}{FV = C * (1+i)^t}
+\deqn{FV = C(1+i)^t}
 where \eqn{i} is the annual effective interest rate.
 
 The input interest rate may be supplied as:
 \itemize{
-\item annual effective interest rate \eqn{i},
-\item nominal annual interest rate \eqn{j^{(m)}}{j(m)},
-\item nominal annual discount rate \eqn{d^{(m)}}{d(m)},
-\item force of interest \eqn{\delta}{delta}.
+\item annual effective interest rate,
+\item nominal annual interest rate,
+\item nominal annual discount rate,
+\item force of interest.
 }
 
-Internally, all rate specifications are first converted to the
-equivalent annual effective interest rate using
-\code{\link{standardize_interest}}.
+Internally, all rate specifications are first converted to the equivalent
+annual effective interest rate using \code{\link{standardize_interest}}.
 
-This is the core numeric version of the calculation. It is designed
-to work naturally with vectors and with \code{dplyr::mutate()}.
+This function follows the compact actuarial notation used throughout
+\code{tidyactuarial}: \code{C} denotes the initial payment amount or capital,
+\code{t} denotes time, \code{i} denotes the interest-rate input,
+\code{i_type} denotes the interest-rate type, and \code{m} denotes the
+conversion frequency for nominal rates.
 
-Input vectors must have length 1 or a common length. Standard recycling
-is supported only under that rule.
-
-Missing values are propagated. This function does not accept dates.
-If you need a tabular output with actuarial fields, use
-\code{\link{future_value_tbl}}.
+Input vectors must have length 1 or a common length. Missing values are
+propagated. This function does not accept dates; use \code{\link{fv_flow}}
+for dated cash flows.
 }
 \examples{
-# Simple scalar example
-future_value(C = 1000, rate = 0.08, type = "effective", t = 3)
+# Numeric future value
+future_value(C = 1000, i = 0.08, t = 3)
 
-# Medium vectorized example
+# Nominal interest converted monthly
+future_value(
+  C = 1000,
+  i = 0.12,
+  i_type = "nominal_interest",
+  m = 12,
+  t = 5
+)
+
+# Tibble output for teaching or auditing
+future_value(
+  C = 1000,
+  i = 0.08,
+  t = 3,
+  tidy = TRUE
+)
+
+# Vectorized example
 future_value(
   C = c(1000, 2500, 4000),
-  rate = c(0.08, 0.10, 0.12),
-  type = c("effective", "nominal_interest", "force"),
+  i = c(0.08, 0.10, 0.12),
+  i_type = c("effective", "nominal_interest", "force"),
   m = c(1, 12, 1),
   t = c(3, 5, 2)
 )
 
-# Use inside a data pipeline
-if (requireNamespace("dplyr", quietly = TRUE) &&
-    requireNamespace("tibble", quietly = TRUE)) {
-  investments <- tibble::tibble(
-    deposit = c(1000, 1500, 2000),
-    rate    = c(0.08, 0.12, 0.09),
-    type    = c("effective", "force", "nominal_interest"),
-    m       = c(1, 1, 4),
-    t       = c(2, 3, 5)
-  )
-
-  dplyr::mutate(
-    investments,
-    fv = future_value(C = deposit, rate = rate, type = type, m = m, t = t)
-  )
-}
-
 }
 \seealso{
 \code{\link{standardize_interest}}, \code{\link{present_value}},
-\code{\link{future_value_tbl}}
+\code{\link{fv_flow}}
 
 Other time-value: 
-\code{\link{future_value_tbl}()},
 \code{\link{fv_flow}()},
 \code{\link{irr_flow}()},
 \code{\link{irr_flow_multi}()},
 \code{\link{plot_cash_flow}()},
 \code{\link{present_value}()},
-\code{\link{present_value_tbl}()},
 \code{\link{pv_flow}()}
 }
 \concept{time-value}

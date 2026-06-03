@@ -1,0 +1,534 @@
+---
+title: "bond_book_value(): manual técnico"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+
+# Nombre de la función
+
+`bond_book_value`
+
+# Firma exacta
+
+```r
+bond_book_value(
+    face,
+    coupon_rate,
+    years_to_maturity,
+    valuation_time,
+    coupons_per_year = 1L,
+    y_effective_per_period = NULL,
+    y_rate = NULL,
+    y_type = "effective",
+    y_m = 1L,
+    redemption = NULL,
+    tol = 1e-10,
+    check = TRUE
+)
+```
+
+# Descripción general
+
+`bond_book_value()` calcula el **valor en libros prospectivo** de un bono de cupones nivelados en una o varias fechas de cupón.
+
+La interpretación que fija el código es precisa: `valuation_time` se entiende como un instante **inmediatamente después** de que cualquier cupón exigible en esa fecha ya fue pagado. Por eso:
+
+* en `valuation_time = 0`, el valor en libros coincide con el precio del bono;
+* en `valuation_time = years_to_maturity`, el valor en libros es `0`.
+
+La función trabaja solo en fechas alineadas con la malla de cupones. No hay intereses corridos ni periodos irregulares.
+
+# Parámetros
+
+## `face`
+
+Escalar numérico. Valor nominal del bono.
+
+Restricciones del código:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+## `coupon_rate`
+
+Escalar numérico. Tasa anual del cupón en proporción.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+## `years_to_maturity`
+
+Escalar numérico. Tiempo total hasta vencimiento, en años.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+Además, el producto
+
+$$
+years_to_maturity \times coupons_per_year
+$$
+
+debe ser entero.
+
+## `valuation_time`
+
+Vector numérico. Tiempo o tiempos de valuación, en años desde emisión.
+
+Restricciones:
+
+* debe suministrarse;
+* debe ser numérico;
+* todos sus valores deben ser finitos;
+* cada valor debe satisfacer
+
+$$
+0 \le valuation_time \le years_to_maturity
+$$
+
+* cada valor debe alinearse con fechas de cupón, es decir:
+
+$$
+valuation_time \times coupons_per_year
+$$
+
+debe ser entero.
+
+## `coupons_per_year`
+
+Escalar entero positivo. Número de cupones por año.
+
+Ejemplos:
+
+* `1` anual,
+* `2` semestral,
+* `4` trimestral.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser positivo;
+* debe ser entero.
+
+## `y_effective_per_period`
+
+Escalar numérico opcional. Rendimiento efectivo por periodo de cupón.
+
+Si se suministra, **toma precedencia** sobre `y_rate`, `y_type` y `y_m`.
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser mayor que `-1`.
+
+## `y_rate`
+
+Escalar numérico opcional. Tasa anual de rendimiento.
+
+Solo se usa si `y_effective_per_period = NULL`.
+
+## `y_type`
+
+Cadena de caracteres. Tipo de tasa anual de rendimiento.
+
+Valores esperados por diseño:
+
+* `"effective"`
+* `"nominal_interest"`
+* `"nominal_discount"`
+* `"force"`
+
+Valor por defecto:
+
+* `"effective"`
+
+La conversión a tasa efectiva anual se delega a `standardize_interest()`.
+
+## `y_m`
+
+Escalar entero positivo. Frecuencia de capitalización para tasas nominales anuales de rendimiento.
+
+Valor por defecto:
+
+* `1L`
+
+## `redemption`
+
+Escalar numérico. Valor de redención al vencimiento.
+
+Si es `NULL`, el código fija:
+
+```r
+redemption <- face
+```
+
+Restricciones:
+
+* debe ser numérico;
+* longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser no negativo.
+
+## `tol`
+
+Escalar numérico positivo. Tolerancia usada en verificaciones de alineación.
+
+Valor por defecto:
+
+* `1e-10`
+
+## `check`
+
+Escalar lógico.
+
+* `TRUE`: activa validaciones de entrada;
+* `FALSE`: omite parte de las validaciones y asume coherencia interna.
+
+# Supuestos explícitos del código
+
+La función asume:
+
+* cupones pagados en arrears a intervalos regulares;
+* `years_to_maturity * coupons_per_year` entero;
+* cada `valuation_time * coupons_per_year` entero;
+* no hay stub periods;
+* la valuación se hace exactamente en fechas de cupón;
+* no se calcula interés corrido.
+
+# Lógica financiera implementada
+
+## 1. Conversión del rendimiento
+
+La función admite dos rutas.
+
+### Ruta A: rendimiento dado por periodo de cupón
+
+Si `y_effective_per_period` se suministra, se usa directamente:
+
+$$
+i_p = y_effective_per_period
+$$
+
+Luego se calcula la tasa efectiva anual equivalente como:
+
+$$
+i = (1+i_p)^{m_c} - 1
+$$
+
+donde (m_c = coupons_per_year).
+
+### Ruta B: rendimiento anual dado en otra convención
+
+Si `y_effective_per_period = NULL`, el código convierte primero la tasa anual a efectiva anual mediante `standardize_interest()`:
+
+$$
+i = \text{standardize_interest}(\cdot)
+$$
+
+y luego obtiene la tasa efectiva por periodo de cupón:
+
+$$
+i_p = (1+i)^{1/m_c} - 1
+$$
+
+## 2. Flujo del bono
+
+La función usa `bond_cash_flows()` para construir los flujos futuros del bono.
+
+En términos financieros, para un bono nivelado:
+
+* cada cupón es
+
+$$
+C = \frac{face \cdot coupon_rate}{coupons_per_year}
+$$
+
+* y en el último periodo se suma el valor de redención.
+
+## 3. Valor en libros prospectivo
+
+Sea:
+
+* (N): número total de periodos de cupón,
+* (k): periodo de valuación,
+* (C_{k+1}, \ldots, C_N): flujos futuros remanentes,
+* (i_p): rendimiento efectivo por periodo de cupón.
+
+Entonces el valor en libros en el periodo (k) es:
+
+$$
+BV_k = \sum_{j=k+1}^{N} C_j (1+i_p)^{-(j-k)}
+$$
+
+Eso es exactamente lo que implementa el código.
+
+Si `valuation_time` coincide con el vencimiento, la función devuelve `0`.
+
+# Valor de salida
+
+La función devuelve un **vector numérico** con un valor en libros por cada `valuation_time` suministrado.
+
+## Tipo
+
+* `numeric`
+
+## Estructura
+
+* un elemento por cada tiempo de valuación;
+* si `valuation_time` es un escalar, la salida es un escalar numérico;
+* si `valuation_time` es un vector, la salida tiene la misma longitud.
+
+## Interpretación
+
+Cada componente representa el valor presente, en la fecha de valuación correspondiente, de todos los cupones remanentes y del valor de redención, descontados a la base de rendimiento del bono.
+
+# Validaciones relevantes del código
+
+La función detiene la ejecución si ocurre alguno de estos casos:
+
+* `face` no es un número finito no negativo;
+* `coupon_rate` no es un número finito no negativo;
+* `years_to_maturity` no es un número finito no negativo;
+* `coupons_per_year` no es entero positivo;
+* `y_m` no es entero positivo;
+* `redemption` no es un número finito no negativo;
+* `tol` no es positivo;
+* falta `valuation_time`;
+* `valuation_time` no es numérico finito;
+* `valuation_time` cae fuera del intervalo permitido;
+* `years_to_maturity * coupons_per_year` no es entero;
+* alguna `valuation_time * coupons_per_year` no es entera;
+* no se suministra ni `y_effective_per_period` ni `y_rate`;
+* `y_effective_per_period <= -1` cuando se usa directamente.
+
+# Inconsistencias o matices detectados
+
+## 1. `face = 0` está permitido por el código
+
+Eso no es usual en un bono estándar, pero la validación interna solo exige `face >= 0`, no `face > 0`.
+
+## 2. La valuación siempre es posterior al pago del cupón en esa fecha
+
+Esto es crucial. El usuario no debe interpretar `valuation_time` como justo antes del cupón, sino justo después. Por eso al vencimiento el valor en libros es `0` y no el valor de redención.
+
+## 3. No hay valoración entre cupones
+
+La función no calcula precio sucio ni interés corrido. Si el usuario intenta una fecha intermedia, la alineación falla por diseño.
+
+# Ejemplo 1: uso mínimo correcto
+
+```{r ejemplo-sencillo}
+library(tidyactuarial)
+bond_book_value(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 5,
+  valuation_time = 0,
+  coupons_per_year = 2,
+  y_rate = 0.06,
+  y_type = "effective"
+)
+```
+
+Interpretación: este valor debe coincidir con el precio del bono en emisión, porque la función valúa en tiempo 0 justo después de cualquier cupón debido en ese instante, y todavía quedan todos los flujos futuros.
+
+# Ejemplo 2: uso con la mayoría de los parámetros
+
+```{r ejemplo-mayoria-parametros}
+
+bond_book_value(
+  face = 1000,
+  coupon_rate = 0.05,
+  years_to_maturity = 10,
+  valuation_time = c(0, 2, 4, 6),
+  coupons_per_year = 2,
+  y_effective_per_period = 0.03,
+  redemption = 1000,
+  tol = 1e-10,
+  check = TRUE
+)
+```
+
+# Ejemplo 3: uso tidy-friendly
+
+En este caso sí es pertinente un uso sencillo con un pequeño `tibble` y `purrr`, porque cada bono produce varios valores dependiendo del tiempo de valuación.
+
+```{r ejemplo-tidy-friendly}
+library(tibble)
+library(dplyr)
+library(purrr)
+
+bonds <- tibble(
+  face = c(100, 100),
+  coupon_rate = c(0.08, 0.06),
+  years_to_maturity = c(5, 4),
+  coupons_per_year = c(1L, 2L),
+  y_rate = c(0.06, 0.05)
+)
+
+bonds %>%
+  mutate(
+    bv_t0 = pmap_dbl(
+      list(face, coupon_rate, years_to_maturity, coupons_per_year, y_rate),
+      ~ bond_book_value(
+          face = ..1,
+          coupon_rate = ..2,
+          years_to_maturity = ..3,
+          valuation_time = 0,
+          coupons_per_year = ..4,
+          y_rate = ..5,
+          y_type = "effective"
+        )
+    )
+  )
+```
+
+# Verificación analítica
+
+## Referencia conceptual
+
+La verificación corresponde al tratamiento clásico de bonos en Finan, donde el valor del bono en una fecha de cupón se obtiene como el valor presente de los cupones restantes y del valor de redención, descontados a la tasa de rendimiento del bono.
+
+Esa es precisamente la definición prospectiva implementada en `bond_book_value()`.
+
+## Planteamiento
+
+Considérese un bono con:
+
+* valor nominal: 100,
+* tasa cupón anual: 8%,
+* vencimiento: 5 años,
+* cupones anuales,
+* rendimiento efectivo anual: 6%.
+
+Queremos calcular el valor en libros en:
+
+* tiempo 0,
+* tiempo 2.
+
+## Fórmula teórica
+
+El cupón anual es:
+
+$$
+C = 100 \times 0.08 = 8
+$$
+
+En tiempo 0, el valor del bono es:
+
+$$
+BV_0 = 8 a_{\overline{5|0.06}} + 100(1.06)^{-5}
+$$
+
+En tiempo 2, inmediatamente después de pagado el segundo cupón, quedan tres cupones y la redención:
+
+$$
+BV_2 = 8 a_{\overline{3|0.06}} + 100(1.06)^{-3}
+$$
+
+## Solución analítica sencilla
+
+```{r verificacion-analitica-manual}
+i <- 0.06
+C <- 8
+F <- 100
+
+a5 <- (1 - (1 + i)^(-5)) / i
+a3 <- (1 - (1 + i)^(-3)) / i
+
+BV0_teorico <- C * a5 + F * (1 + i)^(-5)
+BV2_teorico <- C * a3 + F * (1 + i)^(-3)
+
+tibble::tibble(
+  BV0_teorico = BV0_teorico,
+  BV2_teorico = BV2_teorico
+)
+```
+
+## Comparación con la salida de la función
+
+```{r verificacion-analitica-funcion}
+
+out <- bond_book_value(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 5,
+  valuation_time = c(0, 2),
+  coupons_per_year = 1,
+  y_rate = 0.06,
+  y_type = "effective"
+)
+
+out
+```
+
+```{r verificacion-analitica-comparacion}
+
+all.equal(c(BV0_teorico, BV2_teorico), out)
+```
+
+La comparación debe coincidir, porque la función implementa exactamente esa suma prospectiva de flujos remanentes.
+
+## Ejemplo explícito tipo Finan
+
+Un ejemplo completamente natural en el estilo de Finan es valorar un bono cupón anual del 8% a rendimiento efectivo anual del 6%, con nominal 100 y vencimiento a 5 años. En ese caso:
+
+* en tiempo 0, el valor en libros coincide con el precio del bono;
+* en una fecha posterior de cupón, el valor en libros es el valor presente de los flujos pendientes.
+
+```{r ejemplo-finan}
+bond_book_value(
+  face = 100,
+  coupon_rate = 0.08,
+  years_to_maturity = 5,
+  valuation_time = c(0, 1, 2, 3, 4, 5),
+  coupons_per_year = 1,
+  y_rate = 0.06,
+  y_type = "effective"
+)
+```
+
+Este vector permite ver cómo evoluciona el valor en libros del bono a lo largo de todas las fechas de cupón, hasta llegar a `0` en el vencimiento.
+
+# Comentario final
+
+`bond_book_value()` es una función bien enfocada para valoración prospectiva de bonos en fechas de cupón.
+
+Sus principales fortalezas son:
+
+* admite una o varias fechas de valuación;
+* permite especificar el rendimiento por periodo o en base anual bajo varias convenciones;
+* distingue claramente entre precio al inicio y valor nulo al vencimiento;
+* evita ambigüedades entre cupón corrido y cupón ya pagado;
+* encaja muy bien con la teoría estándar de bonos de Finan.
+
+Además, su salida numérica la hace cómoda para cálculos directos, mientras que `bond_book_value_tbl()` queda como opción natural cuando se necesita reporte estructurado.

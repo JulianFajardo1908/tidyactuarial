@@ -1,0 +1,53 @@
+file,line,text
+R/annuity_arith.R,75,#' # Increasing annuity: replaces Ia_angle()
+R/annuity_arith.R,78,#' # Decreasing annuity: replaces Da_angle()
+R/annuity_geom.R,84,#' # Present value: replaces ga_angle()
+R/annuity_geom.R,92,#' # Accumulated value: replaces gs_angle()
+R/arithmetic_annuity_av_tbl.R,57,"#' @seealso \code{\link{arithmetic_annuity_pv_tbl}}, \code{\link{a_angle}}, \code{\link{s_angle}}"
+R/arithmetic_annuity_av_tbl.R,62,#' arithmetic_annuity_av_tbl(
+R/arithmetic_annuity_av_tbl.R,77,#' arithmetic_annuity_av_tbl(
+R/arithmetic_annuity_av_tbl.R,89,arithmetic_annuity_av_tbl <- function(
+R/arithmetic_annuity_pv_tbl.R,67,"#' @seealso \code{\link{arithmetic_annuity_av_tbl}}, \code{\link{a_angle}}, \code{\link{s_angle}}"
+R/arithmetic_annuity_pv_tbl.R,73,#' arithmetic_annuity_pv_tbl(
+R/arithmetic_annuity_pv_tbl.R,89,#' arithmetic_annuity_pv_tbl(
+R/arithmetic_annuity_pv_tbl.R,97,#' arithmetic_annuity_pv_tbl(
+R/arithmetic_annuity_pv_tbl.R,111,arithmetic_annuity_pv_tbl <- function(
+R/Da_angle.R,69,"#' @seealso \code{\link{Da_angle_tbl}}, \code{\link{Ia_angle}}, \code{\link{a_angle}},"
+R/Da_angle.R,76,#' Da_angle(
+R/Da_angle.R,84,#' Da_angle(
+R/Da_angle.R,94,Da_angle <- function(
+R/Da_angle.R,245,#' This is a reporting wrapper around \code{\link{Da_angle}}. The decreasing annuity
+R/Da_angle.R,283,"#' @seealso \code{\link{Da_angle}}, \code{Ia_angle_tbl}, \code{\link{a_angle_tbl}},"
+R/Da_angle.R,290,#' Da_angle_tbl(
+R/Da_angle.R,298,#' Da_angle_tbl(
+R/Da_angle.R,309,Da_angle_tbl <- function(
+R/Da_angle.R,367,Da_factor <- Da_angle(
+R/ga_angle_n.R,83,"#' @seealso \code{\link{ga_angle_tbl}}, \code{\link{a_angle}},"
+R/ga_angle_n.R,84,"#'   \code{\link{gs_angle}}, \code{\link{standardize_interest}}"
+R/ga_angle_n.R,90,#' ga_angle(
+R/ga_angle_n.R,100,#' ga_angle(
+R/ga_angle_n.R,110,#' ga_angle(
+R/ga_angle_n.R,123,ga_angle <- function(
+R/ga_angle_n.R,328,#' This is a reporting wrapper around \code{\link{ga_angle}}. The factor assumes
+R/ga_angle_n.R,374,"#' @seealso \code{\link{ga_angle}}, \code{\link{a_angle_tbl}},"
+R/ga_angle_n.R,381,#' ga_angle_tbl(
+R/ga_angle_n.R,391,#' ga_angle_tbl(
+R/ga_angle_n.R,405,ga_angle_tbl <- function(
+R/ga_angle_n.R,478,ga_factor <- ga_angle(
+R/gs_angle_n.R,81,"#' @seealso \code{\link{gs_angle_tbl}}, \code{\link{s_angle}},"
+R/gs_angle_n.R,82,"#'   \code{\link{ga_angle}}, \code{\link{standardize_interest}}"
+R/gs_angle_n.R,88,#' gs_angle(
+R/gs_angle_n.R,98,#' gs_angle(
+R/gs_angle_n.R,108,#' gs_angle(
+R/gs_angle_n.R,121,gs_angle <- function(
+R/gs_angle_n.R,287,#' This is a reporting wrapper around \code{\link{gs_angle}}. The factor assumes
+R/gs_angle_n.R,333,"#' @seealso \code{\link{gs_angle}}, \code{\link{s_angle}},"
+R/gs_angle_n.R,334,"#'   \code{\link{ga_angle_tbl}}, \code{\link{standardize_interest}}"
+R/gs_angle_n.R,340,#' gs_angle_tbl(
+R/gs_angle_n.R,350,#' gs_angle_tbl(
+R/gs_angle_n.R,364,gs_angle_tbl <- function(
+R/gs_angle_n.R,427,gs_factor <- gs_angle(
+R/Ia_angle.R,87,"#' @seealso \code{Ia_angle_tbl}, \code{\link{Da_angle}},"
+R/Ia_angle.R,94,#' Ia_angle(
+R/Ia_angle.R,101,#' Ia_angle(
+R/Ia_angle.R,111,Ia_angle <- function(

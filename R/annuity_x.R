@@ -1,64 +1,93 @@
 #' Actuarial present value of a life annuity
 #'
-#' Computes the APV of a discrete life annuity at actuarial age \eqn{x} using
-#' a life table. Supports term \eqn{n} (temporary), integer deferral \eqn{m},
-#' \eqn{k}-thly payments (exact under UDD), and Woolhouse approximations up
-#' to second order.
+#' Computes the actuarial present value of a discrete life annuity using compact
+#' actuarial notation.
 #'
-#' @param lt A lifetable object as produced by \code{\link{lifetable}}.
-#'   Must contain columns \code{x} and \code{lx}.
-#' @param x Integer actuarial age.
-#' @param i Effective annual interest rate (must satisfy \code{i > -1}).
-#' @param n Integer term in years. If \code{NULL} (default), whole life to
-#'   end of table.
-#' @param m Integer deferral in years (default \code{0}).
-#' @param k Integer payments per year (default \code{1}). Example:
-#'   \code{k = 12} for monthly.
-#' @param timing \code{"immediate"} (payments at end of period) or
-#'   \code{"due"} (beginning). Default \code{"immediate"}.
-#' @param woolhouse For \code{k > 1}: \code{"none"} (exact UDD),
-#'   \code{"first"} (2-term Woolhouse), or \code{"second"} (3-term Woolhouse).
-#' @param tidy Logical. If \code{TRUE}, returns a one-row tibble.
-#'
-#' @details
-#' **Annual annuity-due** (Finan, Section 37.2, Example 37.9):
-#' \deqn{\ddot{a}_{x:\overline{n}|} = \sum_{k=0}^{n-1} v^k \cdot {}_kp_x.}
-#'
-#' **Annual annuity-immediate** (Finan, Section 37.5):
-#' \deqn{a_{x:\overline{n}|} = \sum_{k=1}^{n} v^k \cdot {}_kp_x.}
-#'
-#' **Deferral** (Finan, Section 37.3):
-#' \deqn{{}_{m|}\ddot{a}_x = v^m \cdot {}_mp_x \cdot \ddot{a}_{x+m}.}
-#'
-#' **k-thly exact under UDD** (Finan, Section 38): each \eqn{1/k}-year
-#' fractional survival is computed under UDD, giving an exact result:
-#' \deqn{\ddot{a}^{(k)}_{x:\overline{n}|} = \frac{1}{k}\sum_{j=0}^{kn-1}
-#'   v^{j/k} \cdot {}_{j/k}p_x.}
-#'
-#' **Woolhouse approximations** (Finan, Problems 38.9--38.10):
+#' The function supports:
 #' \itemize{
-#'   \item 2-term (first order):
-#'     \eqn{\ddot{a}^{(m)}_{x:\overline{n}|} \approx
-#'     \ddot{a}_{x:\overline{n}|} - \frac{m-1}{2m}(1 - {}_nE_x).}
-#'   \item 3-term (second order):
-#'     \eqn{\ddot{a}^{(m)}_{x:\overline{n}|} \approx
-#'     \ddot{a}_{x:\overline{n}|} - \frac{m-1}{2m}(1 - {}_nE_x) -
-#'     \frac{m^2-1}{12m^2}[\delta + \mu(x) - {}_nE_x(\delta + \mu(x+n))].}
+#'   \item whole-life annuities,
+#'   \item temporary annuities,
+#'   \item integer deferment,
+#'   \item annual or k-thly payments,
+#'   \item exact fractional survival for k-thly payments,
+#'   \item first- and second-order Woolhouse approximations.
 #' }
 #'
-#' Conversion from due to immediate for k-thly temporaries
-#' (Finan, Problem 38.6):
-#' \deqn{a^{(m)}_{x:\overline{n}|} = \ddot{a}^{(m)}_{x:\overline{n}|}
-#'   - \frac{1}{m}(1 - {}_nE_x).}
+#' @param lt A life table as produced by \code{\link{lifetable}}, or a
+#'   \code{tidyact_life_contract} object created by \code{\link{life_contract}}.
+#'   A life table must contain columns \code{x} and \code{lx}.
+#' @param x Integer actuarial age. Optional when \code{lt} is a single-life
+#'   \code{tidyact_life_contract}.
+#' @param i Numeric scalar. Annual interest-rate input. Optional when \code{lt}
+#'   is a single-life \code{tidyact_life_contract}.
+#' @param i_type Character string indicating the interest-rate type. Allowed
+#'   values are \code{"effective"}, \code{"nominal_interest"},
+#'   \code{"nominal_discount"}, and \code{"force"}.
+#' @param m Positive integer. Conversion frequency for nominal interest rates.
+#'   Ignored for \code{i_type = "effective"} and \code{i_type = "force"}.
+#'   In \code{tidyactuarial}, \code{m} is reserved for interest conversion
+#'   frequency, not deferment.
+#' @param n Integer term in years. Use \code{NULL} or \code{Inf} for a
+#'   whole-life annuity.
+#' @param h Integer deferment period in years.
+#' @param k Positive integer. Number of annuity payments per year. For example,
+#'   use \code{k = 12} for monthly payments.
+#' @param timing Character string. Either \code{"immediate"} for payments at
+#'   the end of each payment period or \code{"due"} for payments at the
+#'   beginning of each payment period.
+#' @param woolhouse Character string. For \code{k > 1}, use \code{"none"} for
+#'   exact fractional-age computation, \code{"first"} for the first-order
+#'   Woolhouse approximation, or \code{"second"} for the second-order
+#'   Woolhouse approximation.
+#' @param frac Character string. Fractional-age assumption used when
+#'   \code{k > 1} and \code{woolhouse = "none"}. Allowed values are
+#'   \code{"UDD"}, \code{"CF"}, \code{"CML"}, and \code{"Balducci"}. If
+#'   \code{NULL}, the \code{frac} attribute of \code{lt} is used when available;
+#'   otherwise \code{"UDD"} is used.
+#' @param tidy Logical. If \code{FALSE}, returns a numeric APV. If \code{TRUE},
+#'   returns a one-row tibble with intermediate quantities.
 #'
-#' @return A single numeric APV value, or a one-row tibble if
-#'   \code{tidy = TRUE}.
+#' @return
+#' If \code{tidy = FALSE}, a numeric scalar containing the actuarial present
+#' value.
 #'
-#' @seealso \code{\link{insurance_x}} for life insurance APVs (derived from
-#'   annuity values), \code{\link{premium_x}} for benefit premiums,
-#'   \code{\link{a_angle}} for annuities-certain (no mortality),
-#'   \code{\link{t_px}} for survival probabilities,
-#'   \code{\link{t_Ex}} for pure endowments.
+#' If \code{tidy = TRUE}, a one-row tibble with the main input values,
+#' equivalent interest rate, deferment factor, pure endowment factor, and APV.
+#'
+#' @details
+#' This function follows the compact actuarial notation used throughout
+#' \code{tidyactuarial}:
+#'
+#' \itemize{
+#'   \item \code{lt}: life table;
+#'   \item \code{x}: actuarial age;
+#'   \item \code{i}: interest rate;
+#'   \item \code{i_type}: interest-rate type;
+#'   \item \code{m}: interest conversion frequency;
+#'   \item \code{n}: annuity term;
+#'   \item \code{h}: deferment period;
+#'   \item \code{k}: payment frequency.
+#' }
+#'
+#' For annual annuities-due,
+#' \deqn{\ddot{a}_{x:\overline{n}|} =
+#' \sum_{j=0}^{n-1} v^j\,{}_jp_x.}
+#'
+#' For annual annuities-immediate,
+#' \deqn{a_{x:\overline{n}|} =
+#' \sum_{j=1}^{n} v^j\,{}_jp_x.}
+#'
+#' Deferment is handled through
+#' \deqn{v^h\,{}_hp_x,}
+#' where \eqn{h} is the deferment period.
+#'
+#' For k-thly payments with \code{woolhouse = "none"}, fractional survival is
+#' computed under the selected fractional-age assumption.
+#'
+#' @seealso \code{\link{insurance_x}}, \code{\link{premium_x}},
+#'   \code{\link{reserve_x}}, \code{\link{t_px}}, \code{\link{t_Ex}}
+#'
+#' @family life-contingencies
 #'
 #' @examples
 #' lt <- data.frame(
@@ -66,195 +95,521 @@
 #'   lx = c(100000, 99000, 97500, 95500, 93000, 90000)
 #' )
 #'
-#' # Whole life annuity-due (Finan, Section 37.1)
-#' annuity_x(lt, x = 60, i = 0.06, timing = "due")
-#'
-#' # 5-year temporary annuity-due (Finan, Section 37.2)
-#' annuity_x(lt, x = 60, i = 0.06, n = 5, timing = "due")
-#'
-#' # Whole life annuity-immediate (Finan, Section 37.5)
-#' annuity_x(lt, x = 60, i = 0.06, timing = "immediate")
-#'
-#' # Finan Example 37.21: a_{x:3} with given px values
-#' lt_ex <- data.frame(
-#'   x  = 0:3,
-#'   lx = c(1, 0.82, 0.82 * 0.81, 0.82 * 0.81 * 0.80)
+#' # Annual annuity-immediate
+#' annuity_x(
+#'   lt = lt,
+#'   x = 60,
+#'   i = 0.06,
+#'   timing = "immediate"
 #' )
-#' annuity_x(lt_ex, x = 0, i = 1/0.78 - 1, n = 3, timing = "immediate")
-#' # Expected: 1.2959
 #'
-#' # 2-year deferred whole life annuity-due (Finan, Section 37.3)
-#' annuity_x(lt, x = 60, i = 0.06, m = 2, timing = "due")
+#' # Annual annuity-due
+#' annuity_x(
+#'   lt = lt,
+#'   x = 60,
+#'   i = 0.06,
+#'   timing = "due"
+#' )
 #'
-#' # Monthly (k=12) exact under UDD
-#' annuity_x(lt, x = 60, i = 0.06, k = 12, timing = "due", woolhouse = "none")
+#' # Temporary annuity
+#' annuity_x(
+#'   lt = lt,
+#'   x = 60,
+#'   i = 0.06,
+#'   n = 3,
+#'   timing = "due"
+#' )
 #'
-#' # Monthly with 2-term Woolhouse
-#' annuity_x(lt, x = 60, i = 0.06, k = 12, timing = "due", woolhouse = "first")
+#' # Deferred annuity
+#' annuity_x(
+#'   lt = lt,
+#'   x = 60,
+#'   i = 0.06,
+#'   h = 2,
+#'   timing = "due"
+#' )
 #'
 #' # Tidy output
-#' annuity_x(lt, x = 60, i = 0.06, n = 5, timing = "due", tidy = TRUE)
+#' annuity_x(
+#'   lt = lt,
+#'   x = 60,
+#'   i = 0.06,
+#'   n = 3,
+#'   timing = "due",
+#'   tidy = TRUE
+#' )
+#'
+#' # Pipe workflow with a life contract
+#' life_contract(lt = lt, lives = "single", x = 60, i = 0.06) |>
+#'   annuity_x(n = 3, timing = "due")
 #'
 #' @export
 annuity_x <- function(
-    lt, x, i,
+    lt,
+    x,
+    i,
+    i_type = "effective",
+    m = 1L,
     n = NULL,
-    m = 0L,
+    h = 0L,
     k = 1L,
     timing = c("immediate", "due"),
     woolhouse = c("none", "first", "second"),
+    frac = NULL,
     tidy = FALSE
 ) {
-  timing    <- match.arg(timing)
+  timing <- match.arg(timing)
   woolhouse <- match.arg(woolhouse)
 
-  # --- checks ---
-  if (!is.data.frame(lt)) stop("'lt' must be a data.frame.")
-  if (!all(c("x", "lx") %in% names(lt))) stop("Life table must contain columns 'x' and 'lx'.")
-  if (!is.numeric(i) || length(i) != 1L || is.na(i) || i <= -1) stop("'i' must be > -1.")
-  if (!is.numeric(x) || length(x) != 1L || is.na(x) || abs(x - round(x)) > 1e-10) stop("'x' must be an integer.")
-  if (!is.numeric(m) || length(m) != 1L || is.na(m) || m < 0 || abs(m - round(m)) > 1e-10) stop("'m' must be a nonnegative integer.")
-  if (!is.numeric(k) || length(k) != 1L || is.na(k) || k < 1 || abs(k - round(k)) > 1e-10) stop("'k' must be a positive integer.")
+  # -------------------------------------------------------------------------
+  # Pipe support: allow a tidyact_life_contract as first argument
+  # -------------------------------------------------------------------------
+
+  if (.as_life_contract(lt)) {
+    contract <- lt
+
+    if (!identical(contract$lives, "single")) {
+      stop(
+        "`annuity_x()` supports only single-life `life_contract()` objects.",
+        call. = FALSE
+      )
+    }
+
+    lt <- contract$lt
+
+    if (missing(x) || is.null(x)) {
+      x <- contract$x
+    }
+
+    if (missing(i) || is.null(i)) {
+      i <- contract$i
+    }
+
+    if (missing(i_type) || is.null(i_type)) {
+      i_type <- contract$i_type
+    }
+
+    if (missing(m) || is.null(m)) {
+      m <- contract$m
+    }
+  }
+
+  # -------------------------------------------------------------------------
+  # Basic validation
+  # -------------------------------------------------------------------------
+
+  if (!is.logical(tidy) || length(tidy) != 1L || is.na(tidy)) {
+    stop("`tidy` must be a logical scalar.", call. = FALSE)
+  }
+
+  if (!is.data.frame(lt)) {
+    stop("`lt` must be a data frame, tibble, or single-life contract.", call. = FALSE)
+  }
+
+  if (!all(c("x", "lx") %in% names(lt))) {
+    stop("`lt` must contain columns `x` and `lx`.", call. = FALSE)
+  }
+
+  if (missing(x) ||
+      !is.numeric(x) ||
+      length(x) != 1L ||
+      is.na(x) ||
+      !is.finite(x) ||
+      abs(x - round(x)) > 1e-10) {
+    stop("`x` must be a single integer age.", call. = FALSE)
+  }
+
+  if (missing(i) ||
+      !is.numeric(i) ||
+      length(i) != 1L ||
+      is.na(i) ||
+      !is.finite(i)) {
+    stop("`i` must be a single finite numeric value.", call. = FALSE)
+  }
+
+  if (!is.character(i_type) ||
+      length(i_type) != 1L ||
+      is.na(i_type)) {
+    stop("`i_type` must be a single character string.", call. = FALSE)
+  }
+
+  valid_i_type <- c(
+    "effective",
+    "nominal_interest",
+    "nominal_discount",
+    "force"
+  )
+
+  if (!i_type %in% valid_i_type) {
+    stop(
+      "`i_type` must be one of: ",
+      paste(sprintf("'%s'", valid_i_type), collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
+
+  if (!is.numeric(m) ||
+      length(m) != 1L ||
+      is.na(m) ||
+      !is.finite(m) ||
+      m < 1 ||
+      abs(m - round(m)) > 1e-10) {
+    stop("`m` must be a single positive integer.", call. = FALSE)
+  }
+
+  if (!is.numeric(h) ||
+      length(h) != 1L ||
+      is.na(h) ||
+      !is.finite(h) ||
+      h < 0 ||
+      abs(h - round(h)) > 1e-10) {
+    stop("`h` must be a single nonnegative integer.", call. = FALSE)
+  }
+
+  if (!is.numeric(k) ||
+      length(k) != 1L ||
+      is.na(k) ||
+      !is.finite(k) ||
+      k < 1 ||
+      abs(k - round(k)) > 1e-10) {
+    stop("`k` must be a single positive integer.", call. = FALSE)
+  }
+
+  if (!is.null(n) &&
+      (!is.numeric(n) ||
+       length(n) != 1L ||
+       is.na(n) ||
+       n < 0 ||
+       (!is.infinite(n) &&
+        (!is.finite(n) || abs(n - round(n)) > 1e-10)))) {
+    stop("`n` must be `NULL`, `Inf`, or a single nonnegative integer.", call. = FALSE)
+  }
+
+  if (is.null(frac)) {
+    frac <- attr(lt, "frac")
+
+    if (is.null(frac) || length(frac) != 1L || is.na(frac)) {
+      frac <- "UDD"
+    }
+  }
+
+  if (!is.character(frac) || length(frac) != 1L || is.na(frac)) {
+    stop("`frac` must be a single character string.", call. = FALSE)
+  }
+
+  frac <- match.arg(frac, c("UDD", "CF", "CML", "Balducci"))
 
   x <- as.integer(round(x))
   m <- as.integer(round(m))
+  h <- as.integer(round(h))
   k <- as.integer(round(k))
 
-  # sort and basic integrity
-  lt <- lt[order(lt$x), ]
-  if (anyDuplicated(lt$x)) stop("Life table ages 'x' must be unique.")
-  if (any(is.na(lt$lx)) || any(lt$lx < 0)) stop("'lx' must be nonnegative and not NA.")
+  if (!is.null(n) && !is.infinite(n)) {
+    n <- as.integer(round(n))
+  }
 
-  ages <- as.integer(lt$x)
-  lx   <- as.numeric(lt$lx)
+  # -------------------------------------------------------------------------
+  # Interest conversion
+  # -------------------------------------------------------------------------
+
+  i_effective <- standardize_interest(
+    type = i_type,
+    rate = i,
+    m = m
+  )
+
+  if (!is.numeric(i_effective) ||
+      length(i_effective) != 1L ||
+      is.na(i_effective) ||
+      !is.finite(i_effective) ||
+      i_effective <= -1) {
+    stop(
+      "The standardized annual effective interest rate must be greater than -1.",
+      call. = FALSE
+    )
+  }
+
+  v_pow <- function(tt) {
+    (1 + i_effective)^(-tt)
+  }
+
+  # -------------------------------------------------------------------------
+  # Life table preparation
+  # -------------------------------------------------------------------------
+
+  lt <- lt[order(lt$x), , drop = FALSE]
+
+  if (!is.numeric(lt$x)) {
+    stop("Column `x` in `lt` must be numeric.", call. = FALSE)
+  }
+
+  if (!is.numeric(lt$lx)) {
+    stop("Column `lx` in `lt` must be numeric.", call. = FALSE)
+  }
+
+  if (any(is.na(lt$x)) || any(!is.finite(lt$x))) {
+    stop("Column `x` in `lt` must contain finite non-missing values.", call. = FALSE)
+  }
+
+  if (any(abs(lt$x - round(lt$x)) > 1e-10)) {
+    stop("Column `x` in `lt` must contain integer ages.", call. = FALSE)
+  }
+
+  if (anyDuplicated(lt$x)) {
+    stop("Life table ages in column `x` must be unique.", call. = FALSE)
+  }
+
+  if (any(is.na(lt$lx)) || any(!is.finite(lt$lx)) || any(lt$lx < 0)) {
+    stop("Column `lx` in `lt` must contain finite nonnegative values.", call. = FALSE)
+  }
+
+  ages <- as.integer(round(lt$x))
+  lx <- as.numeric(lt$lx)
   omega <- max(ages)
 
-  # helper: get lx at integer age; assume lx(omega+1) = 0
-  get_lx <- function(age) {
-    idx <- match(age, ages)
-    if (!is.na(idx)) return(lx[idx])
-    if (age == omega + 1L) return(0)
+  get_lx <- function(current_age) {
+    idx <- match(current_age, ages)
+
+    if (!is.na(idx)) {
+      return(lx[[idx]])
+    }
+
+    if (current_age == omega + 1L) {
+      return(0)
+    }
+
     NA_real_
   }
 
-  # integer-year survival
-  t_p_int <- function(age, tt) {
-    if (tt == 0) return(1)
-    l0 <- get_lx(age)
-    l1 <- get_lx(age + tt)
-    if (is.na(l0) || is.na(l1) || l0 <= 0) return(NA_real_)
+  t_p_int <- function(current_age, tt) {
+    if (tt == 0) {
+      return(1)
+    }
+
+    l0 <- get_lx(current_age)
+    l1 <- get_lx(current_age + tt)
+
+    if (is.na(l0) || is.na(l1) || l0 <= 0) {
+      return(NA_real_)
+    }
+
     l1 / l0
   }
 
-  # UDD fractional survival
-  t_p_udd <- function(age, u) {
-    if (u < 0) return(NA_real_)
-    if (u == 0) return(1)
+  t_p_frac <- function(current_age, u) {
+    if (u < 0) {
+      return(NA_real_)
+    }
+
+    if (u == 0) {
+      return(1)
+    }
+
     tt <- floor(u)
-    s  <- u - tt
-    pt <- t_p_int(age, tt)
-    if (is.na(pt)) return(NA_real_)
-    if (s == 0) return(pt)
-    y   <- age + tt
-    ly  <- get_lx(y)
-    ly1 <- get_lx(y + 1L)
-    if (is.na(ly) || is.na(ly1) || ly <= 0) return(NA_real_)
-    dy <- ly - ly1
-    ps <- (ly - s * dy) / ly
-    pt * ps
+    s <- u - tt
+
+    pt <- t_p_int(current_age, tt)
+
+    if (is.na(pt)) {
+      return(NA_real_)
+    }
+
+    if (s == 0) {
+      return(pt)
+    }
+
+    y_age <- current_age + tt
+
+    ly <- get_lx(y_age)
+    ly1 <- get_lx(y_age + 1L)
+
+    if (is.na(ly) || is.na(ly1) || ly <= 0) {
+      return(NA_real_)
+    }
+
+    p_y <- ly1 / ly
+    q_y <- 1 - p_y
+
+    p_s <- switch(
+      frac,
+      UDD = 1 - s * q_y,
+      CF = if (p_y <= 0) 0 else p_y^s,
+      CML = if (p_y <= 0) 0 else p_y^s,
+      Balducci = p_y / (p_y + s * q_y)
+    )
+
+    pt * p_s
   }
 
-  # discount
-  v_pow <- function(tt) (1 + i)^(-tt)
+  # -------------------------------------------------------------------------
+  # Deferment
+  # -------------------------------------------------------------------------
 
-  # --- deferral factor: v^m * m_p_x ---
-  defer <- v_pow(m) * t_p_int(x, m)
-  if (is.na(defer)) stop("Deferral age x+m is outside the life table (or lx(x)=0).")
+  deferment_factor <- v_pow(h) * t_p_int(x, h)
 
-  y <- x + m  # annuity starts at age y
+  if (is.na(deferment_factor)) {
+    stop(
+      "The deferred age `x + h` is outside the life table or `lx(x)` is zero.",
+      call. = FALSE
+    )
+  }
 
-  # --- determine n (whole life default) ---
-  max_years <- max(0L, (omega + 1L) - y)
-  if (is.null(n)) {
-    n <- max_years
+  start_age <- x + h
+
+  # -------------------------------------------------------------------------
+  # Term
+  # -------------------------------------------------------------------------
+
+  max_years <- max(0L, (omega + 1L) - start_age)
+
+  if (is.null(n) || is.infinite(n)) {
+    n_used <- max_years
+    n_display <- if (is.null(n)) Inf else n
   } else {
-    if (!is.numeric(n) || length(n) != 1L || is.na(n) || n < 0 || abs(n - round(n)) > 1e-10) {
-      stop("'n' must be a nonnegative integer or NULL.")
+    n_used <- n
+    n_display <- n
+
+    if (n_used > max_years) {
+      stop(
+        "`n` exceeds the horizon allowed by the life table. ",
+        "The table must support ages up to `x + h + n`.",
+        call. = FALSE
+      )
     }
-    n <- as.integer(round(n))
-    if (n > max_years) stop("'n' exceeds the horizon allowed by the life table (need lx up to x+m+n).")
   }
 
-  if (n == 0) {
+  if (n_used == 0L) {
     result <- 0
-    if (isTRUE(tidy)) {
-      return(tibble::tibble(x = x, i = i, n = n, m = m, k = k,
-                            timing = timing, woolhouse = woolhouse, apv = 0))
+
+    if (!tidy) {
+      return(result)
     }
-    return(0)
+
+    return(tibble::tibble(
+      x = x,
+      i = i,
+      i_type = i_type,
+      m = m,
+      i_effective = i_effective,
+      n = n_display,
+      n_used = n_used,
+      h = h,
+      x_h = start_age,
+      k = k,
+      timing = timing,
+      woolhouse = woolhouse,
+      frac = frac,
+      deferment_factor = deferment_factor,
+      pure_endowment_factor = 0,
+      apv = result
+    ))
   }
 
-  # --- nEx = v^n * n_p_y (pure endowment at y for term n) ---
-  nEx <- v_pow(n) * t_p_int(y, n)
-  if (is.na(nEx)) nEx <- 0
+  pure_endowment_factor <- v_pow(n_used) *
+    t_p_int(start_age, n_used)
 
-  # --- annual exact ---
-  annual_exact <- function(age, nn, tim) {
+  if (is.na(pure_endowment_factor)) {
+    pure_endowment_factor <- 0
+  }
+
+  # -------------------------------------------------------------------------
+  # Annual and k-thly computation helpers
+  # -------------------------------------------------------------------------
+
+  annual_exact <- function(current_age, nn, tim) {
     if (tim == "due") {
-      tt <- 0:(nn - 1L)
+      times <- 0:(nn - 1L)
     } else {
-      tt <- 1:nn
+      times <- 1:nn
     }
-    sp <- vapply(tt, function(t) t_p_int(age, t), numeric(1))
-    if (anyNA(sp)) stop("Life table does not support required ages for annual payments.")
-    sum(v_pow(tt) * sp)
+
+    survival <- vapply(
+      times,
+      function(tt) t_p_int(current_age, tt),
+      numeric(1L)
+    )
+
+    if (anyNA(survival)) {
+      stop(
+        "The life table does not support the required ages for annual payments.",
+        call. = FALSE
+      )
+    }
+
+    sum(v_pow(times) * survival)
   }
 
-  # --- k-thly exact under UDD ---
-  kthly_exact_udd <- function(age, nn, kk, tim) {
+  kthly_exact <- function(current_age, nn, kk, tim) {
     if (tim == "due") {
       j <- 0:(kk * nn - 1L)
     } else {
       j <- 1:(kk * nn)
     }
-    u  <- j / kk
-    sp <- vapply(u, function(uu) t_p_udd(age, uu), numeric(1))
-    if (anyNA(sp)) stop("Life table does not support required ages for UDD k-thly payments.")
-    sum((1 / kk) * v_pow(u) * sp)
+
+    u <- j / kk
+
+    survival <- vapply(
+      u,
+      function(uu) t_p_frac(current_age, uu),
+      numeric(1L)
+    )
+
+    if (anyNA(survival)) {
+      stop(
+        "The life table does not support the required ages for k-thly payments.",
+        call. = FALSE
+      )
+    }
+
+    sum((1 / kk) * v_pow(u) * survival)
   }
 
-  # --- main computation ---
-  if (k == 1L) {
-    result <- defer * annual_exact(y, n, timing)
-  } else if (woolhouse == "none") {
-    # exact under UDD
-    result <- defer * kthly_exact_udd(y, n, k, timing)
-  } else {
-    # --- Woolhouse approximation (Finan, Problems 38.9-38.10) ---
-    # Always start from annual annuity-due
-    adue <- annual_exact(y, n, "due")
+  # -------------------------------------------------------------------------
+  # Main APV computation
+  # -------------------------------------------------------------------------
 
-    # 2-term Woolhouse (Finan, Problem 38.9a):
-    # ä^(m)_{y:n} ≈ ä_{y:n} - (m-1)/(2m) * (1 - nEx)
-    adj1 <- (k - 1) / (2 * k) * (1 - nEx)
+  if (k == 1L) {
+    annuity_value_at_start <- annual_exact(
+      current_age = start_age,
+      nn = n_used,
+      tim = timing
+    )
+  } else if (woolhouse == "none") {
+    annuity_value_at_start <- kthly_exact(
+      current_age = start_age,
+      nn = n_used,
+      kk = k,
+      tim = timing
+    )
+  } else {
+    annual_due <- annual_exact(
+      current_age = start_age,
+      nn = n_used,
+      tim = "due"
+    )
+
+    adj1 <- (k - 1) / (2 * k) *
+      (1 - pure_endowment_factor)
 
     if (woolhouse == "first") {
-      adue_k <- adue - adj1
+      due_k <- annual_due - adj1
     } else {
-      # 3-term Woolhouse (Finan, Problem 38.10a):
-      # ä^(m)_{y:n} ≈ ä_{y:n} - adj1 - (m²-1)/(12m²) * [δ+μ(y) - nEx*(δ+μ(y+n))]
-      delta <- log(1 + i)
+      delta <- log1p(i_effective)
 
-      # μ(y) approximated from p_y
-      ly  <- get_lx(y)
-      ly1 <- get_lx(y + 1L)
-      if (is.na(ly) || is.na(ly1) || ly <= 0) stop("Cannot compute mu at age y from lx.")
+      ly <- get_lx(start_age)
+      ly1 <- get_lx(start_age + 1L)
+
+      if (is.na(ly) || is.na(ly1) || ly <= 0) {
+        stop("Cannot compute the force approximation at the starting age.", call. = FALSE)
+      }
+
       p_y <- ly1 / ly
       mu_y <- if (!is.na(p_y) && p_y > 0) -log(p_y) else 0
 
-      # μ(y+n) approximated from p_{y+n} (for temporary correction)
-      lyn  <- get_lx(y + n)
-      lyn1 <- get_lx(y + n + 1L)
+      lyn <- get_lx(start_age + n_used)
+      lyn1 <- get_lx(start_age + n_used + 1L)
+
       if (!is.na(lyn) && !is.na(lyn1) && lyn > 0) {
         p_yn <- lyn1 / lyn
         mu_yn <- if (p_yn > 0) -log(p_yn) else 0
@@ -262,22 +617,46 @@ annuity_x <- function(
         mu_yn <- 0
       }
 
-      adj2 <- (k^2 - 1) / (12 * k^2) * (delta + mu_y - nEx * (delta + mu_yn))
-      adue_k <- adue - adj1 - adj2
+      adj2 <- (k^2 - 1) /
+        (12 * k^2) *
+        (
+          delta + mu_y -
+            pure_endowment_factor * (delta + mu_yn)
+        )
+
+      due_k <- annual_due - adj1 - adj2
     }
 
-    # Convert due → immediate for k-thly (Finan, Problem 38.6):
-    # a^(m)_{y:n} = ä^(m)_{y:n} - (1/m)(1 - nEx)
-    a_k <- if (timing == "due") adue_k else (adue_k - (1 / k) * (1 - nEx))
-
-    result <- defer * a_k
+    annuity_value_at_start <- if (timing == "due") {
+      due_k
+    } else {
+      due_k - (1 / k) * (1 - pure_endowment_factor)
+    }
   }
 
-  if (isTRUE(tidy)) {
-    return(tibble::tibble(
-      x = x, i = i, n = as.integer(n), m = m, k = k,
-      timing = timing, woolhouse = woolhouse, apv = result
-    ))
+  result <- deferment_factor * annuity_value_at_start
+
+  if (!tidy) {
+    return(result)
   }
-  result
+
+  tibble::tibble(
+    x = x,
+    i = i,
+    i_type = i_type,
+    m = m,
+    i_effective = i_effective,
+    n = n_display,
+    n_used = n_used,
+    h = h,
+    x_h = start_age,
+    k = k,
+    timing = timing,
+    woolhouse = woolhouse,
+    frac = frac,
+    deferment_factor = deferment_factor,
+    pure_endowment_factor = pure_endowment_factor,
+    annuity_value_at_start = annuity_value_at_start,
+    apv = result
+  )
 }

@@ -6,98 +6,169 @@
 \usage{
 insurance_xy(
   lt,
-  x,
-  y,
-  i,
-  n = NULL,
-  m = 0L,
+  x = NULL,
+  y = NULL,
+  i = NULL,
+  i_type = "effective",
+  m = 1L,
   type = c("whole", "term", "endowment"),
-  cohort = c("first", "last"),
-  tidy = FALSE
+  status = c("joint", "last"),
+  n = Inf,
+  h = 0L,
+  benefit = 1,
+  frac,
+  tidy = FALSE,
+  ...
 )
 }
 \arguments{
-\item{lt}{A life table data frame with columns \code{x} and \code{lx}.}
+\item{lt}{A life table, a list of two life tables \code{list(lt_x, lt_y)}, or
+a \code{tidyact_life_contract} object created by \code{\link{life_contract}}.
+Each life table must contain columns \code{x} and \code{lx}.}
 
-\item{x}{Integer actuarial age for life 1 at issue.}
+\item{x}{Integer actuarial age for the first life.}
 
-\item{y}{Integer actuarial age for life 2 at issue.}
+\item{y}{Integer actuarial age for the second life.}
 
-\item{i}{Annual effective interest rate (must be \code{> -1}).}
+\item{i}{Numeric scalar. Annual interest-rate input.}
 
-\item{n}{Integer term in years. Required for \code{type = "term"} or
-\code{type = "endowment"}. Ignored for \code{type = "whole"}.}
+\item{i_type}{Character string indicating the interest-rate type. Allowed
+values are \code{"effective"}, \code{"nominal_interest"},
+\code{"nominal_discount"}, and \code{"force"}.}
 
-\item{m}{Integer deferral in years (default \code{0}).}
+\item{m}{Positive integer. Conversion frequency for nominal rates. Ignored
+for \code{i_type = "effective"} and \code{i_type = "force"}.}
 
-\item{type}{Insurance type: \code{"whole"}, \code{"term"}, or
+\item{type}{Character string. One of \code{"whole"}, \code{"term"}, or
 \code{"endowment"}.}
 
-\item{cohort}{Status cohort: \code{"first"} (joint-life) or
-\code{"last"} (last-survivor).}
+\item{status}{Character string. Use \code{"joint"} for first-death insurance
+or \code{"last"} for second-death insurance.}
 
-\item{tidy}{Logical. If \code{TRUE}, returns a one-row tibble.}
+\item{n}{Term in years. Required as finite for term and endowment insurance.
+Use \code{Inf} for whole-life insurance.}
+
+\item{h}{Nonnegative integer deferment period in years.}
+
+\item{benefit}{Numeric scalar. Insurance benefit.}
+
+\item{frac}{Fractional-age assumption used in two-life survival
+probabilities. One of \code{"UDD"}, \code{"CF"}, \code{"CML"}, or
+\code{"Balducci"}.}
+
+\item{tidy}{Logical scalar. If \code{FALSE}, returns a numeric APV. If
+\code{TRUE}, returns a one-row tibble.}
+
+\item{...}{Transitional compatibility for older calls using
+\code{mortality_table}, \code{age_x}, \code{age_y}, \code{rate},
+\code{rate_type}, \code{insurance_type}, \code{cohort},
+\code{term_years}, \code{deferment_years}, and \code{output}.}
 }
 \value{
-A single numeric APV value (per unit benefit), or a one-row
-tibble if \code{tidy = TRUE}.
+If \code{tidy = FALSE}, a numeric scalar.
+
+If \code{tidy = TRUE}, a one-row tibble with input values, standardized
+interest rate, deferment factor, unit APV, and APV.
 }
 \description{
-Computes the APV of a discrete two-life insurance with benefit 1 payable
-at the end of the year of the triggering death, assuming independent lives.
-The implementation uses standard identities that express insurance values
-in terms of the annuity-due value (generalizing Finan, Sections 27 and 37
-to two-life statuses from Sections 58--59).
+Computes the actuarial present value of a discrete two-life insurance with
+benefit payable at the end of the year of the triggering death, assuming
+independent future lifetimes and using compact actuarial notation.
 }
 \details{
 Supported contracts:
 \itemize{
-\item \strong{Whole life}: \eqn{A_{xy} = 1 - d \, \ddot{a}_{xy}}
-\item \strong{n-year term}:
-\eqn{A^1_{xy:\overline{n}|} = 1 - d \, \ddot{a}_{xy:\overline{n}|}
-    - v^n \, {}_np_{xy}}
-\item \strong{n-year endowment}:
-\eqn{A_{xy:\overline{n}|} = 1 - d \, \ddot{a}_{xy:\overline{n}|}}
+\item \code{"whole"}: whole-life two-life insurance.
+\item \code{"term"}: n-year two-life term insurance.
+\item \code{"endowment"}: n-year two-life endowment insurance.
 }
 
-The two-life cohort determines the status:
+The \code{status} argument determines the two-life status:
 \itemize{
-\item \code{cohort = "first"}: joint-life (triggers on first death)
-\item \code{cohort = "last"}: last-survivor (triggers on second death)
+\item \code{status = "joint"}: first-death insurance, based on the
+joint-life status.
+\item \code{status = "last"}: second-death insurance, based on the
+last-survivor status.
 }
 
-Deferral by \eqn{m} years is applied as:
-\eqn{v^m \, {}_mp_{xy} \times \text{(value at ages } x+m, y+m\text{)}}.
+This function follows the compact actuarial notation used throughout
+\code{tidyactuarial}: \code{lt} is the life table input, \code{x} and
+\code{y} are the two actuarial ages, \code{i} is the interest-rate input,
+\code{i_type} is the interest-rate type, \code{m} is the conversion
+frequency for nominal rates, \code{n} is the insurance term, and \code{h} is
+the deferment period.
 
-This function calls \code{\link{annuity_xy}} internally using annual
-payments (\code{k = 1}, \code{timing = "due"}, \code{woolhouse = "none"}).
+The function uses the standard fully discrete identities that express
+insurance values through two-life annuity-due values.
 
-For the term insurance adjustment \eqn{v^n \, {}_np}, the survival
-probability is computed using \code{\link{t_pxy}} at integer time
-\code{n} (fractional-age assumption is irrelevant at integer times).
+For a whole-life contract:
+\deqn{A = 1 - d \ddot{a}.}
 
-The endowment decomposes as:
-\deqn{A_{xy:\overline{n}|} = A^1_{xy:\overline{n}|} +
-  {}_nE_{xy}}
-where \eqn{{}_nE_{xy} = v^n \, {}_np_{xy}} is the two-life pure
-endowment.
+For an n-year term insurance:
+\deqn{A^1_{:\overline{n}|} =
+1 - d\ddot{a}_{:\overline{n}|} - v^n\,{}_np.}
+
+For an n-year endowment insurance:
+\deqn{A_{:\overline{n}|} =
+1 - d\ddot{a}_{:\overline{n}|}.}
+
+A deferred insurance is valued by multiplying the value at deferred ages
+\code{x + h} and \code{y + h} by the deferment factor
+\deqn{v^h\,{}_hp_{xy}}
+for the selected two-life status.
 }
 \examples{
-lt <- data.frame(x = 60:110, lx = seq(100000, 0, length.out = 51))
+lt <- data.frame(
+  x = 60:110,
+  lx = seq(100000, 0, length.out = 51)
+)
 
-# Whole life joint-life insurance (Finan, Sec. 58)
-insurance_xy(lt, x = 60, y = 62, i = 0.06,
-             type = "whole", cohort = "first")
+insurance_xy(
+  lt = lt,
+  x = 60,
+  y = 62,
+  i = 0.06,
+  type = "whole",
+  status = "joint"
+)
 
-# 4-year term, joint-life
-insurance_xy(lt, x = 60, y = 62, i = 0.06,
-             n = 4, type = "term", cohort = "first")
+insurance_xy(
+  lt = lt,
+  x = 60,
+  y = 62,
+  i = 0.06,
+  type = "term",
+  status = "last",
+  n = 10,
+  tidy = TRUE
+)
+
+lt |>
+  life_contract(lives = "joint", x = 60, y = 62, i = 0.06) |>
+  insurance_xy(
+    type = "term",
+    n = 4,
+    status = "joint"
+  )
 
 }
 \seealso{
-\code{\link{annuity_xy}} for two-life annuity APVs,
-\code{\link{insurance_x}} for single-life insurance,
-\code{\link{insurance_multi}} for N-life insurance,
-\code{\link{premium_xy}} for two-life benefit premiums,
-\code{\link{t_pxy}} for two-life survival.
+\code{\link{annuity_xy}}, \code{\link{premium_xy}},
+\code{\link{insurance_x}}, \code{\link{t_pxy}}
+
+Other life-contingencies: 
+\code{\link{annuity_multi}()},
+\code{\link{annuity_x}()},
+\code{\link{annuity_xy}()},
+\code{\link{insurance_variable_k}()},
+\code{\link{insurance_x}()},
+\code{\link{life_contract}()},
+\code{\link{premium_gross}()},
+\code{\link{premium_x}()},
+\code{\link{premium_xy}()},
+\code{\link{reserve_x}()},
+\code{\link{reserve_xy}()},
+\code{\link{simulate_annuity_x}()},
+\code{\link{simulate_insurance_x}()}
 }
+\concept{life-contingencies}

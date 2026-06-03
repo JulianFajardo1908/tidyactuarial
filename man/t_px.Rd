@@ -33,69 +33,27 @@ Numeric vector of \eqn{{}_t p_x}, or a tibble if
 }
 \description{
 Computes the t-year survival probability
-\deqn{{}_t p_x = \Pr[T(x) > t]}
+\deqn{{}_t p_x = P[T(x) > t]}
 using an annual life table, allowing for fractional ages under standard
 actuarial assumptions.
 }
 \details{
 The integer-year survival is obtained directly from the life table
 (Finan, Section 22):
-\deqn{{}_n p_x = \frac{\ell_{x+n}}{\ell_x}.}
+\deqn{{}_n p_x = \frac{\ell_{x+n}}{\ell_x}}
 
-For non-integer durations, let \eqn{t = n + s} with \eqn{n = \lfloor t
-\rfloor} and \eqn{s \in [0,1)}. Then (Finan, Section 24):
-\deqn{{}_t p_x = {}_n p_x \cdot {}_s p_{x+n}.}
+For non-integer durations, let \eqn{t = n + s} with \eqn{n = \lfloor t \rfloor}
+and \eqn{s \in [0,1)}. Then (Finan, Section 24):
+\deqn{{}_t p_x = {}_n p_x \times {}_s p_{x+n}}
 
 The fractional-year factor \eqn{{}_s p_y} depends on the assumption:
 \itemize{
-\item UDD (Finan, Sec. 24.1): \eqn{{}_s p_y = 1 - s \, q_y}
-\item CF (Finan, Sec. 24.2): \eqn{{}_s p_y = p_y^s}
+\item UDD (Finan, Sec. 24.1): \eqn{{}_s p_y = 1 - s \times q_y}
+\item CF (Finan, Sec. 24.2): \eqn{{}_s p_y = (p_y)^s}
 \item Balducci (Finan, Sec. 24.3):
-\eqn{{}_s p_y = p_y / (1 - (1 - s) \, q_y)}
+\eqn{{}_s p_y = \frac{p_y}{1 - (1 - s) \times q_y}}
 }
 
 If \eqn{x + t > \omega} (the terminal age), the function returns 0
 since no survival is possible beyond the table's limiting age.
-}
-\examples{
-x  <- 0:5
-lx <- c(100000, 99500, 99000, 98200, 97000, 95000)
-lt <- lifetable(x = x, lx = lx, omega = 5, close = TRUE)
-
-# Integer survival (Finan, Section 22)
-t_px(lt, x = 0, t = 3)
-
-# Finan Example 22.2b: 2_p_2 = l_4 / l_2 = 97000/99000
-lt_22 <- lifetable(
-  x = 0:5,
-  lx = c(100000, 99499, 98995, 98489, 97980, 97468)
-)
-t_px(lt_22, x = 2, t = 2)  # 0.98975
-
-# Fractional ages under three assumptions (Finan, Section 24)
-t_px(lt, x = 0, t = 2.5, frac = "UDD")
-t_px(lt, x = 0, t = 2.5, frac = "CF")
-t_px(lt, x = 0, t = 2.5, frac = "Balducci")
-
-# Vectorized with tidy output
-t_px(lt, x = c(0, 1), t = c(1.5, 2.2), frac = "Balducci", tidy = TRUE)
-
-# t = 0 always returns 1
-t_px(lt, x = 3, t = 0)  # 1
-
-# Beyond omega returns 0
-t_px(lt, x = 3, t = 10)  # 0
-
-# Use in a tidy pipeline
-if (requireNamespace("dplyr", quietly = TRUE)) {
-  tibble::tibble(age = c(0, 1, 2), duration = c(3, 2.5, 1.7)) |>
-    dplyr::mutate(surv = t_px(lt, x = age, t = duration))
-}
-
-}
-\seealso{
-\code{\link{t_qx}} for the complementary death probability,
-\code{\link{t_Ex}} for the pure endowment (discounted survival),
-\code{\link{e_x}} for life expectancy,
-\code{\link{lifetable}} for building the life table input.
 }

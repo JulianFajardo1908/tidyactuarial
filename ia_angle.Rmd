@@ -1,0 +1,548 @@
+---
+title: "Ia_angle(): manual técnico"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+
+# Nombre de la función
+
+`Ia_angle`
+
+# Firma exacta
+
+```r
+Ia_angle(
+    n_years,
+    payments_per_year = 1L,
+    rate,
+    type = "effective",
+    m = 1L,
+    deferral_years = 0,
+    timing = "immediate"
+)
+```
+
+# Descripción general
+
+`Ia_angle()` calcula el **factor actuarial de valor presente** de una anualidad creciente aritmética.
+
+La anualidad está definida con gradiente unitario. En la convención básica, los pagos son:
+
+$$
+1, 2, \ldots, n
+$$
+
+cuando el número total de periodos es `n`. Si hay más de un pago por año, la función trabaja con el número total de periodos de pago:
+
+$$
+N = n_years \times payments_per_year
+$$
+
+Además, la función admite:
+
+* anualidad **inmediata** (`timing = "immediate"`),
+* anualidad **anticipada** (`timing = "due"`),
+* anualidad **diferida** mediante `deferral_years`,
+* varias convenciones de tasa de interés, que primero se convierten a tasa efectiva anual mediante `standardize_interest()`.
+
+La salida es el **factor actuarial**, no el valor presente monetario escalado por un pago base. Si se desea un valor presente monetario, hay que multiplicar el factor por la unidad monetaria del gradiente o por la escala correspondiente.
+
+# Parámetros
+
+## `n_years`
+
+Vector numérico con la duración de la anualidad en años.
+
+Restricciones del código:
+
+* debe suministrarse obligatoriamente;
+* debe ser numérico;
+* cada valor no perdido debe ser finito;
+* cada valor no perdido debe ser estrictamente mayor que 0.
+
+Además, para anualidades discretas, el producto `n_years * payments_per_year` debe ser entero.
+
+## `payments_per_year`
+
+Vector numérico que representa el número de pagos por año.
+
+Valor por defecto:
+
+* `1L`
+
+Restricciones efectivas del código:
+
+* debe ser numérico;
+* dentro del ciclo de cálculo, cada valor usado debe ser finito;
+* debe ser positivo;
+* debe ser entero.
+
+Interpretación:
+
+* `1` corresponde a pagos anuales;
+* `12` corresponde a pagos mensuales;
+* cualquier entero positivo `k` representa `k` pagos por año.
+
+## `rate`
+
+Vector numérico con los valores de tasa.
+
+Restricciones:
+
+* debe suministrarse obligatoriamente;
+* debe ser numérico.
+
+La validación fina de coherencia financiera se delega a `standardize_interest()` según el `type` y `m` suministrados.
+
+## `type`
+
+Vector de caracteres que identifica el tipo de tasa de entrada.
+
+Valores permitidos por el diseño:
+
+* `"effective"`
+* `"nominal_interest"`
+* `"nominal_discount"`
+* `"force"`
+
+Valor por defecto:
+
+* `"effective"`
+
+La función delega la validación financiera completa a `standardize_interest()`.
+
+## `m`
+
+Vector numérico que representa la frecuencia de conversión para tasas nominales.
+
+Valor por defecto:
+
+* `1L`
+
+Uso:
+
+* se usa cuando `type` corresponde a una tasa nominal;
+* en otros casos pasa igualmente a `standardize_interest()` como parte del flujo de entrada.
+
+## `deferral_years`
+
+Vector numérico con el diferimiento en años.
+
+Valor por defecto:
+
+* `0`
+
+Restricciones:
+
+* debe ser numérico;
+* cada valor no perdido debe ser finito;
+* cada valor no perdido debe ser mayor o igual que 0.
+
+Además, para anualidades discretas, el producto
+
+$$
+deferral_years \times payments_per_year
+$$
+
+debe ser entero.
+
+## `timing`
+
+Vector de caracteres que indica la convención temporal de los pagos.
+
+Valores permitidos:
+
+* `"immediate"`
+* `"due"`
+
+Valor por defecto:
+
+* `"immediate"`
+
+La función convierte internamente este argumento a minúsculas con `tolower()`.
+
+# Lógica financiera implementada
+
+## Paso 1: conversión a tasa efectiva anual
+
+La función transforma primero la tasa dada a una tasa efectiva anual:
+
+$$
+i
+$$
+
+mediante `standardize_interest()`.
+
+## Paso 2: tasa efectiva por periodo de pago
+
+Si hay `k = payments_per_year` pagos por año, entonces la tasa efectiva por periodo de pago es:
+
+$$
+i_{(p)} = (1+i)^{1/k} - 1
+$$
+
+## Paso 3: factor de descuento por periodo
+
+$$
+v_{(p)} = \frac{1}{1+i_{(p)}}
+$$
+
+## Paso 4: número de periodos y diferimiento
+
+La función define:
+
+$$
+N = n_years \cdot k
+$$
+
+$$
+h = deferral_years \cdot k
+$$
+
+Ambos deben ser enteros en el caso discreto.
+
+## Paso 5: factor base para anualidad creciente inmediata
+
+Si `i_period` no es prácticamente cero, el código usa:
+
+$$
+a_N = \frac{1-v_{(p)}^N}{i_{(p)}}
+$$
+
+Luego calcula el factor creciente inmediato:
+
+$$
+(Ia)*N = \frac{a_N - N v*{(p)}^N}{i_{(p)}}
+$$
+
+## Paso 6: caso límite cuando la tasa por periodo es cero
+
+Si `|i_period| < 1e-12`, el código usa el límite:
+
+$$
+(Ia)_N = \frac{N(N+1)}{2}
+$$
+
+## Paso 7: ajuste por anualidad anticipada
+
+Si `timing = "due"`, el código multiplica el factor base por:
+
+$$
+1 + i_{(p)}
+$$
+
+es decir,
+
+$$
+(I\ddot{a})*N = (1+i*{(p)})(Ia)_N
+$$
+
+## Paso 8: ajuste por diferimiento
+
+Si existe diferimiento de `h` periodos, la función multiplica por:
+
+$$
+v_{(p)}^h
+$$
+
+Por tanto, el resultado final es:
+
+$$
+\text{factor final} = \text{factor base ajustado por timing} \times v_{(p)}^h
+$$
+
+# Valor de salida
+
+La función devuelve un **vector numérico**.
+
+## Tipo
+
+* `numeric`
+
+## Estructura
+
+* la longitud de la salida es la longitud común reciclada de los argumentos de entrada;
+* cada posición contiene el factor actuarial correspondiente a la observación de entrada en esa misma posición;
+* los `NA` se propagan cuando una observación no es computable por faltantes en las entradas relevantes.
+
+## Interpretación
+
+Cada valor devuelto representa el **factor actuarial de valor presente** de una anualidad creciente aritmética con gradiente unitario.
+
+Esto significa que, si la escala monetaria real del flujo es `R`, entonces el valor presente monetario se obtiene como:
+
+$$
+PV = R \times Ia_angle(\cdot)
+$$
+
+siempre que `R` represente correctamente la unidad de gradiente bajo la estructura del flujo planteado.
+
+# Validaciones relevantes del código
+
+La función detiene la ejecución en, entre otros, los siguientes casos:
+
+* falta `n_years`;
+* falta `rate`;
+* `n_years` no es numérico;
+* `payments_per_year` no es numérico;
+* `rate` no es numérico;
+* `m` no es numérico;
+* `deferral_years` no es numérico;
+* `type` no es de caracteres;
+* `timing` no es de caracteres;
+* los argumentos no tienen longitud 1 o longitud común;
+* `n_years` contiene valores no finitos o no positivos;
+* `deferral_years` contiene valores negativos o no finitos;
+* `timing` toma valores distintos de `"immediate"` o `"due"`;
+* `payments_per_year` no es entero positivo;
+* `n_years * payments_per_year` no es entero;
+* `deferral_years * payments_per_year` no es entero.
+
+Además, como depende de `standardize_interest()`, también puede fallar por una especificación inválida de tasa.
+
+# Inconsistencias o matices detectados
+
+## 1. La documentación habla de valores perdidos propagados, pero no todos los argumentos participan igual
+
+La función propaga `NA` si aparecen en `n_years`, `rate`, `i_effective`, `deferral_years` o `timing`. Sin embargo, `payments_per_year` no se incluye en la construcción de `is_na_elem`; si `payments_per_year` es `NA`, el código entra al ciclo y allí produce error, no simple propagación. Por tanto, la frase general “Missing values are propagated” no es completamente uniforme para todos los argumentos.
+
+## 2. El caso de tasa cero está bien tratado numéricamente
+
+Esto no es inconsistencia, sino una fortaleza del código. Cuando la tasa por periodo es prácticamente cero, la función usa el límite combinatorio:
+
+$$
+\frac{N(N+1)}{2}
+$$
+
+en vez de la fórmula general, evitando divisiones numéricamente inestables.
+
+## 3. La función trabaja con gradiente unitario, no con pago escalado
+
+Esto es coherente con la documentación, pero conviene remarcarlo: `Ia_angle()` devuelve solo el **factor**. Si el usuario espera directamente un valor presente monetario, debe escalarlo por fuera o usar `Ia_angle_tbl()` con el argumento `payment`.
+
+# Ejemplo 1: uso mínimo correcto
+
+Este ejemplo calcula el factor de una anualidad creciente inmediata anual de 10 años al 5% efectivo anual.
+
+```{r ejemplo-sencillo}
+library(tidyactuarial)
+ej1 <- Ia_angle(
+  n_years = 10,
+  rate = 0.05,
+  type = "effective",
+  timing = "immediate"
+)
+ej1$present_value
+```
+
+# Ejemplo 2: uso con la mayoría de los parámetros
+
+Este ejemplo usa varias de las capacidades de la función: frecuencia de pagos, tasa nominal, diferimiento y convención anticipada.
+
+```{r ejemplo-mayoria-parametros}
+
+Ia_angle(
+  n_years = 5,
+  payments_per_year = 12,
+  rate = 0.08,
+  type = "nominal_interest",
+  m = 12,
+  deferral_years = 2,
+  timing = "due"
+)
+```
+
+Aquí el cálculo corresponde a una anualidad creciente con pagos mensuales, tasa nominal anual convertible mensualmente, diferida 2 años y pagadera al inicio de cada periodo.
+
+# Ejemplo 3: uso tidy-friendly
+
+Enunciado: una cartera contiene tres anualidades crecientes con distintas duraciones, tasas y convenciones. Se desea calcular el factor actuarial de cada una dentro de un flujo natural con `tibble`, `mutate()` y pipes.
+
+```{r ejemplo-tidy-friendly}
+
+library(tidyactuarial)
+library(dplyr)
+library(tibble)
+
+portfolio <- tibble(
+  n_years = c(10, 8, 6),
+  payments_per_year = c(1L, 12L, 4L),
+  rate = c(0.05, 0.06, 0.08),
+  type = c("effective", "nominal_interest", "force"),
+  m = c(1L, 12L, 1L),
+  deferral_years = c(0, 2, 1),
+  timing = c("immediate", "due", "immediate")
+)
+
+library(dplyr)
+
+portfolio %>%
+  rowwise() %>%
+  mutate(
+    Ia_factor = Ia_angle(
+      n_years = n_years,
+      payments_per_year = payments_per_year,
+      rate = rate,
+      type = type,
+      m = m,
+      deferral_years = deferral_years,
+      timing = timing
+    )
+  ) %>%
+  ungroup() %>% 
+  dplyr::select(n_years, rate, payments_per_year, Ia_factor)
+
+```
+
+# Verificación analítica
+
+## Referencia conceptual
+
+La verificación se apoya en la teoría de anualidades crecientes aritméticas desarrollada en Finan, en la sección de **Varying Annuity-Immediate**, donde se presenta la fórmula del valor presente de la anualidad inmediata creciente:
+
+$$
+(Ia)_n = \frac{\ddot{a}_n - n v^n}{i}
+$$
+
+o de forma equivalente, usando la anualidad inmediata estándar,
+
+$$
+(Ia)_n = \frac{a_n - n v^n}{i}
+$$
+
+según la convención utilizada para la identidad algebraica. En el código de `Ia_angle()`, la versión implementada para la anualidad inmediata es:
+
+$$
+(Ia)*N = \frac{a_N - N v*{(p)}^N}{i_{(p)}}
+$$
+
+que coincide con la fórmula clásica para pagos 1, 2, ..., N al final de cada periodo.
+
+## Planteamiento
+
+Tomemos una anualidad creciente inmediata anual con:
+
+* duración: 5 años,
+* tasa efectiva anual: 6%,
+* pagos: 1, 2, 3, 4, 5 al final de cada año.
+
+Queremos comparar la solución analítica con la salida de la función.
+
+## Fórmula teórica
+
+Sea
+
+$$
+v = \frac{1}{1+i}
+$$
+
+$$
+a_n = \frac{1-v^n}{i}
+$$
+
+Entonces:
+
+$$
+(Ia)_n = \frac{a_n - n v^n}{i}
+$$
+
+## Solución analítica sencilla
+
+```{r verificacion-analitica-manual}
+i <- 0.06
+n <- 5
+v <- 1 / (1 + i)
+a_n <- (1 - v^n) / i
+Ia_teorica <- (a_n - n * v^n) / i
+Ia_teorica
+```
+
+## Comparación con la salida de la función
+
+```{r verificacion-analitica-funcion}
+Ia_funcion <- Ia_angle(
+  n_years = 5,
+  payments_per_year = 1,
+  rate = 0.06,
+  type = "effective",
+  timing = "immediate"
+)
+
+Ia_funcion
+```
+
+```{r verificacion-analitica-comparacion}
+all.equal(Ia_teorica, Ia_funcion)
+```
+
+La comparación debe coincidir, porque el código implementa directamente esa fórmula en el caso anual inmediato.
+
+## Ejemplo explícito tipo Finan
+
+En Finan aparece un ejemplo con una secuencia creciente en progresión aritmética: pagos de 500, 520, 540, ..., hasta 800. La idea teórica es separar el flujo en:
+
+* una anualidad nivelada, y
+* una anualidad creciente inmediata.
+
+Como la diferencia entre pagos es 20, el flujo puede escribirse como:
+
+$$
+500, 520, 540, \ldots, 800
+==========================
+
+480 + 20(1,2,3,\ldots,16)
+$$
+
+porque en el periodo 16 se obtiene:
+
+$$
+500 + 20(16-1) = 800
+$$
+
+Así, el valor presente es:
+
+$$
+PV = 480 a_{16} + 20 (Ia)_{16}
+$$
+
+con tasa efectiva anual del 2%.
+
+```{r ejemplo-finan, eval=FALSE}
+
+i <- 0.02
+n <- 16
+v <- 1 / (1 + i)
+a_16 <- (1 - v^n) / i
+Ia_16 <- Ia_angle(
+  n_years = 16,
+  rate = 0.02,
+  type = "effective",
+  timing = "immediate"
+)
+
+PV_finan <- 480 * a_16 + 20 * Ia_16
+PV_finan
+
+```
+
+Este ejemplo es completamente natural para la función porque `Ia_angle()` devuelve exactamente el factor creciente necesario para reconstruir el valor presente del componente aritméticamente creciente.
+
+# Comentario final
+
+`Ia_angle()` está bien planteada para trabajar anualidades crecientes discretas con bastante flexibilidad. Sus puntos fuertes son:
+
+* acepta varias convenciones de tasa;
+* permite pagos más frecuentes que una vez por año;
+* maneja anualidades inmediatas y anticipadas;
+* incorpora diferimiento;
+* trata correctamente el caso límite de tasa nula.
+
+Desde el punto de vista actuarial, es una función útil para modelar flujos que aumentan linealmente por periodo y para reproducir ejemplos clásicos de teoría de anualidades crecientes, incluidos los del estilo FM/Finan.

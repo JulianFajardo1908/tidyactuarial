@@ -47,7 +47,7 @@ work directly with the output of \code{\link{km_lifetable}}.
 \details{
 Both the survival curve and the confidence band are rendered as step
 functions (using \code{\link[ggplot2]{geom_step}}), which is the correct
-representation for the KM estimator — a right-continuous step function
+representation for the KM estimator - a right-continuous step function
 that drops at each observed event time.
 
 The confidence band uses \code{geom_stepribbon} logic: the data is
@@ -63,7 +63,7 @@ status <- rbinom(n, 1, prob = 0.7)
 # Fit KM and plot directly
 out <- km_lifetable(time, status, breaks = 0:30)
 
-# Pass the full list — $km is extracted automatically
+# Pass the full list - $km is extracted automatically
 plot_km(out)
 
 # Or pass just the km tibble

@@ -1,0 +1,428 @@
+---
+title: "interest_equivalents(): manual técnico"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+
+# Nombre de la función
+
+`interest_equivalents`
+
+# Firma exacta
+
+```r
+interest_equivalents(
+    type = c("effective", "nominal_interest", "nominal_discount", "force"),
+    rate,
+    m = 1L
+)
+```
+
+# Descripción general
+
+`interest_equivalents()` toma una única especificación de tasa y la convierte a un conjunto de tasas equivalentes en notación actuarial FM. Según el código, primero transforma la tasa suministrada a **tasa efectiva anual de interés** mediante `standardize_interest()`, y luego construye otras cantidades equivalentes asociadas a la misma base anual y a la misma frecuencia `m` para las tasas nominales. fileciteturn1file0
+
+La salida no es un número aislado sino una tabla con varias representaciones equivalentes de la misma ley financiera. fileciteturn1file0
+
+# Parámetros
+
+## `type`
+
+Cadena de caracteres que indica el tipo de tasa de entrada.
+
+Valores permitidos exactamente:
+
+* `"effective"`
+* `"nominal_interest"`
+* `"nominal_discount"`
+* `"force"`
+
+Detalles del código:
+
+* El valor formal del argumento está definido con `c("effective", "nominal_interest", "nominal_discount", "force")`.
+* Internamente se usa `match.arg(type)`, por lo que la función exige una sola elección válida entre esas opciones.
+* No admite vectorización en `type`; debe resolverse a un único valor.
+
+## `rate`
+
+Escalar numérico que representa la tasa de entrada.
+
+Restricciones impuestas por el código:
+
+* debe ser numérico;
+* debe tener longitud 1;
+* no puede ser `NA`;
+* debe ser finito.
+
+Si no cumple lo anterior, la función produce error con el mensaje correspondiente. fileciteturn1file0
+
+## `m`
+
+Escalar entero positivo que representa la frecuencia de conversión usada para las tasas nominales equivalentes.
+
+Restricciones del código:
+
+* debe ser numérico;
+* debe tener longitud 1;
+* no puede ser `NA`;
+* debe ser finito;
+* debe ser positivo;
+* debe ser entero, validado con `m != floor(m)`.
+
+Luego se convierte a entero con `as.integer(m)`. fileciteturn1file0
+
+Valor por defecto:
+
+* `m = 1L`
+
+# Lógica de cálculo
+
+La función ejecuta primero:
+
+```r
+i <- standardize_interest(type = type, rate = rate, m = m)
+```
+
+Es decir, toda la construcción posterior parte de la tasa efectiva anual `i`. A partir de allí calcula: 
+
+## 1. Tasa efectiva anual de interés
+
+$$
+i
+$$
+
+## 2. Tasa efectiva anual de descuento
+
+$$
+d = \frac{i}{1+i}
+$$
+
+## 3. Factor anual de descuento
+
+$$
+v = \frac{1}{1+i}
+$$
+
+## 4. Fuerza de interés
+
+$$
+\delta = \ln(1+i)
+$$
+
+## 5. Tasa nominal anual de interés convertible `m` veces por año
+
+$$
+j^{(m)} = m\left[(1+i)^{1/m} - 1\right]
+$$
+
+En el código se calcula con una forma numéricamente estable:
+
+```r
+j_m <- m * expm1(log1p(i) / m)
+```
+
+## 6. Tasa nominal anual de descuento convertible `m` veces por año
+
+$$
+d^{(m)} = m\left[1 - (1+i)^{-1/m}\right]
+$$
+
+En el código se calcula como:
+
+```r
+d_m <- m * (1 - exp(-log1p(i) / m))
+```
+
+# Etiquetas de frecuencia
+
+La descripción textual de la tasa nominal depende de `m`:
+
+* `1`  → `annual`
+* `2`  → `semiannual`
+* `4`  → `quarterly`
+* `12` → `monthly`
+* cualquier otro entero positivo → `"m-thly"`
+
+Por ejemplo, si `m = 6`, la descripción usa `"6-thly"`. fileciteturn1file0
+
+# Valor de salida
+
+La función devuelve un **tibble** con seis filas y cinco columnas. fileciteturn1file0
+
+## Tipo
+
+* `tibble::tibble`
+
+## Estructura
+
+Las columnas son:
+
+### `family`
+
+Familia de la tasa equivalente. Toma exactamente estos valores:
+
+* `"effective"`
+* `"discount"`
+* `"discount_factor"`
+* `"force"`
+* `"nominal_interest"`
+* `"nominal_discount"`
+
+### `notation`
+
+Notación actuarial asociada:
+
+* `i`
+* `d`
+* `v`
+* `delta`
+* `j^(m)`
+* `d^(m)`
+
+### `m`
+
+Frecuencia de conversión.
+
+* Para `i`, `d`, `v` y `delta`, la columna toma `NA_integer_`.
+* Para `j^(m)` y `d^(m)`, la columna toma el valor entero `m` suministrado.
+
+### `description`
+
+Descripción legible de cada cantidad financiera.
+
+### `value`
+
+Valor numérico de la tasa o factor equivalente.
+
+## Interpretación
+
+La tabla resume, en distintas representaciones actuariales estándar, una misma estructura de interés. Es especialmente útil cuando se desea pasar de una especificación dada a notaciones como `i`, `d`, `v`, `\delta`, `j^(m)` y `d^(m)` sin recalcular manualmente cada una. fileciteturn1file0
+
+# Validaciones relevantes
+
+La función detiene la ejecución si ocurre alguno de estos casos: fileciteturn1file0
+
+* `rate` no fue suministrado;
+* `rate` no es un único valor numérico finito;
+* `m` no es un único entero positivo finito.
+
+Además, como se apoya en `standardize_interest()`, hereda las validaciones de coherencia propias del tipo de tasa suministrado. Por ejemplo, si `type = "nominal_discount"`, la combinación de `rate` y `m` debe satisfacer la restricción algebraica correspondiente para que la estandarización sea válida.
+
+# Inconsistencias o matices detectados
+
+## 1. La documentación no menciona explícitamente la fila `discount_factor`
+
+En la sección `@return`, el roxygen enumera `family` con los valores `"effective"`, `"discount"`, `"force"`, `"nominal_interest"` y `"nominal_discount"`. Sin embargo, el código realmente incluye también la familia `"discount_factor"` con notación `v`. Esa fila sí aparece en la salida efectiva de la función. fileciteturn1file0
+
+## 2. La documentación habla de una sola especificación de tasa, y el código efectivamente exige escalares
+
+Aquí sí hay coherencia total: esta función no es vectorizada. Si se desea uso en lote, debe hacerse externamente, por ejemplo con `purrr::pmap()`, tal como sugieren los ejemplos del propio archivo. fileciteturn1file0
+
+## 3. `m` se exige siempre, incluso cuando conceptualmente no sería necesario
+
+Aunque para `type = "effective"` o `type = "force"` la tasa de entrada no requiere frecuencia de conversión para quedar determinada, el argumento `m` igualmente debe pasar la validación escalar-entera-positiva porque la función siempre construye también `j^(m)` y `d^(m)` en la salida. Esto no es un error: es una decisión de diseño. Pero conviene decirlo de forma explícita.
+
+# Ejemplo 1: uso mínimo correcto
+
+Este ejemplo parte de una tasa efectiva anual del 8% y devuelve todas sus equivalencias actuariales.
+
+```{r ejemplo-sencillo}
+library(tidyactuarial)
+interest_equivalents(
+  type = "effective",
+  rate = 0.08
+)
+```
+
+# Ejemplo 2: uso con la mayoría de los parámetros
+
+Este ejemplo usa una tasa nominal de descuento convertible mensualmente y solicita las equivalencias manteniendo `m = 12`.
+
+```{r ejemplo-mayoria-parametros}
+
+interest_equivalents(
+  type = "nominal_discount",
+  rate = 0.10,
+  m = 12
+)
+```
+
+Aquí la tabla resultante incluye la tasa efectiva anual equivalente, la tasa efectiva de descuento, el factor de descuento, la fuerza de interés y las versiones nominales compatibles con frecuencia mensual.
+
+# Ejemplo 3: uso tidy-friendly
+
+Enunciado: se tiene una pequeña colección de casos financieros, cada uno con una especificación distinta de tasa. Se desea obtener, para cada caso, su tabla de equivalencias actuariales usando un flujo natural con `tibble`, pipes y `purrr`.
+
+```{r ejemplo-tidy-friendly}
+
+library(tibble)
+library(dplyr)
+library(purrr)
+
+cases <- tibble(
+  case_id = 1:3,
+  type = c("effective", "force", "nominal_interest"),
+  rate = c(0.08, 0.05, 0.12),
+  m = c(1L, 1L, 12L)
+)
+
+cases %>%
+  mutate(
+    equivalents = pmap(
+      list(type, rate, m),
+      interest_equivalents
+    )
+  )
+```
+
+Este patrón no aplana automáticamente las tablas, pero sí permite almacenar en una columna lista la salida completa de `interest_equivalents()` para cada observación, lo cual es una forma limpia y natural de integrarla en flujos tidy.
+
+# Verificación analítica
+
+## Referencia conceptual
+
+La verificación corresponde al tratamiento estándar de teoría del interés en Finan sobre equivalencias entre:
+
+* tasa efectiva anual `i`,
+* tasa efectiva de descuento `d`,
+* factor de descuento `v`,
+* fuerza de interés `\delta`,
+* tasa nominal de interés `j^(m)`,
+* tasa nominal de descuento `d^(m)`.
+
+Esto aparece en el bloque de teoría de interés del texto de Finan, especialmente en las secciones sobre **Effective Interest Rate**, **Nominal Rates of Interest and Discount** y **Force of Interest**. El PDF de Finan desarrolla precisamente las identidades
+
+$$
+d = \frac{i}{1+i}, \qquad v = \frac{1}{1+i}, \qquad \delta = \ln(1+i),
+$$
+
+y también
+
+$$
+j^{(m)} = m\left[(1+i)^{1/m} - 1\right], \qquad d^{(m)} = m\left[1 - (1+i)^{-1/m}\right].
+$$
+fileciteturn0file1
+
+## Planteamiento
+
+Tomemos una tasa efectiva anual de interés del 8% y verifiquemos analíticamente algunas de sus equivalencias más importantes. Es decir, suponemos:
+
+$$
+i = 0.08
+$$
+
+Queremos comparar la teoría con la salida de la función.
+
+## Fórmulas teóricas
+
+Las relaciones teóricas son:
+
+$$
+d = \frac{i}{1+i}
+$$
+
+$$
+v = \frac{1}{1+i}
+$$
+
+$$
+\delta = \ln(1+i)
+$$
+
+$$
+j^{(4)} = 4\left[(1+i)^{1/4} - 1\right]
+$$
+
+$$
+d^{(4)} = 4\left[1 - (1+i)^{-1/4}\right]
+$$
+
+## Solución analítica sencilla
+
+```{r verificacion-analitica-manual}
+
+i <- 0.08
+m <- 4
+
+d_teorica <- i / (1 + i)
+v_teorica <- 1 / (1 + i)
+delta_teorica <- log(1 + i)
+j4_teorica <- m * ((1 + i)^(1 / m) - 1)
+d4_teorica <- m * (1 - (1 + i)^(-1 / m))
+
+tibble(
+  notation = c("d", "v", "delta", "j^(4)", "d^(4)"),
+  teorica = c(d_teorica, v_teorica, delta_teorica, j4_teorica, d4_teorica)
+)
+```
+
+## Comparación con la salida de la función
+
+```{r verificacion-analitica-funcion}
+
+out <- interest_equivalents(
+  type = "effective",
+  rate = 0.08,
+  m = 4
+)
+
+out
+```
+
+```{r verificacion-analitica-comparacion}
+
+comparacion <- out %>%
+  filter(notation %in% c("d", "v", "delta", "j^(4)", "d^(4)")) %>%
+  select(notation, value) %>%
+  left_join(
+    tibble(
+      notation = c("d", "v", "delta", "j^(4)", "d^(4)"),
+      teorica = c(d_teorica, v_teorica, delta_teorica, j4_teorica, d4_teorica)
+    ),
+    by = "notation"
+  ) %>%
+  mutate(coincide = abs(value - teorica) < 1e-12)
+
+comparacion
+```
+
+La coincidencia debe ser exacta salvo redondeo numérico de máquina, porque la función implementa directamente estas identidades.
+
+## Ejemplo explícito tomado del enfoque de Finan
+
+Finan usa de forma estándar conversiones como pasar de una tasa efectiva anual a una nominal convertible varias veces por año, o viceversa. Un caso clásico es obtener la tasa nominal trimestral equivalente a una tasa efectiva anual dada. Con `i = 0.08` y `m = 4`:
+
+$$
+j^{(4)} = 4\left[(1.08)^{1/4} - 1\right]
+$$
+
+```{r ejemplo-finan-explicito}
+
+4 * ((1.08)^(1/4) - 1)
+interest_equivalents("effective", rate = 0.08, m = 4) %>%
+  filter(notation == "j^(4)")
+```
+
+Este ejemplo está completamente alineado con el tipo de equivalencias de tasas que Finan desarrolla en su capítulo de teoría del interés. fileciteturn0file1
+
+# Comentario final
+
+`interest_equivalents()` es una función corta pero muy útil. No solo estandariza una tasa de entrada, sino que entrega de una vez un cuadro compacto con las representaciones actuariales equivalentes más usadas en FM.
+
+Su diseño es especialmente valioso cuando se necesita:
+
+* verificar identidades de teoría del interés;
+* preparar tablas comparativas;
+* documentar resultados en notación actuarial estándar;
+* integrar conversiones dentro de flujos de trabajo reproducibles en R.
+
+Además, el hecho de devolver un tibble en vez de un vector hace que la salida sea mucho más interpretable para docencia, validación y reporte técnico. 

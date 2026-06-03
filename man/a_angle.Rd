@@ -5,47 +5,60 @@
 \title{Level annuity factor a-angle-n}
 \usage{
 a_angle(
-  n_years = NULL,
-  payments_per_year = 1L,
-  rate,
-  type = "effective",
+  n = NULL,
+  k = 1L,
+  i,
+  i_type = "effective",
   m = 1L,
-  deferral_years = 0,
+  h = 0,
   timing = "immediate",
-  perpetuity = FALSE
+  perpetuity = FALSE,
+  payment = 1,
+  tidy = FALSE
 )
 }
 \arguments{
-\item{n_years}{Numeric vector of payment durations in years.
-Ignored when \code{perpetuity = TRUE}. If \code{perpetuity = FALSE},
-each value must be positive and finite.}
+\item{n}{Numeric vector of payment durations in years. Ignored when
+\code{perpetuity = TRUE}. If \code{perpetuity = FALSE}, each value must be
+positive and finite.}
 
-\item{payments_per_year}{Positive integer vector giving the number of
-discrete payments per year. Ignored for continuous annuities.}
+\item{k}{Positive integer vector giving the number of discrete payments per
+year. Ignored for continuous annuities.}
 
-\item{rate}{Numeric vector of rate values.}
+\item{i}{Numeric vector of interest-rate values.}
 
-\item{type}{Character vector indicating the rate type.
-Allowed values are \code{"effective"}, \code{"nominal_interest"},
+\item{i_type}{Character vector indicating the interest-rate type. Allowed
+values are \code{"effective"}, \code{"nominal_interest"},
 \code{"nominal_discount"}, and \code{"force"}.}
 
-\item{m}{Positive integer vector giving the compounding frequency
-for nominal rates. Ignored for \code{"effective"} and \code{"force"}.}
+\item{m}{Positive integer vector giving the conversion frequency for nominal
+rates. Ignored for \code{"effective"} and \code{"force"}.}
 
-\item{deferral_years}{Numeric vector of deferral times in years.
-Must be greater than or equal to 0.}
+\item{h}{Numeric vector of deferment times in years. Must be greater than or
+equal to 0.}
 
-\item{timing}{Character vector. One of \code{"immediate"},
-\code{"due"}, or \code{"continuous"}.}
+\item{timing}{Character vector. One of \code{"immediate"}, \code{"due"}, or
+\code{"continuous"}.}
 
 \item{perpetuity}{Logical vector. If \code{TRUE}, computes the perpetuity
 factor.}
+
+\item{payment}{Numeric vector of level payment amounts. Used only when
+\code{tidy = TRUE} to report the corresponding present value. The annuity
+factor itself is always computed for unit payments.}
+
+\item{tidy}{Logical scalar. If \code{FALSE}, returns a numeric annuity factor.
+If \code{TRUE}, returns a tibble with intermediate calculations.}
 }
 \value{
-Numeric vector of annuity factors.
+If \code{tidy = FALSE}, a numeric vector of annuity factors.
+
+If \code{tidy = TRUE}, a tibble with input values, equivalent rates, annuity
+factors, payment amounts, and present values.
 }
 \description{
-Computes the actuarial present value factor for a level annuity.
+Computes the actuarial present value factor for a level annuity using compact
+actuarial notation.
 }
 \details{
 Supported timing conventions:
@@ -55,97 +68,92 @@ Supported timing conventions:
 \item \code{"continuous"}: continuous annuity.
 }
 
-For discrete annuities, \code{payments_per_year = k} means payments are made
-every \eqn{1/k} year. The function returns the annuity factor only, assuming
-a unit payment at each payment time.
+For discrete annuities, \code{k} is the number of payments per year, so
+payments are made every \eqn{1/k} year. The function returns the annuity
+factor, assuming a unit payment at each payment time.
 
-Deferral is supported through \code{deferral_years = h}. For discrete
-annuities, the deferral must align with the payment grid, that is,
-\eqn{h k} must be an integer.
+Deferment is supported through \code{h}. For discrete annuities, the
+deferment must align with the payment grid, that is, \eqn{hk} must be an
+integer.
 
 If \code{perpetuity = TRUE}, the infinite-term annuity factor is returned.
+
+This function follows the compact actuarial notation used throughout
+\code{tidyactuarial}:
+
+\itemize{
+\item \code{n}: annuity term;
+\item \code{k}: payment frequency;
+\item \code{i}: interest rate;
+\item \code{i_type}: interest-rate type;
+\item \code{m}: conversion frequency for nominal rates;
+\item \code{h}: deferment period.
+}
 
 The function first converts the supplied rate to the equivalent annual
 effective interest rate using \code{\link{standardize_interest}}.
 
 For finite discrete annuities:
-\deqn{a_{\overline{n|}} = \frac{1 - v^n}{i}}{a_n| = (1 - v^n)/(i)}
+\deqn{a_{\overline{n|}} = \frac{1 - v^n}{i}}
 
 For due annuities:
-\deqn{\ddot{a}_{\overline{n|}} = (1+i)a_{\overline{n|}}}{a_n| = (1+i)a_n|}
+\deqn{\ddot{a}_{\overline{n|}} = (1+i)a_{\overline{n|}}}
 
 For continuous annuities:
-\deqn{\bar{a}_{\overline{n|}} = \frac{1 - e^{-\delta n}}{\delta}}{a_n| = 1 - e^-delta ndelta}
+\deqn{\bar{a}_{\overline{n|}} = \frac{1 - e^{-\delta n}}{\delta}}
 
-Input vectors must have length 1 or a common length.
-Missing values are propagated.
+Input vectors must have length 1 or a common length. Missing values are
+propagated.
 }
 \examples{
-# Simple scalar examples
-a_angle(n_years = 10, rate = 0.05, type = "effective")
-a_angle(n_years = 10, rate = 0.06, type = "nominal_interest", m = 12,
-        payments_per_year = 12)
-a_angle(n_years = 15, rate = 0.04, type = "force", timing = "continuous")
+# Numeric annuity factor
+a_angle(n = 10, i = 0.05)
 
-# Medium vectorized example
+# Nominal interest converted monthly, with monthly payments
 a_angle(
-  n_years = c(5, 10, 20),
-  payments_per_year = c(1, 12, 1),
-  rate = c(0.05, 0.06, 0.04),
-  type = c("effective", "nominal_interest", "force"),
+  n = 10,
+  i = 0.06,
+  i_type = "nominal_interest",
+  m = 12,
+  k = 12
+)
+
+# Continuous annuity
+a_angle(
+  n = 15,
+  i = 0.04,
+  i_type = "force",
+  timing = "continuous"
+)
+
+# Tibble output for teaching or auditing
+a_angle(
+  n = 10,
+  i = 0.05,
+  payment = 1000,
+  tidy = TRUE
+)
+
+# Vectorized example
+a_angle(
+  n = c(5, 10, 20),
+  k = c(1, 12, 1),
+  i = c(0.05, 0.06, 0.04),
+  i_type = c("effective", "nominal_interest", "force"),
   m = c(1, 12, 1),
-  deferral_years = c(0, 0, 2),
+  h = c(0, 0, 2),
   timing = c("immediate", "immediate", "continuous"),
   perpetuity = c(FALSE, FALSE, FALSE)
 )
 
-# Use inside a data pipeline
-if (requireNamespace("dplyr", quietly = TRUE) &&
-    requireNamespace("tibble", quietly = TRUE)) {
-  contracts <- tibble::tibble(
-    n_years = c(10, 15, 20),
-    rate = c(0.05, 0.06, 0.04),
-    type = c("effective", "nominal_interest", "force"),
-    m = c(1, 12, 1),
-    payments_per_year = c(1, 12, NA),
-    deferral_years = c(0, 0, 3),
-    timing = c("immediate", "immediate", "continuous"),
-    perpetuity = c(FALSE, FALSE, FALSE)
-  )
-
-  dplyr::mutate(
-    contracts,
-    factor = a_angle(
-      n_years = n_years,
-      payments_per_year = dplyr::coalesce(payments_per_year, 1L),
-      rate = rate,
-      type = type,
-      m = m,
-      deferral_years = deferral_years,
-      timing = timing,
-      perpetuity = perpetuity
-    )
-  )
-}
-
 }
 \seealso{
-\code{\link{a_angle_tbl}}, \code{\link{s_angle}}, \code{\link{Da_angle}}, \code{\link{Ia_angle}},
-\code{\link{standardize_interest}}, \code{\link{present_value}}
+\code{\link{s_angle}}, \code{\link{standardize_interest}},
+\code{\link{present_value}}
 
 Other annuities: 
-\code{\link{Da_angle}()},
-\code{\link{Da_angle_tbl}()},
-\code{\link{Ia_angle}()},
-\code{\link{Ia_angle_tbl}()},
-\code{\link{a_angle_tbl}()},
-\code{\link{arithmetic_annuity_av_tbl}()},
-\code{\link{arithmetic_annuity_pv_tbl}()},
-\code{\link{ga_angle}()},
-\code{\link{ga_angle_tbl}()},
-\code{\link{gs_angle}()},
-\code{\link{gs_angle_tbl}()},
-\code{\link{s_angle}()},
-\code{\link{s_angle_tbl}()}
+\code{\link{annuity_arith}()},
+\code{\link{annuity_geom}()},
+\code{\link{s_angle}()}
 }
 \concept{annuities}

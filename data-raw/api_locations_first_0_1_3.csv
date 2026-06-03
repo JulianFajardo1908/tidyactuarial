@@ -1,0 +1,23 @@
+function_name,file
+Da_angle,R/a_angle.R; R/Da_angle.R; R/Ia_angle.R
+Da_angle_tbl,R/Da_angle.R
+Ia_angle,R/a_angle.R; R/Da_angle.R; R/Ia_angle.R
+Var_annuity_x,R/Var_annuity_x.R; R/Var_insurance_x.R
+a_angle_tbl,R/a_angle.R; R/Da_angle.R; R/ga_angle_n.R; R/s_angle.R
+arithmetic_annuity_av_tbl,R/arithmetic_annuity_av_tbl.R; R/arithmetic_annuity_pv_tbl.R
+arithmetic_annuity_pv_tbl,R/arithmetic_annuity_av_tbl.R; R/arithmetic_annuity_pv_tbl.R
+ga_angle,R/ga_angle_n.R; R/gs_angle_n.R
+ga_angle_tbl,R/ga_angle_n.R; R/gs_angle_n.R
+gs_angle,R/ga_angle_n.R; R/gs_angle_n.R
+gs_angle_tbl,R/gs_angle_n.R
+s_angle_tbl,R/s_angle.R
+bond_book_value_tbl,R/bond_book_value.R
+bond_callable_price_tbl,R/bond_callable_price.R
+portfolio_convexity_tbl,R/portfolio_convexity_tbl.R; R/portfolio_duration_tbl.R
+portfolio_duration_tbl,R/portfolio_convexity_tbl.R; R/portfolio_duration_tbl.R
+discount_factor_spot_tbl,R/discount_factor_spot.R
+forward_rate_tbl,R/forward_rate_tbl.R; R/yield_curve.R
+future_value_tbl,R/future_value.R
+present_value_tbl,R/present_value.R
+yield_curve_tbl,R/yield_curve.R
+Var_insurance_x,R/insurance_variable_k.R; R/insurance_x.R; R/Var_annuity_x.R; R/Var_insurance_x.R
