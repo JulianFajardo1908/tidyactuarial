@@ -32,6 +32,7 @@ mc_reserve(
   not_in_force = c("na", "zero"),
   col_L = "L_t",
   tol = 1e-10,
+  premium = NULL,
   ...
 )
 }
@@ -108,6 +109,10 @@ missing under either option.}
 \item{col_L}{Output column containing the prospective loss.}
 
 \item{tol}{Nonnegative numeric tolerance for consistency checks.}
+
+\item{premium}{Deprecated explicit alias for \code{P}. It remains a
+formal argument because otherwise R partially matches it against
+\code{premium_unit} and \code{premium_timing}.}
 
 \item{...}{Transitional compatibility for older argument names.}
 }

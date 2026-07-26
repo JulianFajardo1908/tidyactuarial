@@ -1,7 +1,7 @@
 Package: tidyactuarial
 Type: Package
 Title: Tidy Tools for Actuarial Mathematics and Life Contingencies
-Version: 0.1.4.9000
+Version: 0.1.5
 Authors@R: person(given = "Julian", family = "Fajardo", email = "julian.fajardo1908@gmail.com", role = c("aut", "cre"))
 Description: Provides tidyverse-aligned tools for actuarial mathematics
     and life contingencies, including life tables, survival probabilities,
