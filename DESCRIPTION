@@ -22,8 +22,3 @@ Config/testthat/edition: 3
 URL: https://github.com/JulianFajardo1908/tidyactuarial
 BugReports: https://github.com/JulianFajardo1908/tidyactuarial/issues
 NeedsCompilation: no
-Packaged: 2026-07-27 18:40:23 UTC; LENOVO
-Author: Julian Fajardo [aut, cre]
-Maintainer: Julian Fajardo <julian.fajardo1908@gmail.com>
-Repository: CRAN
-Date/Publication: 2026-07-27 19:30:02 UTC
