@@ -547,7 +547,7 @@ forward_rate <- function(
   } else if (.keep == "used") {
     out <- data_in[, c(t_name, i_name, t_start_name, t_end_name), drop = FALSE]
   } else {
-    out <- tibble::tibble()
+    out <- tibble::tibble(.rows = n_rows)
   }
 
   out[[.out]] <- out_forward
