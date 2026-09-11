@@ -1,84 +1,14 @@
 # tidyactuarial
 
-**Actuarial mathematics in R for users who think in formulas, tibbles, and reproducible pipelines.**
+**Actuarial mathematics in R with transparent formulas, reproducible workflows, and tidy outputs where they add value.**
 
-`tidyactuarial` provides actuarial mathematics tools designed for transparent,
-vectorized, and reproducible workflows in R. The package keeps the underlying
-actuarial quantities explicit while making it natural to move from one formula
-to a complete analysis built with tibbles, the native pipe, and tidyverse tools.
-Structured outputs can be used for teaching, auditing, scenario analysis, and
-applied actuarial work.
+`tidyactuarial` provides tools for financial mathematics and life contingencies in R. The package is designed so that the actuarial model remains visible: formulas, timing conventions, mortality assumptions, and valuation dates come first; computation is then used to reproduce, audit, and scale the calculation.
 
-The current stable release is **0.1.6** on CRAN. The development branch uses
-version **0.1.6.9000**.
-
-## What the package covers
-
-The current API includes tools for:
-
-- **Interest theory and cash flows:** rate conversion, present and future
-  values, accumulation and discount factors, general cash flows, IRR, and
-  equations of value.
-- **Annuities and loans:** actuarial annuity factors, arithmetic and geometric
-  annuities, amortization schedules, general payment patterns, and sinking
-  funds.
-- **Bonds and interest-rate risk:** cash-flow schedules, prices, yields, book
-  values, callable bonds, duration, convexity, and portfolio measures.
-- **Yield curves and immunization:** spot discounting, forward rates, yield
-  curves, duration matching, and duration-convexity immunization.
-- **Life contingencies:** life tables, survival probabilities, life
-  expectancy, life annuities, insurance benefits, premiums, reserves, and
-  multiple-life calculations.
-- **Simulation:** lifetime simulation and Monte Carlo tools for annuities,
-  insurance, premiums, losses, reserves, and multiple-life status models.
-- **Reproducible actuarial workflows:** tidy tables, audit-oriented outputs,
-  sample datasets, and cash-flow visualizations.
-
-## Design principles
-
-`tidyactuarial` is built around four ideas:
-
-1. **Actuarial transparency.** Functions use recognizable actuarial inputs and
-   keep the financial or life-contingency model visible.
-2. **Composable workflows.** Many calculations accept vectors, and several
-   higher-level functions are tibble-first or pipe-friendly, so actuarial
-   calculations can be embedded naturally in `dplyr`, `tidyr`, and `purrr`
-   workflows.
-3. **Appropriate output for the task.** Direct calculations often return
-   numeric values; functions that benefit from inspection can also provide
-   tidy, summary, audit, schedule, or portfolio-level outputs.
-4. **Reproducibility.** Calculations are designed to be checked, repeated,
-   compared across scenarios, and connected to downstream data analysis.
-
-The package does **not** replace actuarial reasoning. It is intended to make
-that reasoning easier to reproduce and audit computationally.
-
-
-## For users who like tidy workflows
-
-`tidyactuarial` does not force every actuarial calculation into a tibble. A
-single present value should still be easy to compute as a number. But when the
-problem becomes a collection of scenarios, contracts, positions, or portfolios,
-the package is designed to fit naturally into a tidy workflow.
-
-Tidyverse-oriented users should feel at home with four recurring patterns:
-
-- **vectorized primitives inside `mutate()`:** standardize rates, value cash
-  flows, or evaluate scenarios without leaving the data pipeline;
-- **tibble-first summaries:** portfolio duration and convexity consume position
-  tables and return one row per portfolio;
-- **structured outputs:** schedules, summaries, audit tables, and other outputs
-  can be joined, filtered, reshaped, or plotted with familiar tidyverse tools;
-- **domain pipelines:** actuarial objects such as life contracts can be built
-  progressively with the native `|>` pipe before valuation.
-
-The objective is not to hide actuarial mathematics behind syntax. It is to let
-the mathematics remain recognizable while the surrounding workflow becomes
-repeatable, inspectable, and scalable.
+The stable release is **0.1.6** on CRAN. The development version is **0.1.6.9000**.
 
 ## Installation
 
-Install the stable release from CRAN:
+Install the stable version from CRAN:
 
 ```r
 install.packages("tidyactuarial")
@@ -90,43 +20,80 @@ Load the package with:
 library(tidyactuarial)
 ```
 
-The development version is maintained at the canonical GitHub repository:
+## What tidyactuarial covers
 
-```r
-# install.packages("pak")
-pak::pak("JulianFajardo1908/tidyactuarial")
-```
+The package currently includes tools for:
+
+- **Financial mathematics and interest rates:** accumulation, discounting, equivalent rates, present and future values, equations of value, cash-flow valuation, and IRR.
+- **Annuities and loans:** level and varying annuities, amortization schedules, extra principal, variable rates, and general payment rules.
+- **Bonds and interest-rate risk:** bond cash flows, price, yield, book value, callable bonds, duration, convexity, and portfolio measures.
+- **Term structure and immunization:** spot discounting, forward rates, yield curves, duration matching, and duration-convexity immunization.
+- **Life tables and survival:** life-table construction, fractional-age assumptions, survival and death probabilities, life expectancy, Kaplan-Meier estimation, and commutation functions.
+- **Life contingencies:** life annuities, life insurance, premiums, reserves, and contract-based workflows.
+- **Multiple-life and multiple-decrement models:** joint-life and last-survivor quantities, premiums, reserves, and cause-specific decrement calculations.
+- **Simulation and actuarial risk:** lifetime simulation and Monte Carlo tools for annuities, insurance, premiums, reserves, losses, and multiple-life status models.
+
+The full API is organized by actuarial area in the **Reference** section of the package website.
+
+## A simple design principle
+
+The package does not try to replace actuarial reasoning with software.
+
+For a payment of amount $C$ at time $t$, financial valuation begins with
+
+$$
+PV = C(1+i)^{-t}.
+$$
+
+For a payment contingent on survival of a life aged $x$, the corresponding actuarial structure becomes
+
+$$
+{}_tE_x
+=
+v^t\,{}_tp_x.
+$$
+
+`tidyactuarial` keeps these quantities explicit and then provides functions that make the same calculations easier to reproduce across scenarios, portfolios, contracts, and datasets.
 
 ## Quick start
 
-### 1. Standardize heterogeneous interest-rate conventions
+### Interest-rate conversion and valuation
 
-A portfolio may contain rates quoted under different conventions. They can be
-placed on a common annual-effective basis before valuation.
+Different rate conventions can first be placed on a common annual-effective basis.
 
 ```r
 library(tidyactuarial)
 library(dplyr)
 library(tibble)
 
-alternatives <- tibble(
+rates <- tibble(
   product = c(
-    "annual effective",
+    "effective",
     "nominal interest",
-    "force of interest",
+    "force",
     "nominal discount"
   ),
-  i = c(0.0620, 0.0605, 0.0605, 0.0590),
+  i = c(
+    0.0620,
+    0.0605,
+    0.0605,
+    0.0590
+  ),
   i_type = c(
     "effective",
     "nominal_interest",
     "force",
     "nominal_discount"
   ),
-  m = c(1, 12, 1, 4)
+  m = c(
+    1,
+    12,
+    1,
+    4
+  )
 )
 
-alternatives |>
+rates |>
   mutate(
     i_effective = standardize_interest(
       i_type = i_type,
@@ -141,97 +108,62 @@ alternatives |>
   )
 ```
 
-This illustrates a central package pattern: standardize actuarial assumptions
-first, then apply the same valuation function across scenarios.
+This pattern is useful when actuarial assumptions arrive in heterogeneous forms but the valuation model requires a common basis.
 
-### 2. Accumulate under a time-varying force of interest
+### General loan schedules
 
-`accumulation_factor()` can work with a conventional interest rate, a general
-accumulation function, or a time-varying force of interest.
+For a loan balance $B_{t-1}$, interest $I_t$, scheduled payment $R_t$, and extra principal $E_t$,
 
-```r
-delta_fun <- function(t) {
-  0.03 + 0.004 * t
-}
-
-accumulation_factor(
-  s = 2,
-  t = 5,
-  delta = delta_fun
-)
-```
-
-For a force of interest \(\delta(t)\), the calculation corresponds to
-
-\[
-a(s,t)
+$$
+B_t
 =
-\exp\left\{\int_s^t \delta(u)\,du\right\}.
-\]
+B_{t-1}
++
+I_t
+-
+R_t
+-
+E_t.
+$$
 
-### 3. Build a general amortization schedule
-
-The general loan engine supports level or non-level payments, period-specific
-rates, extra principal, and payment rules.
+A standard amortization schedule can be generated directly:
 
 ```r
-schedule <- amort_schedule_general(
-  principal = 100000,
-  n = 12,
+amort_schedule(
+  principal = 50000,
+  n = 5,
   i = 0.12,
   i_type = "nominal_interest",
   m = 12,
   k = 12
 )
-
-schedule
 ```
 
-A compact summary is also available:
+When rates or payment rules vary over time, `amort_schedule_general()` provides the more flexible engine.
 
 ```r
+principal <- 120000
+rates <- c(
+  0.04,
+  0.05,
+  0.06,
+  0.07,
+  0.08,
+  0.09
+)
+
 amort_schedule_general(
-  principal = 100000,
-  n = 60,
-  i = 0.08,
-  k = 12,
-  output = "summary"
+  principal = principal,
+  n = 6,
+  i = rates,
+  payment = NULL
 )
 ```
 
-### 4. Price and inspect a coupon bond
+### Bond valuation and interest-rate risk
 
 ```r
-bond_cash_flows(
-  face = 1000,
-  c = 0.05,
-  n = 10,
-  k = 2,
-  R = 1000
-)
-
-bond_price(
-  face = 1000,
-  c = 0.05,
-  n = 10,
-  k = 2,
-  y = 0.06,
-  y_type = "effective"
-)
-```
-
-The same bond framework also includes yield, book value, callable-bond,
-duration, and convexity calculations.
-
-
-### 5. Move from bond valuation to duration and convexity
-
-The bond tools extend naturally from price to interest-rate risk. For a single
-bond, Macaulay duration, modified duration, and discrete convexity can be
-computed from the same compact actuarial specification.
-
-```r
-bond_duration(
+price <- bond_price(
   face = 1000,
   c = 0.05,
   n = 10,
@@ -240,7 +172,7 @@ bond_duration(
   y_type = "effective"
 )
 
-bond_convexity(
+duration <- bond_duration(
   face = 1000,
   c = 0.05,
   n = 10,
@@ -248,50 +180,32 @@ bond_convexity(
   y = 0.06,
   y_type = "effective"
 )
-```
 
-For portfolio work, duration and convexity are implemented as summarise-style,
-tibble-first functions. Each input row can represent a position and each output
-row a portfolio.
-
-```r
-positions <- tibble(
-  portfolio_id = c("A", "A", "A", "B", "B"),
-  P = c(980, 1020, 995, 1500, 1200),
-  D = c(2.8, 5.1, 8.4, 4.6, 7.2),
-  C = c(9.7, 31.5, 79.2, 24.8, 58.1)
+convexity <- bond_convexity(
+  face = 1000,
+  c = 0.05,
+  n = 10,
+  k = 2,
+  y = 0.06,
+  y_type = "effective"
 )
 
-positions |>
-  portfolio_duration(
-    col_portfolio = "portfolio_id",
-    col_P = "P",
-    col_D = "D"
-  )
-
-positions |>
-  portfolio_convexity(
-    col_portfolio = "portfolio_id",
-    col_P = "P",
-    col_C = "C"
-  )
+tibble(
+  price = price,
+  duration = duration,
+  convexity = convexity
+)
 ```
 
-This is the type of transition the package is designed to support: from an
-individual actuarial formula to a portfolio-level workflow without changing the
-underlying financial interpretation.
+The package uses the same actuarial specification to move from bond price to duration and convexity.
 
-### 6. Move from a life table to a premium calculation
+### From a life table to a premium
 
 ```r
-lt <- data.frame(
-  x = 40:90,
-  lx = round(100000 * exp(-0.018 * (0:50)^1.35))
-)
-lt$lx[nrow(lt)] <- 0
+data("soa08lt")
 
 premium_x(
-  lt = lt,
+  lt = soa08lt,
   x = 40,
   i = 0.05,
   type = "term",
@@ -303,15 +217,15 @@ premium_x(
 )
 ```
 
-Contracts can also be assembled progressively:
+The same contract can be assembled progressively:
 
 ```r
-life_contract(
-  lt = lt,
-  lives = "single",
-  x = 40,
-  i = 0.05
-) |>
+soa08lt |>
+  life_contract(
+    lives = "single",
+    x = 40,
+    i = 0.05
+  ) |>
   add_insurance(
     type = "term",
     benefit = 100000,
@@ -322,56 +236,83 @@ life_contract(
     n_prem = 10,
     timing = "due"
   ) |>
-  premium_x(output = "summary")
+  premium_x(
+    output = "summary"
+  )
 ```
 
-## Reliability and development
+The pipe records the actuarial construction of the contract; it does not replace the underlying equation of equivalence.
 
-The package source includes unit and regression tests under `tests/testthat/`.
-The development roadmap is focused on strengthening automated checks, public
-coverage reporting, high-level vignettes, and external use cases before
-expanding the API further.
+## Articles
 
-For reproducible work, use a released CRAN version when stability is the main
-priority and the development branch when testing upcoming changes.
+Four introductory articles develop complete workflows rather than isolated function calls:
+
+- **Financial Mathematics with tidyactuarial**
+- **Loans, Amortization, and General Payment Schedules**
+- **Bonds, Duration, Convexity, and Immunization**
+- **Life Contingencies with tidyactuarial**
+
+They are available from the **Articles** menu of the package website.
+
+## Output philosophy
+
+Not every actuarial result needs to be a tibble.
+
+`tidyactuarial` uses several output patterns depending on the task:
+
+- direct numerical values for simple actuarial quantities;
+- tidy one-row summaries when intermediate quantities are useful;
+- schedules for loans, bonds, reserves, and related time-dependent calculations;
+- portfolio-level summaries for grouped financial positions;
+- pipe-friendly contract objects for life-contingency workflows.
+
+This keeps simple calculations simple while allowing larger analyses to remain inspectable and reproducible.
+
+## Reliability
+
+The package is developed with automated unit and regression tests. The development branch is also checked through continuous integration on Linux, Windows, and macOS.
+
+For released work where stability is the priority, use the CRAN version.
 
 ## Documentation
 
-Function-level documentation and examples are available from R:
+Function-level documentation is available from R:
 
 ```r
 help(package = "tidyactuarial")
-?future_value
+?standardize_interest
 ?amort_schedule_general
 ?bond_price
-?bond_duration
-?bond_convexity
-?portfolio_duration
+?annuity_x
 ?premium_x
+?reserve_x
 ```
 
-The package includes sample data for cash flows, loans, bonds, mortality, and
-multiple-decrement workflows.
+The package website provides:
 
-## Contributing and reporting problems
+- **Reference:** functions organized by actuarial area;
+- **Articles:** worked actuarial workflows;
+- **Changelog:** package development history.
 
-Bug reports and reproducible examples are welcome through GitHub Issues:
+## Reporting problems
 
-<https://github.com/JulianFajardo1908/tidyactuarial/issues>
+Bug reports and reproducible examples are welcome through the project issue tracker.
 
-When reporting a numerical issue, please include the function call, inputs,
-expected actuarial result, observed result, and `sessionInfo()` whenever
-possible.
+For numerical issues, include whenever possible:
+
+- the function call;
+- all relevant inputs;
+- the expected actuarial result;
+- the observed result;
+- `sessionInfo()`.
 
 ## References
 
-The package is grounded in standard actuarial mathematics and financial
-mathematics. Useful references for the implemented topics include:
+The package follows standard actuarial and financial mathematics. Useful background references include:
 
-- Dickson, D. C. M., Hardy, M. R., & Waters, H. R. *Actuarial Mathematics for
-  Life Contingent Risks*.
+- Dickson, D. C. M., Hardy, M. R., & Waters, H. R. *Actuarial Mathematics for Life Contingent Risks*.
 - Kellison, S. G. *The Theory of Interest*.
-- Finan, M. B. *A Reading of the Theory of Life Contingencies*.
+- Bowers, N. L., Gerber, H. U., Hickman, J. C., Jones, D. A., & Nesbitt, C. J. *Actuarial Mathematics*.
 
 ## License
 
