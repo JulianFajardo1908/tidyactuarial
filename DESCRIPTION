@@ -14,11 +14,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1.0)
 Imports: dplyr, ggplot2, rlang, scales, stats, tibble, utils
-Suggests: purrr, testthat (>= 3.0.0)
+Suggests: knitr, purrr, rmarkdown, testthat (>= 3.0.0)
 LazyData: true
 LazyDataCompression: xz
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
+VignetteBuilder: knitr
 URL: https://github.com/JulianFajardo1908/tidyactuarial
 BugReports: https://github.com/JulianFajardo1908/tidyactuarial/issues
 NeedsCompilation: no
