@@ -1,0 +1,18 @@
+title: tidyactuarial
+
+template:
+  bootstrap: 5
+  math-rendering: katex
+
+articles:
+- title: "Financial Mathematics"
+  navbar: ~
+  contents:
+  - financial-mathematics
+  - loans-amortization-general-schedules
+  - bonds-duration-convexity-immunization
+
+- title: "Life Contingencies"
+  navbar: ~
+  contents:
+  - life-contingencies
