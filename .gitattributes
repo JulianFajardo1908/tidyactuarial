@@ -1,0 +1,33 @@
+# Keep text files normalized in the repository.
+* text=auto eol=lf
+
+# R package source and documentation
+*.R          text eol=lf
+*.r          text eol=lf
+*.Rmd        text eol=lf
+*.qmd        text eol=lf
+*.md         text eol=lf
+*.Rd         text eol=lf
+DESCRIPTION  text eol=lf
+NAMESPACE    text eol=lf
+NEWS         text eol=lf
+NEWS.md      text eol=lf
+*.Rproj      text eol=lf
+*.yml        text eol=lf
+*.yaml       text eol=lf
+*.json       text eol=lf
+*.csv        text eol=lf
+*.txt        text eol=lf
+
+# Binary artifacts and package data
+*.rda        binary
+*.rds        binary
+*.RData      binary
+*.png        binary
+*.jpg        binary
+*.jpeg       binary
+*.gif        binary
+*.pdf        binary
+*.zip        binary
+*.gz         binary
+*.tar        binary

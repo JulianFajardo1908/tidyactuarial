@@ -203,7 +203,7 @@ km_lifetable <- function(
   S_at <- function(t) {
     if (n_ut == 0L) return(rep(1, length(t)))
     idx <- findInterval(t, ut)
-    ifelse(idx == 0L, 1, S[idx])
+    c(1, S)[idx + 1L]
   }
 
   # --- breaks default ---

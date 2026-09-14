@@ -544,7 +544,7 @@ plot_cash_flow <- function(
           hjust = .data[["label_hjust"]]
         ),
         size = label_size,
-        label.size = 0,
+        linewidth = 0,
         alpha = 0.92,
         color = "white",
         show.legend = FALSE
