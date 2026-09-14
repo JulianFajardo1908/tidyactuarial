@@ -20,6 +20,6 @@ LazyDataCompression: xz
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-URL: https://github.com/JulianFajardo1908/tidyactuarial
+URL: https://github.com/JulianFajardo1908/tidyactuarial, https://julianfajardo1908.github.io/tidyactuarial/
 BugReports: https://github.com/JulianFajardo1908/tidyactuarial/issues
 NeedsCompilation: no

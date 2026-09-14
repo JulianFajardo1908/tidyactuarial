@@ -1,14 +1,12 @@
+url: https://julianfajardo1908.github.io/tidyactuarial/
 title: tidyactuarial
-
 template:
   bootstrap: 5
   math-rendering: katex
-
 reference:
-- title: "Financial Mathematics and Interest Rates"
-  desc: >
-    Accumulation, discounting, equivalent rates, equations of value,
-    cash-flow valuation, and internal rates of return.
+- title: Financial Mathematics and Interest Rates
+  desc: |
+    Accumulation, discounting, equivalent rates, equations of value, cash-flow valuation, and internal rates of return.
   contents:
   - accumulation_factor
   - discount_factor
@@ -22,9 +20,8 @@ reference:
   - irr_flow
   - irr_flow_multi
   - plot_cash_flow
-
-- title: "Annuities and Loans"
-  desc: >
+- title: Annuities and Loans
+  desc: |
     Level and varying annuities, amortization schedules, and loan repayment.
   contents:
   - a_angle
@@ -34,11 +31,9 @@ reference:
   - amort_schedule
   - amort_schedule_general
   - sinking_fund_schedule
-
-- title: "Bonds, Duration, Convexity, and Immunization"
-  desc: >
-    Bond valuation, yield, book value, callable bonds, duration, convexity,
-    portfolio measures, and immunization.
+- title: Bonds, Duration, Convexity, and Immunization
+  desc: |
+    Bond valuation, yield, book value, callable bonds, duration, convexity, portfolio measures, and immunization.
   contents:
   - bond_cash_flows
   - bond_price
@@ -54,19 +49,16 @@ reference:
   - immunize_duration
   - immunize_duration_convexity
   - plot_immunization_gap
-
-- title: "Term Structure of Interest Rates"
-  desc: >
+- title: Term Structure of Interest Rates
+  desc: |
     Spot discount factors, yield curves, and forward rates.
   contents:
   - discount_factor_spot
   - yield_curve
   - forward_rate
-
-- title: "Life Tables and Survival"
-  desc: >
-    Life-table construction, mortality laws, Kaplan-Meier estimation,
-    survival probabilities, life expectancy, and commutation functions.
+- title: Life Tables and Survival
+  desc: |
+    Life-table construction, mortality laws, Kaplan-Meier estimation, survival probabilities, life expectancy, and commutation functions.
   contents:
   - lifetable
   - mortality_law_table
@@ -77,11 +69,9 @@ reference:
   - t_Ex
   - e_x
   - commutation_table
-
-- title: "Single-Life Contingencies"
-  desc: >
-    Life annuities, life insurance, premiums, reserves, and contract workflows
-    for a single life.
+- title: Single-Life Contingencies
+  desc: |
+    Life annuities, life insurance, premiums, reserves, and contract workflows for a single life.
   contents:
   - life_contract
   - add_insurance
@@ -93,9 +83,8 @@ reference:
   - premium_x
   - premium_gross
   - reserve_x
-
-- title: "Multiple-Life Contingencies"
-  desc: >
+- title: Multiple-Life Contingencies
+  desc: |
     Joint-life, last-survivor, and multi-life survival and contingent values.
   contents:
   - t_pxy
@@ -105,21 +94,17 @@ reference:
   - premium_xy
   - reserve_xy
   - annuity_multi
-
-- title: "Multiple Decrements"
-  desc: >
-    Multiple-decrement tables, total-decrement life tables, cause-specific
-    probabilities, and cause-specific insurance values.
+- title: Multiple Decrements
+  desc: |
+    Multiple-decrement tables, total-decrement life tables, cause-specific probabilities, and cause-specific insurance values.
   contents:
   - md_table
   - lt_tau
   - t_qxj
   - insurance_xj
-
-- title: "Simulation and Actuarial Risk"
-  desc: >
-    Lifetime simulation, Monte Carlo valuation, loss distributions, reserves,
-    multi-life simulation, and simulation summaries.
+- title: Simulation and Actuarial Risk
+  desc: |
+    Lifetime simulation, Monte Carlo valuation, loss distributions, reserves, multi-life simulation, and simulation summaries.
   contents:
   - simulate_lifetime
   - simulate_lifetimes
@@ -132,9 +117,8 @@ reference:
   - mc_loss
   - mc_multilife_status
   - summary_mc
-
-- title: "Datasets"
-  desc: >
+- title: Datasets
+  desc: |
     Reproducible datasets for financial and actuarial examples.
   contents:
   - bonds_sample
@@ -145,16 +129,14 @@ reference:
   - mortality_world_sample_2023
   - multiple_decrement_sample
   - soa08lt
-
 articles:
-- title: "Financial Mathematics"
+- title: Financial Mathematics
   navbar: ~
   contents:
   - financial-mathematics
   - loans-amortization-general-schedules
   - bonds-duration-convexity-immunization
-
-- title: "Life Contingencies"
+- title: Life Contingencies
   navbar: ~
-  contents:
-  - life-contingencies
+  contents: life-contingencies
+
