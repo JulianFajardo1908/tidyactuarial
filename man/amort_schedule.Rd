@@ -40,10 +40,10 @@ If \code{NULL}, it is computed from the loan data.}
 
 \item{extra_principal}{Optional extra principal payments. Can be:
 \itemize{
-\item \code{NULL},
-\item a scalar,
-\item an unnamed numeric vector of length \code{n},
-\item a named numeric vector with names interpreted as period numbers.
+  \item \code{NULL},
+  \item a scalar,
+  \item an unnamed numeric vector of length \code{n},
+  \item a named numeric vector with names interpreted as period numbers.
 }}
 
 \item{adjust}{Character string. One of \code{"none"}, \code{"term"}, or
@@ -54,20 +54,20 @@ If \code{NULL}, it is computed from the loan data.}
 \value{
 A tibble with one row per realized period and columns:
 \describe{
-\item{period}{Period index.}
-\item{ob_start}{Outstanding balance at the start of the period.}
-\item{interest}{Interest charged during the period.}
-\item{payment}{Regular payment in the period.}
-\item{extra_principal}{Extra principal paid in the period.}
-\item{principal}{Principal repaid through the regular payment.}
-\item{total_principal}{Total principal repaid in the period.}
-\item{cashflow}{Total payment made in the period.}
-\item{ob_end}{Outstanding balance at the end of the period.}
-\item{i_effective_annual}{Equivalent annual effective rate.}
-\item{i_effective_period}{Equivalent effective rate per schedule period.}
-\item{k}{Schedule frequency.}
-\item{timing}{Payment timing convention.}
-\item{adjust}{Adjustment rule used.}
+  \item{period}{Period index.}
+  \item{ob_start}{Outstanding balance at the start of the period.}
+  \item{interest}{Interest charged during the period.}
+  \item{payment}{Regular payment in the period.}
+  \item{extra_principal}{Extra principal paid in the period.}
+  \item{principal}{Principal repaid through the regular payment.}
+  \item{total_principal}{Total principal repaid in the period.}
+  \item{cashflow}{Total payment made in the period.}
+  \item{ob_end}{Outstanding balance at the end of the period.}
+  \item{i_effective_annual}{Equivalent annual effective rate.}
+  \item{i_effective_period}{Equivalent effective rate per schedule period.}
+  \item{k}{Schedule frequency.}
+  \item{timing}{Payment timing convention.}
+  \item{adjust}{Adjustment rule used.}
 }
 }
 \description{
@@ -81,14 +81,15 @@ period using \code{k}.
 
 Adjustment policies after extra principal payments:
 \itemize{
-\item \code{"none"}: keep the original payment and contractual term,
-unless the loan is fully repaid early.
-\item \code{"term"}: keep the regular payment and shorten the term.
-No special logic is needed: the loop exits naturally when the
-outstanding balance reaches zero.
-\item \code{"payment"}: keep the remaining contractual term and
-recalculate the regular payment after each period.
+  \item \code{"none"}: keep the original payment and contractual term,
+        unless the loan is fully repaid early.
+  \item \code{"term"}: keep the regular payment and shorten the term.
+        No special logic is needed: the loop exits naturally when the
+        outstanding balance reaches zero.
+  \item \code{"payment"}: keep the remaining contractual term and
+        recalculate the regular payment after each period.
 }
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{i} is the interest rate, \code{i_type} is the
@@ -139,10 +140,10 @@ amort_schedule(
 }
 \seealso{
 \code{\link{a_angle}}, \code{\link{present_value}},
-\code{\link{pv_flow}}, \code{\link{standardize_interest}}
+  \code{\link{pv_flow}}, \code{\link{standardize_interest}}
 
-Other amortization: 
-\code{\link{amort_schedule_general}()},
-\code{\link{sinking_fund_schedule}()}
+Other amortization:
+\code{\link[=amort_schedule_general]{amort_schedule_general()}},
+\code{\link[=sinking_fund_schedule]{sinking_fund_schedule()}}
 }
 \concept{amortization}

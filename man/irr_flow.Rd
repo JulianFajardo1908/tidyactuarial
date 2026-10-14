@@ -40,21 +40,21 @@ One of \code{"act/365"} or \code{"act/360"}.}
 \value{
 A one-row tibble with:
 \describe{
-\item{irr}{Estimated IRR as an annual effective rate.}
-\item{i_effective_annual}{Same as \code{irr}, reported explicitly.}
-\item{j_nominal_interest}{Equivalent nominal annual interest rate
-convertible \code{m} times.}
-\item{delta}{Equivalent force of interest.}
-\item{npv}{Present value at the estimated IRR, close to zero.}
-\item{interval_left}{Left endpoint of the search interval.}
-\item{interval_right}{Right endpoint of the search interval.}
-\item{converged}{Logical flag indicating whether a root was found.}
-\item{n_iter}{Number of iterations used by \code{uniroot}.}
-\item{n_cashflows}{Length of \code{cf}.}
-\item{has_both_signs}{Whether the cash flow has at least one positive
-and one negative value.}
-\item{n_sign_changes}{Number of sign changes in the nonzero cash-flow
-sequence.}
+  \item{irr}{Estimated IRR as an annual effective rate.}
+  \item{i_effective_annual}{Same as \code{irr}, reported explicitly.}
+  \item{j_nominal_interest}{Equivalent nominal annual interest rate
+    convertible \code{m} times.}
+  \item{delta}{Equivalent force of interest.}
+  \item{npv}{Present value at the estimated IRR, close to zero.}
+  \item{interval_left}{Left endpoint of the search interval.}
+  \item{interval_right}{Right endpoint of the search interval.}
+  \item{converged}{Logical flag indicating whether a root was found.}
+  \item{n_iter}{Number of iterations used by \code{uniroot}.}
+  \item{n_cashflows}{Length of \code{cf}.}
+  \item{has_both_signs}{Whether the cash flow has at least one positive
+    and one negative value.}
+  \item{n_sign_changes}{Number of sign changes in the nonzero cash-flow
+    sequence.}
 }
 
 If no sign change is present in the cash flow, or if the NPV does not change
@@ -72,6 +72,7 @@ either through \code{t} (in years) or \code{date} (calendar dates). If
 \code{date} is supplied, the earliest date is treated as time 0.
 
 The IRR returned is interpreted as an annual effective rate.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,
@@ -106,17 +107,17 @@ irr_flow(
 }
 \seealso{
 \code{\link{pv_flow}}, \code{\link{irr_flow_multi}},
-\code{\link{bond_ytm}}
+  \code{\link{bond_ytm}}
 
-Other time-value: 
-\code{\link{accumulation_factor}()},
-\code{\link{discount_factor}()},
-\code{\link{future_value}()},
-\code{\link{fv_flow}()},
-\code{\link{irr_flow_multi}()},
-\code{\link{plot_cash_flow}()},
-\code{\link{present_value}()},
-\code{\link{pv_flow}()},
-\code{\link{solve_value}()}
+Other time-value:
+\code{\link[=accumulation_factor]{accumulation_factor()}},
+\code{\link[=discount_factor]{discount_factor()}},
+\code{\link[=future_value]{future_value()}},
+\code{\link[=fv_flow]{fv_flow()}},
+\code{\link[=irr_flow_multi]{irr_flow_multi()}},
+\code{\link[=plot_cash_flow]{plot_cash_flow()}},
+\code{\link[=present_value]{present_value()}},
+\code{\link[=pv_flow]{pv_flow()}},
+\code{\link[=solve_value]{solve_value()}}
 }
 \concept{time-value}

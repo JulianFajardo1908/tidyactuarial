@@ -43,14 +43,14 @@ force), or \code{"Balducci"}.}
 \value{
 A list with two tibbles:
 \itemize{
-\item \code{km}: tibble with columns \code{time}, \code{n_risk},
-\code{d}, \code{censored}, \code{S}, \code{varS}, \code{seS},
-\code{ci_low}, \code{ci_high}.
-\item \code{lifetable}: tibble with columns \code{x}, \code{x_next},
-\code{width}, \code{lx}, \code{dx}, \code{qx}, \code{px}, \code{mx},
-\code{ax}, \code{Lx}, \code{Tx}, \code{ex}. Carries class
-\code{"lifetable"} and standard attributes for compatibility with
-downstream functions.
+  \item \code{km}: tibble with columns \code{time}, \code{n_risk},
+    \code{d}, \code{censored}, \code{S}, \code{varS}, \code{seS},
+    \code{ci_low}, \code{ci_high}.
+  \item \code{lifetable}: tibble with columns \code{x}, \code{x_next},
+    \code{width}, \code{lx}, \code{dx}, \code{qx}, \code{px}, \code{mx},
+    \code{ax}, \code{Lx}, \code{Tx}, \code{ex}. Carries class
+    \code{"lifetable"} and standard attributes for compatibility with
+    downstream functions.
 }
 }
 \description{
@@ -60,12 +60,13 @@ for \eqn{\hat S(t)}, and constructs a discrete life table by evaluating
 \eqn{\hat S(t)} at user-provided cut points (\code{breaks}).
 }
 \details{
-The resulting life table is intended for \emph{experience-based} (empirical) life
+The resulting life table is intended for *experience-based* (empirical) life
 tables in actuarial/demographic contexts (e.g., cohort studies, population
 indicators). It is not a replacement for graduated/regulatory tables when
 smoothing, extrapolation, or product-specific selection effects are required.
 
-\strong{Kaplan--Meier estimator.} At each observed event time \eqn{t_j}:
+
+**Kaplan--Meier estimator.** At each observed event time \eqn{t_j}:
 \deqn{\hat S(t) = \prod_{t_j \le t} \left(1 - \frac{d_j}{n_j}\right)}
 where \eqn{n_j} is the risk set size and \eqn{d_j} is the number of events.
 Greenwood's variance:
@@ -73,32 +74,32 @@ Greenwood's variance:
 \frac{d_j}{n_j(n_j - d_j)}.}
 Pointwise confidence intervals use the log(-log) transformation.
 
-\strong{Life table mapping.} For each interval \eqn{[x, x + \Delta)}:
+**Life table mapping.** For each interval \eqn{[x, x + \Delta)}:
 \deqn{\ell_x = \text{radix} \cdot \hat S(x), \quad d_x = \ell_x -
   \ell_{x+\Delta}, \quad q_x = d_x / \ell_x.}
 
 Exposure \eqn{L_x = \int_x^{x+\Delta} \ell(t)\,dt} is computed using the
 selected fractional-age assumption (Finan, Section 24):
 \itemize{
-\item UDD (Finan, Sec. 24.1):
-\eqn{L_x \approx \tfrac{\ell_x + \ell_{x+\Delta}}{2} \Delta}
-\item CF (constant force, Finan, Sec. 24.2):
-\eqn{L_x = \Delta \cdot (\ell_x - \ell_{x+\Delta}) /
+  \item UDD (Finan, Sec. 24.1):
+    \eqn{L_x \approx \tfrac{\ell_x + \ell_{x+\Delta}}{2} \Delta}
+  \item CF (constant force, Finan, Sec. 24.2):
+    \eqn{L_x = \Delta \cdot (\ell_x - \ell_{x+\Delta}) /
     \ln(\ell_x / \ell_{x+\Delta})}
-\item Balducci (Finan, Sec. 24.3):
-\eqn{L_x = \Delta \cdot \ell_x \ell_{x+\Delta} /
+  \item Balducci (Finan, Sec. 24.3):
+    \eqn{L_x = \Delta \cdot \ell_x \ell_{x+\Delta} /
     (\ell_x - \ell_{x+\Delta}) \cdot \ln(\ell_x / \ell_{x+\Delta})}
 }
 
 Additional columns follow Finan, Sections 23.3, 23.8--23.9:
 \itemize{
-\item \eqn{T_x = \sum_{k \ge x} L_k}: total expected years lived after
-age \eqn{x} (Finan, Sec. 23.3).
-\item \eqn{\mathring{e}_x = T_x / \ell_x}: complete life expectancy
-(Finan, Sec. 23.3).
-\item \eqn{m_x = d_x / L_x}: central death rate (Finan, Sec. 23.9).
-\item \eqn{a_x = (\ell_x \Delta - L_x) / d_x}: average fraction of the
-interval lived by those who die.
+  \item \eqn{T_x = \sum_{k \ge x} L_k}: total expected years lived after
+    age \eqn{x} (Finan, Sec. 23.3).
+  \item \eqn{\mathring{e}_x = T_x / \ell_x}: complete life expectancy
+    (Finan, Sec. 23.3).
+  \item \eqn{m_x = d_x / L_x}: central death rate (Finan, Sec. 23.9).
+  \item \eqn{a_x = (\ell_x \Delta - L_x) / d_x}: average fraction of the
+    interval lived by those who die.
 }
 }
 \examples{
@@ -128,5 +129,5 @@ plot_km(out$km, time_col = "time", surv_col = "S",
 }
 \seealso{
 \code{\link{lifetable}} for building tables from known mortality
-inputs, \code{\link{plot_km}} for plotting the KM curve.
+  inputs, \code{\link{plot_km}} for plotting the KM curve.
 }

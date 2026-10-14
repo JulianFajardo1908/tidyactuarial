@@ -71,10 +71,11 @@ within the term or at the end of the term if the life survives.
 
 Supported contracts:
 \itemize{
-\item \code{"whole"}: whole-life insurance.
-\item \code{"term"}: n-year term insurance.
-\item \code{"endowment"}: n-year endowment insurance.
+  \item \code{"whole"}: whole-life insurance.
+  \item \code{"term"}: n-year term insurance.
+  \item \code{"endowment"}: n-year endowment insurance.
 }
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{lt} is the life table, \code{x} is the age at
@@ -146,23 +147,23 @@ insurance_x(
 }
 \seealso{
 \code{\link{annuity_x}}, \code{\link{premium_x}},
-\code{\link{reserve_x}}, \code{\link{t_Ex}}, \code{\link{insurance_xy}}
+  \code{\link{reserve_x}}, \code{\link{t_Ex}}, \code{\link{insurance_xy}}
 
-Other life-contingencies: 
-\code{\link{add_insurance}()},
-\code{\link{add_premium_schedule}()},
-\code{\link{annuity_multi}()},
-\code{\link{annuity_x}()},
-\code{\link{annuity_xy}()},
-\code{\link{insurance_variable_k}()},
-\code{\link{insurance_xy}()},
-\code{\link{life_contract}()},
-\code{\link{premium_gross}()},
-\code{\link{premium_x}()},
-\code{\link{premium_xy}()},
-\code{\link{reserve_x}()},
-\code{\link{reserve_xy}()},
-\code{\link{simulate_annuity_x}()},
-\code{\link{simulate_insurance_x}()}
+Other life-contingencies:
+\code{\link[=add_insurance]{add_insurance()}},
+\code{\link[=add_premium_schedule]{add_premium_schedule()}},
+\code{\link[=annuity_multi]{annuity_multi()}},
+\code{\link[=annuity_x]{annuity_x()}},
+\code{\link[=annuity_xy]{annuity_xy()}},
+\code{\link[=insurance_variable_k]{insurance_variable_k()}},
+\code{\link[=insurance_xy]{insurance_xy()}},
+\code{\link[=life_contract]{life_contract()}},
+\code{\link[=premium_gross]{premium_gross()}},
+\code{\link[=premium_x]{premium_x()}},
+\code{\link[=premium_xy]{premium_xy()}},
+\code{\link[=reserve_x]{reserve_x()}},
+\code{\link[=reserve_xy]{reserve_xy()}},
+\code{\link[=simulate_annuity_x]{simulate_annuity_x()}},
+\code{\link[=simulate_insurance_x]{simulate_insurance_x()}}
 }
 \concept{life-contingencies}

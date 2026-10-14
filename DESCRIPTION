@@ -17,9 +17,9 @@ Imports: dplyr, ggplot2, rlang, scales, stats, tibble, utils
 Suggests: knitr, purrr, rmarkdown, testthat (>= 3.0.0)
 LazyData: true
 LazyDataCompression: xz
-RoxygenNote: 7.3.3
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://github.com/JulianFajardo1908/tidyactuarial, https://julianfajardo1908.github.io/tidyactuarial/
 BugReports: https://github.com/JulianFajardo1908/tidyactuarial/issues
 NeedsCompilation: no
+Config/roxygen2/version: 8.1.0

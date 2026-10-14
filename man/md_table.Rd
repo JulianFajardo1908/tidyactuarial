@@ -37,13 +37,13 @@ at the last age (default \code{TRUE}).}
 \value{
 A tibble with columns:
 \itemize{
-\item \code{x}: integer ages.
-\item \code{lx}: cohort \eqn{\ell_x}.
-\item \code{q_total}: total decrement probability \eqn{q_x^{(\tau)}}.
-\item \code{p_total}: total survival probability \eqn{p_x^{(\tau)}}.
-\item \code{d_total}: total decrements \eqn{d_x^{(\tau)} = \ell_x q_x^{(\tau)}}.
-\item cause columns (as provided).
-\item cause-specific decrements \code{d_*} with \eqn{d_x^{(j)} = \ell_x q_x^{(j)}}.
+  \item \code{x}: integer ages.
+  \item \code{lx}: cohort \eqn{\ell_x}.
+  \item \code{q_total}: total decrement probability \eqn{q_x^{(\tau)}}.
+  \item \code{p_total}: total survival probability \eqn{p_x^{(\tau)}}.
+  \item \code{d_total}: total decrements \eqn{d_x^{(\tau)} = \ell_x q_x^{(\tau)}}.
+  \item cause columns (as provided).
+  \item cause-specific decrements \code{d_*} with \eqn{d_x^{(j)} = \ell_x q_x^{(j)}}.
 }
 }
 \description{

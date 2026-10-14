@@ -45,7 +45,7 @@ from \code{i_effective - delta} to \code{i_effective + delta}, where
 }
 \value{
 A \code{ggplot2} object showing the PV difference curve
-\eqn{PV_A(i) - PV_L(i)}{PV_A(i) - PV_L(i)} and a zero reference line.
+  \eqn{PV_A(i) - PV_L(i)}{PV_A(i) - PV_L(i)} and a zero reference line.
 }
 \description{
 Computes and plots the difference between the present value of liabilities
@@ -90,11 +90,11 @@ plot_immunization_gap(
 }
 \seealso{
 \code{\link{immunize_duration}},
-\code{\link{immunize_duration_convexity}},
-\code{\link{bond_duration}}, \code{\link{bond_convexity}}
+  \code{\link{immunize_duration_convexity}},
+  \code{\link{bond_duration}}, \code{\link{bond_convexity}}
 
-Other immunization: 
-\code{\link{immunize_duration}()},
-\code{\link{immunize_duration_convexity}()}
+Other immunization:
+\code{\link[=immunize_duration]{immunize_duration()}},
+\code{\link[=immunize_duration_convexity]{immunize_duration_convexity()}}
 }
 \concept{immunization}

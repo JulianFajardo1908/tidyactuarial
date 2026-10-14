@@ -118,15 +118,15 @@ formal argument because otherwise R partially matches it against
 }
 \value{
 A tibble with one row per simulation and requested duration. Important
-standardized columns include:
+  standardized columns include:
 \describe{
-\item{Z_t}{Future benefit present value at duration \code{t}.}
-\item{Y_t}{Future premium-annuity basis present value.}
-\item{future_pv_premiums}{Actual future premium present value.}
-\item{premium_annualized}{Annualized premium \eqn{P^{(k)}}.}
-\item{premium_per_payment}{Premium paid at each date.}
-\item{premium_annuity_scale}{Coefficient multiplying \code{Y_t}.}
-\item{L_t}{Prospective loss, or the name supplied through \code{col_L}.}
+  \item{Z_t}{Future benefit present value at duration \code{t}.}
+  \item{Y_t}{Future premium-annuity basis present value.}
+  \item{future_pv_premiums}{Actual future premium present value.}
+  \item{premium_annualized}{Annualized premium \eqn{P^{(k)}}.}
+  \item{premium_per_payment}{Premium paid at each date.}
+  \item{premium_annuity_scale}{Coefficient multiplying \code{Y_t}.}
+  \item{L_t}{Prospective loss, or the name supplied through \code{col_L}.}
 }
 }
 \description{
@@ -190,17 +190,17 @@ simulated |>
 }
 \seealso{
 \code{\link{mc_annuity}}, \code{\link{mc_insurance}},
-\code{\link{mc_premium}}, \code{\link{mc_loss}},
-\code{\link{reserve_x}}, \code{\link{reserve_xy}}
+  \code{\link{mc_premium}}, \code{\link{mc_loss}},
+  \code{\link{reserve_x}}, \code{\link{reserve_xy}}
 
-Other monte-carlo: 
-\code{\link{mc_annuity}()},
-\code{\link{mc_insurance}()},
-\code{\link{mc_loss}()},
-\code{\link{mc_multilife_status}()},
-\code{\link{mc_premium}()},
-\code{\link{simulate_lifetime}()},
-\code{\link{simulate_lifetimes}()},
-\code{\link{summary_mc}()}
+Other monte-carlo:
+\code{\link[=mc_annuity]{mc_annuity()}},
+\code{\link[=mc_insurance]{mc_insurance()}},
+\code{\link[=mc_loss]{mc_loss()}},
+\code{\link[=mc_multilife_status]{mc_multilife_status()}},
+\code{\link[=mc_premium]{mc_premium()}},
+\code{\link[=simulate_lifetime]{simulate_lifetime()}},
+\code{\link[=simulate_lifetimes]{simulate_lifetimes()}},
+\code{\link[=summary_mc]{summary_mc()}}
 }
 \concept{monte-carlo}

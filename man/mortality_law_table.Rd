@@ -61,8 +61,8 @@ between age \eqn{x} and \eqn{x+1}. Default is \code{0.5}.}
 }
 \value{
 A tibble with columns \code{x}, \code{law}, \code{frac},
-\code{mu_x}, \code{qx}, \code{px}, \code{lx}, \code{dx}, \code{Lx},
-\code{Tx}, \code{ex}, and \code{mx}.
+  \code{mu_x}, \code{qx}, \code{px}, \code{lx}, \code{dx}, \code{Lx},
+  \code{Tx}, \code{ex}, and \code{mx}.
 }
 \description{
 Creates a tidy life table with one row per integer age from a parametric
@@ -72,6 +72,7 @@ mortality law, using compact actuarial notation.
 The output follows tidyactuarial conventions and includes columns such as
 \code{x}, \code{qx}, \code{px}, \code{lx}, \code{dx}, \code{Lx},
 \code{Tx}, \code{ex}, and \code{mx}.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{x} denotes age, \code{l0} denotes the starting
@@ -87,16 +88,16 @@ still accepted as a transitional alias.
 \section{Supported laws}{
 
 \itemize{
-\item \strong{Exponential}: \eqn{\mu_x = \lambda}.
-\item \strong{Gompertz}: \eqn{\mu_x = Bc^x}.
-\item \strong{Makeham}: \eqn{\mu_x = A + Bc^x}.
-\item \strong{Weibull}: \eqn{\mu_x = (shape/scale)(x/scale)^{shape-1}}.
-\item \strong{Logistic}: \eqn{\mu_x = (A + Bc^x)/(1 + Cc^x)}.
-\item \strong{DeMoivre}: finite lifetime law with
-\eqn{q_x = 1/(\omega - x)} for \eqn{x < \omega}.
-\item \strong{Beta}: scaled lifetime model
-\eqn{X/\omega \sim Beta(\alpha,\beta)}.
-\item \strong{HeligmanPollard}: odds model returning \eqn{q_x} directly.
+  \item \strong{Exponential}: \eqn{\mu_x = \lambda}.
+  \item \strong{Gompertz}: \eqn{\mu_x = Bc^x}.
+  \item \strong{Makeham}: \eqn{\mu_x = A + Bc^x}.
+  \item \strong{Weibull}: \eqn{\mu_x = (shape/scale)(x/scale)^{shape-1}}.
+  \item \strong{Logistic}: \eqn{\mu_x = (A + Bc^x)/(1 + Cc^x)}.
+  \item \strong{DeMoivre}: finite lifetime law with
+  \eqn{q_x = 1/(\omega - x)} for \eqn{x < \omega}.
+  \item \strong{Beta}: scaled lifetime model
+  \eqn{X/\omega \sim Beta(\alpha,\beta)}.
+  \item \strong{HeligmanPollard}: odds model returning \eqn{q_x} directly.
 }
 }
 
@@ -108,17 +109,17 @@ through the named list \code{params}. Direct parameters supplied through
 
 Required parameters:
 \itemize{
-\item \code{"Exponential"}: \code{lambda}.
-\item \code{"Gompertz"}: \code{B}, \code{c}.
-\item \code{"Makeham"}: \code{A}, \code{B}, \code{c}.
-\item \code{"Weibull"}: \code{shape}, \code{scale}. Transitional aliases
-\code{k} and \code{lambda} are accepted.
-\item \code{"Logistic"}: \code{A}, \code{B}, \code{c}, \code{C}.
-\item \code{"DeMoivre"}: \code{omega}.
-\item \code{"Beta"}: \code{alpha}, \code{beta}, \code{omega}.
-\item \code{"HeligmanPollard"}: \code{A}, \code{B}, \code{C},
-\code{D}, \code{E}, \code{F_hp}, and \code{G}. Transitional alias
-\code{F} is accepted and mapped to \code{F_hp}.
+  \item \code{"Exponential"}: \code{lambda}.
+  \item \code{"Gompertz"}: \code{B}, \code{c}.
+  \item \code{"Makeham"}: \code{A}, \code{B}, \code{c}.
+  \item \code{"Weibull"}: \code{shape}, \code{scale}. Transitional aliases
+  \code{k} and \code{lambda} are accepted.
+  \item \code{"Logistic"}: \code{A}, \code{B}, \code{c}, \code{C}.
+  \item \code{"DeMoivre"}: \code{omega}.
+  \item \code{"Beta"}: \code{alpha}, \code{beta}, \code{omega}.
+  \item \code{"HeligmanPollard"}: \code{A}, \code{B}, \code{C},
+  \code{D}, \code{E}, \code{F_hp}, and \code{G}. Transitional alias
+  \code{F} is accepted and mapped to \code{F_hp}.
 }
 }
 
@@ -127,9 +128,9 @@ Required parameters:
 For laws defined by a force of mortality \eqn{\mu_x}, the one-year death
 probability \eqn{q_x} is obtained using \code{frac}:
 \itemize{
-\item \code{"CF"} or \code{"CML"}: \eqn{q_x = 1 - \exp(-\mu_x)}.
-\item \code{"UDD"}: \eqn{q_x = \mu_x}.
-\item \code{"Balducci"}: \eqn{q_x = \mu_x/(1+\mu_x)}.
+  \item \code{"CF"} or \code{"CML"}: \eqn{q_x = 1 - \exp(-\mu_x)}.
+  \item \code{"UDD"}: \eqn{q_x = \mu_x}.
+  \item \code{"Balducci"}: \eqn{q_x = \mu_x/(1+\mu_x)}.
 }
 }
 

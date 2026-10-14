@@ -17,27 +17,27 @@ duration_cash_flow(
 \item{cf}{Numeric vector of cash-flow amounts.}
 
 \item{t}{Numeric vector of cash-flow times. Times must be expressed in
-the same units used by \code{rate}.}
+the same units used by `rate`.}
 
 \item{rate}{Effective yield per unit of time. It must be a finite numeric
-scalar greater than \code{-1}.}
+scalar greater than `-1`.}
 
 \item{valuation_time}{Finite numeric scalar indicating the valuation time.
-Defaults to \code{0}.}
+Defaults to `0`.}
 
 \item{duration}{Character scalar indicating the duration measure:
-\code{"macaulay"} or \code{"modified"}.}
+`"macaulay"` or `"modified"`.}
 
 \item{output}{Character scalar indicating the returned object:
-\code{"value"} returns the selected duration as a numeric scalar;
-\code{"audit"} returns a detailed tibble.}
+`"value"` returns the selected duration as a numeric scalar;
+`"audit"` returns a detailed tibble.}
 }
 \value{
-If \code{output = "value"}, a numeric scalar.
+If `output = "value"`, a numeric scalar.
 
-If \code{output = "audit"}, a tibble with six columns:
-\code{time}, \code{remaining_time}, \code{cash_flow}, \code{discount_factor},
-\code{present_value}, and \code{duration_contribution}.
+If `output = "audit"`, a tibble with six columns:
+`time`, `remaining_time`, `cash_flow`, `discount_factor`,
+`present_value`, and `duration_contribution`.
 }
 \description{
 Computes the Macaulay or modified duration of a general cash-flow
@@ -76,7 +76,7 @@ D_{\mathrm{mod},\tau}
 }
 
 The function follows an ex-cash-flow convention: cash flows occurring
-exactly at \code{valuation_time} are excluded. Therefore, the result represents
+exactly at `valuation_time` are excluded. Therefore, the result represents
 duration immediately after any cash flow paid at that time.
 
 For streams containing both positive and negative cash flows, duration

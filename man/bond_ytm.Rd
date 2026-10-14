@@ -45,13 +45,13 @@ effective yield per coupon period.}
 \value{
 A one-row tibble with columns:
 \describe{
-\item{price}{Input dirty price.}
-\item{i_period}{Effective yield per coupon period.}
-\item{j_nominal}{Nominal annual yield convertible \code{k} times per year
-(= \code{k * i_period}). When \code{k = 2}, this is the bond-equivalent
-yield.}
-\item{i_effective_annual}{Annual effective yield.}
-\item{k}{Coupon frequency.}
+  \item{price}{Input dirty price.}
+  \item{i_period}{Effective yield per coupon period.}
+  \item{j_nominal}{Nominal annual yield convertible \code{k} times per year
+    (= \code{k * i_period}). When \code{k = 2}, this is the bond-equivalent
+    yield.}
+  \item{i_effective_annual}{Annual effective yield.}
+  \item{k}{Coupon frequency.}
 }
 }
 \description{
@@ -64,11 +64,12 @@ reported together with common annual equivalents.
 
 Assumptions:
 \itemize{
-\item Coupons are paid in arrears at regular intervals.
-\item Price is observed at a coupon date (no accrued interest).
-\item \code{n * k} must be an integer.
-\item Stub periods are not supported.
+  \item Coupons are paid in arrears at regular intervals.
+  \item Price is observed at a coupon date (no accrued interest).
+  \item \code{n * k} must be an integer.
+  \item Stub periods are not supported.
 }
+
 
 This function follows the compact bond notation used in
 \code{tidyactuarial}: \code{P} is the observed dirty price, \code{face} is
@@ -107,16 +108,17 @@ bond_ytm(
 }
 \seealso{
 \code{\link{bond_price}}, \code{\link{bond_cash_flows}},
-\code{\link{bond_duration}}, \code{\link{bond_convexity}},
-\code{\link{bond_callable_price}}
+  \code{\link{bond_duration}}, \code{\link{bond_convexity}},
+  \code{\link{bond_callable_price}}
 
-Other bonds: 
-\code{\link{bond_book_value}()},
-\code{\link{bond_callable_price}()},
-\code{\link{bond_convexity}()},
-\code{\link{bond_duration}()},
-\code{\link{bond_price}()},
-\code{\link{portfolio_convexity}()},
-\code{\link{portfolio_duration}()}
+Other bonds:
+\code{\link[=accrued_interest]{accrued_interest()}},
+\code{\link[=bond_book_value]{bond_book_value()}},
+\code{\link[=bond_callable_price]{bond_callable_price()}},
+\code{\link[=bond_convexity]{bond_convexity()}},
+\code{\link[=bond_duration]{bond_duration()}},
+\code{\link[=bond_price]{bond_price()}},
+\code{\link[=portfolio_convexity]{portfolio_convexity()}},
+\code{\link[=portfolio_duration]{portfolio_duration()}}
 }
 \concept{bonds}

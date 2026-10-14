@@ -77,9 +77,10 @@ This implementation supports up to three lives, which covers the most common
 practical multi-life arrangements.
 
 Supports status-based annuities (joint-life / last-survivor) and a
-joint-and-survivor style annuity (\code{"reversionary"}) that pays 1 while all
+joint-and-survivor style annuity (`"reversionary"`) that pays 1 while all
 lives are alive and then pays a fraction \eqn{\alpha} while at least one life
 remains alive.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{i} is the interest rate, \code{i_type} is the
@@ -90,10 +91,10 @@ payment frequency.
 Under the assumption of independent future lifetimes, the survival
 probability for the status is calculated as:
 \itemize{
-\item \strong{Joint-life (first-death):}
-\eqn{{}_t p_{x_1 x_2 \dots x_n} = \prod_{j=1}^n {}_t p_{x_j}}
-\item \strong{Last-survivor:}
-\eqn{{}_t p_{\overline{x_1 x_2 \dots x_n}} = 1 - \prod_{j=1}^n (1 - {}_t p_{x_j})}
+  \item \strong{Joint-life (first-death):}
+    \eqn{{}_t p_{x_1 x_2 \dots x_n} = \prod_{j=1}^n {}_t p_{x_j}}
+  \item \strong{Last-survivor:}
+    \eqn{{}_t p_{\overline{x_1 x_2 \dots x_n}} = 1 - \prod_{j=1}^n (1 - {}_t p_{x_j})}
 }
 
 For \code{annuity = "reversionary"}, the APV is a weighted combination of
@@ -128,23 +129,23 @@ annuity_multi(
 }
 \seealso{
 \code{\link{annuity_x}} for single-life annuities,
-\code{\link{t_px}} for survival probabilities.
+  \code{\link{t_px}} for survival probabilities.
 
-Other life-contingencies: 
-\code{\link{add_insurance}()},
-\code{\link{add_premium_schedule}()},
-\code{\link{annuity_x}()},
-\code{\link{annuity_xy}()},
-\code{\link{insurance_variable_k}()},
-\code{\link{insurance_x}()},
-\code{\link{insurance_xy}()},
-\code{\link{life_contract}()},
-\code{\link{premium_gross}()},
-\code{\link{premium_x}()},
-\code{\link{premium_xy}()},
-\code{\link{reserve_x}()},
-\code{\link{reserve_xy}()},
-\code{\link{simulate_annuity_x}()},
-\code{\link{simulate_insurance_x}()}
+Other life-contingencies:
+\code{\link[=add_insurance]{add_insurance()}},
+\code{\link[=add_premium_schedule]{add_premium_schedule()}},
+\code{\link[=annuity_x]{annuity_x()}},
+\code{\link[=annuity_xy]{annuity_xy()}},
+\code{\link[=insurance_variable_k]{insurance_variable_k()}},
+\code{\link[=insurance_x]{insurance_x()}},
+\code{\link[=insurance_xy]{insurance_xy()}},
+\code{\link[=life_contract]{life_contract()}},
+\code{\link[=premium_gross]{premium_gross()}},
+\code{\link[=premium_x]{premium_x()}},
+\code{\link[=premium_xy]{premium_xy()}},
+\code{\link[=reserve_x]{reserve_x()}},
+\code{\link[=reserve_xy]{reserve_xy()}},
+\code{\link[=simulate_annuity_x]{simulate_annuity_x()}},
+\code{\link[=simulate_insurance_x]{simulate_insurance_x()}}
 }
 \concept{life-contingencies}

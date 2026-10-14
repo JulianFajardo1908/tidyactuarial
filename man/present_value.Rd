@@ -42,14 +42,15 @@ where \eqn{i} is the annual effective interest rate and
 
 The input interest rate may be supplied as:
 \itemize{
-\item annual effective interest rate,
-\item nominal annual interest rate,
-\item nominal annual discount rate,
-\item force of interest.
+  \item annual effective interest rate,
+  \item nominal annual interest rate,
+  \item nominal annual discount rate,
+  \item force of interest.
 }
 
 Internally, all rate specifications are first converted to the equivalent
 annual effective interest rate using \code{\link{standardize_interest}}.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{C} denotes the future payment amount or capital,
@@ -94,17 +95,17 @@ present_value(
 }
 \seealso{
 \code{\link{standardize_interest}}, \code{\link{future_value}},
-\code{\link{pv_flow}}
+  \code{\link{pv_flow}}
 
-Other time-value: 
-\code{\link{accumulation_factor}()},
-\code{\link{discount_factor}()},
-\code{\link{future_value}()},
-\code{\link{fv_flow}()},
-\code{\link{irr_flow}()},
-\code{\link{irr_flow_multi}()},
-\code{\link{plot_cash_flow}()},
-\code{\link{pv_flow}()},
-\code{\link{solve_value}()}
+Other time-value:
+\code{\link[=accumulation_factor]{accumulation_factor()}},
+\code{\link[=discount_factor]{discount_factor()}},
+\code{\link[=future_value]{future_value()}},
+\code{\link[=fv_flow]{fv_flow()}},
+\code{\link[=irr_flow]{irr_flow()}},
+\code{\link[=irr_flow_multi]{irr_flow_multi()}},
+\code{\link[=plot_cash_flow]{plot_cash_flow()}},
+\code{\link[=pv_flow]{pv_flow()}},
+\code{\link[=solve_value]{solve_value()}}
 }
 \concept{time-value}

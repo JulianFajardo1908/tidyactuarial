@@ -54,9 +54,9 @@ objects. Used only if \code{plot = TRUE}.}
 }
 \value{
 A tibble. By default, it returns the original columns plus a new
-list-column named by \code{.out} containing discount-factor vectors. If
-\code{plot = TRUE}, it also adds a list-column named by \code{.out_plot}
-containing \code{ggplot2} objects.
+  list-column named by \code{.out} containing discount-factor vectors. If
+  \code{plot = TRUE}, it also adds a list-column named by \code{.out_plot}
+  containing \code{ggplot2} objects.
 }
 \description{
 Builds a tibble-first representation of a discrete yield curve and computes
@@ -74,6 +74,7 @@ where \eqn{i_t} is the annual effective spot rate for maturity \eqn{t}.
 
 If \code{plot = TRUE}, the function also returns a list-column of
 \code{ggplot2} objects showing the spot yield curve for each row.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{t} denotes maturity, \code{i} denotes the spot
@@ -129,14 +130,17 @@ Kellison, S. G. \emph{The Theory of Interest}.
 }
 \seealso{
 \code{\link{forward_rate}},
-\code{\link{discount_factor_spot}}, \code{\link{standardize_interest}}
+  \code{\link{discount_factor_spot}}, \code{\link{standardize_interest}}
 
-Other interest: 
-\code{\link{accumulation_factor}()},
-\code{\link{discount_factor}()},
-\code{\link{discount_factor_spot}()},
-\code{\link{forward_rate}()},
-\code{\link{interest_equivalents}()},
-\code{\link{standardize_interest}()}
+Other interest:
+\code{\link[=accumulation_factor]{accumulation_factor()}},
+\code{\link[=bootstrap_spot_curve]{bootstrap_spot_curve()}},
+\code{\link[=discount_factor]{discount_factor()}},
+\code{\link[=discount_factor_spot]{discount_factor_spot()}},
+\code{\link[=forward_curve]{forward_curve()}},
+\code{\link[=forward_rate]{forward_rate()}},
+\code{\link[=interest_equivalents]{interest_equivalents()}},
+\code{\link[=par_rate]{par_rate()}},
+\code{\link[=standardize_interest]{standardize_interest()}}
 }
 \concept{interest}

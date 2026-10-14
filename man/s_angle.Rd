@@ -59,9 +59,9 @@ actuarial notation.
 \details{
 Supported timing conventions:
 \itemize{
-\item \code{"immediate"}: annuity-immediate with discrete payments.
-\item \code{"due"}: annuity-due with discrete payments.
-\item \code{"continuous"}: continuous annuity.
+  \item \code{"immediate"}: annuity-immediate with discrete payments.
+  \item \code{"due"}: annuity-due with discrete payments.
+  \item \code{"continuous"}: continuous annuity.
 }
 
 For discrete annuities, \code{k} is the number of payments per year, so
@@ -78,16 +78,17 @@ does not modify the factor.
 The future value of a perpetuity diverges, so perpetuities are not supported
 in \code{s_angle()}.
 
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}:
 
 \itemize{
-\item \code{n}: annuity term;
-\item \code{k}: payment frequency;
-\item \code{i}: interest rate;
-\item \code{i_type}: interest-rate type;
-\item \code{m}: conversion frequency for nominal rates;
-\item \code{h}: deferment period.
+  \item \code{n}: annuity term;
+  \item \code{k}: payment frequency;
+  \item \code{i}: interest rate;
+  \item \code{i_type}: interest-rate type;
+  \item \code{m}: conversion frequency for nominal rates;
+  \item \code{h}: deferment period.
 }
 
 The function first converts the supplied rate to the equivalent annual
@@ -148,11 +149,11 @@ s_angle(
 }
 \seealso{
 \code{\link{a_angle}}, \code{\link{standardize_interest}},
-\code{\link{future_value}}
+  \code{\link{future_value}}
 
-Other annuities: 
-\code{\link{a_angle}()},
-\code{\link{annuity_arith}()},
-\code{\link{annuity_geom}()}
+Other annuities:
+\code{\link[=a_angle]{a_angle()}},
+\code{\link[=annuity_arith]{annuity_arith()}},
+\code{\link[=annuity_geom]{annuity_geom()}}
 }
 \concept{annuities}

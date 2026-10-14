@@ -78,18 +78,19 @@ independent future lifetimes and using compact actuarial notation.
 \details{
 Supported contracts:
 \itemize{
-\item \code{"whole"}: whole-life two-life insurance.
-\item \code{"term"}: n-year two-life term insurance.
-\item \code{"endowment"}: n-year two-life endowment insurance.
+  \item \code{"whole"}: whole-life two-life insurance.
+  \item \code{"term"}: n-year two-life term insurance.
+  \item \code{"endowment"}: n-year two-life endowment insurance.
 }
 
 The \code{status} argument determines the two-life status:
 \itemize{
-\item \code{status = "joint"}: first-death insurance, based on the
-joint-life status.
-\item \code{status = "last"}: second-death insurance, based on the
-last-survivor status.
+  \item \code{status = "joint"}: first-death insurance, based on the
+  joint-life status.
+  \item \code{status = "last"}: second-death insurance, based on the
+  last-survivor status.
 }
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{lt} is the life table input, \code{x} and
@@ -154,23 +155,23 @@ lt |>
 }
 \seealso{
 \code{\link{annuity_xy}}, \code{\link{premium_xy}},
-\code{\link{insurance_x}}, \code{\link{t_pxy}}
+  \code{\link{insurance_x}}, \code{\link{t_pxy}}
 
-Other life-contingencies: 
-\code{\link{add_insurance}()},
-\code{\link{add_premium_schedule}()},
-\code{\link{annuity_multi}()},
-\code{\link{annuity_x}()},
-\code{\link{annuity_xy}()},
-\code{\link{insurance_variable_k}()},
-\code{\link{insurance_x}()},
-\code{\link{life_contract}()},
-\code{\link{premium_gross}()},
-\code{\link{premium_x}()},
-\code{\link{premium_xy}()},
-\code{\link{reserve_x}()},
-\code{\link{reserve_xy}()},
-\code{\link{simulate_annuity_x}()},
-\code{\link{simulate_insurance_x}()}
+Other life-contingencies:
+\code{\link[=add_insurance]{add_insurance()}},
+\code{\link[=add_premium_schedule]{add_premium_schedule()}},
+\code{\link[=annuity_multi]{annuity_multi()}},
+\code{\link[=annuity_x]{annuity_x()}},
+\code{\link[=annuity_xy]{annuity_xy()}},
+\code{\link[=insurance_variable_k]{insurance_variable_k()}},
+\code{\link[=insurance_x]{insurance_x()}},
+\code{\link[=life_contract]{life_contract()}},
+\code{\link[=premium_gross]{premium_gross()}},
+\code{\link[=premium_x]{premium_x()}},
+\code{\link[=premium_xy]{premium_xy()}},
+\code{\link[=reserve_x]{reserve_x()}},
+\code{\link[=reserve_xy]{reserve_xy()}},
+\code{\link[=simulate_annuity_x]{simulate_annuity_x()}},
+\code{\link[=simulate_insurance_x]{simulate_insurance_x()}}
 }
 \concept{life-contingencies}

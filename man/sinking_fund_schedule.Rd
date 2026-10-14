@@ -53,22 +53,22 @@ period. If \code{NULL}, it is computed so that the fund accumulates to
 \value{
 A tibble with one row per period and columns:
 \describe{
-\item{period}{Period index.}
-\item{loan_balance_start}{Outstanding loan balance at the start of the period.}
-\item{interest_loan}{Interest paid on the loan during the period.}
-\item{sinking_deposit}{Deposit made into the sinking fund.}
-\item{fund_balance_start}{Fund balance at the start of the period.}
-\item{interest_fund}{Interest earned by the fund during the period.}
-\item{fund_balance_end_before_redemption}{Fund balance before final redemption.}
-\item{redemption_from_fund}{Amount withdrawn from the fund to redeem the loan at maturity.}
-\item{fund_balance_end}{Fund balance after redemption.}
-\item{loan_balance_end}{Outstanding loan balance after redemption.}
-\item{total_cashflow_borrower}{Borrower's external cash outflow during the period.}
-\item{i_effective_loan_annual}{Equivalent annual effective loan rate.}
-\item{i_effective_fund_annual}{Equivalent annual effective fund rate.}
-\item{i_loan_period}{Effective loan rate per schedule period.}
-\item{i_fund_period}{Effective fund rate per schedule period.}
-\item{k}{Schedule frequency.}
+  \item{period}{Period index.}
+  \item{loan_balance_start}{Outstanding loan balance at the start of the period.}
+  \item{interest_loan}{Interest paid on the loan during the period.}
+  \item{sinking_deposit}{Deposit made into the sinking fund.}
+  \item{fund_balance_start}{Fund balance at the start of the period.}
+  \item{interest_fund}{Interest earned by the fund during the period.}
+  \item{fund_balance_end_before_redemption}{Fund balance before final redemption.}
+  \item{redemption_from_fund}{Amount withdrawn from the fund to redeem the loan at maturity.}
+  \item{fund_balance_end}{Fund balance after redemption.}
+  \item{loan_balance_end}{Outstanding loan balance after redemption.}
+  \item{total_cashflow_borrower}{Borrower's external cash outflow during the period.}
+  \item{i_effective_loan_annual}{Equivalent annual effective loan rate.}
+  \item{i_effective_fund_annual}{Equivalent annual effective fund rate.}
+  \item{i_loan_period}{Effective loan rate per schedule period.}
+  \item{i_fund_period}{Effective fund rate per schedule period.}
+  \item{k}{Schedule frequency.}
 }
 }
 \description{
@@ -78,11 +78,12 @@ accumulation rate for the sinking fund, using compact actuarial notation.
 \details{
 The borrower pays:
 \itemize{
-\item interest on the loan each period, and
-\item a level deposit into the sinking fund.
+  \item interest on the loan each period, and
+  \item a level deposit into the sinking fund.
 }
 
 At maturity, the sinking fund is used to redeem the principal.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{i} is the loan interest rate, \code{j} is the
@@ -130,8 +131,8 @@ sinking_fund_schedule(
 \seealso{
 \code{\link{amort_schedule}}, \code{\link{s_angle}}
 
-Other amortization: 
-\code{\link{amort_schedule}()},
-\code{\link{amort_schedule_general}()}
+Other amortization:
+\code{\link[=amort_schedule]{amort_schedule()}},
+\code{\link[=amort_schedule_general]{amort_schedule_general()}}
 }
 \concept{amortization}

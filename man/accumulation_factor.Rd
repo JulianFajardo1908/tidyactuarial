@@ -60,9 +60,9 @@ intermediate quantities, and accumulation factor.
 Computes the accumulation factor from time \code{s} to time \code{t} using
 exactly one of three interest specifications:
 \itemize{
-\item a conventional interest rate \code{i};
-\item an accumulation function \code{a(t)};
-\item a time-varying force of interest \code{delta(t)}.
+  \item a conventional interest rate \code{i};
+  \item an accumulation function \code{a(t)};
+  \item a time-varying force of interest \code{delta(t)}.
 }
 }
 \details{
@@ -73,6 +73,7 @@ for a constant annual effective rate,
 for an accumulation function, and
 \deqn{A(s,t) = \exp\left(\int_s^t \delta(u)\,du\right)}
 for a time-varying force of interest.
+
 
 Exactly one of \code{i}, \code{a}, or \code{delta} must be supplied.
 
@@ -135,26 +136,29 @@ if (requireNamespace("dplyr", quietly = TRUE) &&
 }
 \seealso{
 \code{\link{standardize_interest}},
-\code{\link{present_value}}, \code{\link{future_value}}
+  \code{\link{present_value}}, \code{\link{future_value}}
 
-Other interest: 
-\code{\link{discount_factor}()},
-\code{\link{discount_factor_spot}()},
-\code{\link{forward_rate}()},
-\code{\link{interest_equivalents}()},
-\code{\link{standardize_interest}()},
-\code{\link{yield_curve}()}
+Other interest:
+\code{\link[=bootstrap_spot_curve]{bootstrap_spot_curve()}},
+\code{\link[=discount_factor]{discount_factor()}},
+\code{\link[=discount_factor_spot]{discount_factor_spot()}},
+\code{\link[=forward_curve]{forward_curve()}},
+\code{\link[=forward_rate]{forward_rate()}},
+\code{\link[=interest_equivalents]{interest_equivalents()}},
+\code{\link[=par_rate]{par_rate()}},
+\code{\link[=standardize_interest]{standardize_interest()}},
+\code{\link[=yield_curve]{yield_curve()}}
 
-Other time-value: 
-\code{\link{discount_factor}()},
-\code{\link{future_value}()},
-\code{\link{fv_flow}()},
-\code{\link{irr_flow}()},
-\code{\link{irr_flow_multi}()},
-\code{\link{plot_cash_flow}()},
-\code{\link{present_value}()},
-\code{\link{pv_flow}()},
-\code{\link{solve_value}()}
+Other time-value:
+\code{\link[=discount_factor]{discount_factor()}},
+\code{\link[=future_value]{future_value()}},
+\code{\link[=fv_flow]{fv_flow()}},
+\code{\link[=irr_flow]{irr_flow()}},
+\code{\link[=irr_flow_multi]{irr_flow_multi()}},
+\code{\link[=plot_cash_flow]{plot_cash_flow()}},
+\code{\link[=present_value]{present_value()}},
+\code{\link[=pv_flow]{pv_flow()}},
+\code{\link[=solve_value]{solve_value()}}
 }
 \concept{interest}
 \concept{time-value}

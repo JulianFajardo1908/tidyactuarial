@@ -80,20 +80,20 @@ simulated present values of benefits. Default is \code{"pv_benefit"}.}
 \value{
 A tibble with the original simulation columns and additional columns:
 \describe{
-\item{i}{Original interest-rate input.}
-\item{i_type}{Interest-rate convention.}
-\item{m}{Interest conversion frequency.}
-\item{i_effective}{Equivalent annual effective interest rate.}
-\item{v}{Annual discount factor.}
-\item{type}{Canonical insurance type.}
-\item{benefit}{Benefit amount.}
-\item{n}{Insurance term, if applicable.}
-\item{h}{Deferral period.}
-\item{timing}{Timing used for death benefits.}
-\item{benefit_time}{Simulated payment time of the benefit.}
-\item{benefit_indicator}{Indicator that the benefit is paid.}
-\item{pv_benefit}{Simulated present value of the benefit, or another name
-supplied through \code{col_pv}.}
+  \item{i}{Original interest-rate input.}
+  \item{i_type}{Interest-rate convention.}
+  \item{m}{Interest conversion frequency.}
+  \item{i_effective}{Equivalent annual effective interest rate.}
+  \item{v}{Annual discount factor.}
+  \item{type}{Canonical insurance type.}
+  \item{benefit}{Benefit amount.}
+  \item{n}{Insurance term, if applicable.}
+  \item{h}{Deferral period.}
+  \item{timing}{Timing used for death benefits.}
+  \item{benefit_time}{Simulated payment time of the benefit.}
+  \item{benefit_indicator}{Indicator that the benefit is paid.}
+  \item{pv_benefit}{Simulated present value of the benefit, or another name
+  supplied through \code{col_pv}.}
 }
 
 For transition, the output also includes legacy columns such as
@@ -112,6 +112,7 @@ takes simulated values of the curtate future lifetime \eqn{K_x}, and when
 needed the complete future lifetime \eqn{T_x}, and evaluates the present
 value random variable associated with classical life insurance benefits.
 
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{i} is the interest-rate input, \code{i_type}
 is the interest-rate convention, \code{m} is the nominal conversion
@@ -120,8 +121,8 @@ period.
 
 The arguments \code{m} and \code{col_K} have deliberately different roles:
 \itemize{
-\item \code{m} is used only for nominal interest-rate conversion.
-\item \code{col_K} identifies the simulated curtate future lifetime column.
+  \item \code{m} is used only for nominal interest-rate conversion.
+  \item \code{col_K} identifies the simulated curtate future lifetime column.
 }
 
 If \code{timing = "end_of_year"}, death benefits are discounted using
@@ -133,17 +134,17 @@ from the curtate lifetime \eqn{K_x}. If
 
 The following insurance types are supported:
 \itemize{
-\item \code{"whole"}: benefit is paid whenever death occurs.
-\item \code{"term"}: benefit is paid if death occurs within \code{n}
-years.
-\item \code{"deferred"}: benefit is paid if death occurs after the
-deferral period \code{h}.
-\item \code{"deferred_term"}: benefit is paid if death occurs after
-\code{h} and within the following \code{n} years.
-\item \code{"pure_endowment"}: benefit is paid at time \code{n} if the
-life survives to that time.
-\item \code{"endowment"}: death benefit is paid if death occurs within
-\code{n} years; otherwise, a survival benefit is paid at time \code{n}.
+  \item \code{"whole"}: benefit is paid whenever death occurs.
+  \item \code{"term"}: benefit is paid if death occurs within \code{n}
+  years.
+  \item \code{"deferred"}: benefit is paid if death occurs after the
+  deferral period \code{h}.
+  \item \code{"deferred_term"}: benefit is paid if death occurs after
+  \code{h} and within the following \code{n} years.
+  \item \code{"pure_endowment"}: benefit is paid at time \code{n} if the
+  life survives to that time.
+  \item \code{"endowment"}: death benefit is paid if death occurs within
+  \code{n} years; otherwise, a survival benefit is paid at time \code{n}.
 }
 
 The function returns simulated present values, not only their expected value.
@@ -258,14 +259,14 @@ Society of Actuaries.
 \code{\link{mc_premium}}, \code{\link{mc_loss}}, \code{\link{mc_reserve}},
 \code{\link{summary_mc}}
 
-Other monte-carlo: 
-\code{\link{mc_annuity}()},
-\code{\link{mc_loss}()},
-\code{\link{mc_multilife_status}()},
-\code{\link{mc_premium}()},
-\code{\link{mc_reserve}()},
-\code{\link{simulate_lifetime}()},
-\code{\link{simulate_lifetimes}()},
-\code{\link{summary_mc}()}
+Other monte-carlo:
+\code{\link[=mc_annuity]{mc_annuity()}},
+\code{\link[=mc_loss]{mc_loss()}},
+\code{\link[=mc_multilife_status]{mc_multilife_status()}},
+\code{\link[=mc_premium]{mc_premium()}},
+\code{\link[=mc_reserve]{mc_reserve()}},
+\code{\link[=simulate_lifetime]{simulate_lifetime()}},
+\code{\link[=simulate_lifetimes]{simulate_lifetimes()}},
+\code{\link[=summary_mc]{summary_mc()}}
 }
 \concept{monte-carlo}

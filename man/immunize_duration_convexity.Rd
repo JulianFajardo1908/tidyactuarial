@@ -34,28 +34,29 @@ for \code{i_type = "effective"} and \code{i_type = "force"}.}
 \value{
 A tibble with:
 \describe{
-\item{w}{Numeric vector of asset weights or units.}
-\item{PV_L}{Present value of the liabilities.}
-\item{D_L}{Macaulay duration of the liabilities.}
-\item{C_L}{Discrete convexity of the liabilities.}
-\item{PV_A}{Present value of the asset portfolio.}
-\item{D_A}{Macaulay duration of the asset portfolio.}
-\item{C_A}{Discrete convexity of the asset portfolio.}
-\item{n_assets}{Number of assets used.}
+  \item{w}{Numeric vector of asset weights or units.}
+  \item{PV_L}{Present value of the liabilities.}
+  \item{D_L}{Macaulay duration of the liabilities.}
+  \item{C_L}{Discrete convexity of the liabilities.}
+  \item{PV_A}{Present value of the asset portfolio.}
+  \item{D_A}{Macaulay duration of the asset portfolio.}
+  \item{C_A}{Discrete convexity of the asset portfolio.}
+  \item{n_assets}{Number of assets used.}
 }
 }
 \description{
 Computes asset weights that immunize a stream of liabilities using three or
 more assets, enforcing:
 \enumerate{
-\item present value of assets = present value of liabilities;
-\item Macaulay duration of assets = Macaulay duration of liabilities;
-\item convexity of assets = convexity of liabilities.
+  \item present value of assets = present value of liabilities;
+  \item Macaulay duration of assets = Macaulay duration of liabilities;
+  \item convexity of assets = convexity of liabilities.
 }
 }
 \details{
 For exactly three assets, the system is solved directly. For four or more
 assets, a minimum-norm solution is computed by linear algebra.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{L} denotes liabilities, \code{t} denotes payment
@@ -128,10 +129,10 @@ immunize_duration_convexity(
 }
 \seealso{
 \code{\link{immunize_duration}}, \code{\link{bond_duration}},
-\code{\link{bond_convexity}}
+  \code{\link{bond_convexity}}
 
-Other immunization: 
-\code{\link{immunize_duration}()},
-\code{\link{plot_immunization_gap}()}
+Other immunization:
+\code{\link[=immunize_duration]{immunize_duration()}},
+\code{\link[=plot_immunization_gap]{plot_immunization_gap()}}
 }
 \concept{immunization}

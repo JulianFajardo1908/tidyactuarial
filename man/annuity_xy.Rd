@@ -92,6 +92,7 @@ The function supports joint-life, last-survivor, and state-based
 reversionary-style payments. The life table input may be either one common
 table for both lives or a list of two life tables, one for each life.
 
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{lt} is the life table input, \code{x} and
 \code{y} are the two actuarial ages, \code{i} is the interest-rate input,
@@ -178,23 +179,23 @@ annuity_xy(
 }
 \seealso{
 \code{\link{annuity_x}}, \code{\link{insurance_xy}},
-\code{\link{premium_xy}}, \code{\link{t_pxy}}, \code{\link{t_px}}
+  \code{\link{premium_xy}}, \code{\link{t_pxy}}, \code{\link{t_px}}
 
-Other life-contingencies: 
-\code{\link{add_insurance}()},
-\code{\link{add_premium_schedule}()},
-\code{\link{annuity_multi}()},
-\code{\link{annuity_x}()},
-\code{\link{insurance_variable_k}()},
-\code{\link{insurance_x}()},
-\code{\link{insurance_xy}()},
-\code{\link{life_contract}()},
-\code{\link{premium_gross}()},
-\code{\link{premium_x}()},
-\code{\link{premium_xy}()},
-\code{\link{reserve_x}()},
-\code{\link{reserve_xy}()},
-\code{\link{simulate_annuity_x}()},
-\code{\link{simulate_insurance_x}()}
+Other life-contingencies:
+\code{\link[=add_insurance]{add_insurance()}},
+\code{\link[=add_premium_schedule]{add_premium_schedule()}},
+\code{\link[=annuity_multi]{annuity_multi()}},
+\code{\link[=annuity_x]{annuity_x()}},
+\code{\link[=insurance_variable_k]{insurance_variable_k()}},
+\code{\link[=insurance_x]{insurance_x()}},
+\code{\link[=insurance_xy]{insurance_xy()}},
+\code{\link[=life_contract]{life_contract()}},
+\code{\link[=premium_gross]{premium_gross()}},
+\code{\link[=premium_x]{premium_x()}},
+\code{\link[=premium_xy]{premium_xy()}},
+\code{\link[=reserve_x]{reserve_x()}},
+\code{\link[=reserve_xy]{reserve_xy()}},
+\code{\link[=simulate_annuity_x]{simulate_annuity_x()}},
+\code{\link[=simulate_insurance_x]{simulate_insurance_x()}}
 }
 \concept{life-contingencies}

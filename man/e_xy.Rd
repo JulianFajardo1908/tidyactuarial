@@ -52,11 +52,11 @@ Computes the expected future lifetime for two independent lives aged
 last-survivor (second death).
 }
 \details{
-\strong{Curtate expectation} (Finan, Section 56.4 / Section 57):
+**Curtate expectation** (Finan, Section 56.4 / Section 57):
 \deqn{e_{xy} = \sum_{k=1}^{\infty} {}_kp_{xy}, \quad
   e_{\overline{xy}} = \sum_{k=1}^{\infty} {}_kp_{\overline{xy}}.}
 
-\strong{Complete expectation} (Finan, Section 56.4):
+**Complete expectation** (Finan, Section 56.4):
 \deqn{\mathring{e}_{xy} = \int_0^{\infty} {}_tp_{xy} \, dt.}
 
 The integral is decomposed year-by-year. Within each year, the survival
@@ -64,7 +64,7 @@ integral for the two-life status is computed numerically via composite
 trapezoid (80-point grid), since closed-form expressions for joint/last
 survivor under fractional-age assumptions are complex.
 
-\strong{Key identity} (Finan, Example 57.4):
+**Key identity** (Finan, Example 57.4):
 \deqn{\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
   - \mathring{e}_{xy}.}
 
@@ -102,6 +102,6 @@ e_xy(lt, x = 60, y = 62, type = "curtate", cohort = "first", tidy = TRUE)
 }
 \seealso{
 \code{\link{e_x}} for single-life expectancy,
-\code{\link{t_pxy}} for two-life survival probabilities,
-\code{\link{annuity_xy}} for two-life annuity APVs.
+  \code{\link{t_pxy}} for two-life survival probabilities,
+  \code{\link{annuity_xy}} for two-life annuity APVs.
 }

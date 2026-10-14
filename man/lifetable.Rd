@@ -21,7 +21,7 @@ lifetable(
 )
 }
 \arguments{
-\item{x}{Numeric vector of ages. Must be \strong{integer} and \strong{consecutive}
+\item{x}{Numeric vector of ages. Must be **integer** and **consecutive**
 (annual table), e.g. \code{0:110}.}
 
 \item{lx}{Optional numeric vector of survivors \eqn{\ell_x}. Must be
@@ -69,31 +69,31 @@ and consistency checks.}
 }
 \value{
 A \code{tibble} with class
-\code{c("lifetable","tbl_df","tbl","data.frame")} and columns:
+  \code{c("lifetable","tbl_df","tbl","data.frame")} and columns:
 \itemize{
-\item \code{x}: integer ages
-\item \code{lx}: survivors at exact age x
-\item \code{dx}: deaths in \eqn{[x, x+1)}
-\item \code{qx}: probability of death in \eqn{[x, x+1)}
-\item \code{px}: probability of survival to \eqn{x+1}
-\item \code{mx}: central death rate (derived using \code{ax}). At the
-terminal age with \code{close = TRUE}, \code{mx} equals
-\eqn{1/(1 - a_x)} and may be \code{Inf} if \code{ax = 1}.
+  \item \code{x}: integer ages
+  \item \code{lx}: survivors at exact age x
+  \item \code{dx}: deaths in \eqn{[x, x+1)}
+  \item \code{qx}: probability of death in \eqn{[x, x+1)}
+  \item \code{px}: probability of survival to \eqn{x+1}
+  \item \code{mx}: central death rate (derived using \code{ax}). At the
+    terminal age with \code{close = TRUE}, \code{mx} equals
+    \eqn{1/(1 - a_x)} and may be \code{Inf} if \code{ax = 1}.
 }
 Attributes include: \code{radix}, \code{omega}, \code{type}, \code{frac},
 \code{closed}, \code{ax}.
 }
 \description{
-Creates an annual life table with \strong{integer, consecutive ages} and returns a
-\strong{tibble} (tidyverse-friendly) with class \code{"lifetable"}.
+Creates an annual life table with **integer, consecutive ages** and returns a
+**tibble** (tidyverse-friendly) with class `"lifetable"`.
 }
 \details{
 The table can be built from exactly one of:
 \itemize{
-\item \code{lx} (survivors), or
-\item \code{qx} (one-year death probabilities), or
-\item \code{px} (one-year survival probabilities), or
-\item \code{mx} (central death rates),
+  \item \code{lx} (survivors), or
+  \item \code{qx} (one-year death probabilities), or
+  \item \code{px} (one-year survival probabilities), or
+  \item \code{mx} (central death rates),
 }
 and the function will compute the remaining columns consistently: \code{dx},
 \code{qx}, \code{px}, and \code{mx}.
@@ -106,6 +106,7 @@ validated (both must agree via \eqn{q_x = (\ell_x - \ell_{x+1}) / \ell_x}).
 By default, the table is actuarially closed at \code{omega}:
 \deqn{\ell_{\omega+1} = 0 \Rightarrow d_{\omega} = \ell_{\omega}
       \Rightarrow q_{\omega} = 1 \Rightarrow p_{\omega} = 0.}
+
 
 The life table follows the standard actuarial construction described in
 Finan, Sections 22--24 (Exam MLC preparation).

@@ -25,7 +25,7 @@ for \code{i_type = "effective"} and \code{i_type = "force"}.}
 }
 \value{
 A tibble with columns \code{x}, \code{lx}, \code{dx}, \code{v},
-\code{Dx}, \code{Nx}, \code{Sx}, \code{Cx}, \code{Mx}, and \code{Rx}.
+  \code{Dx}, \code{Nx}, \code{Sx}, \code{Cx}, \code{Mx}, and \code{Rx}.
 }
 \description{
 The function builds annual commutation columns from \code{x}, \code{lx}, and
@@ -36,6 +36,7 @@ an annual effective rate before constructing the discount factor.
 Constructs classical annual commutation functions \eqn{D_x}, \eqn{N_x},
 \eqn{S_x}, \eqn{C_x}, \eqn{M_x}, and \eqn{R_x} from a life table defined
 at integer ages, using compact actuarial notation.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{lt} is the life table, \code{i} is the

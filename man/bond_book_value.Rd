@@ -74,28 +74,29 @@ bond's yield basis.
 This function interprets \code{t} as a time immediately after any coupon due
 at that date has been paid. Therefore:
 \itemize{
-\item at \code{t = 0}, the book value equals the bond price,
-\item at \code{t = n}, the book value is 0.
+  \item at \code{t = 0}, the book value equals the bond price,
+  \item at \code{t = n}, the book value is 0.
 }
 
 Assumptions:
 \itemize{
-\item Coupons are paid in arrears at regular intervals.
-\item \code{n * k} must be an integer.
-\item Each \code{t * k} must be an integer.
-\item Stub periods are not supported.
-\item Valuation is performed at coupon dates; no accrued interest is included.
+  \item Coupons are paid in arrears at regular intervals.
+  \item \code{n * k} must be an integer.
+  \item Each \code{t * k} must be an integer.
+  \item Stub periods are not supported.
+  \item Valuation is performed at coupon dates; no accrued interest is included.
 }
 
 Yield input conventions:
 \itemize{
-\item If \code{y_effective_per_period} is supplied, it takes precedence over
-\code{y}, \code{y_type}, and \code{y_m}, and is interpreted as the
-effective yield per coupon period.
-\item Otherwise, \code{y}, \code{y_type}, and \code{y_m} define an annual
-yield specification, which is converted first to annual effective
-yield and then to effective yield per coupon period.
+  \item If \code{y_effective_per_period} is supplied, it takes precedence over
+        \code{y}, \code{y_type}, and \code{y_m}, and is interpreted as the
+        effective yield per coupon period.
+  \item Otherwise, \code{y}, \code{y_type}, and \code{y_m} define an annual
+        yield specification, which is converted first to annual effective
+        yield and then to effective yield per coupon period.
 }
+
 
 This function follows the compact bond notation used in
 \code{tidyactuarial}: \code{P} is price, \code{face} is the face value,
@@ -159,15 +160,16 @@ bond_book_value(
 }
 \seealso{
 \code{\link{bond_price}}, \code{\link{bond_cash_flows}},
-\code{\link{bond_duration}}, \code{\link{bond_convexity}}
+  \code{\link{bond_duration}}, \code{\link{bond_convexity}}
 
-Other bonds: 
-\code{\link{bond_callable_price}()},
-\code{\link{bond_convexity}()},
-\code{\link{bond_duration}()},
-\code{\link{bond_price}()},
-\code{\link{bond_ytm}()},
-\code{\link{portfolio_convexity}()},
-\code{\link{portfolio_duration}()}
+Other bonds:
+\code{\link[=accrued_interest]{accrued_interest()}},
+\code{\link[=bond_callable_price]{bond_callable_price()}},
+\code{\link[=bond_convexity]{bond_convexity()}},
+\code{\link[=bond_duration]{bond_duration()}},
+\code{\link[=bond_price]{bond_price()}},
+\code{\link[=bond_ytm]{bond_ytm()}},
+\code{\link[=portfolio_convexity]{portfolio_convexity()}},
+\code{\link[=portfolio_duration]{portfolio_duration()}}
 }
 \concept{bonds}

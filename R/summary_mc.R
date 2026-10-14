@@ -34,8 +34,18 @@
 #' values, mean, variance, standard deviation, standard error, minimum, maximum,
 #' selected quantiles, empirical VaR, and empirical TVaR.
 #'
-#' TVaR is computed empirically as the mean of simulated values greater than or
-#' equal to the corresponding empirical VaR.
+#' Empirical VaR uses the lower quantile (the inverse empirical CDF; type 1),
+#' without interpolation between observed loss amounts. In contrast, the
+#' descriptive `q...` columns retain the default interpolated quantiles from
+#' [stats::quantile()].
+#'
+#' TVaR uses the mean of the upper `1 - p` fraction of the empirical loss
+#' distribution, with the appropriate fraction of any probability mass at VaR.
+#' Equivalently, for `0 <= p < 1` and `v = VaR_p(X)`,
+#' `TVaR_p(X) = v + E[(X - v)_+] / (1 - p)`.
+#' For `p = 1`, the finite empirical upper-endpoint limit (`max(x)`) is
+#' reported. At `p = 0`, TVaR is the empirical mean. Negative simulated
+#' values are permitted because `summary_mc()` is a generic numeric summary.
 #'
 #' If \code{na_rm = TRUE}, missing values in \code{col_value} are removed before
 #' computing statistics. If \code{na_rm = FALSE} and missing values are present,
@@ -270,29 +280,30 @@ summary_mc <- function(
 
     names(q_values) <- make_prob_name("q", probs)
 
+    # Actuarial VaR: the lower quantile of the empirical distribution.
+    # Descriptive quantiles above retain the usual type-7 interpolation.
     var_values <- as.numeric(stats::quantile(
       x,
       probs = var_probs,
       na.rm = FALSE,
-      names = FALSE
+      names = FALSE,
+      type = 1L
     ))
 
     names(var_values) <- make_prob_name("VaR_", var_probs)
 
+    # Empirical TVaR (Expected Shortfall): the required fraction of the
+    # atom at VaR is included, rather than all observations equal to VaR.
+    # At p = 1 the value is its bounded empirical right-endpoint limit.
     tvar_values <- vapply(seq_along(var_probs), function(j) {
-      threshold <- var_values[[j]]
+      p <- var_probs[[j]]
+      v <- var_values[[j]]
 
-      if (is.na(threshold)) {
-        return(NA_real_)
+      if (p == 1) {
+        return(max(x))
       }
 
-      tail_x <- x[x >= threshold]
-
-      if (length(tail_x) == 0L) {
-        return(NA_real_)
-      }
-
-      mean(tail_x)
+      v + mean(pmax(x - v, 0)) / (1 - p)
     }, numeric(1L))
 
     names(tvar_values) <- make_prob_name("TVaR_", var_probs)

@@ -112,6 +112,7 @@ For premiums payable \eqn{k} times per year, the function distinguishes
 between the annualized premium \eqn{P^{(k)}} and the amount paid at each
 installment, \eqn{P^{(k)} / k}.
 
+
 Let \eqn{Z} be the present-value random variable of benefits and let
 \eqn{Y^{(k)}} be the present-value random variable of a premium annuity
 normalized to an annual payment rate of 1. The loss at issue is
@@ -200,25 +201,25 @@ life_contract(
 }
 \seealso{
 \code{\link{life_contract}}, \code{\link{add_insurance}},
-\code{\link{add_premium_schedule}}, \code{\link{insurance_x}},
-\code{\link{insurance_variable_k}}, \code{\link{annuity_x}},
-\code{\link{premium_xy}}, \code{\link{premium_gross}}
+  \code{\link{add_premium_schedule}}, \code{\link{insurance_x}},
+  \code{\link{insurance_variable_k}}, \code{\link{annuity_x}},
+  \code{\link{premium_xy}}, \code{\link{premium_gross}}
 
-Other life-contingencies: 
-\code{\link{add_insurance}()},
-\code{\link{add_premium_schedule}()},
-\code{\link{annuity_multi}()},
-\code{\link{annuity_x}()},
-\code{\link{annuity_xy}()},
-\code{\link{insurance_variable_k}()},
-\code{\link{insurance_x}()},
-\code{\link{insurance_xy}()},
-\code{\link{life_contract}()},
-\code{\link{premium_gross}()},
-\code{\link{premium_xy}()},
-\code{\link{reserve_x}()},
-\code{\link{reserve_xy}()},
-\code{\link{simulate_annuity_x}()},
-\code{\link{simulate_insurance_x}()}
+Other life-contingencies:
+\code{\link[=add_insurance]{add_insurance()}},
+\code{\link[=add_premium_schedule]{add_premium_schedule()}},
+\code{\link[=annuity_multi]{annuity_multi()}},
+\code{\link[=annuity_x]{annuity_x()}},
+\code{\link[=annuity_xy]{annuity_xy()}},
+\code{\link[=insurance_variable_k]{insurance_variable_k()}},
+\code{\link[=insurance_x]{insurance_x()}},
+\code{\link[=insurance_xy]{insurance_xy()}},
+\code{\link[=life_contract]{life_contract()}},
+\code{\link[=premium_gross]{premium_gross()}},
+\code{\link[=premium_xy]{premium_xy()}},
+\code{\link[=reserve_x]{reserve_x()}},
+\code{\link[=reserve_xy]{reserve_xy()}},
+\code{\link[=simulate_annuity_x]{simulate_annuity_x()}},
+\code{\link[=simulate_insurance_x]{simulate_insurance_x()}}
 }
 \concept{life-contingencies}

@@ -86,26 +86,26 @@ simulated present values of annuity payments. Default is
 \value{
 A tibble with the original simulation columns and additional columns:
 \describe{
-\item{i}{Original interest-rate input.}
-\item{i_type}{Interest-rate convention.}
-\item{m}{Interest conversion frequency.}
-\item{i_effective}{Equivalent annual effective interest rate.}
-\item{v}{Annual discount factor.}
-\item{type}{Canonical annuity type.}
-\item{payment}{Legacy-compatible amount of each annuity payment.}
-\item{payment_per_payment}{Amount paid at each payment date.}
-\item{payment_annualized}{Payment amount multiplied by the number of
-payments per year.}
-\item{k}{Annuity payment frequency.}
-\item{n}{Annuity term, if applicable.}
-\item{h}{Deferral period.}
-\item{n_guar}{Guaranteed period, if applicable.}
-\item{timing}{Annuity payment timing.}
-\item{n_payments}{Number of payments made in the simulated scenario.}
-\item{first_payment_time}{First payment time in the simulated scenario.}
-\item{last_payment_time}{Last payment time in the simulated scenario.}
-\item{pv_annuity}{Simulated present value of annuity payments, or another
-name supplied through \code{col_pv}.}
+  \item{i}{Original interest-rate input.}
+  \item{i_type}{Interest-rate convention.}
+  \item{m}{Interest conversion frequency.}
+  \item{i_effective}{Equivalent annual effective interest rate.}
+  \item{v}{Annual discount factor.}
+  \item{type}{Canonical annuity type.}
+  \item{payment}{Legacy-compatible amount of each annuity payment.}
+  \item{payment_per_payment}{Amount paid at each payment date.}
+  \item{payment_annualized}{Payment amount multiplied by the number of
+  payments per year.}
+  \item{k}{Annuity payment frequency.}
+  \item{n}{Annuity term, if applicable.}
+  \item{h}{Deferral period.}
+  \item{n_guar}{Guaranteed period, if applicable.}
+  \item{timing}{Annuity payment timing.}
+  \item{n_payments}{Number of payments made in the simulated scenario.}
+  \item{first_payment_time}{First payment time in the simulated scenario.}
+  \item{last_payment_time}{Last payment time in the simulated scenario.}
+  \item{pv_annuity}{Simulated present value of annuity payments, or another
+  name supplied through \code{col_pv}.}
 }
 
 For transition, the output also includes legacy columns such as
@@ -124,6 +124,7 @@ takes simulated values of the curtate future lifetime \eqn{K_x}, and when
 needed the complete future lifetime \eqn{T_x}, and evaluates the present
 value random variable associated with classical annuity benefits.
 
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{i} is the interest-rate input, \code{i_type}
 is the interest-rate convention, \code{m} is the nominal conversion
@@ -132,8 +133,8 @@ annuity term, and \code{h} is the deferral period.
 
 The arguments \code{m} and \code{k} have different meanings:
 \itemize{
-\item \code{m} is used only for nominal interest-rate conversion.
-\item \code{k} controls how frequently annuity payments are made.
+  \item \code{m} is used only for nominal interest-rate conversion.
+  \item \code{k} controls how frequently annuity payments are made.
 }
 
 The argument \code{payment} represents the amount of each annuity payment.
@@ -266,14 +267,14 @@ Society of Actuaries.
 \code{\link{mc_premium}}, \code{\link{mc_loss}}, \code{\link{mc_reserve}},
 \code{\link{summary_mc}}
 
-Other monte-carlo: 
-\code{\link{mc_insurance}()},
-\code{\link{mc_loss}()},
-\code{\link{mc_multilife_status}()},
-\code{\link{mc_premium}()},
-\code{\link{mc_reserve}()},
-\code{\link{simulate_lifetime}()},
-\code{\link{simulate_lifetimes}()},
-\code{\link{summary_mc}()}
+Other monte-carlo:
+\code{\link[=mc_insurance]{mc_insurance()}},
+\code{\link[=mc_loss]{mc_loss()}},
+\code{\link[=mc_multilife_status]{mc_multilife_status()}},
+\code{\link[=mc_premium]{mc_premium()}},
+\code{\link[=mc_reserve]{mc_reserve()}},
+\code{\link[=simulate_lifetime]{simulate_lifetime()}},
+\code{\link[=simulate_lifetimes]{simulate_lifetimes()}},
+\code{\link[=summary_mc]{summary_mc()}}
 }
 \concept{monte-carlo}

@@ -41,11 +41,11 @@ the end of each period or \code{"due"} for payments at the beginning.}
 
 \item{payment}{Payment specification. It may be:
 \itemize{
-\item \code{NULL}, in which case a level payment is calculated;
-\item a nonnegative numeric scalar;
-\item a nonnegative numeric vector of length \code{n};
-\item a function with arguments \code{period}, \code{ob_start}, and
-\code{i_effective_period}, returning one nonnegative payment.
+  \item \code{NULL}, in which case a level payment is calculated;
+  \item a nonnegative numeric scalar;
+  \item a nonnegative numeric vector of length \code{n};
+  \item a function with arguments \code{period}, \code{ob_start}, and
+    \code{i_effective_period}, returning one nonnegative payment.
 }}
 
 \item{extra_principal}{Optional nonnegative extra-principal payments. It may
@@ -72,12 +72,13 @@ period.
 The function extends the fixed-pattern workflow of
 \code{\link{amort_schedule}} without modifying that function. It supports:
 \itemize{
-\item a scalar interest rate recycled over all periods;
-\item a vector of interest rates, one for each period;
-\item a level payment computed automatically;
-\item a scalar or period-specific payment vector;
-\item a payment function depending on the current loan state.
+  \item a scalar interest rate recycled over all periods;
+  \item a vector of interest rates, one for each period;
+  \item a level payment computed automatically;
+  \item a scalar or period-specific payment vector;
+  \item a payment function depending on the current loan state.
 }
+
 
 Each value of \code{i} is interpreted as an annual rate under its associated
 \code{i_type} and \code{m}. It is first converted to an annual effective
@@ -151,10 +152,10 @@ amort_schedule_general(
 }
 \seealso{
 \code{\link{amort_schedule}}, \code{\link{a_angle}},
-\code{\link{standardize_interest}}
+  \code{\link{standardize_interest}}
 
-Other amortization: 
-\code{\link{amort_schedule}()},
-\code{\link{sinking_fund_schedule}()}
+Other amortization:
+\code{\link[=amort_schedule]{amort_schedule()}},
+\code{\link[=sinking_fund_schedule]{sinking_fund_schedule()}}
 }
 \concept{amortization}

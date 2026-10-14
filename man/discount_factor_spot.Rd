@@ -35,16 +35,17 @@ compact actuarial notation.
 \details{
 The spot rate may be supplied in FM-style notation:
 \itemize{
-\item annual effective rate,
-\item nominal annual interest rate,
-\item nominal annual discount rate,
-\item force of interest.
+  \item annual effective rate,
+  \item nominal annual interest rate,
+  \item nominal annual discount rate,
+  \item force of interest.
 }
 
 Internally, the supplied spot rate is first converted to the equivalent
 annual effective rate using \code{\link{standardize_interest}}. The discount
 factor is then computed as
 \deqn{v(t) = (1+i)^{-t}.}
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{t} denotes time, \code{i} denotes the spot-rate
@@ -87,14 +88,17 @@ discount_factor_spot(
 }
 \seealso{
 \code{\link{standardize_interest}}, \code{\link{present_value}},
-\code{\link{pv_flow}}
+  \code{\link{pv_flow}}
 
-Other interest: 
-\code{\link{accumulation_factor}()},
-\code{\link{discount_factor}()},
-\code{\link{forward_rate}()},
-\code{\link{interest_equivalents}()},
-\code{\link{standardize_interest}()},
-\code{\link{yield_curve}()}
+Other interest:
+\code{\link[=accumulation_factor]{accumulation_factor()}},
+\code{\link[=bootstrap_spot_curve]{bootstrap_spot_curve()}},
+\code{\link[=discount_factor]{discount_factor()}},
+\code{\link[=forward_curve]{forward_curve()}},
+\code{\link[=forward_rate]{forward_rate()}},
+\code{\link[=interest_equivalents]{interest_equivalents()}},
+\code{\link[=par_rate]{par_rate()}},
+\code{\link[=standardize_interest]{standardize_interest()}},
+\code{\link[=yield_curve]{yield_curve()}}
 }
 \concept{interest}

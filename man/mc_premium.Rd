@@ -59,14 +59,14 @@ inferred from \code{payment_per_payment}, \code{payment}, or
 A tibble containing the original simulations and standardized
 premium columns:
 \describe{
-\item{premium_annualized}{Estimated annualized premium
-\eqn{\widehat P^{(k)}}.}
-\item{premium_per_payment}{Amount collected at each premium date.}
-\item{payments_per_year}{Premium payment frequency \code{k}.}
-\item{premium_annuity_scale}{Coefficient \eqn{\widehat q} multiplying
-\code{col_Y}.}
-\item{mc_equivalence_residual}{Difference
-\eqn{\overline Z-\widehat q\overline{Y_c}} within the estimation group.}
+  \item{premium_annualized}{Estimated annualized premium
+  \eqn{\widehat P^{(k)}}.}
+  \item{premium_per_payment}{Amount collected at each premium date.}
+  \item{payments_per_year}{Premium payment frequency \code{k}.}
+  \item{premium_annuity_scale}{Coefficient \eqn{\widehat q} multiplying
+  \code{col_Y}.}
+  \item{mc_equivalence_residual}{Difference
+  \eqn{\overline Z-\widehat q\overline{Y_c}} within the estimation group.}
 }
 
 The column selected by \code{col_P} stores
@@ -155,14 +155,14 @@ Society of Actuaries.
 \code{\link{mc_loss}}, \code{\link{mc_reserve}},
 \code{\link{premium_x}}, \code{\link{premium_xy}}
 
-Other monte-carlo: 
-\code{\link{mc_annuity}()},
-\code{\link{mc_insurance}()},
-\code{\link{mc_loss}()},
-\code{\link{mc_multilife_status}()},
-\code{\link{mc_reserve}()},
-\code{\link{simulate_lifetime}()},
-\code{\link{simulate_lifetimes}()},
-\code{\link{summary_mc}()}
+Other monte-carlo:
+\code{\link[=mc_annuity]{mc_annuity()}},
+\code{\link[=mc_insurance]{mc_insurance()}},
+\code{\link[=mc_loss]{mc_loss()}},
+\code{\link[=mc_multilife_status]{mc_multilife_status()}},
+\code{\link[=mc_reserve]{mc_reserve()}},
+\code{\link[=simulate_lifetime]{simulate_lifetime()}},
+\code{\link[=simulate_lifetimes]{simulate_lifetimes()}},
+\code{\link[=summary_mc]{summary_mc()}}
 }
 \concept{monte-carlo}

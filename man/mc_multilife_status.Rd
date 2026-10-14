@@ -39,13 +39,13 @@ complete future lifetime is compatible with its curtate lifetime.}
 \value{
 A tibble with one row per simulation and:
 \describe{
-\item{sim_id}{Standard simulation identifier.}
-\item{sim}{Compatibility alias for the simulation identifier.}
-\item{K_status}{Curtate future lifetime of the status.}
-\item{T_status}{Complete future lifetime of the status.}
-\item{n_lives}{Number of lives represented in each simulation.}
-\item{status}{Canonical status: \code{"joint"} or
-\code{"last_survivor"}.}
+  \item{sim_id}{Standard simulation identifier.}
+  \item{sim}{Compatibility alias for the simulation identifier.}
+  \item{K_status}{Curtate future lifetime of the status.}
+  \item{T_status}{Complete future lifetime of the status.}
+  \item{n_lives}{Number of lives represented in each simulation.}
+  \item{status}{Canonical status: \code{"joint"} or
+  \code{"last_survivor"}.}
 }
 
 If \code{col_sim} is neither \code{"sim_id"} nor \code{"sim"}, that
@@ -95,16 +95,16 @@ simulated |>
 }
 \seealso{
 \code{\link{simulate_lifetimes}}, \code{\link{mc_insurance}},
-\code{\link{mc_annuity}}, \code{\link{mc_reserve}}
+  \code{\link{mc_annuity}}, \code{\link{mc_reserve}}
 
-Other monte-carlo: 
-\code{\link{mc_annuity}()},
-\code{\link{mc_insurance}()},
-\code{\link{mc_loss}()},
-\code{\link{mc_premium}()},
-\code{\link{mc_reserve}()},
-\code{\link{simulate_lifetime}()},
-\code{\link{simulate_lifetimes}()},
-\code{\link{summary_mc}()}
+Other monte-carlo:
+\code{\link[=mc_annuity]{mc_annuity()}},
+\code{\link[=mc_insurance]{mc_insurance()}},
+\code{\link[=mc_loss]{mc_loss()}},
+\code{\link[=mc_premium]{mc_premium()}},
+\code{\link[=mc_reserve]{mc_reserve()}},
+\code{\link[=simulate_lifetime]{simulate_lifetime()}},
+\code{\link[=simulate_lifetimes]{simulate_lifetimes()}},
+\code{\link[=summary_mc]{summary_mc()}}
 }
 \concept{monte-carlo}

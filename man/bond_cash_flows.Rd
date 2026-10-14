@@ -24,7 +24,7 @@ to \code{face}.}
 }
 \value{
 A tibble with the bond cash-flow schedule. The main actuarial
-columns are \code{t} for payment time and \code{cf} for cash flow.
+  columns are \code{t} for payment time and \code{cf} for cash flow.
 }
 \description{
 Builds the cash-flow schedule of a level coupon bond with constant coupon

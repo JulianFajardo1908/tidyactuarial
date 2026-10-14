@@ -89,6 +89,7 @@ that pays \code{benefit} at the end of the year of decrement by a specified
 cause \code{j}, using a multiple decrement table produced by
 \code{\link{md_table}}.
 
+
 Let \eqn{q_{x+k}^{(j)}} be the one-year decrement probability for cause
 \eqn{j} at age \eqn{x+k}, and let \eqn{p_{x+r}^{(\tau)}} be the one-year
 total survival probability against all decrements at age \eqn{x+r}.
@@ -146,7 +147,7 @@ insurance_xj(
 }
 \seealso{
 \code{\link{t_qxj}} for cause-specific decrement probabilities,
-\code{\link{lt_tau}} to build a single-decrement life table for the total
-decrement.
+  \code{\link{lt_tau}} to build a single-decrement life table for the total
+  decrement.
 }
 \concept{multiple-decrements}

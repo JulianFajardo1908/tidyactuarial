@@ -30,7 +30,7 @@ Passed directly to \code{\link{t_px}}.}
 }
 \value{
 Numeric vector of \eqn{{}_t q_x}, or a tibble if
-\code{tidy = TRUE}.
+  \code{tidy = TRUE}.
 }
 \description{
 Computes the t-year death probability
@@ -95,7 +95,7 @@ if (requireNamespace("dplyr", quietly = TRUE)) {
 }
 \seealso{
 \code{\link{t_px}} for the complementary survival probability,
-\code{\link{t_Ex}} for the pure endowment (discounted survival),
-\code{\link{e_x}} for life expectancy,
-\code{\link{lifetable}} for building the life table input.
+  \code{\link{t_Ex}} for the pure endowment (discounted survival),
+  \code{\link{e_x}} for life expectancy,
+  \code{\link{lifetable}} for building the life table input.
 }

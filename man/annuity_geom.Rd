@@ -81,9 +81,10 @@ This function covers finite geometric annuities and geometric perpetuities.
 
 Supported timing conventions:
 \itemize{
-\item \code{"immediate"}: payments at the end of each period.
-\item \code{"due"}: payments at the beginning of each period.
+  \item \code{"immediate"}: payments at the end of each period.
+  \item \code{"due"}: payments at the beginning of each period.
 }
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{n} is the term, \code{k} is the payment
@@ -155,11 +156,11 @@ annuity_geom(
 }
 \seealso{
 \code{\link{a_angle}}, \code{\link{s_angle}},
-\code{\link{annuity_arith}}, \code{\link{standardize_interest}}
+  \code{\link{annuity_arith}}, \code{\link{standardize_interest}}
 
-Other annuities: 
-\code{\link{a_angle}()},
-\code{\link{annuity_arith}()},
-\code{\link{s_angle}()}
+Other annuities:
+\code{\link[=a_angle]{a_angle()}},
+\code{\link[=annuity_arith]{annuity_arith()}},
+\code{\link[=s_angle]{s_angle()}}
 }
 \concept{annuities}

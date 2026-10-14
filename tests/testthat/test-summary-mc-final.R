@@ -28,10 +28,10 @@ test_that("summary_mc reproduces elementary Monte Carlo summary statistics", {
   expect_equal(out$q1000, 5)
 
   expect_equal(out$VaR_500, 3)
-  expect_equal(out$VaR_800, 4.2)
+  expect_equal(out$VaR_800, 4)
 
-  # Empirical TVaR is the mean of observations >= empirical VaR.
-  expect_equal(out$TVaR_500, mean(c(3, 4, 5)))
+  # TVaR includes only the required fraction of any VaR atom.
+  expect_equal(out$TVaR_500, 4.2)
   expect_equal(out$TVaR_800, 5)
 })
 
@@ -53,7 +53,7 @@ test_that("summary_mc groups explicitly by actuarial scenario columns", {
   expect_equal(out$n_sim, c(2L, 2L))
   expect_equal(out$mean, c(2, 3))
   expect_equal(out$q500, c(2, 3))
-  expect_equal(out$VaR_500, c(2, 3))
+  expect_equal(out$VaR_500, c(1, 2))
   expect_equal(out$TVaR_500, c(3, 4))
 })
 

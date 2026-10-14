@@ -112,17 +112,17 @@ Society of Actuaries.
 }
 \seealso{
 \code{\link{simulate_lifetimes}}, \code{\link{mc_insurance}},
-\code{\link{mc_annuity}}, \code{\link{mc_premium}},
-\code{\link{mc_loss}}, \code{\link{mc_reserve}}
+  \code{\link{mc_annuity}}, \code{\link{mc_premium}},
+  \code{\link{mc_loss}}, \code{\link{mc_reserve}}
 
-Other monte-carlo: 
-\code{\link{mc_annuity}()},
-\code{\link{mc_insurance}()},
-\code{\link{mc_loss}()},
-\code{\link{mc_multilife_status}()},
-\code{\link{mc_premium}()},
-\code{\link{mc_reserve}()},
-\code{\link{simulate_lifetimes}()},
-\code{\link{summary_mc}()}
+Other monte-carlo:
+\code{\link[=mc_annuity]{mc_annuity()}},
+\code{\link[=mc_insurance]{mc_insurance()}},
+\code{\link[=mc_loss]{mc_loss()}},
+\code{\link[=mc_multilife_status]{mc_multilife_status()}},
+\code{\link[=mc_premium]{mc_premium()}},
+\code{\link[=mc_reserve]{mc_reserve()}},
+\code{\link[=simulate_lifetimes]{simulate_lifetimes()}},
+\code{\link[=summary_mc]{summary_mc()}}
 }
 \concept{monte-carlo}

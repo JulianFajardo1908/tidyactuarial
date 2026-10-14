@@ -57,7 +57,7 @@ used in the calculation.}
 }
 \value{
 A tibble with one row per portfolio and columns for portfolio
-convexity, total portfolio value, and number of positions used.
+  convexity, total portfolio value, and number of positions used.
 }
 \description{
 Computes portfolio convexity from individual position convexities using
@@ -75,6 +75,7 @@ The portfolio convexity is computed as:
 \deqn{C_P = \frac{\sum_{j=1}^r P_j C_j}{\sum_{j=1}^r P_j}}
 where \eqn{P_j} is the present value or market value of position \eqn{j},
 and \eqn{C_j} is its convexity.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{P} denotes price, present value, or market value,
@@ -117,15 +118,16 @@ Duration, Convexity and Immunization.
 }
 \seealso{
 \code{\link{portfolio_duration}},
-\code{\link{bond_convexity}}, \code{\link{bond_duration}}
+  \code{\link{bond_convexity}}, \code{\link{bond_duration}}
 
-Other bonds: 
-\code{\link{bond_book_value}()},
-\code{\link{bond_callable_price}()},
-\code{\link{bond_convexity}()},
-\code{\link{bond_duration}()},
-\code{\link{bond_price}()},
-\code{\link{bond_ytm}()},
-\code{\link{portfolio_duration}()}
+Other bonds:
+\code{\link[=accrued_interest]{accrued_interest()}},
+\code{\link[=bond_book_value]{bond_book_value()}},
+\code{\link[=bond_callable_price]{bond_callable_price()}},
+\code{\link[=bond_convexity]{bond_convexity()}},
+\code{\link[=bond_duration]{bond_duration()}},
+\code{\link[=bond_price]{bond_price()}},
+\code{\link[=bond_ytm]{bond_ytm()}},
+\code{\link[=portfolio_duration]{portfolio_duration()}}
 }
 \concept{bonds}

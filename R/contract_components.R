@@ -1,49 +1,41 @@
 #' Add an insurance benefit specification to a life contract
 #'
-#' Adds the benefit side of a single-life insurance contract to an existing
-#' [life_contract()] object. This function stores the specification only; it
-#' does not calculate an actuarial present value.
+#' Adds the benefit side of a single-life or two-life insurance contract to an
+#' existing [life_contract()] object. This function stores the specification
+#' only; it does not calculate an actuarial present value.
 #'
-#' @param contract A single-life `tidyact_life_contract` object.
-#' @param type Character string. Insurance type: `"whole"`, `"term"`,
-#'   `"endowment"`, or `"variable_k"`.
+#' For two-life contracts, the insurance status is inferred from
+#' `contract$lives`: `"joint"` becomes joint-life status and
+#' `"last_survivor"` becomes last-survivor status.
+#'
+#' @param contract A `tidyact_life_contract` object.
+#' @param type Insurance type. Single-life contracts support `"whole"`,
+#'   `"term"`, `"endowment"`, and `"variable_k"`. Two-life contracts support
+#'   `"whole"`, `"term"`, `"endowment"`, and `"pure_endowment"`.
 #' @param benefit Benefit amount. For standard products, a single nonnegative
-#'   numeric value. For `type = "variable_k"`, a numeric vector or a function
-#'   of time may be supplied.
+#'   numeric value. For single-life `type = "variable_k"`, a numeric vector or
+#'   a function of time may be supplied.
 #' @param n Insurance term in years. Use `Inf` for whole-life insurance.
-#'   A finite positive value is required for term and endowment insurance.
 #' @param h Nonnegative integer deferment period in years.
-#' @param k Positive integer. Frequency used for benefits evaluated within
-#'   each year when `type = "variable_k"`.
-#' @param frac Fractional-age assumption. One of `"UDD"`, `"CF"`, `"CML"`,
-#'   or `"Balducci"`.
+#' @param k Positive integer. Benefit frequency for single-life
+#'   `type = "variable_k"`.
+#' @param frac Fractional-age assumption: `"UDD"`, `"CF"`, `"CML"`, or
+#'   `"Balducci"`.
 #'
 #' @return The original contract with an `insurance` component.
-#'
-#' @examples
-#' lt <- data.frame(
-#'   x = 40:90,
-#'   lx = round(100000 * exp(-0.018 * (0:50)^1.35))
-#' )
-#'
-#' life_contract(
-#'   lt = lt,
-#'   lives = "single",
-#'   x = 40,
-#'   i = 0.05
-#' ) |>
-#'   add_insurance(
-#'     type = "term",
-#'     benefit = 100000,
-#'     n = 20
-#'   )
 #'
 #' @family life-contingencies
 #'
 #' @export
 add_insurance <- function(
     contract,
-    type = c("whole", "term", "endowment", "variable_k"),
+    type = c(
+      "whole",
+      "term",
+      "endowment",
+      "pure_endowment",
+      "variable_k"
+    ),
     benefit = 1,
     n = Inf,
     h = 0L,
@@ -51,12 +43,8 @@ add_insurance <- function(
     frac = c("UDD", "CF", "CML", "Balducci")
 ) {
   if (!inherits(contract, "tidyact_life_contract")) {
-    stop("`contract` must be a `tidyact_life_contract` object.", call. = FALSE)
-  }
-
-  if (!identical(contract$lives, "single")) {
     stop(
-      "`add_insurance()` currently supports only single-life contracts.",
+      "`contract` must be a `tidyact_life_contract` object.",
       call. = FALSE
     )
   }
@@ -68,16 +56,54 @@ add_insurance <- function(
     frac <- "CF"
   }
 
+  is_single <- identical(contract$lives, "single")
+  is_two_life <- contract$lives %in% c("joint", "last_survivor")
+
+  if (!is_single && !is_two_life) {
+    stop("Unsupported life-contract status.", call. = FALSE)
+  }
+
+  allowed_types <- if (is_single) {
+    c("whole", "term", "endowment", "variable_k")
+  } else {
+    c("whole", "term", "endowment", "pure_endowment")
+  }
+
+  if (!type %in% allowed_types) {
+    stop(
+      "`type = '", type, "'` is not supported for a ",
+      if (is_single) "single-life" else "two-life",
+      " contract.",
+      call. = FALSE
+    )
+  }
+
   if (!is.numeric(n) ||
       length(n) != 1L ||
       is.na(n) ||
       n <= 0 ||
       (!is.infinite(n) && !is.finite(n))) {
-    stop("`n` must be `Inf` or a single positive finite value.", call. = FALSE)
+    stop(
+      "`n` must be `Inf` or a single positive finite value.",
+      call. = FALSE
+    )
   }
 
-  if (type %in% c("term", "endowment") && is.infinite(n)) {
-    stop("`n` must be finite for term and endowment insurance.", call. = FALSE)
+  if (type %in% c("term", "endowment", "pure_endowment") &&
+      is.infinite(n)) {
+    stop(
+      "`n` must be finite for term, endowment, and pure endowment insurance.",
+      call. = FALSE
+    )
+  }
+
+  if (type != "variable_k" &&
+      !is.infinite(n) &&
+      abs(n - round(n)) > 1e-10) {
+    stop(
+      "Standard insurance terms must be an integer number of years.",
+      call. = FALSE
+    )
   }
 
   if (!is.numeric(h) ||
@@ -98,15 +124,15 @@ add_insurance <- function(
     stop("`k` must be a single positive integer.", call. = FALSE)
   }
 
-  if (type == "variable_k") {
+  if (identical(type, "variable_k")) {
     if (!(is.function(benefit) ||
           (is.numeric(benefit) &&
            length(benefit) >= 1L &&
            all(is.finite(benefit)) &&
            all(benefit >= 0)))) {
       stop(
-        "For `type = 'variable_k'`, `benefit` must be a nonnegative numeric ",
-        "vector or a function of time.",
+        "For `type = 'variable_k'`, `benefit` must be a nonnegative ",
+        "numeric vector or a function of time.",
         call. = FALSE
       )
     }
@@ -131,13 +157,26 @@ add_insurance <- function(
     }
   }
 
+  status <- if (is_single) {
+    NULL
+  } else if (identical(contract$lives, "joint")) {
+    "joint"
+  } else {
+    "last"
+  }
+
   contract$insurance <- list(
     type = type,
     benefit = benefit,
-    n = n,
+    n = if (!is.infinite(n) && type != "variable_k") {
+      as.integer(round(n))
+    } else {
+      n
+    },
     h = as.integer(round(h)),
     k = as.integer(round(k)),
-    frac = frac
+    frac = frac,
+    status = status
   )
 
   contract
@@ -146,48 +185,23 @@ add_insurance <- function(
 
 #' Add a contingent premium-payment schedule to a life contract
 #'
-#' Adds the premium-payment side of a single-life insurance contract. The
-#' schedule defines when premiums are payable while the insured is alive.
-#' This function stores the specification only; [premium_x()] later applies
-#' the equivalence principle.
+#' Adds the premium-payment side of a single-life or two-life insurance
+#' contract. The schedule defines when premiums are payable while the selected
+#' life status is in force. This function stores the specification only.
 #'
-#' @param contract A single-life `tidyact_life_contract` object.
+#' @param contract A `tidyact_life_contract` object.
 #' @param k Positive integer. Number of premium payments per year.
 #' @param timing Timing of premium payments: `"due"` or `"immediate"`.
 #' @param premium_start Start of premium payments: `"issue"` or `"deferred"`.
 #' @param n_prem Premium-paying term in years. Use `NULL` to infer the term
-#'   from the insurance component. A finite fractional value is allowed when
+#'   from the insurance component. A fractional value is allowed when
 #'   `n_prem * k` is an integer.
 #' @param woolhouse Woolhouse approximation order: `"none"`, `"first"`, or
 #'   `"second"`.
-#' @param frac Fractional-age assumption for exact k-thly valuation. One of
-#'   `"UDD"`, `"CF"`, `"CML"`, or `"Balducci"`. If `NULL`, the insurance
-#'   component's assumption is used when available; otherwise `"UDD"`.
+#' @param frac Fractional-age assumption. If `NULL`, the insurance component's
+#'   assumption is used when available; otherwise `"UDD"`.
 #'
 #' @return The original contract with a `premium_schedule` component.
-#'
-#' @examples
-#' lt <- data.frame(
-#'   x = 40:90,
-#'   lx = round(100000 * exp(-0.018 * (0:50)^1.35))
-#' )
-#'
-#' life_contract(
-#'   lt = lt,
-#'   lives = "single",
-#'   x = 40,
-#'   i = 0.05
-#' ) |>
-#'   add_insurance(
-#'     type = "term",
-#'     benefit = 100000,
-#'     n = 20
-#'   ) |>
-#'   add_premium_schedule(
-#'     k = 12,
-#'     n_prem = 10,
-#'     timing = "due"
-#'   )
 #'
 #' @family life-contingencies
 #'
@@ -202,12 +216,8 @@ add_premium_schedule <- function(
     frac = NULL
 ) {
   if (!inherits(contract, "tidyact_life_contract")) {
-    stop("`contract` must be a `tidyact_life_contract` object.", call. = FALSE)
-  }
-
-  if (!identical(contract$lives, "single")) {
     stop(
-      "`add_premium_schedule()` currently supports only single-life contracts.",
+      "`contract` must be a `tidyact_life_contract` object.",
       call. = FALSE
     )
   }
@@ -262,8 +272,13 @@ add_premium_schedule <- function(
     }
   }
 
-  if (!is.character(frac) || length(frac) != 1L || is.na(frac)) {
-    stop("`frac` must be `NULL` or a single character string.", call. = FALSE)
+  if (!is.character(frac) ||
+      length(frac) != 1L ||
+      is.na(frac)) {
+    stop(
+      "`frac` must be `NULL` or a single character string.",
+      call. = FALSE
+    )
   }
 
   frac <- match.arg(frac, c("UDD", "CF", "CML", "Balducci"))

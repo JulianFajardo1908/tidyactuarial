@@ -84,26 +84,27 @@ actuarial notation.
 \details{
 The function supports:
 \itemize{
-\item whole-life annuities,
-\item temporary annuities,
-\item integer deferment,
-\item annual or k-thly payments,
-\item exact fractional survival for k-thly payments,
-\item first- and second-order Woolhouse approximations.
+  \item whole-life annuities,
+  \item temporary annuities,
+  \item integer deferment,
+  \item annual or k-thly payments,
+  \item exact fractional survival for k-thly payments,
+  \item first- and second-order Woolhouse approximations.
 }
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}:
 
 \itemize{
-\item \code{lt}: life table;
-\item \code{x}: actuarial age;
-\item \code{i}: interest rate;
-\item \code{i_type}: interest-rate type;
-\item \code{m}: interest conversion frequency;
-\item \code{n}: annuity term;
-\item \code{h}: deferment period;
-\item \code{k}: payment frequency.
+  \item \code{lt}: life table;
+  \item \code{x}: actuarial age;
+  \item \code{i}: interest rate;
+  \item \code{i_type}: interest-rate type;
+  \item \code{m}: interest conversion frequency;
+  \item \code{n}: annuity term;
+  \item \code{h}: deferment period;
+  \item \code{k}: payment frequency.
 }
 
 For annual annuities-due,
@@ -187,23 +188,23 @@ life_contract(lt = lt, lives = "single", x = 60, i = 0.06) |>
 }
 \seealso{
 \code{\link{insurance_x}}, \code{\link{premium_x}},
-\code{\link{reserve_x}}, \code{\link{t_px}}, \code{\link{t_Ex}}
+  \code{\link{reserve_x}}, \code{\link{t_px}}, \code{\link{t_Ex}}
 
-Other life-contingencies: 
-\code{\link{add_insurance}()},
-\code{\link{add_premium_schedule}()},
-\code{\link{annuity_multi}()},
-\code{\link{annuity_xy}()},
-\code{\link{insurance_variable_k}()},
-\code{\link{insurance_x}()},
-\code{\link{insurance_xy}()},
-\code{\link{life_contract}()},
-\code{\link{premium_gross}()},
-\code{\link{premium_x}()},
-\code{\link{premium_xy}()},
-\code{\link{reserve_x}()},
-\code{\link{reserve_xy}()},
-\code{\link{simulate_annuity_x}()},
-\code{\link{simulate_insurance_x}()}
+Other life-contingencies:
+\code{\link[=add_insurance]{add_insurance()}},
+\code{\link[=add_premium_schedule]{add_premium_schedule()}},
+\code{\link[=annuity_multi]{annuity_multi()}},
+\code{\link[=annuity_xy]{annuity_xy()}},
+\code{\link[=insurance_variable_k]{insurance_variable_k()}},
+\code{\link[=insurance_x]{insurance_x()}},
+\code{\link[=insurance_xy]{insurance_xy()}},
+\code{\link[=life_contract]{life_contract()}},
+\code{\link[=premium_gross]{premium_gross()}},
+\code{\link[=premium_x]{premium_x()}},
+\code{\link[=premium_xy]{premium_xy()}},
+\code{\link[=reserve_x]{reserve_x()}},
+\code{\link[=reserve_xy]{reserve_xy()}},
+\code{\link[=simulate_annuity_x]{simulate_annuity_x()}},
+\code{\link[=simulate_insurance_x]{simulate_insurance_x()}}
 }
 \concept{life-contingencies}

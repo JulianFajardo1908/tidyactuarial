@@ -50,7 +50,7 @@ attribute, that value is used.}
 }
 \value{
 Numeric vector of \eqn{{}_tE_x}, or a tibble if
-\code{tidy = TRUE}.
+  \code{tidy = TRUE}.
 }
 \description{
 Computes the actuarial present value of a pure endowment, i.e., the expected
@@ -76,13 +76,13 @@ applying the discount factor:
 
 Key identities involving \eqn{{}_nE_x}:
 \itemize{
-\item Actuarial accumulated value:
-\eqn{\ddot{s}_{x:\overline{n}|} = \ddot{a}_{x:\overline{n}|} /
+  \item Actuarial accumulated value:
+    \eqn{\ddot{s}_{x:\overline{n}|} = \ddot{a}_{x:\overline{n}|} /
     {}_nE_x}.
-\item Endowment insurance decomposition:
-\eqn{A_{x:\overline{n}|} = A^1_{x:\overline{n}|} + {}_nE_x}.
-\item Deferred annuity:
-\eqn{{}_{n|}\ddot{a}_x = {}_nE_x \cdot \ddot{a}_{x+n}}.
+  \item Endowment insurance decomposition:
+    \eqn{A_{x:\overline{n}|} = A^1_{x:\overline{n}|} + {}_nE_x}.
+  \item Deferred annuity:
+    \eqn{{}_{n|}\ddot{a}_x = {}_nE_x \cdot \ddot{a}_{x+n}}.
 }
 
 For a constant force of mortality \eqn{\mu} and force of interest
@@ -136,6 +136,6 @@ if (requireNamespace("dplyr", quietly = TRUE)) {
 }
 \seealso{
 \code{\link{t_px}} for survival probabilities without discounting,
-\code{\link{insurance_x}} for insurance APVs, \code{\link{annuity_x}} for
-life annuity APVs.
+  \code{\link{insurance_x}} for insurance APVs, \code{\link{annuity_x}} for
+  life annuity APVs.
 }

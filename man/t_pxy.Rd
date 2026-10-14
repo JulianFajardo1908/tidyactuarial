@@ -9,8 +9,8 @@ t_pxy(lt, x, y, t, frac, status = c("joint", "last"))
 \arguments{
 \item{lt}{Either:
 \itemize{
-\item a single life table data frame, used for both lives; or
-\item a list of two life tables \code{list(lt_x, lt_y)}, one for each life.
+  \item a single life table data frame, used for both lives; or
+  \item a list of two life tables \code{list(lt_x, lt_y)}, one for each life.
 }
 Each life table must contain columns \code{x} and \code{lx}.}
 
@@ -39,11 +39,11 @@ status.
 \details{
 Independence is assumed throughout (Finan, Sections 56--57).
 
-\strong{Joint-life status} (Finan, Section 56): the status survives as long as
+**Joint-life status** (Finan, Section 56): the status survives as long as
 \emph{both} lives are alive.
 \deqn{{}_tp_{xy} = {}_tp_x \cdot {}_tp_y.}
 
-\strong{Last-survivor status} (Finan, Section 57): the status survives as long
+**Last-survivor status** (Finan, Section 57): the status survives as long
 as \emph{at least one} life is alive.
 \deqn{{}_tp_{\overline{xy}} = {}_tp_x + {}_tp_y - {}_tp_x \cdot {}_tp_y.}
 
@@ -103,7 +103,7 @@ c(q_joint = q_joint, q_sum = qx + qy - qx * qy)  # should match
 }
 \seealso{
 \code{\link{t_px}} for single-life survival,
-\code{\link{e_xy}} for joint-life expectancy,
-\code{\link{annuity_xy}} for two-life annuity APVs,
-\code{\link{insurance_xy}} for two-life insurance APVs.
+  \code{\link{e_xy}} for joint-life expectancy,
+  \code{\link{annuity_xy}} for two-life annuity APVs,
+  \code{\link{insurance_xy}} for two-life insurance APVs.
 }

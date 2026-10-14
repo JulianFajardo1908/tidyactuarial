@@ -41,22 +41,22 @@ attribute (set by \code{\link{lifetable}}), that value is used.}
 }
 \value{
 A numeric vector of expected future lifetimes, or a tibble if
-\code{tidy = TRUE} with columns \code{x}, \code{t}, \code{type},
-\code{frac}, \code{ex}.
+  \code{tidy = TRUE} with columns \code{x}, \code{t}, \code{type},
+  \code{frac}, \code{ex}.
 }
 \description{
 Computes the curtate or complete expected future lifetime at integer age
 \eqn{x}, optionally restricted to a temporary horizon of \eqn{t} years.
 }
 \details{
-\strong{Curtate life expectancy} (Finan, Section 23.7):
+**Curtate life expectancy** (Finan, Section 23.7):
 \deqn{e_x = \sum_{k=1}^{\omega - x} {}_k p_x = \frac{1}{\ell_x}
   \sum_{k=1}^{\omega - x} \ell_{x+k}.}
 
 The \eqn{t}-year temporary curtate expectancy is (Finan, Sec. 23.7):
 \deqn{e_{x:\overline{t}|} = \sum_{k=1}^{t} {}_k p_x.}
 
-\strong{Complete life expectancy} (Finan, Section 23.3):
+**Complete life expectancy** (Finan, Section 23.3):
 \deqn{\breve{e}_x = \int_0^{\omega - x} {}_t p_x \, dt =
   \frac{T_x}{\ell_x}.}
 
@@ -65,9 +65,9 @@ within-year survival integral \eqn{\int_0^s {}_u p_y \, du} is evaluated
 in closed form under the selected fractional-age assumption
 (Finan, Section 24):
 \itemize{
-\item UDD (Sec. 24.1): \eqn{\int_0^s {}_u p_y \, du = s - \frac{1}{2} s^2 q_y}
-\item CF (Sec. 24.2): \eqn{\int_0^s {}_u p_y \, du = (1 - p_y^s) / (-\ln p_y)}
-\item Balducci (Sec. 24.3): \eqn{\int_0^s {}_u p_y \, du = \frac{p_y}{q_y} \ln \left( \frac{p_y + q_y s}{p_y} \right)}
+  \item UDD (Sec. 24.1): \eqn{\int_0^s {}_u p_y \, du = s - \frac{1}{2} s^2 q_y}
+  \item CF (Sec. 24.2): \eqn{\int_0^s {}_u p_y \, du = (1 - p_y^s) / (-\ln p_y)}
+  \item Balducci (Sec. 24.3): \eqn{\int_0^s {}_u p_y \, du = \frac{p_y}{q_y} \ln \left( \frac{p_y + q_y s}{p_y} \right)}
 }
 
 Under UDD, the complete expectancy satisfies the well-known approximation

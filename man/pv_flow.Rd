@@ -41,8 +41,8 @@ Numeric scalar: the present value of the cash flow.
 \description{
 Computes the present value of a cash-flow vector under either:
 \itemize{
-\item a constant interest-rate specification, or
-\item a term structure of spot rates, one rate per cash flow.
+  \item a constant interest-rate specification, or
+  \item a term structure of spot rates, one rate per cash flow.
 }
 }
 \details{
@@ -52,22 +52,23 @@ If \code{date} is supplied, the earliest date is taken as time 0.
 
 Interest-rate input:
 \itemize{
-\item If \code{i} has length 1, the same rate is used for all cash flows.
-\item If \code{i} has the same length as \code{cf}, each rate is
-interpreted as the spot rate associated with the corresponding
-cash-flow time.
+  \item If \code{i} has length 1, the same rate is used for all cash flows.
+  \item If \code{i} has the same length as \code{cf}, each rate is
+        interpreted as the spot rate associated with the corresponding
+        cash-flow time.
 }
 
 Rate types may be supplied in FM-style notation:
 \itemize{
-\item annual effective rate \eqn{i},
-\item nominal annual interest rate \eqn{j^{(m)}}{j(m)},
-\item nominal annual discount rate \eqn{d^{(m)}}{d(m)},
-\item force of interest \eqn{\delta}{delta}.
+  \item annual effective rate \eqn{i},
+  \item nominal annual interest rate \eqn{j^{(m)}}{j(m)},
+  \item nominal annual discount rate \eqn{d^{(m)}}{d(m)},
+  \item force of interest \eqn{\delta}{delta}.
 }
 
 Internally, all supplied rates are converted to annual effective rates using
 \code{\link{standardize_interest}}.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,
@@ -117,17 +118,17 @@ pv_flow(
 }
 \seealso{
 \code{\link{fv_flow}}, \code{\link{present_value}},
-\code{\link{irr_flow}}, \code{\link{standardize_interest}}
+  \code{\link{irr_flow}}, \code{\link{standardize_interest}}
 
-Other time-value: 
-\code{\link{accumulation_factor}()},
-\code{\link{discount_factor}()},
-\code{\link{future_value}()},
-\code{\link{fv_flow}()},
-\code{\link{irr_flow}()},
-\code{\link{irr_flow_multi}()},
-\code{\link{plot_cash_flow}()},
-\code{\link{present_value}()},
-\code{\link{solve_value}()}
+Other time-value:
+\code{\link[=accumulation_factor]{accumulation_factor()}},
+\code{\link[=discount_factor]{discount_factor()}},
+\code{\link[=future_value]{future_value()}},
+\code{\link[=fv_flow]{fv_flow()}},
+\code{\link[=irr_flow]{irr_flow()}},
+\code{\link[=irr_flow_multi]{irr_flow_multi()}},
+\code{\link[=plot_cash_flow]{plot_cash_flow()}},
+\code{\link[=present_value]{present_value()}},
+\code{\link[=solve_value]{solve_value()}}
 }
 \concept{time-value}

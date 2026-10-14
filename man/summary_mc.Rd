@@ -48,6 +48,7 @@ This function is intentionally generic. It can summarise simulated present
 values from annuities, insurances, premiums, reserves, losses, or any other
 numeric actuarial indicator stored in a tidy simulation table.
 
+
 This function follows the compact column-naming convention used throughout
 the Monte Carlo layer of \code{tidyactuarial}: column arguments are prefixed
 with \code{col_}. Thus, \code{col_value} identifies the simulated actuarial
@@ -57,8 +58,18 @@ The function computes the number of simulations used, number of missing
 values, mean, variance, standard deviation, standard error, minimum, maximum,
 selected quantiles, empirical VaR, and empirical TVaR.
 
-TVaR is computed empirically as the mean of simulated values greater than or
-equal to the corresponding empirical VaR.
+Empirical VaR uses the lower quantile (the inverse empirical CDF; type 1),
+without interpolation between observed loss amounts. In contrast, the
+descriptive `q...` columns retain the default interpolated quantiles from
+[stats::quantile()].
+
+TVaR uses the mean of the upper `1 - p` fraction of the empirical loss
+distribution, with the appropriate fraction of any probability mass at VaR.
+Equivalently, for `0 <= p < 1` and `v = VaR_p(X)`,
+`TVaR_p(X) = v + E[(X - v)_+] / (1 - p)`.
+For `p = 1`, the finite empirical upper-endpoint limit (`max(x)`) is
+reported. At `p = 0`, TVaR is the empirical mean. Negative simulated
+values are permitted because `summary_mc()` is a generic numeric summary.
 
 If \code{na_rm = TRUE}, missing values in \code{col_value} are removed before
 computing statistics. If \code{na_rm = FALSE} and missing values are present,
@@ -80,14 +91,14 @@ summary_mc(sim, value_col = "L_t", group_cols = "t")
 
 }
 \seealso{
-Other monte-carlo: 
-\code{\link{mc_annuity}()},
-\code{\link{mc_insurance}()},
-\code{\link{mc_loss}()},
-\code{\link{mc_multilife_status}()},
-\code{\link{mc_premium}()},
-\code{\link{mc_reserve}()},
-\code{\link{simulate_lifetime}()},
-\code{\link{simulate_lifetimes}()}
+Other monte-carlo:
+\code{\link[=mc_annuity]{mc_annuity()}},
+\code{\link[=mc_insurance]{mc_insurance()}},
+\code{\link[=mc_loss]{mc_loss()}},
+\code{\link[=mc_multilife_status]{mc_multilife_status()}},
+\code{\link[=mc_premium]{mc_premium()}},
+\code{\link[=mc_reserve]{mc_reserve()}},
+\code{\link[=simulate_lifetime]{simulate_lifetime()}},
+\code{\link[=simulate_lifetimes]{simulate_lifetimes()}}
 }
 \concept{monte-carlo}

@@ -63,9 +63,9 @@ actuarial notation.
 \details{
 Supported timing conventions:
 \itemize{
-\item \code{"immediate"}: annuity-immediate with discrete payments.
-\item \code{"due"}: annuity-due with discrete payments.
-\item \code{"continuous"}: continuous annuity.
+  \item \code{"immediate"}: annuity-immediate with discrete payments.
+  \item \code{"due"}: annuity-due with discrete payments.
+  \item \code{"continuous"}: continuous annuity.
 }
 
 For discrete annuities, \code{k} is the number of payments per year, so
@@ -78,16 +78,17 @@ integer.
 
 If \code{perpetuity = TRUE}, the infinite-term annuity factor is returned.
 
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}:
 
 \itemize{
-\item \code{n}: annuity term;
-\item \code{k}: payment frequency;
-\item \code{i}: interest rate;
-\item \code{i_type}: interest-rate type;
-\item \code{m}: conversion frequency for nominal rates;
-\item \code{h}: deferment period.
+  \item \code{n}: annuity term;
+  \item \code{k}: payment frequency;
+  \item \code{i}: interest rate;
+  \item \code{i_type}: interest-rate type;
+  \item \code{m}: conversion frequency for nominal rates;
+  \item \code{h}: deferment period.
 }
 
 The function first converts the supplied rate to the equivalent annual
@@ -149,11 +150,11 @@ a_angle(
 }
 \seealso{
 \code{\link{s_angle}}, \code{\link{standardize_interest}},
-\code{\link{present_value}}
+  \code{\link{present_value}}
 
-Other annuities: 
-\code{\link{annuity_arith}()},
-\code{\link{annuity_geom}()},
-\code{\link{s_angle}()}
+Other annuities:
+\code{\link[=annuity_arith]{annuity_arith()}},
+\code{\link[=annuity_geom]{annuity_geom()}},
+\code{\link[=s_angle]{s_angle()}}
 }
 \concept{annuities}

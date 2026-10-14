@@ -75,6 +75,7 @@ Converts a net-premium result from \code{\link{premium_x}} or
 The function preserves the package-wide distinction between an annualized
 premium and the amount paid at each of the \code{k} payment dates.
 
+
 Let \eqn{a^{(k)}} denote the APV of the premium annuity returned by
 \code{\link{premium_x}} or \code{\link{premium_xy}}. That annuity has
 \eqn{k} payments per year, each of amount \eqn{1/k}; hence it represents an
@@ -173,23 +174,23 @@ life_contract(
 }
 \seealso{
 \code{\link{premium_x}}, \code{\link{premium_xy}},
-\code{\link{annuity_x}}, \code{\link{annuity_xy}}
+  \code{\link{annuity_x}}, \code{\link{annuity_xy}}
 
-Other life-contingencies: 
-\code{\link{add_insurance}()},
-\code{\link{add_premium_schedule}()},
-\code{\link{annuity_multi}()},
-\code{\link{annuity_x}()},
-\code{\link{annuity_xy}()},
-\code{\link{insurance_variable_k}()},
-\code{\link{insurance_x}()},
-\code{\link{insurance_xy}()},
-\code{\link{life_contract}()},
-\code{\link{premium_x}()},
-\code{\link{premium_xy}()},
-\code{\link{reserve_x}()},
-\code{\link{reserve_xy}()},
-\code{\link{simulate_annuity_x}()},
-\code{\link{simulate_insurance_x}()}
+Other life-contingencies:
+\code{\link[=add_insurance]{add_insurance()}},
+\code{\link[=add_premium_schedule]{add_premium_schedule()}},
+\code{\link[=annuity_multi]{annuity_multi()}},
+\code{\link[=annuity_x]{annuity_x()}},
+\code{\link[=annuity_xy]{annuity_xy()}},
+\code{\link[=insurance_variable_k]{insurance_variable_k()}},
+\code{\link[=insurance_x]{insurance_x()}},
+\code{\link[=insurance_xy]{insurance_xy()}},
+\code{\link[=life_contract]{life_contract()}},
+\code{\link[=premium_x]{premium_x()}},
+\code{\link[=premium_xy]{premium_xy()}},
+\code{\link[=reserve_x]{reserve_x()}},
+\code{\link[=reserve_xy]{reserve_xy()}},
+\code{\link[=simulate_annuity_x]{simulate_annuity_x()}},
+\code{\link[=simulate_insurance_x]{simulate_insurance_x()}}
 }
 \concept{life-contingencies}

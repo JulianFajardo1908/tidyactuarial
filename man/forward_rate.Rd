@@ -71,8 +71,8 @@ objects. Used only if \code{plot = TRUE}.}
 }
 \value{
 A tibble. By default it returns the original columns plus a new
-numeric column named by \code{.out}. If \code{plot = TRUE}, it also adds
-a list-column named by \code{.out_plot} containing \code{ggplot2} objects.
+  numeric column named by \code{.out}. If \code{plot = TRUE}, it also adds
+  a list-column named by \code{.out_plot} containing \code{ggplot2} objects.
 }
 \description{
 Returns the annual effective forward rate implied between two maturities from
@@ -94,12 +94,13 @@ so that
 
 Two extraction methods are supported for the spot rates:
 \itemize{
-\item \code{"exact"}: requires that \code{t_start} and \code{t_end}
-match curve nodes.
-\item \code{"linear"}: uses linear interpolation between adjacent nodes.
+  \item \code{"exact"}: requires that \code{t_start} and \code{t_end}
+    match curve nodes.
+  \item \code{"linear"}: uses linear interpolation between adjacent nodes.
 }
 
 No extrapolation is performed outside the observed maturity range.
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{t} denotes maturity, \code{i} denotes the spot
@@ -157,14 +158,17 @@ The Term Structure of Interest Rates.
 }
 \seealso{
 \code{\link{yield_curve}}, \code{\link{discount_factor_spot}},
-\code{\link{standardize_interest}}
+  \code{\link{standardize_interest}}
 
-Other interest: 
-\code{\link{accumulation_factor}()},
-\code{\link{discount_factor}()},
-\code{\link{discount_factor_spot}()},
-\code{\link{interest_equivalents}()},
-\code{\link{standardize_interest}()},
-\code{\link{yield_curve}()}
+Other interest:
+\code{\link[=accumulation_factor]{accumulation_factor()}},
+\code{\link[=bootstrap_spot_curve]{bootstrap_spot_curve()}},
+\code{\link[=discount_factor]{discount_factor()}},
+\code{\link[=discount_factor_spot]{discount_factor_spot()}},
+\code{\link[=forward_curve]{forward_curve()}},
+\code{\link[=interest_equivalents]{interest_equivalents()}},
+\code{\link[=par_rate]{par_rate()}},
+\code{\link[=standardize_interest]{standardize_interest()}},
+\code{\link[=yield_curve]{yield_curve()}}
 }
 \concept{interest}

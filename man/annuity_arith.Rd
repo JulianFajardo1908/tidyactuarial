@@ -72,17 +72,18 @@ functions.
 
 Supported payment patterns:
 \itemize{
-\item \code{"increasing"}: payments \eqn{1, 2, \ldots, N}.
-\item \code{"decreasing"}: payments \eqn{N, N-1, \ldots, 1}.
-\item \code{"custom"}: payments following
-\eqn{P_r = P_1 + (r - 1)g}.
+  \item \code{"increasing"}: payments \eqn{1, 2, \ldots, N}.
+  \item \code{"decreasing"}: payments \eqn{N, N-1, \ldots, 1}.
+  \item \code{"custom"}: payments following
+    \eqn{P_r = P_1 + (r - 1)g}.
 }
 
 Supported timing conventions:
 \itemize{
-\item \code{"immediate"}: payments at the end of each period.
-\item \code{"due"}: payments at the beginning of each period.
+  \item \code{"immediate"}: payments at the end of each period.
+  \item \code{"due"}: payments at the beginning of each period.
 }
+
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{n} is the term, \code{k} is the payment
@@ -136,11 +137,11 @@ annuity_arith(
 }
 \seealso{
 \code{\link{a_angle}}, \code{\link{s_angle}},
-\code{\link{standardize_interest}}
+  \code{\link{standardize_interest}}
 
-Other annuities: 
-\code{\link{a_angle}()},
-\code{\link{annuity_geom}()},
-\code{\link{s_angle}()}
+Other annuities:
+\code{\link[=a_angle]{a_angle()}},
+\code{\link[=annuity_geom]{annuity_geom()}},
+\code{\link[=s_angle]{s_angle()}}
 }
 \concept{annuities}
