@@ -1,3 +1,11 @@
+# tidyactuarial 0.2.0
+
+## Bug fixes
+
+* Corrected `lifetable()` conversions between `mx` and `qx` for `ax != 0.5`,
+  using the mean fraction of the year lived by those who die. This correction
+  can change previous actuarial results; results for `ax = 0.5` are preserved.
+
 # tidyactuarial 0.1.6
 
 ## Bug fixes

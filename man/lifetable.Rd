@@ -53,7 +53,8 @@ raised (the function will not invent missing ages).}
 those who die in the interval \eqn{[x, x+1)}. Under UDD (Finan, Sec. 24.1),
 \code{ax = 0.5}. Under constant force, \eqn{a_x = 1/\mu - 1/(\exp(\mu)-1)}.
 At the terminal age with \code{close = TRUE}, \code{mx} equals
-\eqn{1/(1 - a_x)}, which is 2 for \code{ax = 0.5}. Default is \code{0.5}.}
+\eqn{1/a_x}, which is 2 for \code{ax = 0.5}, 1 for \code{ax = 1},
+and \code{Inf} for \code{ax = 0}. Default is \code{0.5}.}
 
 \item{type}{Character. \code{"ultimate"} or \code{"select"} (metadata).
 Stored as an attribute and used by downstream functions.}
@@ -78,7 +79,7 @@ A \code{tibble} with class
   \item \code{px}: probability of survival to \eqn{x+1}
   \item \code{mx}: central death rate (derived using \code{ax}). At the
     terminal age with \code{close = TRUE}, \code{mx} equals
-    \eqn{1/(1 - a_x)} and may be \code{Inf} if \code{ax = 1}.
+    \eqn{1/a_x} and is \code{Inf} if \code{ax = 0}.
 }
 Attributes include: \code{radix}, \code{omega}, \code{type}, \code{frac},
 \code{closed}, \code{ax}.
@@ -115,9 +116,11 @@ The basic identities are (Finan, Section 22):
 \deqn{\ell_x = \ell_0 \cdot s(x), \quad d_x = \ell_x - \ell_{x+1},
       \quad q_x = d_x / \ell_x, \quad p_x = \ell_{x+1} / \ell_x.}
 
-The central death rate \code{mx} is computed via the discrete approximation
-(Finan, Section 23.9):
-\deqn{m_x = \frac{q_x}{1 - a_x \cdot q_x}}
+With \eqn{a_x} the mean fraction of the year lived by those who die,
+exposure is \eqn{L_x = \ell_{x+1} + a_x d_x} and \eqn{m_x = d_x / L_x}.
+Consequently,
+\deqn{m_x = \frac{q_x}{1 - (1 - a_x) q_x}, \quad
+      q_x = \frac{m_x}{1 + (1 - a_x) m_x}}
 which under UDD (\code{ax = 0.5}) reduces to the classical formula
 \eqn{m_x = q_x / (1 - 0.5 \, q_x)} (Finan, Section 24.1). This arises
 because under UDD, \eqn{L_x = \ell_x - \tfrac{1}{2} d_x}, and therefore
@@ -125,8 +128,11 @@ because under UDD, \eqn{L_x = \ell_x - \tfrac{1}{2} d_x}, and therefore
 
 At the terminal age \eqn{\omega} with \code{close = TRUE}, closure forces
 \eqn{q_\omega = 1}, \eqn{p_\omega = 0}, and \eqn{d_\omega = \ell_\omega}.
-The corresponding \eqn{m_\omega} equals \eqn{1/(1 - a_x)}, which is 2
-under UDD (\code{ax = 0.5}). If \code{ax = 1}, \eqn{m_\omega = \infty}.
+For positive terminal survivors, \eqn{L_\omega = a_x \ell_\omega} and
+\eqn{m_\omega = 1/a_x}, which is 2 under UDD (\code{ax = 0.5}).
+At \code{ax = 0}, the zero-exposure limit is \eqn{m_\omega = \infty};
+at \code{ax = 1}, \eqn{m_\omega = 1}. Infinite \code{mx} inputs remain
+unsupported; this limit can be obtained from \code{lx} or \code{qx}.
 }
 \examples{
 # Example 1: build from lx (Finan, Section 22 style)
