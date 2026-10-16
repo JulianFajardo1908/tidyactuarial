@@ -5,3 +5,5 @@
 ^pkgdown$
 ^\.github$
 ^CONTRIBUTING[.]md$
+^AGENTS[.]md$
+^audit-.*[.]md$

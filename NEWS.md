@@ -2,52 +2,16 @@
 
 ## Bug fixes
 
-* Immunization functions now use relative checks for liability present values
-  and two-asset duration degeneracy, avoiding rejection of valid portfolios
-  solely because of monetary units or small asset prices. Non-finite
-  liability valuations and sensitivities are rejected explicitly.
-
-* Immunization systems with more assets than moment constraints now use row-scaled singular
-  value decomposition for the minimum-norm asset units, instead of normal
-  equations that could falsely classify distinct sensitivities as singular.
-
-* Clarified that `immunize_duration_convexity()` requires convexity with
-  respect to the annual effective yield. The coupon-frequency-scaled
-  `bond_convexity()` output generally uses a different yield variable;
-  documentation now gives the chain-rule conversion. Bond output meanings
-  are preserved. Examples now use convexities on the liability yield basis.
-
+* Fractional deferred Monte Carlo annuities now anchor their payment grid
+  at the deferment rather than issue time. Non-grid-aligned deferments no
+  longer omit eligible payments; the shared reserve calendar is corrected too.
 * Negative-binomial and geometric frequency thinning now avoids intermediate
   overflow for tiny original `prob`. Conversions that would round a positive
   payment frequency to zero now fail explicitly and retain the per-loss
   model as the available representation.
 
-* Discrete VaR now compares the requested level directly with cumulative
-  probabilities, without shifting it by an absolute epsilon. Levels just
-  above an atom or the represented aggregate mass no longer select the
-  previous atom or slip into an uncomputed tail.
-
-* VaR from FFT aggregates now checks whether omitted claim-count probability
-  could change the selected quantile, using the minimum possible loss of
-  omitted counts. Ambiguous quantiles are rejected with advice to reduce
-  `tol`. Documentation distinguishes unrepresented mass from an upper loss
-  tail: omitted large counts can still produce small aggregate losses.
-
-* Aggregate distributions now infer decimal lattices relative to the severity
-  magnitude and merge support points using relative monetary tolerances.
-  Small monetary units no longer collapse distinct losses into zero, and
-  convolution/FFT `max_loss` cutoffs respect the same scale. Strictly positive
-  masses below 1e-18 are retained rather than silently discarded.
-
-* Stop-loss premiums for covered exponential per-loss severities now use
-  closed forms for ordinary and franchise deductibles, inflation, coinsurance,
-  and finite or infinite limits. Very large limits no longer produce spurious
-  zero premiums through quadrature. Their reported method changes from
-  `numerical_survival` to `closed_form`; TVaR uses the corrected premiums too.
-
-* Fractional deferred Monte Carlo annuities now anchor their payment grid
-  at the deferment rather than issue time. Non-grid-aligned deferments no
-  longer omit eligible payments; the shared reserve calendar is corrected too.
+* Internal development instructions and audit records are excluded from
+  source-package archives.
 
 * Life-contingent Monte Carlo insurance, annuity and reserve calculations
   now reject noninteger or infinite curtate lifetimes, infinite complete
@@ -59,12 +23,10 @@
 * Monte Carlo life annuities now preserve missing lifetime information as
   missing present values and payment counts, instead of zero payments.
   Certain annuities remain independent of lifetime data.
-
 * Fractional Monte Carlo annuity schedules now compare payment grid dates
   directly with the complete lifetime. A fixed epsilon no longer removes
   payments just before death or introduces payments just after death.
   Existing exact-death endpoint conventions are preserved.
-
 * Guaranteed fractional annuities retain their guaranteed payments even
   when death occurs at time zero. The shared payment schedule also serves
   Monte Carlo reserve and fractional annuity simulation calculations.
@@ -74,10 +36,43 @@
   mixed these conditioning states and disagreed with prospective reserves.
   Documentation explicitly conditions reserve_xy() on both lives being alive
   at valuation. Joint-life recursion and public output columns are preserved.
-
 * Constant-force fractional lifetime simulation now evaluates log(1-q) using
   log1p(-q). Tiny positive mortality probabilities no longer round the
   denominator to zero and collapse conditional death times to the year start.
+
+* Discrete VaR now compares the requested level directly with cumulative
+  probabilities, without shifting it by an absolute epsilon. Levels just
+  above an atom or the represented aggregate mass no longer select the
+  previous atom or slip into an uncomputed tail.
+* VaR from FFT aggregates now checks whether omitted claim-count probability
+  could change the selected quantile, using the minimum possible loss of
+  omitted counts. Ambiguous quantiles are rejected with advice to reduce
+  `tol`. Documentation distinguishes unrepresented mass from an upper loss
+  tail: omitted large counts can still produce small aggregate losses.
+
+* Aggregate distributions now infer decimal lattices relative to the severity
+  magnitude and merge support points using relative monetary tolerances.
+  Small monetary units no longer collapse distinct losses into zero, and
+  convolution/FFT `max_loss` cutoffs respect the same scale. Strictly positive
+  masses below 1e-18 are retained rather than silently discarded.
+* Stop-loss premiums for covered exponential per-loss severities now use
+  closed forms for ordinary and franchise deductibles, inflation, coinsurance,
+  and finite or infinite limits. Very large limits no longer produce spurious
+  zero premiums through quadrature. Their reported method changes from
+  `numerical_survival` to `closed_form`; TVaR uses the corrected premiums too.
+
+* Immunization functions now use relative checks for liability present values
+  and two-asset duration degeneracy, avoiding rejection of valid portfolios
+  solely because of monetary units or small asset prices. Non-finite
+  liability valuations and sensitivities are rejected explicitly.
+* Immunization systems with more assets than moment constraints now use row-scaled singular
+  value decomposition for the minimum-norm asset units, instead of normal
+  equations that could falsely classify distinct sensitivities as singular.
+* Clarified that `immunize_duration_convexity()` requires convexity with
+  respect to the annual effective yield. The coupon-frequency-scaled
+  `bond_convexity()` output generally uses a different yield variable;
+  documentation now gives the chain-rule conversion. Bond output meanings
+  are preserved. Examples now use convexities on the liability yield basis.
 
 * Corrected complete `e_xy(..., cohort = "last")` calculations to preserve
   conditioning on both lives being alive at the initial ages. Annual
