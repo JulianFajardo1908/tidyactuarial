@@ -64,6 +64,11 @@
 #' \frac{\sum_{r=1}^{N} C_r r(r+1) v^r}{(1+j)^2}.}
 #'
 #' Discrete convexity in years is \eqn{C_p / k^2}.
+#' This is sensitivity to the nominal annual yield \eqn{z=kj}; it is
+#' generally not the relative second derivative with respect to the annual
+#' effective yield \eqn{i=(1+j)^k-1}. Before passing convexity to
+#' \code{immunize_duration_convexity()}, apply the chain rule described
+#' there or compute \code{convexity_cash_flow()} from annual cash-flow times.
 #'
 #' This is the second-order sensitivity of the bond price to changes in the
 #' yield per period. Together with \code{\link{bond_duration}}, it is used in

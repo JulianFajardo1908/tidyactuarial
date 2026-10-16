@@ -2,6 +2,21 @@
 
 ## Bug fixes
 
+* Immunization functions now use relative checks for liability present values
+  and two-asset duration degeneracy, avoiding rejection of valid portfolios
+  solely because of monetary units or small asset prices. Non-finite
+  liability valuations and sensitivities are rejected explicitly.
+
+* Immunization systems with more assets than moment constraints now use row-scaled singular
+  value decomposition for the minimum-norm asset units, instead of normal
+  equations that could falsely classify distinct sensitivities as singular.
+
+* Clarified that `immunize_duration_convexity()` requires convexity with
+  respect to the annual effective yield. The coupon-frequency-scaled
+  `bond_convexity()` output generally uses a different yield variable;
+  documentation now gives the chain-rule conversion. Bond output meanings
+  are preserved. Examples now use convexities on the liability yield basis.
+
 * Corrected complete `e_xy(..., cohort = "last")` calculations to preserve
   conditioning on both lives being alive at the initial ages. Annual
   integration now uses survival from those original ages, including paths

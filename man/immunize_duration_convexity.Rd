@@ -18,8 +18,11 @@ assets, evaluated on the same yield basis.}
 \item{D}{Numeric vector with the Macaulay duration of each asset, expressed
 in the same time units as \code{t}.}
 
-\item{C}{Numeric vector with the discrete convexity of each asset, expressed
-in the same time units as \code{t}.}
+\item{C}{Numeric vector with each asset's relative second derivative
+\eqn{P_j''(i_e)/P_j(i_e)} with respect to the annual effective yield
+\eqn{i_e}, using the same time units as \code{t}. A coupon-period
+convexity divided by squared coupon frequency generally uses a different
+yield variable and must be converted before use here.}
 
 \item{i}{Numeric scalar. Interest-rate input used to discount the
 liabilities.}
@@ -92,6 +95,23 @@ assets, the minimum-norm solution
 w = A^T(AA^T)^{-1}b
 }
 is computed.
+It is evaluated by singular value decomposition of the row-scaled
+constraint matrix, without forming normal equations. The norm is over
+asset units \code{w}, not market-value fractions; short positions are allowed.
+
+All asset sensitivities must use the same annual effective yield as the
+liabilities, even when \code{i_type} specifies a nominal rate or a force.
+For coupon frequency \eqn{k}, let \eqn{j=(1+i_e)^{1/k}-1}. If
+\eqn{C_j=P''(j)/P} and \eqn{D_j^*=-P'(j)/P}, the required convexity is
+\deqn{C_{i_e}=C_j[j'(i_e)]^2-D_j^*j''(i_e).}
+The outputs \code{discrete_convexity_periods} from \code{bond_convexity()}
+and \code{modified_duration_periods_j} from \code{bond_duration()} give
+\eqn{C_j} and \eqn{D_j^*}. Alternatively, use \code{convexity_cash_flow()}
+on the asset cash flows at the annual effective yield.
+
+Matching convexity makes the surplus's second derivative zero at the
+base yield. This differs from Redington's strict positive-curvature
+condition and does not guarantee a nonnegative surplus after rate shifts.
 }
 \examples{
 # Three-asset immunization
@@ -100,7 +120,7 @@ immunize_duration_convexity(
   t = c(3, 5, 7),
   P = c(100, 150, 200),
   D = c(2, 5, 8),
-  C = c(6, 30, 72),
+  C = c(6, 30, 72) / (1.05)^2,
   i = 0.05
 )
 
@@ -110,7 +130,7 @@ immunize_duration_convexity(
   t = c(3, 5, 7),
   P = c(100, 120, 150, 200),
   D = c(2, 4, 6, 8),
-  C = c(6, 20, 42, 72),
+  C = c(6, 20, 42, 72) / (1.05)^2,
   i = 0.05
 )
 
@@ -120,7 +140,7 @@ immunize_duration_convexity(
   t = c(3, 5, 7),
   P = c(100, 150, 200),
   D = c(2, 5, 8),
-  C = c(6, 30, 72),
+  C = c(6, 30, 72) / (1 + 0.06 / 12)^(2 * 12),
   i = 0.06,
   i_type = "nominal_interest",
   m = 12

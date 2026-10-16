@@ -95,6 +95,14 @@ and
 and
 
 \deqn{b = (PV_L, PV_LD_L)^T.}
+
+The minimum Euclidean norm is taken over asset units \code{w}, not
+portfolio market-value fractions. It is evaluated by singular value
+decomposition of the row-scaled constraint matrix, without forming
+normal equations. Short positions are allowed. Matching present value
+and duration gives a zero value and first derivative of the surplus at
+the base yield, but does not ensure nonnegative surplus after rate shifts;
+the Redington convexity condition must be checked separately.
 }
 \examples{
 # Two-asset immunization

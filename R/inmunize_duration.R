@@ -80,6 +80,14 @@
 #'
 #' \deqn{b = (PV_L, PV_LD_L)^T.}
 #'
+#' The minimum Euclidean norm is taken over asset units \code{w}, not
+#' portfolio market-value fractions. It is evaluated by singular value
+#' decomposition of the row-scaled constraint matrix, without forming
+#' normal equations. Short positions are allowed. Matching present value
+#' and duration gives a zero value and first derivative of the surplus at
+#' the base yield, but does not ensure nonnegative surplus after rate shifts;
+#' the Redington convexity condition must be checked separately.
+#'
 #' @seealso \code{\link{immunize_duration_convexity}},
 #'   \code{\link{bond_duration}}, \code{\link{bond_convexity}}
 #'
@@ -227,13 +235,21 @@ immunize_duration <- function(
 
   # --- Present value and duration of liabilities ---
   v <- 1 / (1 + i_effective)
-  pv_L <- sum(L * v^t)
+  discounted <- L * v^t
+  pv_L <- sum(discounted)
+  pv_scale <- sum(abs(discounted))
 
-  if (abs(pv_L) < .Machine$double.eps * 100) {
+  if (!is.finite(pv_L) || !is.finite(pv_scale)) {
+    stop("Discounting liabilities produced non-finite values.", call. = FALSE)
+  }
+  if (pv_scale == 0 || abs(pv_L) <= .Machine$double.eps * 100 * pv_scale) {
     stop("Present value of liabilities is zero; immunization is not meaningful.", call. = FALSE)
   }
 
-  dur_L <- sum(t * L * v^t) / pv_L
+  dur_L <- sum(t * discounted) / pv_L
+  if (!is.finite(dur_L)) {
+    stop("Liability duration is non-finite.", call. = FALSE)
+  }
 
   # --- Build linear system A w = b ---
   # Row 1: PV constraint
@@ -252,26 +268,19 @@ immunize_duration <- function(
     D1 <- D[1L]
     D2 <- D[2L]
 
-    den <- P1 * (D1 - D2)
-    if (abs(den) < .Machine$double.eps * 100) {
+    den <- D1 - D2
+    if (abs(den) <= .Machine$double.eps * 100 * max(abs(D1), abs(D2))) {
       stop("Degenerate case: assets have equal duration; cannot solve uniquely.", call. = FALSE)
     }
 
-    w1 <- pv_L * (dur_L - D2) / den
+    w1 <- (pv_L * ((dur_L - D2) / den)) / P1
     w2 <- (pv_L - w1 * P1) / P2
     w <- c(w1, w2)
   } else {
-    # Minimum-norm solution for n_assets >= 3:
-    # w = t(A) %*% solve(A %*% t(A), b)
-    At <- t(A)
-    M <- A %*% At
-    M_solve <- tryCatch(
-      solve(M, b),
-      error = function(e) {
-        stop("System matrix is singular; cannot compute minimum-norm solution.", call. = FALSE)
-      }
-    )
-    w <- as.numeric(At %*% M_solve)
+    w <- .immunization_min_norm(A, b)
+  }
+  if (any(!is.finite(w))) {
+    stop("Immunization weights are non-finite. Check input magnitudes.", call. = FALSE)
   }
 
   # --- Check resulting portfolio ---
