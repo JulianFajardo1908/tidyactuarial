@@ -38,7 +38,10 @@ mc_reserve(
 }
 \arguments{
 \item{.data}{A data frame or tibble containing simulated curtate future
-lifetimes and, when required, complete future lifetimes.}
+lifetimes and, when required, complete future lifetimes.
+Observed curtate lifetimes must be finite nonnegative integers and
+observed complete lifetimes finite and nonnegative. Paired observations
+must satisfy \eqn{K_x \le T_x < K_x+1}; missing values remain missing.}
 
 \item{t}{Nonnegative numeric vector of valuation durations.}
 

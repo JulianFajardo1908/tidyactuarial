@@ -104,6 +104,10 @@ Because [annuity_xy()] assigns amount `1 / k` to each payment,
 
 Reserves are measured immediately before a premium payable at duration
 `t`. Pure endowments are valued as endowment APV minus term-insurance APV.
+Both lives are assumed alive at the valuation duration, under independent
+mortality. In particular, `status = "last"` selects the insured event;
+it does not condition on an unspecified surviving life. Last-survivor
+recursion tracks the both-alive and each single-survivor state separately.
 }
 \seealso{
 [premium_xy()], [annuity_xy()], [insurance_xy()], [reserve_x()]

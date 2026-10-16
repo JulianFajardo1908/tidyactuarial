@@ -140,6 +140,29 @@
   invisible(TRUE)
 }
 
+# Validate the selected representations of one simulated lifetime. Missing
+# values remain available to each caller's existing propagation rules.
+.mc_validate_lifetimes <- function(K, T) {
+  observed_K <- !is.na(K)
+  observed_T <- !is.na(T)
+  if (any(!is.finite(K[observed_K])) ||
+      any(K[observed_K] < 0) ||
+      any(K[observed_K] != floor(K[observed_K]))) {
+    stop("Curtate lifetimes must be finite nonnegative integers or missing.",
+         call. = FALSE)
+  }
+  if (any(!is.finite(T[observed_T])) || any(T[observed_T] < 0)) {
+    stop("Complete lifetimes must be finite nonnegative numbers or missing.",
+         call. = FALSE)
+  }
+  paired <- observed_K & observed_T
+  if (any(T[paired] < K[paired] | T[paired] >= K[paired] + 1)) {
+    stop("Observed lifetimes must satisfy K <= T < K + 1 for the same life.",
+         call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
 
 #' Internal helper: normalize Monte Carlo interest-rate type
 #'

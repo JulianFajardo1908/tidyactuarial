@@ -26,7 +26,10 @@ mc_annuity(
 \arguments{
 \item{.data}{A data frame or tibble containing simulated future lifetimes,
 typically returned by \code{\link{simulate_lifetime}} or by
-\code{\link{mc_multilife_status}} when working with multiple-life statuses.}
+\code{\link{mc_multilife_status}} when working with multiple-life statuses.
+For life-contingent calculations, observed curtate lifetimes must be
+finite nonnegative integers and observed complete lifetimes finite and
+nonnegative. Paired observations must satisfy \eqn{K_x \le T_x < K_x+1}.}
 
 \item{i}{Numeric scalar. Interest-rate input used for discounting.}
 
@@ -49,7 +52,9 @@ annuities.}
 
 \item{h}{Numeric scalar. Deferral period in years. Default is \code{0}.
 Required to be positive for \code{"deferred"} and
-\code{"deferred_temporary"} annuities.}
+\code{"deferred_temporary"} annuities.
+For fractional payments, the calendar is anchored at \code{h}, which
+need not be a multiple of \code{1 / k}.}
 
 \item{n_guar}{Numeric scalar. Guaranteed payment period in years. Required
 for \code{type = "guaranteed"}.}
@@ -147,6 +152,11 @@ For annual payments, \code{k = 1}, the function works directly with
 \eqn{K_x}. For fractional payments, such as monthly, quarterly, or
 semiannual payments, the function uses \eqn{T_x} to determine whether the
 life is alive at each fractional payment time.
+Missing lifetimes produce missing life-contingent present values and
+payment counts; certain annuities remain independent of lifetime data.
+Fractional due payments use dates strictly before death; fractional
+immediate payments include a date exactly equal to the complete lifetime.
+Guaranteed payments remain payable throughout the guarantee period.
 
 For annual whole-life annuity-immediate, the simulated present value is
 \deqn{

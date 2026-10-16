@@ -24,7 +24,10 @@ mc_insurance(
 \arguments{
 \item{.data}{A data frame or tibble containing simulated future lifetimes,
 typically returned by \code{\link{simulate_lifetime}} or by
-\code{\link{mc_multilife_status}} when working with multiple-life statuses.}
+\code{\link{mc_multilife_status}} when working with multiple-life statuses.
+Observed curtate lifetimes must be finite nonnegative integers and
+observed complete lifetimes finite and nonnegative. Paired observations
+must satisfy \eqn{K_x \le T_x < K_x+1}; missing values remain missing.}
 
 \item{i}{Numeric scalar. Interest-rate input used for discounting.}
 

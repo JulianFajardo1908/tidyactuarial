@@ -44,6 +44,10 @@
 #'
 #' Reserves are measured immediately before a premium payable at duration
 #' `t`. Pure endowments are valued as endowment APV minus term-insurance APV.
+#' Both lives are assumed alive at the valuation duration, under independent
+#' mortality. In particular, `status = "last"` selects the insured event;
+#' it does not condition on an unspecified surviving life. Last-survivor
+#' recursion tracks the both-alive and each single-survivor state separately.
 #'
 #' @return A compact tibble, a named numeric vector, or a long audit tibble.
 #'
@@ -555,6 +559,55 @@ reserve_xy <- function(
 
   if (method == "prospective") {
     reserves <- prospective
+  } else if (status == "last") {
+    # Backward three-state recursion. A last-survivor policy continues after
+    # the first death, with the mortality and reserve of the remaining life.
+    i_effective <- standardize_interest(i_type = i_type, i = i, m = m)
+    v <- 1 / (1 + i_effective)
+    full_t <- seq.int(0L, contract_horizon)
+    both <- only_x <- only_y <- numeric(length(full_t))
+    terminal <- if (type %in% c("endowment", "pure_endowment")) benefit else 0
+    both[length(both)] <- only_x[length(only_x)] <-
+      only_y[length(only_y)] <- terminal
+
+    survival <- function(tab, age) {
+      current <- match(age, tab$x)
+      # Unreachable single-life states contribute nothing to transitions.
+      if (is.na(current)) {
+        if (age > max(tab$x) && tail(tab$lx, 1) == 0) return(0)
+        stop("Cannot compute single-life continuation from the life table.",
+             call. = FALSE)
+      }
+      if (tab$lx[current] == 0) return(0)
+      next_age <- match(age + 1L, tab$x)
+      if (is.na(next_age)) {
+        stop("Cannot compute single-life continuation from the life table.",
+             call. = FALSE)
+      }
+      p <- tab$lx[next_age] / tab$lx[current]
+      if (p < 0 || p > 1) stop("Invalid single-life continuation probability.",
+                               call. = FALSE)
+      p
+    }
+
+    if (contract_horizon > 0L) {
+      for (tt in rev(seq_len(contract_horizon) - 1L)) {
+        idx <- tt + 1L
+        px <- survival(table_x, x + tt)
+        py <- survival(table_y, y + tt)
+        premium_due <- if (tt < premium_end_time) P else 0
+        death_benefit <- if (type == "pure_endowment") 0 else benefit
+        only_x[idx] <- v * (px * only_x[idx + 1L] +
+          (1 - px) * death_benefit) - premium_due
+        only_y[idx] <- v * (py * only_y[idx + 1L] +
+          (1 - py) * death_benefit) - premium_due
+        both[idx] <- v * (px * py * both[idx + 1L] +
+          px * (1 - py) * only_x[idx + 1L] +
+          (1 - px) * py * only_y[idx + 1L] +
+          (1 - px) * (1 - py) * death_benefit) - premium_due
+      }
+    }
+    reserves <- both[match(t_vec, full_t)]
   } else {
     i_effective <- standardize_interest(i_type = i_type, i = i, m = m)
 

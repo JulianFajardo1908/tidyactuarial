@@ -430,7 +430,7 @@ simulate_lifetime <- function(
 
       out[regular] <-
         log1p(-u_frac[regular] * q_death[regular]) /
-        log(px_death[regular])
+        log1p(-q_death[regular])
 
       out
     } else {

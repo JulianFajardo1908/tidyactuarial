@@ -45,6 +45,40 @@
   zero premiums through quadrature. Their reported method changes from
   `numerical_survival` to `closed_form`; TVaR uses the corrected premiums too.
 
+* Fractional deferred Monte Carlo annuities now anchor their payment grid
+  at the deferment rather than issue time. Non-grid-aligned deferments no
+  longer omit eligible payments; the shared reserve calendar is corrected too.
+
+* Life-contingent Monte Carlo insurance, annuity and reserve calculations
+  now reject noninteger or infinite curtate lifetimes, infinite complete
+  lifetimes, and observed pairs inconsistent with K <= T < K + 1.
+  Missing values retain their existing meaning. Certain annuities remain
+  independent of lifetime values. A shared internal validator prevents
+  chained valuations from accepting contradictory versions of the same life.
+
+* Monte Carlo life annuities now preserve missing lifetime information as
+  missing present values and payment counts, instead of zero payments.
+  Certain annuities remain independent of lifetime data.
+
+* Fractional Monte Carlo annuity schedules now compare payment grid dates
+  directly with the complete lifetime. A fixed epsilon no longer removes
+  payments just before death or introduces payments just after death.
+  Existing exact-death endpoint conventions are preserved.
+
+* Guaranteed fractional annuities retain their guaranteed payments even
+  when death occurs at time zero. The shared payment schedule also serves
+  Monte Carlo reserve and fractional annuity simulation calculations.
+
+* Last-survivor recursive reserves now use backward recursion across the
+  both-alive and each single-survivor state. The previous scalar recursion
+  mixed these conditioning states and disagreed with prospective reserves.
+  Documentation explicitly conditions reserve_xy() on both lives being alive
+  at valuation. Joint-life recursion and public output columns are preserved.
+
+* Constant-force fractional lifetime simulation now evaluates log(1-q) using
+  log1p(-q). Tiny positive mortality probabilities no longer round the
+  denominator to zero and collapse conditional death times to the year start.
+
 * Corrected complete `e_xy(..., cohort = "last")` calculations to preserve
   conditioning on both lives being alive at the initial ages. Annual
   integration now uses survival from those original ages, including paths
