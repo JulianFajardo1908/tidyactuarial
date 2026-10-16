@@ -70,7 +70,7 @@ present value (NPV) function, using compact actuarial notation.
 This function is intended for cash flows with multiple sign changes, where
 more than one IRR may exist. It evaluates the NPV on a fine grid over the
 search interval, identifies subintervals with sign changes (and grid points
-where the NPV is approximately zero), and applies
+where the scaled NPV evaluates to zero), and applies
 \code{\link[stats]{uniroot}} to each candidate interval.
 
 The IRRs returned are interpreted as annual effective rates.
@@ -79,6 +79,13 @@ Timing can be supplied either through \code{t} (in years) or \code{date}
 (calendar dates). If \code{date} is supplied, the earliest date is treated
 as time 0.
 
+
+Cash flows are divided by their largest absolute amount during the search;
+reported NPVs remain in the original currency. Scaling that would erase a
+nonzero amount through underflow is rejected. Only exact computed grid
+zeros and sign-changing brackets generate candidates: an absolutely small
+monetary NPV is not by itself evidence of a root. Grid detection remains
+heuristic, including for tangential or very close roots.
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,

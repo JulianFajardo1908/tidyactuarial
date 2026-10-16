@@ -10,8 +10,10 @@ No cambiar DESCRIPTION a versión de release todavía.
 
 Consultar primero `audit-thematic-review.md` (inventario completo de los
 101 nombres públicos) y `audit-interest-foundations.md` (B01 iniciado y
-con pendientes), además de los registros anteriores. La CI y el manual con
-índice ya se ejecutaron; los detalles están en `audit-ci-minimum-r.md` y
+con pendientes), además de los registros anteriores.
+Para la continuación numérica de B01 y las TIR/ecuaciones de B02, consultar
+también `audit-cash-flow-roots.md`; no dar por cerrados ambos bloques.
+La CI y el manual con índice ya se ejecutaron; los detalles están en `audit-ci-minimum-r.md` y
 `audit-manual-index.md`. Sus resultados corresponden al código que indican;
 no validan automáticamente cambios posteriores. El resto de este prompt
 conserva el relevo histórico inicial y debe leerse con esa salvedad.

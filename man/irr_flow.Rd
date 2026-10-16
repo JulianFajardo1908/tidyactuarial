@@ -74,6 +74,11 @@ either through \code{t} (in years) or \code{date} (calendar dates). If
 The IRR returned is interpreted as an annual effective rate.
 
 
+Root finding scales the cash flows by their largest absolute amount;
+this preserves roots across monetary units. The reported NPV remains in
+the original currency. Scaling that would erase a nonzero amount through
+underflow is rejected. The tolerance controls the rate-coordinate solve.
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,
 and \code{m} denotes the conversion frequency used to report the equivalent

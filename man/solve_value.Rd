@@ -95,6 +95,11 @@ This function is intended to reuse the stable calculation functions already
 available in tidyactuarial. It does not reproduce their actuarial formulas.
 
 
+During interval scanning, only exact computed zeros are accepted directly
+as grid roots. Other candidates require a sign-changing bracket and are
+refined numerically. A small residual alone does not establish a root;
+tangential roots may require an appropriate Newton starting value.
+
 `solve_value()` is restricted to one scalar unknown. It is appropriate for
 quantities such as an effective interest rate, a payment, a principal, a
 present value, or another continuous scalar parameter.

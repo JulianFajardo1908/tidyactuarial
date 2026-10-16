@@ -2,6 +2,13 @@
 
 ## Bug fixes
 
+* IRR searches no longer classify small monetary NPVs as grid roots.
+  Positive rescaling preserves roots across monetary units, sign checks
+  avoid residual products, and reported NPVs retain the original currency.
+  Scaling that would erase a nonzero cash flow is rejected explicitly.
+* solve_value interval scans now refine sign-changing brackets rather than
+  treating all residuals below an absolute tolerance as distinct grid roots.
+
 * Interval factors, equivalent-rate tables and basic cash-flow valuations
   retain the original log accumulation rate when an annual effective
   equivalent rounds to -1 or overflows. Interval discounts no longer require

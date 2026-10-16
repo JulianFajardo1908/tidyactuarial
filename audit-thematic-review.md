@@ -19,7 +19,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | Bloque | Tema | Nombres públicos | Estado |
 |---|---|---:|---|
 | B01 | Tasas y factores financieros | 5 | En revisión; ver audit-interest-foundations.md |
-| B02 | Flujos y ecuaciones de valor | 8 | Pendiente de revisión integral; preservar evidencia previa |
+| B02 | Flujos y ecuaciones de valor | 8 | En revisión; ver audit-cash-flow-roots.md y audit-interest-foundations.md |
 | B03 | Anualidades financieras y préstamos | 7 | Pendiente de revisión integral; preservar evidencia previa |
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Pendiente de revisión integral; preservar evidencia previa |
 | B05 | Tablas, mortalidad y probabilidades | 12 | Pendiente de revisión integral; preservar evidencia previa |
@@ -40,19 +40,19 @@ demuestra cobertura de ramas ni incluye llamadas indirectas.
 
 | Bloque | Nombre | Fuente | Tests con llamada directa |
 |---|---|---|---|
-| B01 | `accumulation_factor` | `R/s_angle.R` | `test-accumulation_factor.R`, `test-interest-audit-regressions.R` |
-| B01 | `discount_factor` | `R/mc_reserve.R` | `test-discount_factor.R`, `test-interest-audit-regressions.R` |
+| B01 | `accumulation_factor` | `R/s_angle.R` | `test-accumulation_factor.R`, `test-interest-audit-regressions.R`, `test-interest-log-basis.R` |
+| B01 | `discount_factor` | `R/mc_reserve.R` | `test-discount_factor.R`, `test-interest-audit-regressions.R`, `test-interest-log-basis.R` |
 | B01 | `discount_factor_spot` | `R/discount_factor_spot.R` | `test-discount-factor-spot-finance.R`, `test-discount_factor.R`, `test-interest-audit-regressions.R`, `test-par-rate.R` |
-| B01 | `interest_equivalents` | `R/interest_equivalents.R` | `test-interest-audit-regressions.R`, `test-interest-conversions.R` |
+| B01 | `interest_equivalents` | `R/interest_equivalents.R` | `test-interest-audit-regressions.R`, `test-interest-conversions.R`, `test-interest-log-basis.R` |
 | B01 | `standardize_interest` | `R/standardize_interest.R` | `test-flow-valuation.R`, `test-interest-audit-regressions.R`, `test-interest-conversions.R`, `test-time-value-basics.R` |
-| B02 | `future_value` | `R/s_angle.R` | `test-time-value-basics.R` |
-| B02 | `fv_flow` | `R/fv_flow.R` | `test-flow-valuation.R` |
-| B02 | `irr_flow` | `R/irr_flow.R` | `test-irr-flow.R` |
-| B02 | `irr_flow_multi` | `R/irr_flow_multi.R` | `test-irr-flow.R` |
+| B02 | `future_value` | `R/s_angle.R` | `test-interest-log-basis.R`, `test-time-value-basics.R` |
+| B02 | `fv_flow` | `R/fv_flow.R` | `test-flow-valuation.R`, `test-interest-log-basis.R` |
+| B02 | `irr_flow` | `R/irr_flow.R` | `test-irr-flow.R`, `test-irr-scale-regressions.R` |
+| B02 | `irr_flow_multi` | `R/irr_flow_multi.R` | `test-irr-flow.R`, `test-irr-scale-regressions.R` |
 | B02 | `plot_cash_flow` | `R/plot_cash_flow.R` | `test-plot_cash_flow.R` |
-| B02 | `present_value` | `R/simulate_life_mc.R` | `test-time-value-basics.R` |
-| B02 | `pv_flow` | `R/pv_flow.R` | `test-flow-valuation.R` |
-| B02 | `solve_value` | `R/solve_value_v3.R` | `test-solve_value_v2.R` |
+| B02 | `present_value` | `R/simulate_life_mc.R` | `test-interest-log-basis.R`, `test-time-value-basics.R` |
+| B02 | `pv_flow` | `R/pv_flow.R` | `test-flow-valuation.R`, `test-interest-log-basis.R` |
+| B02 | `solve_value` | `R/solve_value_v3.R` | `test-solve-value-grid-roots.R`, `test-solve_value_v2.R` |
 | B03 | `a_angle` | `R/a_angle.R` | `test-annuity-level-finance.R`, `test-solve_value_v2.R` |
 | B03 | `amort_schedule` | `R/amort_schedule.R` | `test-amort_schedule_general.R`, `test-loan-schedules-finance.R` |
 | B03 | `amort_schedule_general` | `R/amort_schedule_general.R` | `test-amort_schedule_general.R` |
