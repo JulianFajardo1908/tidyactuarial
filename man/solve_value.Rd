@@ -95,6 +95,12 @@ This function is intended to reuse the stable calculation functions already
 available in tidyactuarial. It does not reproduce their actuarial formulas.
 
 
+Newton iteration accepts an exact zero immediately. Otherwise, convergence
+requires both a small residual and a small Newton correction relative to
+the unknown, using \code{tol}. A nonzero derivative is not rejected merely
+because its units make its absolute magnitude small. A step clipped to an
+interval boundary does not by itself demonstrate convergence.
+
 During interval scanning, only exact computed zeros are accepted directly
 as grid roots. Other candidates require a sign-changing bracket and are
 refined numerically. A small residual alone does not establish a root;

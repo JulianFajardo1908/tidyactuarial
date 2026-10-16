@@ -16,7 +16,8 @@ Allowed values are \code{"effective"}, \code{"nominal_interest"},
 \code{"nominal_discount"}, and \code{"force"}.}
 
 \item{m}{Positive integer vector giving the conversion frequency for nominal
-rates. Ignored for \code{"effective"} and \code{"force"}.}
+rates. Observed values are validated as positive integers for all rate
+families; only nominal conversions use their numeric value.}
 
 \item{t}{Numeric vector of times in years until payment.}
 
@@ -54,6 +55,8 @@ Valuation retains the log accumulation rate of the original specification
 instead of reconstructing it from a rounded annual equivalent. In tidy
 output, extreme annual equivalents may round to -1 or overflow to Inf;
 the annual discount factor and present value are calculated independently.
+Products with extreme factors are combined in log space when necessary,
+so an unrepresentable factor need not invalidate a representable value.
 
 
 This function follows the compact actuarial notation used throughout

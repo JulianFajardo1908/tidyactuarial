@@ -56,6 +56,12 @@
 #' }
 #'
 #' @details
+#' Newton iteration accepts an exact zero immediately. Otherwise, convergence
+#' requires both a small residual and a small Newton correction relative to
+#' the unknown, using \code{tol}. A nonzero derivative is not rejected merely
+#' because its units make its absolute magnitude small. A step clipped to an
+#' interval boundary does not by itself demonstrate convergence.
+#'
 #' During interval scanning, only exact computed zeros are accepted directly
 #' as grid roots. Other candidates require a sign-changing bracket and are
 #' refined numerically. A small residual alone does not establish a root;
@@ -449,7 +455,7 @@ solve_value <- function(
 
     for (iteration in seq_len(maxiter)) {
       fx <- .residual(x)
-      if (abs(fx) <= tol) {
+      if (fx == 0) {
         return(list(root = x, residual = fx, iter = iteration - 1L, converged = TRUE))
       }
 
@@ -464,11 +470,15 @@ solve_value <- function(
       }
 
       if (!is.numeric(dfx) || length(dfx) != 1L || !is.finite(dfx) ||
-          abs(dfx) <= sqrt(.Machine$double.eps)) {
+          dfx == 0) {
         return(list(root = x, residual = fx, iter = iteration, converged = FALSE))
       }
 
       step <- fx / dfx
+      if (is.finite(step) && abs(step) <= tol * max(1, abs(x)) &&
+          abs(fx) <= tol) {
+        return(list(root = x, residual = fx, iter = iteration - 1L, converged = TRUE))
+      }
       candidate <- x - step
 
       if (!is.finite(candidate)) {
@@ -493,13 +503,18 @@ solve_value <- function(
       }
 
       if (abs(candidate - x) <= tol * max(1, abs(x)) &&
-          abs(candidate_residual) <= sqrt(tol)) {
+          abs(step) <= tol * max(1, abs(x)) &&
+          abs(candidate_residual) <= tol) {
         return(list(
           root = candidate,
           residual = candidate_residual,
           iter = iteration,
           converged = TRUE
         ))
+      }
+
+      if (candidate == x) {
+        return(list(root = x, residual = fx, iter = iteration, converged = FALSE))
       }
 
       x <- candidate

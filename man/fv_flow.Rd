@@ -25,8 +25,9 @@ fv_flow(
 \code{"nominal_discount"}, or \code{"force"}.
 May have length 1 or the same length as \code{cf}.}
 
-\item{m}{Positive integer vector giving the conversion frequency for nominal
-rates. May have length 1 or the same length as \code{cf}.}
+\item{m}{Conversion frequency for nominal rates. Must contain positive
+integers for nominal conversions and is ignored by other rate families.
+May have length 1 or the same length as \code{cf}.}
 
 \item{t}{Optional numeric vector of cash-flow times in years.}
 
@@ -82,6 +83,9 @@ rounds to -1 or overflows to Inf, tied horizon flows must have exactly
 equal log accumulation rates; otherwise the existing annual-rate tolerance
 applies.
 
+
+Products are evaluated in log space when separate factors lose range or
+precision; original cash-flow signs and known zero amounts are preserved.
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,

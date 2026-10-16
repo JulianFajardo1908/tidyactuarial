@@ -2,6 +2,16 @@
 
 ## Bug fixes
 
+* Basic cash-flow valuations recover representable signed capital-factor
+  products even when a separate factor overflows, underflows or is subnormal.
+  Known zero payments stay zero without converting missing inputs to zero.
+* Newton solving now requires a small correction as well as a small residual;
+  tiny residual units or a boundary-clipped step no longer imply convergence.
+  Nonzero derivatives are no longer discarded by an absolute scale threshold.
+* Cash-flow plot present values now use the corrected financial basis.
+  Unrepresentable aggregate amounts and inferred present values are rejected;
+  tabular pipes, negative numeric timelines and editable ggplots are preserved.
+
 * IRR searches no longer classify small monetary NPVs as grid roots.
   Positive rescaling preserves roots across monetary units, sign checks
   avoid residual products, and reported NPVs retain the original currency.

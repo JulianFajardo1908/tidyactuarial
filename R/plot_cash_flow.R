@@ -41,6 +41,12 @@
 #' @return A `ggplot2` object.
 #'
 #' @details
+#' Present values use the original interest specification and combine capital
+#' and discount factors stably. Numeric timelines may include negative times;
+#' the valuation origin remains zero. Dated timelines use the earliest date
+#' as origin. Non-finite inferred present values or aggregated amounts are
+#' rejected. The returned ggplot remains editable with additional layers.
+#'
 #' This function uses compact actuarial notation: `C` denotes cash-flow amounts,
 #' `t` denotes times in years, `i` denotes the interest-rate input, and `PV`
 #' denotes present value.
@@ -200,15 +206,8 @@ plot_cash_flow <- function(
     }
 
     m <- as.integer(round(m))
-    i_effective <- standardize_interest(i_type = i_type, i = i, m = m)
-
-    if (!is.numeric(i_effective) || length(i_effective) != 1L ||
-        is.na(i_effective) || !is.finite(i_effective) || i_effective <= -1) {
-      stop(
-        "The standardized annual effective interest rate must be greater than -1.",
-        call. = FALSE
-      )
-    }
+    basis <- .interest_basis(i_type = i_type, i = i, m = m)
+    i_effective <- basis$effective
   } else {
     i_effective <- NULL
   }
@@ -385,13 +384,20 @@ plot_cash_flow <- function(
   }
 
   if (is.null(PV) && !is.null(i_effective)) {
-    PV <- sum(C_vec / (1 + i_effective)^time_for_pv)
+    PV <- sum(.cash_flow_value(C_vec, -basis$growth * time_for_pv))
+    if (!is.finite(PV)) {
+      stop("Computed present value must be finite; supply a representable cash-flow model.",
+           call. = FALSE)
+    }
   }
 
   plot_data <- data.frame(x = x_values, time_for_pv = time_for_pv, C = as.numeric(C_vec))
 
   if (isTRUE(aggregate)) {
     plot_data <- stats::aggregate(C ~ x + time_for_pv, data = plot_data, FUN = sum)
+    if (any(!is.finite(plot_data$C))) {
+      stop("Aggregated cash flows must remain finite for plotting.", call. = FALSE)
+    }
   }
 
   plot_data <- plot_data[order(plot_data$x), , drop = FALSE]

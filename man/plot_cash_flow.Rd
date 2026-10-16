@@ -112,6 +112,12 @@ Creates a professional cash-flow diagram with arrows representing inflows
 and outflows over time, using compact actuarial notation.
 }
 \details{
+Present values use the original interest specification and combine capital
+and discount factors stably. Numeric timelines may include negative times;
+the valuation origin remains zero. Dated timelines use the earliest date
+as origin. Non-finite inferred present values or aggregated amounts are
+rejected. The returned ggplot remains editable with additional layers.
+
 This function uses compact actuarial notation: `C` denotes cash-flow amounts,
 `t` denotes times in years, `i` denotes the interest-rate input, and `PV`
 denotes present value.

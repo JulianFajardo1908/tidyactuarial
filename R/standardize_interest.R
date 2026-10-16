@@ -242,3 +242,18 @@ standardize_interest <- function(
   growth[force] <- rate[force]
   list(effective = effective, growth = growth)
 }
+
+# Preserve ordinary multiplication and recover only products whose separate
+# factor loses range or becomes subnormal. Inputs have been validated by callers.
+.cash_flow_value <- function(amount, log_factor) {
+  factor <- exp(log_factor)
+  out <- amount * factor
+  known <- !is.na(amount) & !is.na(log_factor)
+  zero <- known & amount == 0
+  out[zero] <- 0
+  recover <- known & amount != 0 &
+    (!is.finite(out) | out == 0 | factor < .Machine$double.xmin)
+  out[recover] <- sign(amount[recover]) *
+    exp(log(abs(amount[recover])) + log_factor[recover])
+  out
+}

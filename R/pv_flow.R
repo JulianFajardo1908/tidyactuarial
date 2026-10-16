@@ -48,6 +48,9 @@
 #' @return Numeric scalar: the present value of the cash flow.
 #'
 #' @details
+#' Products are evaluated in log space when separate factors lose range or
+#' precision; original cash-flow signs and known zero amounts are preserved.
+#'
 #' This function follows the compact actuarial notation used throughout
 #' \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,
 #' \code{i} denotes the interest rate, \code{i_type} denotes the interest-rate
@@ -212,5 +215,5 @@ pv_flow <- function(
     )
   }
 
-  sum(cf * exp(-basis$growth * t_cf))
+  sum(.cash_flow_value(cf, -basis$growth * t_cf))
 }

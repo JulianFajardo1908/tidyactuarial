@@ -145,3 +145,30 @@ La antigua limitación sobre makeindex queda resuelta. No se repitió
 R CMD check con la fase del manual habilitada: esta evidencia corresponde
 a la compilación independiente del manual. Siguen pendientes la revisión
 remota de recepción y la conciliación del informe externo.
+
+## Revalidación de productos, Newton y gráfica financiera
+
+Tras las correcciones B02-04 a B02-06 se ejecutaron suite local completa,
+construcción y R CMD check del paquete instalado. Resultado:
+**0 ERROR, 0 WARNING, 1 NOTE**, salida 0. La NOTE corresponde únicamente
+a `Version contains large components (0.1.6.9000)`. Pasaron ejemplos,
+pruebas instaladas y reconstrucción de las cuatro viñetas.
+
+Comandos: `R CMD build --no-manual` y
+`R CMD check --as-cran --no-manual tidyactuarial_0.1.6.9000.tar.gz`.
+Se empleó R 4.6.1 en Windows, con locale válido
+`English_United States.utf8`, Pandoc de RStudio accesible en PATH y
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`. La ejecución fuera del aislamiento
+permitió acceso normal a dependencias. No se cambiaron sus validaciones.
+
+Evidencia en:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-api-products/`.
+Informe: `tidyactuarial.Rcheck/00check.log`; archivo fuente:
+`tidyactuarial_0.1.6.9000.tar.gz`.
+SHA256: `AA9AE8BA29ACC9E5EB67C3C9244FBE731C2AAF0326E1A043F944BFFB102FA237`.
+
+Las 47 comprobaciones nuevas específicas pasan. La matriz de 101 firmas
+es un registro excluido del paquete, no una nueva API o dependencia.
+No se ejecutó nuevamente CI ni recepción remota de CRAN; no se presenta
+la ejecución remota previa como validación del nuevo código. El manual
+provisional no se reconstruyó en esta unidad y el barrido sigue abierto.

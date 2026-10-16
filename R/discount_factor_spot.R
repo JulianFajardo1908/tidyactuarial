@@ -24,6 +24,8 @@
 #'   \code{"nominal_discount"}, and \code{"force"}.
 #' @param m Positive integer vector giving the conversion frequency for nominal
 #'   spot-rate inputs.
+#'   Observed values are validated as positive integers for every family,
+#'   even when the conversion itself does not use \code{m}.
 #' @param tidy Logical scalar. If \code{FALSE}, returns a numeric discount
 #'   factor. If \code{TRUE}, returns a tibble with intermediate calculations.
 #'

@@ -72,6 +72,9 @@ Discounting retains the original log accumulation rates, including when
 annual effective equivalents round to -1 or overflow to Inf.
 
 
+Products are evaluated in log space when separate factors lose range or
+precision; original cash-flow signs and known zero amounts are preserved.
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,
 \code{i} denotes the interest rate, \code{i_type} denotes the interest-rate

@@ -178,3 +178,15 @@ Pendiente para cerrar B01: resolver y documentar coherencia de validación
 de m ignorado, y ampliar la revisión de resultados realmente desbordados
 en consumidores. B02 continúa con TIR y ecuaciones de valor, sin afirmar
 que el barrido integral ya terminó.
+
+## Continuación con auditoría de interfaz
+
+La matriz global está en audit-api-signatures.md (101 entradas y 959
+apariciones de parámetros). La evaluación de API/tidyverse está en
+audit-api-review.md. El papel y la validación de m quedan analizados por
+familia, con aclaraciones Rd compatibles. Modificar su dominio o el orden
+posicional sería categoría C: no se aplica una normalización mecánica.
+El pendiente de análisis de m no debe volver a presentarse como no estudiado.
+Los productos capital-factor y la integración gráfica se detallan en la
+continuación de audit-cash-flow-roots.md. B01 sigue en revisión; las
+propuestas C se separan de defectos A confirmados y corregidos.

@@ -44,8 +44,9 @@
 #'   \code{"effective"}, \code{"nominal_interest"},
 #'   \code{"nominal_discount"}, or \code{"force"}.
 #'   May have length 1 or the same length as \code{cf}.
-#' @param m Positive integer vector giving the conversion frequency for nominal
-#'   rates. May have length 1 or the same length as \code{cf}.
+#' @param m Conversion frequency for nominal rates. Must contain positive
+#'   integers for nominal conversions and is ignored by other rate families.
+#'   May have length 1 or the same length as \code{cf}.
 #' @param t Optional numeric vector of cash-flow times in years.
 #' @param date Optional vector of cash-flow dates. If supplied, the earliest
 #'   date is treated as time 0.
@@ -57,6 +58,9 @@
 #' latest cash-flow time.
 #'
 #' @details
+#' Products are evaluated in log space when separate factors lose range or
+#' precision; original cash-flow signs and known zero amounts are preserved.
+#'
 #' This function follows the compact actuarial notation used throughout
 #' \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,
 #' \code{i} denotes the interest rate, \code{i_type} denotes the interest-rate
@@ -248,5 +252,5 @@ fv_flow <- function(
 
   log_ratio <- g_h[1L] * (T_horizon - t_cf) +
     (g_h[1L] - basis$growth) * t_cf
-  sum(cf * exp(log_ratio))
+  sum(.cash_flow_value(cf, log_ratio))
 }

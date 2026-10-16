@@ -97,3 +97,80 @@ R CMD check ni CI para estos cambios y no se equipara esta suite con ellos.
 Siguiente paso: terminar el análisis de tolerancias de Newton y de los
 productos capital-factor, completar plot_cash_flow y resolver el pendiente
 de validación de m en B01 antes de cerrar ambos bloques o pasar a B03.
+
+## B02-04 (A): productos capital-factor
+
+Estado: confirmado, implementado y probado.
+V=C exp(g)=sign(C) exp(log(abs(C))+g) cuando C no es cero. Se conserva
+la multiplicación directa ordinaria y se usa la segunda expresión si el
+factor separado pierde rango o precisión. Un cero conocido sigue siendo
+cero; NA no se transforma en cero.
+
+Antes, 2^-1000 por 2^1100 daba Inf en lugar de 2^100, y 2^1000 por
+2^-1100 daba cero en lugar de 2^-100; signos negativos fallaban igual.
+Se reprodujeron 20 fallos de producto/cero. Un caso adicional con factor
+subnormal, 2^1000 exp(-740), producía un cociente 1.0026 frente a 1.
+La referencia Decimal de Python a 80 dígitos es
+4.4882708347358573677923533961594e-21. La tolerancia relativa 2e-12
+contempla error log/exp y suma de logaritmos de magnitud cercana a 700,
+sin aceptar la pérdida observada de aproximadamente .26%.
+
+Diff: helper privado .cash_flow_value en standardize_interest.R y llamadas
+en present_value, future_value, pv_flow, fv_flow y plot_cash_flow. Su uso
+compartido responde al mismo defecto en cinco consumidores; no agrega
+API pública. No resuelve sumas con cancelación entre términos que sean
+individualmente no representables. test-capital-factor-products.R:
+23 comprobaciones aprobadas, con referencias binarias y Decimal independientes.
+
+## B02-05 (A): convergencia Newton y unidades del residuo
+
+Estado: confirmado, implementado y probado en este alcance.
+La corrección dx=f/f' es invariante al escalado positivo conjunto de f y
+f'. Antes, f=s(x-2), start=0 y s=1e-12 o 1e-200 aceptaba x=0 aunque
+la raíz es 2. Para f=s(x+1) en [0,2] aceptaba cero sin raíz admisible.
+Tres comprobaciones fallaron antes de corregir.
+
+Ahora se acepta un cero calculado, o se exigen residuo <=tol y corrección
+<=tol max(1,abs(x)). La derivada se rechaza por cero, no por un umbral
+absoluto dependiente de unidades. Un paso recortado en el límite no se
+confunde con una corrección pequeña y el estancamiento se informa como
+no convergencia. No cambian firma, parámetros, columnas o output. Una
+falsa convergencia anterior puede pasar al error de no convergencia
+previsto por el método. test-solve-value-newton-scale.R: 13 comprobaciones
+en escalas 1,1e-12,1e-200,1e200, con derivada explícita/estimada y un
+problema sin raíz admisible. Los tests existentes también pasan.
+La propuesta de separar tolerancias y el diagnóstico general converged
+de otros métodos sigue siendo C01; no se agregan parámetros sin aprobación.
+
+## B02-06 (A/B): matemática e interfaz de plot_cash_flow
+
+La gráfica todavía usaba una anualización/potencia anterior a B01 y
+rechazaba una fuerza cuyo valor final era representable. Ahora comparte
+base financiera y producto estable. Se conserva t numérico negativo con
+origen cero y fechas con origen en la más temprana. Un PV inferido o un
+importe agregado no finito causa error explícito. Los tres casos fallaron
+antes del cambio. No se renombra C/cf ni se añaden aliases.
+
+Se comprobaron .data primero, pipes con columnas desnudas y strings,
+agregación, clase Date y edición del ggplot con +labs. Pasan 11 pruebas
+nuevas en test-plot-cash-flow-audit.R y las 14 existentes. Se renderizaron
+y revisaron cash-flow-numeric.png y cash-flow-dated.png en el área de
+visualizaciones de esta conversación. No se afirma revisión de todos los
+estilos o magnitudes posibles.
+
+## Interfaz, compatibilidad y evidencia conjunta
+
+- Las ocho firmas exportadas en archivos modificados coinciden con HEAD
+  al inicio de la unidad, con defaults y orden. A_xj sigue siendo el alias
+  de insurance_xj. Se conservan los 101 nombres públicos.
+- B: aclaraciones documentales de m, matriz de firmas y ejemplos de uso
+  comprobados. Sus papeles diferentes se explican en audit-api-review.md.
+- C: tolerancias separadas, dominios de m, renombramientos y reordenamientos
+  quedan propuestos, no implementados. Ningún campo público nuevo.
+- Referencias independientes: identidades, potencias binarias y Decimal;
+  no se afirma haber consultado bibliografía externa inaccesible.
+
+47 comprobaciones nuevas específicas y suite completa aprobadas, salida 0.
+Roxygen regeneró solo los Rd afectados. El resultado de construcción y
+R CMD check de este código se registra en audit-precran-check.md. La CI
+previa no valida automáticamente esta unidad. No se publica una release.

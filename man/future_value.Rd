@@ -16,7 +16,8 @@ Allowed values are \code{"effective"}, \code{"nominal_interest"},
 \code{"nominal_discount"}, and \code{"force"}.}
 
 \item{m}{Positive integer vector giving the conversion frequency for nominal
-rates. Ignored for \code{"effective"} and \code{"force"}.}
+rates. Observed values are validated as positive integers for all rate
+families; only nominal conversions use their numeric value.}
 
 \item{t}{Numeric vector of times in years from valuation to accumulation.}
 
@@ -54,6 +55,8 @@ annual effective interest rate using \code{\link{standardize_interest}}.
 Valuation retains the log accumulation rate of the original specification.
 In tidy output, an extreme annual equivalent can round to -1 or overflow
 to Inf while the requested accumulation factor remains representable.
+Capital-factor products use log space when a separate factor loses range
+or precision. The product can be representable even when the factor is not.
 
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{C} denotes the initial payment amount or capital,
