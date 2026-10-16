@@ -59,10 +59,17 @@ last-survivor (second death).
 **Complete expectation** (Finan, Section 56.4):
 \deqn{\mathring{e}_{xy} = \int_0^{\infty} {}_tp_{xy} \, dt.}
 
-The integral is decomposed year-by-year. Within each year, the survival
-integral for the two-life status is computed numerically via composite
-trapezoid (80-point grid), since closed-form expressions for joint/last
-survivor under fractional-age assumptions are complex.
+The integral is decomposed year-by-year and evaluated by adaptive
+quadrature with relative tolerance \code{1e-10}. Survival is always
+measured from the initial ages, conditional on both lives being alive
+at time zero. In particular, last-survivor survival at later times does
+not imply that both lives remain alive.
+
+Horizons end at the last recorded age: the older life limits joint-life
+expectation and the younger life limits last-survivor expectation.
+Survival beyond that age is taken as zero, as in \code{t_px}; an open
+table therefore gives a truncated expectation. Missing initial ages or
+zero initial survivors give \code{NA}, including when \code{t = 0}.
 
 **Key identity** (Finan, Example 57.4):
 \deqn{\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y

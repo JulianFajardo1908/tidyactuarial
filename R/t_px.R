@@ -176,6 +176,10 @@ t_px <- function(
 
   # Combine integer and fractional parts
   result <- p_int * ps
+  # Integer survival needs only lx, even at the final recorded age.
+  # Once the cohort is extinct, a missing fractional factor cannot revive it.
+  result[ok & s == 0] <- p_int[ok & s == 0]
+  result[ok & p_int == 0] <- 0
   # Clamp to [0, 1]
   result <- pmin(pmax(result, 0), 1)
 

@@ -28,10 +28,17 @@
 #' **Complete expectation** (Finan, Section 56.4):
 #' \deqn{\mathring{e}_{xy} = \int_0^{\infty} {}_tp_{xy} \, dt.}
 #'
-#' The integral is decomposed year-by-year. Within each year, the survival
-#' integral for the two-life status is computed numerically via composite
-#' trapezoid (80-point grid), since closed-form expressions for joint/last
-#' survivor under fractional-age assumptions are complex.
+#' The integral is decomposed year-by-year and evaluated by adaptive
+#' quadrature with relative tolerance \code{1e-10}. Survival is always
+#' measured from the initial ages, conditional on both lives being alive
+#' at time zero. In particular, last-survivor survival at later times does
+#' not imply that both lives remain alive.
+#'
+#' Horizons end at the last recorded age: the older life limits joint-life
+#' expectation and the younger life limits last-survivor expectation.
+#' Survival beyond that age is taken as zero, as in \code{t_px}; an open
+#' table therefore gives a truncated expectation. Missing initial ages or
+#' zero initial survivors give \code{NA}, including when \code{t = 0}.
 #'
 #' **Key identity** (Finan, Example 57.4):
 #' \deqn{\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
@@ -145,25 +152,15 @@ e_xy <- function(
 
   status <- if (cohort == "first") "joint" else "last"
 
-  # --- within-year survival integral via composite trapezoid (80 points) ---
-  # Closed-form for joint/last under each frac is complex;
-  # numerical integration is robust and accurate for annual life tables.
-  int_surv <- function(x0, y0, s) {
-    if (is.na(s) || s <= 0) return(0)
-    if (s >= 1) s <- 1
-    grid_n <- 80L
-    u  <- seq(0, s, length.out = grid_n)
-    Su <- vapply(u, function(uu) {
-      t_pxy(lt, x0, y0, t = uu, frac = frac, status = status)
-    }, numeric(1))
-    if (anyNA(Su)) return(NA_real_)
-    sum((head(Su, -1) + tail(Su, -1)) / 2) * (s / (grid_n - 1))
-  }
-
   ex <- rep(NA_real_, nout)
 
   for (j in seq_len(nout)) {
     xj <- x[j]; yj <- y[j]; tj <- t[j]
+
+    initial <- match(c(xj, yj), ages)
+    if (anyNA(initial) || any(!is.finite(lt$lx[initial]) | lt$lx[initial] <= 0)) {
+      next
+    }
 
     # --- maximum horizon depends on status ---
     # Joint life: limited by the older life (both must be alive)
@@ -185,7 +182,6 @@ e_xy <- function(
     }
 
     n_int <- floor(tj_use)
-    s <- tj_use - n_int
 
     # --- curtate: e = sum_{k=1}^{n} k_p (Finan, Sec. 56.4) ---
     if (type == "curtate") {
@@ -200,33 +196,21 @@ e_xy <- function(
       next
     }
 
-    # --- complete: integral decomposed year-by-year ---
-    if (n_int == 0) {
-      ex[j] <- int_surv(xj, yj, s)
+    # Integrate the status survival from the original ages on each annual
+    # interval. A last-survivor status is not a renewal of two living lives.
+    if (tj_use == 0) {
+      ex[j] <- 0
       next
     }
-
-    # Full years: sum_{k=0}^{n-1} k_p * int_0^1 u_p_{x+k, y+k} du
-    p0k <- vapply(0:(n_int - 1), function(k) {
-      t_pxy(lt, xj, yj, t = k, frac = frac, status = status)
+    starts <- seq.int(0, ceiling(tj_use) - 1L)
+    areas <- vapply(starts, function(k) {
+      stats::integrate(function(u) {
+        vapply(u, function(uu) {
+          t_pxy(lt, xj, yj, t = uu, frac = frac, status = status)
+        }, numeric(1))
+      }, k, min(k + 1, tj_use), rel.tol = 1e-10)$value
     }, numeric(1))
-    I1 <- vapply(0:(n_int - 1), function(k) {
-      int_surv(xj + k, yj + k, 1)
-    }, numeric(1))
-    if (anyNA(p0k) || anyNA(I1)) {
-      ex[j] <- NA_real_
-      next
-    }
-    part1 <- sum(p0k * I1)
-
-    # Last partial year
-    part2 <- if (s == 0) 0 else {
-      pn <- t_pxy(lt, xj, yj, t = n_int, frac = frac, status = status)
-      In <- int_surv(xj + n_int, yj + n_int, s)
-      if (is.na(pn) || is.na(In)) NA_real_ else pn * In
-    }
-
-    ex[j] <- part1 + part2
+    ex[j] <- sum(areas)
   }
 
   if (isTRUE(tidy)) {

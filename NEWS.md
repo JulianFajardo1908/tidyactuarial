@@ -2,6 +2,17 @@
 
 ## Bug fixes
 
+* Corrected complete `e_xy(..., cohort = "last")` calculations to preserve
+  conditioning on both lives being alive at the initial ages. Annual
+  integration now uses survival from those original ages, including paths
+  with only one survivor, instead of restarting both lives each year.
+  Adaptive quadrature replaces the fixed trapezoid grid for both cohorts.
+  Missing initial ages and zero initial survivors return `NA` consistently.
+* `t_px()` now obtains integer survival directly from `lx`, including at
+  the last recorded age, without requiring a next-year probability.
+  An extinct attained cohort has zero survival even when its fractional
+  probability is undefined. This also prevents spurious `NA` in `e_xy()`.
+
 * Corrected `mortality_law_table("HeligmanPollard", ...)` to the classical
   eight-parameter odds model. `H` is now required; `C` is the childhood
   exponent, `D`/`E`/`F_hp` describe the accident hump, and `G`/`H` describe
