@@ -23,13 +23,14 @@
 #'   type. Allowed values are \code{"effective"}, \code{"nominal_interest"},
 #'   \code{"nominal_discount"}, and \code{"force"}.
 #' @param m Positive integer. Conversion frequency for nominal loan rates.
-#'   Ignored for \code{i_type = "effective"} and \code{i_type = "force"}.
+#'   Validated for every rate family, although it affects conversion only for
+#'   nominal rates.
 #' @param j_m Positive integer. Conversion frequency for nominal sinking-fund
-#'   rates. Ignored for \code{j_type = "effective"} and
-#'   \code{j_type = "force"}.
+#'   rates. Validated for every rate family, although it affects conversion
+#'   only for nominal rates.
 #' @param deposit Optional numeric scalar. Level sinking-fund deposit per
 #'   period. If \code{NULL}, it is computed so that the fund accumulates to
-#'   \code{principal} at time \code{n}.
+#'   \code{principal} at the end of period \code{n} (\code{n / k} years).
 #' @param tol Numeric tolerance used for zero checks and final-balance checks.
 #'
 #' @return A tibble with one row per period and columns:
@@ -64,9 +65,11 @@
 #' \deqn{i_p = (1+i_e)^{1/k} - 1,\qquad
 #'       j_p = (1+j_e)^{1/k} - 1.}
 #'
-#' If \code{deposit} is \code{NULL} and the sinking-fund periodic rate
-#' \code{j_p} is approximately zero, the deposit is computed as
-#' \code{principal / n}.
+#' If \code{deposit} is \code{NULL}, the unit-payment accumulation sum is
+#' evaluated stably from the original log fund rate. Only an exactly zero
+#' rate uses the zero-rate limit \code{principal / n}. The monetary balance
+#' tolerance does not determine whether a rate is zero. The existing
+#' requirement of finite annual and period equivalents is retained.
 #'
 #' Otherwise, the standard sinking-fund formula is used:
 #' \deqn{deposit = \frac{principal}{s_{\overline{n}|j_p}}}
@@ -190,17 +193,19 @@ sinking_fund_schedule <- function(
   }
 
   # --- Rate conversion ---
-  i_effective_loan_annual <- standardize_interest(
-    type = i_type,
-    rate = i,
+  loan_basis <- .interest_basis(
+    i_type = i_type,
+    i = i,
     m = m
   )
 
-  i_effective_fund_annual <- standardize_interest(
-    type = j_type,
-    rate = j,
+  fund_basis <- .interest_basis(
+    i_type = j_type,
+    i = j,
     m = j_m
   )
+  i_effective_loan_annual <- loan_basis$effective
+  i_effective_fund_annual <- fund_basis$effective
 
   if (!is.finite(i_effective_loan_annual) || i_effective_loan_annual <= -1) {
     stop(
@@ -216,8 +221,9 @@ sinking_fund_schedule <- function(
     )
   }
 
-  i_loan_period <- (1 + i_effective_loan_annual)^(1 / k) - 1
-  i_fund_period <- (1 + i_effective_fund_annual)^(1 / k) - 1
+  i_loan_period <- expm1(loan_basis$growth / k)
+  fund_growth <- fund_basis$growth / k
+  i_fund_period <- expm1(fund_growth)
 
   if (!is.finite(i_loan_period) || i_loan_period <= -1) {
     stop("The effective loan rate per period must be finite and greater than -1.",
@@ -231,12 +237,7 @@ sinking_fund_schedule <- function(
 
   # --- Compute deposit if not provided ---
   if (is.null(deposit)) {
-    if (abs(i_fund_period) < tol) {
-      deposit <- principal / n
-    } else {
-      s_n <- ((1 + i_fund_period)^n - 1) / i_fund_period
-      deposit <- principal / s_n
-    }
+    deposit <- .cash_flow_value(principal, -.annuity_log_sum(fund_growth, n))
   }
 
   if (!is.numeric(deposit) || length(deposit) != 1L || is.na(deposit) ||

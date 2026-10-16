@@ -91,6 +91,13 @@ Adjustment policies after extra principal payments:
 }
 
 
+The original log accumulation rate determines the effective period rate
+and the level payment, avoiding cancellation near zero and saturation of
+the annual equivalent. The periodic rate must remain finite and greater
+than -1. The balance tolerance is in monetary units and does not classify
+nonzero interest rates as zero. Here \code{n} counts periods, so the
+contractual term in years is \code{n / k}.
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{i} is the interest rate, \code{i_type} is the
 interest-rate type, \code{m} is the conversion frequency for nominal annual

@@ -460,9 +460,9 @@ Documentación: `man/sinking_fund_schedule.Rd`. Semántica: revisión por bloque
 | `k` | `1L` | Positive integer. Number of schedule periods per year. |
 | `i_type` | `"effective"` | Character string indicating the loan interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
 | `j_type` | `"effective"` | Character string indicating the sinking-fund accumulation-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
-| `m` | `1L` | Positive integer. Conversion frequency for nominal loan rates. Ignored for i_type = "effective" and i_type = "force" . |
-| `j_m` | `1L` | Positive integer. Conversion frequency for nominal sinking-fund rates. Ignored for j_type = "effective" and j_type = "force" . |
-| `deposit` | `NULL` | Optional numeric scalar. Level sinking-fund deposit per period. If NULL , it is computed so that the fund accumulates to principal at time n . |
+| `m` | `1L` | Positive integer. Conversion frequency for nominal loan rates. Validated for every rate family, although it affects conversion only for nominal rates. |
+| `j_m` | `1L` | Positive integer. Conversion frequency for nominal sinking-fund rates. Validated for every rate family, although it affects conversion only for nominal rates. |
+| `deposit` | `NULL` | Optional numeric scalar. Level sinking-fund deposit per period. If NULL , it is computed so that the fund accumulates to principal at the end of period n ( n / k years). |
 | `tol` | `1e-08` | Numeric tolerance used for zero checks and final-balance checks. |
 
 ## B04 — accrued_interest

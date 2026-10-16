@@ -6,7 +6,17 @@ La matriz `audit-api-signatures.md` contiene 101 entradas y 960 apariciones
 de parámetros, en orden real y con defaults extraídos de formals(). A_xj
 permanece como alias de insurance_xj. Las descripciones Rd transcriben
 concepto, dominio y unidades cuando existen; no prueban su implementación.
-La semántica de B03–B09 sigue pendiente de revisión por bloques.
+La semántica de B03 se revisa progresivamente; B04–B09 conservan pendientes
+de revisión integral por bloques.
+
+Actualización B03: se inició la evaluación de a_angle, s_angle y los tres
+calendarios de préstamos. La tabla por dimensión, unidades y pendientes
+está en audit-financial-annuities-loans.md. Las cinco firmas públicas y
+las columnas se mantienen. La diferencia n=años en anualidades frente a
+n=períodos en préstamos es contractual: se documenta, no se renombra ni
+se transforma automáticamente. Los m/j_m ignorados matemáticamente pero
+validados conservan su dominio. annuity_arith/annuity_geom siguen pendientes
+de revisión integral; no se añaden nuevas propuestas C en esta unidad.
 
 ## B01/B02: evaluación separada por dimensión
 

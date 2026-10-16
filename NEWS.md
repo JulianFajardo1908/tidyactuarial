@@ -2,6 +2,15 @@
 
 ## Bug fixes
 
+* Level annuities retain original log interest rates, small-rate effects over
+  long terms and representable monetary values when standalone factors lose
+  range. Strictly positive perpetuity rates no longer face an arbitrary cutoff.
+* Loan payments and sinking-fund deposits no longer use monetary balance
+  tolerances to classify rates as zero. Period rates and variable-rate discount
+  factors use original log growth. Public signatures and columns are preserved.
+* s_angle documentation now identifies the existing horizon as the end of
+  the term, one payment interval after the final due payment.
+
 * solve_value now has an approved trailing argument `residual_tol = tol`,
   separating result-unit residual accuracy from unknown-coordinate accuracy.
   Audit convergence uses this explicit threshold without a hidden floor.

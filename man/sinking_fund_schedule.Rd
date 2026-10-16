@@ -38,15 +38,16 @@ type. Allowed values are \code{"effective"}, \code{"nominal_interest"},
 \code{"nominal_discount"}, and \code{"force"}.}
 
 \item{m}{Positive integer. Conversion frequency for nominal loan rates.
-Ignored for \code{i_type = "effective"} and \code{i_type = "force"}.}
+Validated for every rate family, although it affects conversion only for
+nominal rates.}
 
 \item{j_m}{Positive integer. Conversion frequency for nominal sinking-fund
-rates. Ignored for \code{j_type = "effective"} and
-\code{j_type = "force"}.}
+rates. Validated for every rate family, although it affects conversion
+only for nominal rates.}
 
 \item{deposit}{Optional numeric scalar. Level sinking-fund deposit per
 period. If \code{NULL}, it is computed so that the fund accumulates to
-\code{principal} at time \code{n}.}
+\code{principal} at the end of period \code{n} (\code{n / k} years).}
 
 \item{tol}{Numeric tolerance used for zero checks and final-balance checks.}
 }
@@ -96,9 +97,11 @@ rates and then to effective rates per schedule period:
 \deqn{i_p = (1+i_e)^{1/k} - 1,\qquad
       j_p = (1+j_e)^{1/k} - 1.}
 
-If \code{deposit} is \code{NULL} and the sinking-fund periodic rate
-\code{j_p} is approximately zero, the deposit is computed as
-\code{principal / n}.
+If \code{deposit} is \code{NULL}, the unit-payment accumulation sum is
+evaluated stably from the original log fund rate. Only an exactly zero
+rate uses the zero-rate limit \code{principal / n}. The monetary balance
+tolerance does not determine whether a rate is zero. The existing
+requirement of finite annual and period equivalents is retained.
 
 Otherwise, the standard sinking-fund formula is used:
 \deqn{deposit = \frac{principal}{s_{\overline{n}|j_p}}}

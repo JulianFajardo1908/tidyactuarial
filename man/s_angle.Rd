@@ -69,7 +69,9 @@ payments are made every \eqn{1/k} year. The function returns the accumulation
 factor, assuming a unit payment at each payment time.
 
 Horizon convention:
-the future value is measured at the time of the last payment. Under this
+the future value is measured at the end of the payment term, \eqn{h+n}.
+This is the last payment time for immediate annuities and one payment
+interval after the last payment for due annuities. Under this
 convention, a pure deferment that shifts the entire payment block forward in
 time does not change the accumulation factor when the payment pattern is
 otherwise unchanged. Therefore, \code{h} is recorded and validated, but it
@@ -102,6 +104,16 @@ For due annuities:
 
 For continuous annuities:
 \deqn{\bar{s}_{\overline{n|}} = \frac{e^{\delta n} - 1}{\delta}}
+
+For \eqn{N=nk}, let \eqn{b=0} for immediate payments and \eqn{b=1}
+for due payments. The discrete factor at horizon \eqn{h+n} is
+\deqn{\sum_{j=1}^{N} \exp\{\delta[n-(j-b)/k]\}.}
+Discrete payments are one unit each; continuous payments are one unit per
+year. The latter factor is \eqn{\int_0^n e^{\delta u}\,du}.
+Original log accumulation rates and stable logarithmic sums/integrals
+preserve small nonzero rates and saturated annual effective equivalents.
+Monetary values combine payments and log factors stably; standalone audit
+rates or factors may still overflow or underflow.
 
 Input vectors must have length 1 or a common length. Missing values are
 propagated.

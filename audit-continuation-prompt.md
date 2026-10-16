@@ -24,7 +24,14 @@ plot_cash_flow; factores distintos no tienen esa garantía. Consultar las
 secciones B02-07/B02-08 de audit-cash-flow-roots.md y la última validación
 de audit-precran-check.md antes de retomar. La matriz actual tiene 101
 entradas y 960 apariciones de parámetros. No repetir estos pendientes
-como si siguieran sin estudiar. B03 aún requiere revisión integral.
+como si siguieran sin estudiar.
+
+B03 ya está iniciado: audit-financial-annuities-loans.md recoge la primera
+unidad de a_angle, s_angle y los tres calendarios de préstamos. Se corrigieron
+tasas pequeñas, saturación anual y el uso de tol monetario para clasificar
+tasas como cero; firmas y columnas intactas. La próxima unidad debe revisar
+annuity_arith/annuity_geom (sumas ponderadas, i próximo a g y límites), sin
+dar por cerrados todos los extremos de préstamos ni el bloque completo.
 
 Consultar primero `audit-thematic-review.md` (inventario completo de los
 101 nombres públicos) y `audit-interest-foundations.md` (B01 iniciado y

@@ -103,6 +103,21 @@ For due annuities:
 For continuous annuities:
 \deqn{\bar{a}_{\overline{n|}} = \frac{1 - e^{-\delta n}}{\delta}}
 
+More generally, let \eqn{N=nk}, let \eqn{b=0} for immediate payments and
+\eqn{b=1} for due payments. The deferred discrete factor is
+\deqn{\sum_{j=1}^{N} \exp\{-\delta[h+(j-b)/k]\}.}
+Each discrete payment is one unit, whereas a continuous annuity pays one
+unit per year. The continuous deferred factor is
+\eqn{\int_h^{h+n} e^{-\delta t}\,dt}.
+
+The original log accumulation rate is retained even if its annual
+effective equivalent rounds to -1 or overflows. Geometric sums and
+continuous integrals use stable logarithmic formulas with exact zero-rate
+limits, rather than replacing a small nonzero rate by zero. Perpetuities
+require a strictly positive rate, without a numerical lower cutoff.
+Monetary values combine payments with log factors before declaring range
+loss; a reported annuity factor or equivalent rate may still be non-finite.
+
 Input vectors must have length 1 or a common length. Missing values are
 propagated.
 }

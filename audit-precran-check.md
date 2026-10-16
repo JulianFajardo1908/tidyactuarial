@@ -210,3 +210,37 @@ El alcance matemático y las limitaciones están en audit-cash-flow-roots.md.
 La compatibilidad incluye conservar las llamadas posicionales; abreviaturas
 parciales como res= deben escribirse result=, al ser ambiguas con el nuevo
 residual_tol. B03 queda como siguiente bloque de revisión integral.
+
+## B03: anualidades de nivel y calendarios de préstamos
+
+Se revisaron a_angle, s_angle, amort_schedule, amort_schedule_general y
+sinking_fund_schedule, con el alcance y los pendientes expresos en
+audit-financial-annuities-loans.md. Siguen pendientes las anualidades
+aritméticas/geométricas y extremos/eventos adicionales de los calendarios.
+
+La suite local completa y 169 comprobaciones nuevas (54 de anualidades,
+115 de préstamos/fondos) pasaron, salida 0. Se verificó igualdad de formals
+con HEAD f7588f4 para las cinco funciones públicas. Se mantienen las columnas,
+101 nombres públicos y 960 apariciones de parámetros. Sin nuevas dependencias.
+Roxygen regeneró solo cinco Rd. git diff --check sin errores.
+
+Se ejecutaron R CMD build --no-manual y R CMD check --as-cran --no-manual
+sobre el archivo fuente final. Resultado: **0 ERROR, 0 WARNING, 1 NOTE**,
+salida 0. Única NOTE: Version contains large components (0.1.6.9000).
+Pasaron dependencias, análisis de código (42 s), documentación y ejemplos
+(24 s), pruebas instaladas (47 s), y reconstrucción de cuatro viñetas (13 s).
+
+Artefactos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b03-level-loans/`.
+Informe: tidyactuarial.Rcheck/00check.log.
+SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`38697E0FEA3D6A4EC0DA501611E92B398DCEE4A7398F033C1B788DEF5A3A1637`.
+Se verificaron quince archivos de código, tests, NEWS, NAMESPACE y Rd contra
+el checkout, normalizando saltos de línea; coinciden. El archivo incluye
+los dos tests y los helpers nuevos; excluye AGENTS y los registros audit-*.
+
+Entorno: R 4.6.1/Windows, locale English_United States.utf8 y Pandoc de RStudio.
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`; ejecución fuera del aislamiento
+para acceder normalmente a las bibliotecas instaladas. No se ejecutó nueva
+CI, comprobación remota de recepción de CRAN ni manual. No hay push,
+publicación o cambio de versión. Este check no sustituye la revisión integral.

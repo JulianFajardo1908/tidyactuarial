@@ -49,6 +49,12 @@
 #' balance, and an indicator of negative amortization.
 #'
 #' @details
+#' Original log accumulation rates are converted directly to period rates.
+#' Level-payment discount factors use cumulative log growth, rather than
+#' products of rounded accumulation factors. Period rates must remain finite
+#' and greater than -1; a displayed annual equivalent may overflow even when
+#' the period rate is representable. The term is \code{n / k} years.
+#'
 #' Each value of \code{i} is interpreted as an annual rate under its associated
 #' \code{i_type} and \code{m}. It is first converted to an annual effective
 #' rate and then to the effective rate for one amortization period:
@@ -226,11 +232,12 @@ amort_schedule_general <- function(
   i_type_input <- rep_len(i_type, n)
   m_input <- rep_len(m, n)
 
-  i_effective_annual <- standardize_interest(
+  basis <- .interest_basis(
     i_type = i_type_input,
     i = i_input,
     m = m_input
   )
+  i_effective_annual <- basis$effective
 
   if (any(is.na(i_effective_annual))) {
     stop(
@@ -240,7 +247,7 @@ amort_schedule_general <- function(
   }
 
   i_effective_period <-
-    (1 + i_effective_annual)^(1 / k) - 1
+    expm1(basis$growth / k)
 
   if (any(!is.finite(i_effective_period)) ||
       any(i_effective_period <= -1)) {
@@ -265,15 +272,15 @@ amort_schedule_general <- function(
   }
 
   if (is.null(payment)) {
-    period_growth <- cumprod(1 + i_effective_period)
+    log_growth <- cumsum(basis$growth / k)
 
     discount_payments <- if (timing == "immediate") {
-      1 / period_growth
+      exp(-log_growth)
     } else {
       c(
         1,
         if (n > 1L) {
-          1 / period_growth[seq_len(n - 1L)]
+          exp(-log_growth[seq_len(n - 1L)])
         } else {
           numeric(0)
         }

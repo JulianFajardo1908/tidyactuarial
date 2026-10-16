@@ -80,6 +80,12 @@ The function extends the fixed-pattern workflow of
 }
 
 
+Original log accumulation rates are converted directly to period rates.
+Level-payment discount factors use cumulative log growth, rather than
+products of rounded accumulation factors. Period rates must remain finite
+and greater than -1; a displayed annual equivalent may overflow even when
+the period rate is representable. The term is \code{n / k} years.
+
 Each value of \code{i} is interpreted as an annual rate under its associated
 \code{i_type} and \code{m}. It is first converted to an annual effective
 rate and then to the effective rate for one amortization period:
