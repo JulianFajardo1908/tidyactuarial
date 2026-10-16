@@ -119,3 +119,16 @@ La matriz ahora incluye R 4.1.0 exacto como configuración local preparada
 (commit `a235fbf`), sin ejecución remota. Permanecen pendientes la ejecución
 de CI, el manual con índice, las comprobaciones remotas de recepción y la
 conciliación del informe externo. No se cambió la versión ni se publicó.
+
+## CI remota aprobada
+
+Tras autorización explícita del usuario se publicó la rama de auditoría.
+La ejecución `38972898289` aprobó sus cuatro jobs sobre `d57e56b`: Ubuntu,
+Windows y macOS ARM64 con R 4.6.1, y Ubuntu con R 4.1.0 exacto.
+Cada log termina con `Status: OK`. Evidencia, enlaces y alcance detallados
+en `audit-ci-minimum-r.md`.
+
+Quedan resueltas la ejecución de esta matriz y la prueba del R mínimo en
+Ubuntu. Siguen pendientes el manual con índice, la revisión remota de
+recepción de CRAN y la conciliación con el informe externo original.
+No se hizo merge, cambio de versión ni envío a CRAN.
