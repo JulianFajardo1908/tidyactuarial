@@ -1,5 +1,21 @@
 # Prompt maestro para continuar tidyactuarial
 
+## Actualización de dirección acordada con el usuario
+
+El 16 de octubre de 2026 el usuario pidió un barrido crítico de **todas las
+funciones por bloques temáticos**, incluyendo oportunidades de mejora
+justificadas. Se acordó objetivo **0.2.0** y decidir sobre **1.0.0 al cerrar
+el barrido**. El manual es provisional; la publicación no es la prioridad.
+No cambiar DESCRIPTION a versión de release todavía.
+
+Consultar primero `audit-thematic-review.md` (inventario completo de los
+101 nombres públicos) y `audit-interest-foundations.md` (B01 iniciado y
+con pendientes), además de los registros anteriores. La CI y el manual con
+índice ya se ejecutaron; los detalles están en `audit-ci-minimum-r.md` y
+`audit-manual-index.md`. Sus resultados corresponden al código que indican;
+no validan automáticamente cambios posteriores. El resto de este prompt
+conserva el relevo histórico inicial y debe leerse con esa salvedad.
+
 Quiero que continúes trabajando conmigo en mejorar, corregir, editar y
 perfeccionar mi paquete R `tidyactuarial`. Estamos estabilizando la versión
 0.2.0 mediante una auditoría actuarial y técnica previa a CRAN. Trabaja con
