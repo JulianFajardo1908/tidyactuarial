@@ -39,7 +39,7 @@ Los documentos Rd indicados corresponden a las funciones públicas del grupo.
 | Grupo | Código funcional y motivo | Pruebas y documentación asociadas |
 |---|---|---|
 | Inmunización | `R/inmunize_duration.R`, `R/inmunize_duration_convexity.R`, `R/utils-immunization.R`: escala relativa y solución SVD; `R/bond_convexity.R`: aclaración de variable de derivación | `test-immunization-regressions.R`; Rd de las dos inmunizaciones y `bond_convexity` |
-| Riesgo y coberturas | `R/aggregate-distribution.R`, `R/risk-measures-internal.R`, `R/stop_loss_premium.R`, `R/tail_value_at_risk.R`, `R/value_at_risk.R`, `R/to_payment_basis.R`: retícula, masas raras, stop-loss, VaR y adelgazamiento | `test-risk-audit-regressions.R`, cambios en `test-stop-loss-premium.R`, `test-value-at-risk.R`, `test-to-payment-basis.R`; seis Rd correspondientes; `audit-risk-coverage.md` |
+| Riesgo y coberturas | `R/aggregate-distribution.R`, `R/risk-measures-internal.R`, `R/stop_loss_premium.R`, `R/tail_value_at_risk.R`, `R/value_at_risk.R`, `R/to_payment_basis.R`: retícula, masas raras, stop-loss, VaR y adelgazamiento | `test-risk-audit-regressions.R`, cambios en `test-stop-loss-premium.R`, `test-value-at-risk.R`, `test-to-payment-basis.R`; cinco Rd públicos correspondientes; `audit-risk-coverage.md` |
 | Reservas y Monte Carlo | `R/reserve_xy.R`, `R/simulate_lifetime.R`, `R/mc-utils.R`, `R/mc_annuity.R`, `R/mc_insurance.R`, `R/mc_reserve.R`: estados condicionantes, CML, calendarios y consistencia K/T | `test-reserve-xy-state-regressions.R`, `test-mc-lifetime-consistency.R`, cambios en `test-mc_annuity-v2.R`, `test-simulate_lifetime-v2.R`; Rd de reserva multivida y tres consumidores MC; `audit-multilife-monte-carlo.md` |
 | Empaquetado y trazabilidad | `.Rbuildignore`: exclusión de instrucciones y registros internos | `audit-precran-check.md`, `audit-continuation-prompt.md`, este registro |
 
@@ -64,3 +64,21 @@ atribuye autoría de cambios previos ni vuelve a reproducir sus fallos.
 
 No se hicieron commits, push, cambios de rama o versión ni publicaciones.
 La compatibilidad funcional permanece exactamente como en el relevo.
+
+## Continuación autorizada: commits locales
+
+Después del inventario anterior, el usuario autorizó continuar los pasos
+propuestos. Se crearon cuatro commits locales, sin push:
+
+- `dae7eb7`: inmunización, helper, pruebas y documentación.
+- `7575fe4`: riesgo y coberturas, regresiones y registro.
+- `94d72fd`: reservas y Monte Carlo, regresiones y registro.
+- `a8d5573`: empaquetado y trazabilidad.
+
+NEWS se incorporó por bloques; el último commit restauró su orden original
+y sus espacios entre entradas. El contenido del checkout quedó preservado
+y el árbol quedó limpio tras esos cuatro commits. Las afirmaciones de
+ausencia de commits de las secciones previas describen el inventario inicial.
+
+La revisión actuarial posterior encontró el condicionamiento diferido de
+`insurance_xy()`, registrado aparte en `audit-deferred-insurance.md`.

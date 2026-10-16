@@ -2,6 +2,11 @@
 
 ## Bug fixes
 
+* Deferred two-life insurance now retains survival conditioning from issue.
+  Last-survivor continuation includes paths with only one survivor at the
+  end of deferment, instead of restarting both lives at advanced ages.
+  Its annuity and maturity-survival audit values use the same conditioning.
+
 * Fractional deferred Monte Carlo annuities now anchor their payment grid
   at the deferment rather than issue time. Non-grid-aligned deferments no
   longer omit eligible payments; the shared reserve calendar is corrected too.

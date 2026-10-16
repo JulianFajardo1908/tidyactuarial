@@ -113,10 +113,16 @@ For an n-year endowment insurance:
 \deqn{A_{:\overline{n}|} =
 1 - d\ddot{a}_{:\overline{n}|}.}
 
-A deferred insurance is valued by multiplying the value at deferred ages
-\code{x + h} and \code{y + h} by the deferment factor
+A deferred insurance retains survival probabilities from the issue ages.
+Its continuation value conditional on the selected status surviving to
+\code{h} is multiplied by the deferment factor
 \deqn{v^h\,{}_hp_{xy}}
 for the selected two-life status.
+For last-survivor insurance, this conditioning includes paths with only
+one survivor at \code{h}; it does not restart both lives at deferred ages.
+In tidy output, \code{annuity_due_value} is the annuity at time \code{h}
+conditional on that status surviving to \code{h}, and
+\code{survival_to_maturity}, when reported, uses the same conditioning.
 }
 \examples{
 lt <- data.frame(

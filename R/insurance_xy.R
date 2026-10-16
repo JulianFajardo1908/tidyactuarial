@@ -70,10 +70,16 @@
 #' \deqn{A_{:\overline{n}|} =
 #' 1 - d\ddot{a}_{:\overline{n}|}.}
 #'
-#' A deferred insurance is valued by multiplying the value at deferred ages
-#' \code{x + h} and \code{y + h} by the deferment factor
+#' A deferred insurance retains survival probabilities from the issue ages.
+#' Its continuation value conditional on the selected status surviving to
+#' \code{h} is multiplied by the deferment factor
 #' \deqn{v^h\,{}_hp_{xy}}
 #' for the selected two-life status.
+#' For last-survivor insurance, this conditioning includes paths with only
+#' one survivor at \code{h}; it does not restart both lives at deferred ages.
+#' In tidy output, \code{annuity_due_value} is the annuity at time \code{h}
+#' conditional on that status surviving to \code{h}, and
+#' \code{survival_to_maturity}, when reported, uses the same conditioning.
 #'
 #' @return
 #' If \code{tidy = FALSE}, a numeric scalar.
@@ -552,9 +558,6 @@ insurance_xy <- function(
 
   deferment_factor <- v_fun(h) * p_def
 
-  start_x <- x + h
-  start_y <- y + h
-
   # If the selected status does not survive to the deferred date, APV is zero.
   if (deferment_factor == 0) {
     result <- 0
@@ -600,20 +603,20 @@ insurance_xy <- function(
   if (type == "whole") {
     annuity_due <- annuity_xy(
       lt = table_use,
-      x = start_x,
-      y = start_y,
+      x = x,
+      y = y,
       i = i,
       i_type = i_type,
       m = m,
       status = status,
       n = Inf,
-      h = 0L,
+      h = h,
       k = 1L,
       timing = "due",
       woolhouse = "none",
       frac = frac,
       tidy = FALSE
-    )
+    ) / deferment_factor
 
     survival_to_maturity <- NA_real_
     unit_apv <- deferment_factor * (1 - d_effective * annuity_due)
@@ -624,20 +627,20 @@ insurance_xy <- function(
   } else {
     annuity_due <- annuity_xy(
       lt = table_use,
-      x = start_x,
-      y = start_y,
+      x = x,
+      y = y,
       i = i,
       i_type = i_type,
       m = m,
       status = status,
       n = n,
-      h = 0L,
+      h = h,
       k = 1L,
       timing = "due",
       woolhouse = "none",
       frac = frac,
       tidy = FALSE
-    )
+    ) / deferment_factor
 
     if (type == "endowment") {
       survival_to_maturity <- NA_real_
@@ -645,15 +648,15 @@ insurance_xy <- function(
     } else {
       survival_to_maturity <- t_pxy(
         lt = table_use,
-        x = start_x,
-        y = start_y,
-        t = n,
+        x = x,
+        y = y,
+        t = h + n,
         frac = frac,
         status = status
-      )
+      ) / p_def
 
       if (is.na(survival_to_maturity)) {
-        stop("Cannot compute n-year survival at deferred ages.", call. = FALSE)
+        stop("Cannot compute survival to maturity from the issue ages.", call. = FALSE)
       }
 
       unit_apv <- deferment_factor *

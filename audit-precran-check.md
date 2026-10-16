@@ -99,3 +99,23 @@ El archivo de la sección anterior se conserva como evidencia histórica.
 SHA256 del archivo fuente más reciente:
 `2A246DFEBDA17E78604FCC99553FDCFE1F9F16FE4B858768D0E729BA47B5F4FA`.
 Las limitaciones sobre índice PDF, revisión remota y matriz de CI permanecen.
+
+## Revalidación del seguro diferido
+
+Tras corregir el condicionamiento de `insurance_xy()` desde las edades de
+emisión, la suite completa pasó y se repitieron construcción y check del
+paquete instalado. Resultado: **0 ERROR, 0 WARNING, 1 NOTE**, salida 0.
+La NOTE corresponde a la versión de desarrollo. Ejemplos, pruebas,
+documentación y reconstrucción de viñetas OK.
+
+La evidencia nueva y el incidente regional del primer intento están en
+`audit-deferred-insurance.md`. Artefactos en
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-deferred/`;
+informe válido en `locale-C/tidyactuarial.Rcheck/00check.log`.
+SHA256 del archivo fuente:
+`0F919EC62F8F381AF83CD1E44827A4D1A09A4076AA0DCF5D8A6948C24F59042F`.
+
+La matriz ahora incluye R 4.1.0 exacto como configuración local preparada
+(commit `a235fbf`), sin ejecución remota. Permanecen pendientes la ejecución
+de CI, el manual con índice, las comprobaciones remotas de recepción y la
+conciliación del informe externo. No se cambió la versión ni se publicó.
