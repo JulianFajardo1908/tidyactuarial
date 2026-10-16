@@ -18,7 +18,9 @@
 #'   \eqn{q_x = 1/(\omega - x)} for \eqn{x < \omega}.
 #'   \item \strong{Beta}: scaled lifetime model
 #'   \eqn{X/\omega \sim Beta(\alpha,\beta)}.
-#'   \item \strong{HeligmanPollard}: odds model returning \eqn{q_x} directly.
+#'   \item \strong{HeligmanPollard}: eight-parameter odds model
+#'   \eqn{q_x/p_x = A^{(x+B)^C} + D\exp(-E(\log x-\log F)^2) + GH^x},
+#'   with \code{F_hp} denoting \eqn{F}.
 #' }
 #'
 #' @section Law parameters:
@@ -37,18 +39,23 @@
 #'   \item \code{"DeMoivre"}: \code{omega}.
 #'   \item \code{"Beta"}: \code{alpha}, \code{beta}, \code{omega}.
 #'   \item \code{"HeligmanPollard"}: \code{A}, \code{B}, \code{C},
-#'   \code{D}, \code{E}, \code{F_hp}, and \code{G}. Transitional alias
+#'   \code{D}, \code{E}, \code{F_hp}, \code{G}, and \code{H}.
+#'   \code{A}, \code{B}, \code{D}, and \code{G} must be nonnegative;
+#'   \code{C}, \code{E}, \code{F_hp}, and \code{H} must be positive.
+#'   At least one of \code{A}, \code{D}, or \code{G} must be positive.
+#'   Ages must be at least 1. Transitional alias
 #'   \code{F} is accepted and mapped to \code{F_hp}.
 #' }
 #'
 #' @section Converting mu(x) to qx:
 #' For laws defined by a force of mortality \eqn{\mu_x}, the one-year death
-#' probability \eqn{q_x} is obtained using \code{frac}:
-#' \itemize{
-#'   \item \code{"CF"} or \code{"CML"}: \eqn{q_x = 1 - \exp(-\mu_x)}.
-#'   \item \code{"UDD"}: \eqn{q_x = \mu_x}.
-#'   \item \code{"Balducci"}: \eqn{q_x = \mu_x/(1+\mu_x)}.
-#' }
+#' probability is \eqn{q_x = 1 - \exp(-\int_x^{x+1}\mu(s)\,ds)},
+#' independently of \code{frac}. The column \code{mu_x} contains the force
+#' evaluated at age \eqn{x}, not its annual integral. Exponential, Gompertz,
+#' Makeham and Weibull use analytic integrals; Logistic uses numerical
+#' integration with relative tolerance \code{1e-10}.
+#' The \code{frac} label records a within-year interpolation convention;
+#' it does not replace integration of the continuous law.
 #'
 #' @section Direct qx laws:
 #' \code{"DeMoivre"}, \code{"Beta"}, and \code{"HeligmanPollard"} define
@@ -71,14 +78,16 @@
 #'   avoids partial-matching conflicts with the Gompertz and Makeham parameter
 #'   \code{c}.
 #' @param params Named list of law parameters, or \code{NULL}.
-#' @param frac Character. Within-year assumption used to convert \eqn{\mu_x} to
-#'   \eqn{q_x}. One of \code{"CF"}, \code{"UDD"}, \code{"Balducci"}, or
+#' @param frac Character. Within-year interpolation label, independent of the
+#'   annual probability calculation. One of \code{"CF"}, \code{"UDD"}, \code{"Balducci"}, or
 #'   \code{"CML"}. \code{"CML"} is treated as \code{"CF"}.
 #' @param l0 Numeric scalar. Initial radix, that is, the starting value
 #'   \eqn{l_{x_min}}.
 #' @param close Logical. If \code{TRUE}, forces the last age to close.
 #' @param a_x Numeric scalar. Average fraction of the year lived by those dying
 #'   between age \eqn{x} and \eqn{x+1}. Default is \code{0.5}.
+#'   Exposure uses \eqn{L_x = l_{x+1} + a_x d_x}; this is an approximation
+#'   controlled by \code{a_x}, not an integration of continuous survival.
 #' @param check Logical. If \code{TRUE}, performs strict input validation.
 #' @param tol Numeric tolerance used in checks.
 #' @param radix Deprecated. Use \code{l0}.
@@ -94,6 +103,16 @@
 #' radix, \code{a_x} denotes the average fraction of the year lived by those
 #' dying during the age interval, \code{qx} denotes the one-year death
 #' probability, and \code{px = 1 - qx}.
+#' Ratios use their actual denominators: \code{mx = dx / Lx} and
+#' \code{ex = Tx / lx}. Positive deaths with zero exposure give infinite
+#' \code{mx}; extinct cohorts with zero numerators and denominators give
+#' \code{NaN} for these undefined ratios.
+#'
+#' Heligman-Pollard follows the eight-parameter odds specification in
+#' Heligman and Pollard (1980), section 2.1, equation (1),
+#' \doi{10.1017/S0020268100040257}. Earlier seven-parameter calls must be
+#' respecified: the previous implementation omitted the childhood exponent
+#' and assigned different meanings to \code{C} through \code{G}.
 #'
 #' The parameter \code{F_hp} is used for the Heligman-Pollard law instead of
 #' \code{F}, because \code{F} is historically associated with \code{FALSE} in
@@ -131,11 +150,12 @@
 #'   1, 110,
 #'   A = 0.0002,
 #'   B = 0.1,
-#'   C = 0.03,
-#'   D = 10,
-#'   E = 20,
-#'   F_hp = 0.00005,
-#'   G = 1.08
+#'   C = 0.3,
+#'   D = 0.03,
+#'   E = 10,
+#'   F_hp = 20,
+#'   G = 0.00005,
+#'   H = 1.08
 #' )
 #'
 #' # Transitional compatibility with older names
@@ -146,11 +166,12 @@
 #'   1, 110,
 #'   A = 0.0002,
 #'   B = 0.1,
-#'   C = 0.03,
-#'   D = 10,
-#'   E = 20,
-#'   F = 0.00005,
-#'   G = 1.08
+#'   C = 0.3,
+#'   D = 0.03,
+#'   E = 10,
+#'   F = 20,
+#'   G = 0.00005,
+#'   H = 1.08
 #' )
 #'
 #' @export
@@ -356,6 +377,7 @@ mortality_law_table <- function(
     }
 
     mu_x <- rep(lambda, n_age)
+    integrated_mu <- mu_x
   }
 
   if (law == "Gompertz") {
@@ -375,6 +397,8 @@ mortality_law_table <- function(
     }
 
     mu_x <- B * (c0 ^ x)
+    log_c <- log(c0)
+    integrated_mu <- mu_x * if (log_c == 0) 1 else expm1(log_c) / log_c
   }
 
   if (law == "Makeham") {
@@ -403,6 +427,9 @@ mortality_law_table <- function(
     }
 
     mu_x <- A + B * (c0 ^ x)
+    log_c <- log(c0)
+    integrated_mu <- A + B * c0^x *
+      if (log_c == 0) 1 else expm1(log_c) / log_c
   }
 
   if (law == "Weibull") {
@@ -433,6 +460,7 @@ mortality_law_table <- function(
     }
 
     mu_x <- (shape / scale) * ((x / scale) ^ (shape - 1))
+    integrated_mu <- ((x + 1) / scale)^shape - (x / scale)^shape
   }
 
   if (law == "Logistic") {
@@ -473,6 +501,12 @@ mortality_law_table <- function(
     }
 
     mu_x <- (A + B * cx) / denominator
+    integrated_mu <- vapply(x, function(age) {
+      stats::integrate(function(s) {
+        cs <- c0^s
+        (A + B * cs) / (1 + C * cs)
+      }, age, age + 1, rel.tol = 1e-10)$value
+    }, numeric(1))
   }
 
   # -------------------------------------------------------------------------
@@ -537,18 +571,19 @@ mortality_law_table <- function(
     survival_beta <- function(age) {
       u <- age / omega
       u <- pmin(pmax(u, 0), 1)
-      1 - stats::pbeta(u, shape1 = alpha, shape2 = beta)
+      stats::pbeta(u, shape1 = alpha, shape2 = beta,
+                   lower.tail = FALSE, log.p = TRUE)
     }
 
     sx <- survival_beta(x)
     sx1 <- survival_beta(x + 1)
 
-    qx <- ifelse(sx <= .Machine$double.eps, 1, (sx - sx1) / sx)
+    qx <- -expm1(sx1 - sx)
     mu_x <- NA_real_
   }
 
   if (law == "HeligmanPollard") {
-    require_names(c("A", "B", "C", "D", "E", "F_hp", "G"))
+    require_names(c("A", "B", "C", "D", "E", "F_hp", "G", "H"))
 
     A <- get_number("A")
     B <- get_number("B")
@@ -557,34 +592,35 @@ mortality_law_table <- function(
     E <- get_number("E")
     F_hp <- get_number("F_hp")
     G <- get_number("G")
+    H <- get_number("H")
 
     if (isTRUE(check)) {
       if (x_min < 1L) {
         stop("HeligmanPollard: require x_min >= 1 due to log(x).", call. = FALSE)
       }
 
-      if (!is.finite(B)) {
-        stop("HeligmanPollard: B must be finite.", call. = FALSE)
-      }
-
-      for (nm in c("A", "C", "D", "E", "F_hp")) {
+      for (nm in c("A", "B", "D", "G")) {
         value <- get(nm)
 
         if (!is.finite(value) || value < 0) {
           stop(
-            "HeligmanPollard: parameters A, C, D, E, and F_hp must be nonnegative.",
+            "HeligmanPollard: parameters A, B, D, and G must be nonnegative.",
             call. = FALSE
           )
         }
       }
 
-      if (!is.finite(G) || G <= 0) {
-        stop("HeligmanPollard: require G > 0.", call. = FALSE)
+      for (nm in c("C", "E", "F_hp", "H")) {
+        value <- get(nm)
+        if (!is.finite(value) || value <= 0) {
+          stop("HeligmanPollard: parameters C, E, F_hp, and H must be positive.",
+               call. = FALSE)
+        }
       }
 
-      if (A == 0 && C == 0 && F_hp == 0) {
+      if (A == 0 && D == 0 && G == 0) {
         stop(
-          "HeligmanPollard: at least one of A, C, or F_hp must be positive.",
+          "HeligmanPollard: at least one of A, D, or G must be positive.",
           call. = FALSE
         )
       }
@@ -592,11 +628,15 @@ mortality_law_table <- function(
 
     xx <- as.numeric(x)
 
-    odds <- (A ^ (xx + B)) +
-      (C * exp(-D * (log(xx) - log(E))^2)) +
-      (F_hp * (G ^ xx))
-
-    qx <- odds / (1 + odds)
+    # Sum the three odds components in log space to avoid Inf/Inf.
+    log_terms <- cbind(log(A) * (xx + B)^C,
+                       log(D) - E * (log(xx) - log(F_hp))^2,
+                       log(G) + xx * log(H))
+    largest <- apply(log_terms, 1, max)
+    log_odds <- largest + log(rowSums(exp(log_terms - largest)))
+    log_odds[largest == -Inf] <- -Inf
+    log_odds[largest == Inf] <- Inf
+    qx <- stats::plogis(log_odds)
     mu_x <- NA_real_
   }
 
@@ -609,13 +649,7 @@ mortality_law_table <- function(
       stop("Computed mu_x must be finite and nonnegative.", call. = FALSE)
     }
 
-    qx <- if (frac == "CF") {
-      1 - exp(-mu_x)
-    } else if (frac == "UDD") {
-      mu_x
-    } else {
-      mu_x / (1 + mu_x)
-    }
+    qx <- -expm1(-integrated_mu)
   }
 
   if (isTRUE(close)) {
@@ -636,10 +670,11 @@ mortality_law_table <- function(
   lx_next <- c(lx[-1], lx[n_age] * px[n_age])
 
   Lx <- lx_next + a_x * dx
-  mx <- dx / pmax(Lx, .Machine$double.eps)
+  # Positive deaths with zero exposure give Inf; 0/0 is undefined (NaN).
+  mx <- dx / Lx
 
   Tx <- rev(cumsum(rev(Lx)))
-  ex <- Tx / pmax(lx, .Machine$double.eps)
+  ex <- Tx / lx
 
   law_out <- law
   frac_out <- if (law_out %in% mu_laws) frac else NA_character_

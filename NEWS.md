@@ -2,6 +2,26 @@
 
 ## Bug fixes
 
+* Corrected `mortality_law_table("HeligmanPollard", ...)` to the classical
+  eight-parameter odds model. `H` is now required; `C` is the childhood
+  exponent, `D`/`E`/`F_hp` describe the accident hump, and `G`/`H` describe
+  old-age mortality. Previous seven-parameter calls must be respecified;
+  adding `H` to the old values is insufficient. The existing `F` alias
+  denotes the same parameter as `F_hp`. Log-space evaluation avoids
+  undefined probabilities when odds overflow.
+* Beta-law conditional probabilities now use log upper-tail survival,
+  avoiding premature `qx = 1` when survival is small.
+* Mortality-law tables now compute `mx = dx / Lx` and `ex = Tx / lx`
+  without artificial denominator floors. Zero-exposure positive deaths
+  give `Inf`; undefined `0/0` ratios for extinct cohorts give `NaN`.
+
+* `mortality_law_table()` now derives annual death probabilities from the
+  integrated continuous force of mortality, independently of `frac`.
+  This changes Gompertz, Makeham, Weibull and Logistic results and the former
+  UDD/Balducci conversions. `mu_x` remains the force at integer age;
+  `a_x` still controls the exposure approximation. Direct `qx` laws and
+  forced terminal closure retain their existing behavior.
+
 * Corrected `lifetable()` conversions between `mx` and `qx` for `ax != 0.5`,
   using the mean fraction of the year lived by those who die. This correction
   can change previous actuarial results; results for `ax = 0.5` are preserved.

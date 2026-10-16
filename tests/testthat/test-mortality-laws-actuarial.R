@@ -26,7 +26,7 @@ test_that("mortality_law_table Exponential reproduces constant-force survival", 
   )
 })
 
-test_that("force-based mortality laws respect CF, UDD and Balducci conversions", {
+test_that("annual probabilities are independent of the interpolation label", {
   lambda <- 0.10
 
   cf <- mortality_law_table(
@@ -51,10 +51,10 @@ test_that("force-based mortality laws respect CF, UDD and Balducci conversions",
   )
 
   expect_equal(cf$qx, rep(1 - exp(-lambda), 3), tolerance = 1e-12)
-  expect_equal(udd$qx, rep(lambda, 3), tolerance = 1e-12)
+  expect_equal(udd$qx, rep(1 - exp(-lambda), 3), tolerance = 1e-12)
   expect_equal(
     bal$qx,
-    rep(lambda / (1 + lambda), 3),
+    rep(1 - exp(-lambda), 3),
     tolerance = 1e-12
   )
 })
@@ -99,7 +99,7 @@ test_that("mortality_law_table Gompertz and Makeham reproduce their forces", {
   mu_g <- B * c0^ages
 
   expect_equal(gompertz$mu_x, mu_g, tolerance = 1e-12)
-  expect_equal(gompertz$qx, 1 - exp(-mu_g), tolerance = 1e-12)
+  expect_equal(gompertz$qx, -expm1(-mu_g * (c0 - 1) / log(c0)), tolerance = 1e-12)
 
   A <- 4e-4
 
@@ -117,7 +117,8 @@ test_that("mortality_law_table Gompertz and Makeham reproduce their forces", {
   mu_m <- A + B * c0^ages
 
   expect_equal(makeham$mu_x, mu_m, tolerance = 1e-12)
-  expect_equal(makeham$qx, 1 - exp(-mu_m), tolerance = 1e-12)
+  hazard_m <- A + (mu_m - A) * (c0 - 1) / log(c0)
+  expect_equal(makeham$qx, -expm1(-hazard_m), tolerance = 1e-12)
 })
 
 test_that("mortality_law_table Weibull and Logistic reproduce their forces", {
@@ -139,7 +140,8 @@ test_that("mortality_law_table Weibull and Logistic reproduce their forces", {
   mu_w <- (shape / scale) * ((ages / scale)^(shape - 1))
 
   expect_equal(weibull$mu_x, mu_w, tolerance = 1e-12)
-  expect_equal(weibull$qx, 1 - exp(-mu_w), tolerance = 1e-12)
+  hazard_w <- ((ages + 1) / scale)^shape - (ages / scale)^shape
+  expect_equal(weibull$qx, -expm1(-hazard_w), tolerance = 1e-12)
 
   A <- 1e-4
   B <- 2e-6
@@ -162,7 +164,10 @@ test_that("mortality_law_table Weibull and Logistic reproduce their forces", {
   mu_l <- (A + B * cx) / (1 + C * cx)
 
   expect_equal(logistic$mu_x, mu_l, tolerance = 1e-12)
-  expect_equal(logistic$qx, 1 - exp(-mu_l), tolerance = 1e-12)
+  hazard_l <- vapply(ages, function(x) {
+    integrate(function(s) (A + B * c0^s) / (1 + C * c0^s), x, x + 1)$value
+  }, numeric(1))
+  expect_equal(logistic$qx, -expm1(-hazard_l), tolerance = 1e-12)
 })
 
 test_that("Weibull transitional aliases agree with the current parameter names", {
@@ -238,11 +243,12 @@ test_that("Heligman-Pollard mortality law reproduces its odds specification", {
 
   A <- 0.0002
   B <- 0.1
-  C <- 0.03
-  D <- 10
-  E <- 20
-  F_hp <- 0.00005
-  G <- 1.08
+  C <- 0.3
+  D <- 0.03
+  E <- 10
+  F_hp <- 20
+  G <- 0.00005
+  H <- 1.08
 
   tab <- mortality_law_table(
     "HeligmanPollard",
@@ -255,14 +261,15 @@ test_that("Heligman-Pollard mortality law reproduces its odds specification", {
     E = E,
     F_hp = F_hp,
     G = G,
+    H = H,
     close = FALSE
   )
 
   xx <- as.numeric(ages)
 
-  odds <- (A^(xx + B)) +
-    (C * exp(-D * (log(xx) - log(E))^2)) +
-    (F_hp * (G^xx))
+  odds <- (A^((xx + B)^C)) +
+    (D * exp(-E * (log(xx) - log(F_hp))^2)) +
+    (G * (H^xx))
 
   expected_q <- odds / (1 + odds)
 
@@ -277,21 +284,22 @@ test_that("Heligman-Pollard transitional F alias agrees with F_hp", {
     x_max = 23,
     A = 0.0002,
     B = 0.1,
-    C = 0.03,
-    D = 10,
-    E = 20,
-    G = 1.08,
+    C = 0.3,
+    D = 0.03,
+    E = 10,
+    G = 0.00005,
+    H = 1.08,
     close = FALSE
   )
 
   current <- do.call(
     mortality_law_table,
-    c(args, list(F_hp = 0.00005))
+    c(args, list(F_hp = 20))
   )
 
   legacy <- do.call(
     mortality_law_table,
-    c(args, list(F = 0.00005))
+    c(args, list(F = 20))
   )
 
   expect_equal(legacy$qx, current$qx, tolerance = 1e-12)
