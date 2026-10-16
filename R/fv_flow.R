@@ -60,6 +60,9 @@
 #' @details
 #' Products are evaluated in log space when separate factors lose range or
 #' precision; original cash-flow signs and known zero amounts are preserved.
+#' If individual values overflow, amounts with exactly equal finite log
+#' factors are netted before valuation. Cancellation between unequal factors
+#' is not recovered by this rule and may still produce non-finite results.
 #'
 #' This function follows the compact actuarial notation used throughout
 #' \code{tidyactuarial}: \code{cf} denotes cash flows, \code{t} denotes time,
@@ -252,5 +255,5 @@ fv_flow <- function(
 
   log_ratio <- g_h[1L] * (T_horizon - t_cf) +
     (g_h[1L] - basis$growth) * t_cf
-  sum(.cash_flow_value(cf, log_ratio))
+  .cash_flow_sum(cf, log_ratio)
 }

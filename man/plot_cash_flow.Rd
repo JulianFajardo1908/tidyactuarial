@@ -113,8 +113,10 @@ and outflows over time, using compact actuarial notation.
 }
 \details{
 Present values use the original interest specification and combine capital
-and discount factors stably. Numeric timelines may include negative times;
-the valuation origin remains zero. Dated timelines use the earliest date
+and discount factors stably. Opposite amounts with exactly equal finite
+log factors are netted if individual present values overflow.
+Numeric timelines may include negative times; the valuation origin remains
+zero. Dated timelines use the earliest date
 as origin. Non-finite inferred present values or aggregated amounts are
 rejected. The returned ggplot remains editable with additional layers.
 

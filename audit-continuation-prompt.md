@@ -15,6 +15,17 @@ matemática, experiencia tidyverse y auditoría de firmas. Consultar
 cambios de API C sin autorización. No hacer push, publicaciones, cambios
 de versión ni operaciones destructivas de Git durante este barrido.
 
+Continuación posterior: C01 fue autorizada expresamente por el usuario e
+implementada: solve_value añade residual_tol=tol al final, conserva los
+argumentos posicionales y usa ese umbral en Newton y converged, sin piso
+oculto. C02–C04 siguen sin autorización/implementación. Se recuperó además
+cancelación extrema con factor logarítmico común en pv_flow, fv_flow y
+plot_cash_flow; factores distintos no tienen esa garantía. Consultar las
+secciones B02-07/B02-08 de audit-cash-flow-roots.md y la última validación
+de audit-precran-check.md antes de retomar. La matriz actual tiene 101
+entradas y 960 apariciones de parámetros. No repetir estos pendientes
+como si siguieran sin estudiar. B03 aún requiere revisión integral.
+
 Consultar primero `audit-thematic-review.md` (inventario completo de los
 101 nombres públicos) y `audit-interest-foundations.md` (B01 iniciado y
 con pendientes), además de los registros anteriores.

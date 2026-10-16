@@ -43,6 +43,17 @@ defaults, parámetros y retornos Rd de las 101 entradas. La evaluación
 semántica de B01/B02 y las propuestas A/B/C están en audit-api-review.md.
 Extraer las firmas no equivale a aprobar las nueve áreas.
 
+Continuación B01/B02: los productos capital-factor, la valoración gráfica,
+el análisis de m y la separación de tolerancias C01 ya tienen evidencia
+específica; C01 fue autorizada expresamente e implementada. La cancelación
+de términos desbordados con factor común también fue corregida. Ver
+audit-cash-flow-roots.md, B02-07/B02-08, y audit-api-review.md. Se preservan
+101 nombres públicos; la matriz contiene ahora 960 apariciones de parámetros.
+Las propuestas C02–C04 quedan separadas de los defectos obligatorios y no
+se implementaron. El siguiente bloque de revisión integral es B03, empezando
+por identidades de anualidades, límites de tasa cero y reconstrucción de
+saldos de préstamos. Esto no da por aprobados los bloques posteriores.
+
 | Bloque | Nombre | Fuente | Tests con llamada directa |
 |---|---|---|---|
 | B01 | `accumulation_factor` | `R/s_angle.R` | `test-accumulation_factor.R`, `test-interest-audit-regressions.R`, `test-interest-log-basis.R` |

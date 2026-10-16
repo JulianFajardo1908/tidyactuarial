@@ -42,8 +42,10 @@
 #'
 #' @details
 #' Present values use the original interest specification and combine capital
-#' and discount factors stably. Numeric timelines may include negative times;
-#' the valuation origin remains zero. Dated timelines use the earliest date
+#' and discount factors stably. Opposite amounts with exactly equal finite
+#' log factors are netted if individual present values overflow.
+#' Numeric timelines may include negative times; the valuation origin remains
+#' zero. Dated timelines use the earliest date
 #' as origin. Non-finite inferred present values or aggregated amounts are
 #' rejected. The returned ggplot remains editable with additional layers.
 #'
@@ -384,7 +386,7 @@ plot_cash_flow <- function(
   }
 
   if (is.null(PV) && !is.null(i_effective)) {
-    PV <- sum(.cash_flow_value(C_vec, -basis$growth * time_for_pv))
+    PV <- .cash_flow_sum(C_vec, -basis$growth * time_for_pv)
     if (!is.finite(PV)) {
       stop("Computed present value must be finite; supply a representable cash-flow model.",
            call. = FALSE)

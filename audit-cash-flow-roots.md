@@ -174,3 +174,82 @@ estilos o magnitudes posibles.
 Roxygen regeneró solo los Rd afectados. El resultado de construcción y
 R CMD check de este código se registra en audit-precran-check.md. La CI
 previa no valida automáticamente esta unidad. No se publica una release.
+
+## B02-07 (A): cancelación de términos desbordados con factor común
+
+Estado: confirmado, implementado y probado en el alcance descrito.
+Identidad independiente: si un grupo comparte el factor exp(g), entonces
+sum(C_j exp(g)) = exp(g) sum(C_j). Es válido netear los capitales antes de
+valorar. Se exige igualdad exacta del log factor finito, no proximidad de
+tasas, igualdad de etiquetas redondeadas ni igualdad de fechas solamente.
+
+Antes, cf=(2^1000,-2^1000,7), t=(1,1,0), fuerza=-100 daba NaN en pv_flow
+en lugar de 7. El caso equivalente de fv_flow y la gráfica también fallaban.
+La causa es Inf + (-Inf) después de valorar separadamente. Otro ejemplo:
+(2^1000 - (2^1000 - 2^948)) * 2^50 = 2^998, con todos los capitales y
+la referencia expresados mediante potencias binarias exactas.
+Se reprodujeron 12 fallos antes de cambiar el helper y sus consumidores.
+
+Diff mínimo: helper privado .cash_flow_sum en standardize_interest.R y
+una llamada en pv_flow, fv_flow y plot_cash_flow. Si la suma ordinaria es
+finita se conserva. De lo contrario se netean los grupos recuperables;
+si su capital neto desborda se conservan los términos originales. Esto evita
+estropear, por ejemplo, dos capitales 2^1023 descontados por 1/4: su suma
+original desborda pero su PV=2^1022 es representable. No hay nueva API,
+dependencia, columna ni cambio en validaciones de importes del gráfico.
+
+test-cash-flow-cancellation.R: 17 comprobaciones aprobadas. Cubren
+permutaciones, saldo residual, cero exacto, signos, spots distintos con el
+mismo log factor, un saldo binario grande y un agregado descontado finito.
+El gráfico obtiene y muestra PV=7. La interfaz ggplot y los reductores
+escalares se conservan; esta corrección no necesita una capa tidy nueva.
+
+Límite explícito en los Rd: esta recuperación no cubre cancelación de
+términos individualmente desbordados con factores distintos. Un resultado
+NaN de ese caso no se convierte en cero. No se afirma sumación exacta
+arbitraria ni recuperación general de cantidades inferiores al rango double.
+
+## B02-08 (C01 autorizada): tolerancias separadas en solve_value
+
+Estado: propuesto, autorizado expresamente por el usuario, implementado y
+probado. El diseño y el impacto están en audit-api-review.md, sección C01.
+La autorización fue «Sí, implementar C01 como está propuesto».
+
+Fundamento: f(x)-target tiene unidades del resultado; dx tiene unidades de
+la incógnita. Un cambio monetario de escala s>0 conserva la raíz y requiere
+escalar también la tolerancia residual por s, no la precisión de x.
+Antes, f(x)=1e5(x^2-2), intervalo [1,2], tol=1e-14 y scan_points=3 daba
+residuo 4.44e-11 y converged=TRUE por un piso oculto cercano a 1.49e-8.
+También uniroot devolvía un candidato tras agotar una sola iteración,
+emitiendo un warning. Ambos comportamientos se reprodujeron antes del cambio.
+
+Diff: residual_tol=tol al final de la firma, validación finita positiva,
+dos comparaciones residuales de Newton y el diagnóstico final. tol conserva
+sus usos de coordenada y agrupación. uniroot usa check.conv=TRUE para no
+presentar un buscador agotado como finalizado. No se alteran las columnas.
+Newton mantiene error si falla. value/summary conservan el candidato
+bracketed que cumple precisión de coordenada; audit indica por separado si
+cumple el umbral residual. No se añade otra política de retorno implícita.
+
+test-solve-value-tolerances.R: 56 comprobaciones nuevas aprobadas, además
+de las 38 anteriores de solve_value. Referencia de raíz sqrt(2), escalas
+1,1e-12,1e12 con target escalado, derivadas explícita y estimada, tolerancia
+por encima/debajo del residuo observado, cero exacto, ocho entradas inválidas,
+agotamiento de iteraciones y equivalencia de llamadas posicionales/nominadas.
+Las comparaciones comprueban solución y residuo, no solo converged.
+
+Compatibilidad: los quince argumentos anteriores mantienen orden y defaults;
+residual_tol añade una aparición a la matriz (960, con 101 nombres públicos).
+El default de Newton conserva su umbral anterior, pero converged puede pasar
+de TRUE a FALSE al eliminar el piso oculto. Uniroot agotado causa error en
+vez de warning con candidato. NEWS y Rd explican estos cambios autorizados.
+C02–C04 continúan sin implementar. La validación final se registra aparte
+en audit-precran-check.md; no se atribuye a la CI histórica.
+
+La suite local completa pasó después de ambas correcciones, salida 0.
+Hay 73 comprobaciones nuevas en esta unidad (17 de cancelación y 56 de
+tolerancias). Se verificaron por AST/formals las cinco firmas públicas en
+archivos modificados: solo solve_value añade el parámetro final autorizado.
+Los trece archivos funcionales, de tests, NEWS, NAMESPACE y Rd relevantes
+coinciden con el archivo fuente de validación tras normalizar saltos de
+línea; DESCRIPTION conserva la versión de desarrollo. git diff --check pasa.

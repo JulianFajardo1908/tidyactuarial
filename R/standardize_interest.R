@@ -257,3 +257,22 @@ standardize_interest <- function(
     exp(log(abs(amount[recover])) + log_factor[recover])
   out
 }
+
+# Recover cancellation under an exactly common finite log factor. Keep the
+# ordinary sum when representable; summing raw amounts first can itself overflow.
+.cash_flow_sum <- function(amount, log_factor) {
+  values <- .cash_flow_value(amount, log_factor)
+  total <- sum(values)
+  if (is.finite(total)) return(total)
+
+  recover <- !is.finite(values) & is.finite(log_factor)
+  for (g in unique(log_factor[recover])) {
+    idx <- which(log_factor == g)
+    net <- sum(amount[idx])
+    if (is.finite(net)) {
+      values[idx] <- 0
+      values[idx[1L]] <- .cash_flow_value(net, g)
+    }
+  }
+  sum(values)
+}

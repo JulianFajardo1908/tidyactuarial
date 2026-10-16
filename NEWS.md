@@ -2,6 +2,17 @@
 
 ## Bug fixes
 
+* solve_value now has an approved trailing argument `residual_tol = tol`,
+  separating result-unit residual accuracy from unknown-coordinate accuracy.
+  Audit convergence uses this explicit threshold without a hidden floor.
+  Exhausting uniroot iterations is now an error. Existing positional arguments
+  and output columns are preserved; an audit flag can become more stringent.
+
+* Present/future cash-flow totals and inferred plot present values recover
+  cancellation of overflowing terms with exactly equal finite log factors.
+  Representable ordinary sums retain their existing evaluation; unequal-factor
+  extreme cancellation remains outside this recovery rule.
+
 * Basic cash-flow valuations recover representable signed capital-factor
   products even when a separate factor overflows, underflows or is subnormal.
   Known zero payments stay zero without converting missing inputs to zero.

@@ -172,3 +172,41 @@ es un registro excluido del paquete, no una nueva API o dependencia.
 No se ejecutó nuevamente CI ni recepción remota de CRAN; no se presenta
 la ejecución remota previa como validación del nuevo código. El manual
 provisional no se reconstruyó en esta unidad y el barrido sigue abierto.
+
+## Revalidación de cancelación financiera y C01 autorizada
+
+Tras B02-07/B02-08, la suite local completa pasó, salida 0, con 73
+comprobaciones nuevas: 17 de cancelación y 56 de tolerancias. Se regeneraron
+solo los cuatro Rd afectados. La matriz conserva 101 entradas públicas y
+contiene 960 apariciones de parámetros; el único cambio de firma es el
+argumento final residual_tol=tol autorizado expresamente por el usuario.
+
+Construcción final y chequeo del paquete instalado:
+`R CMD build --no-manual` y
+`R CMD check --as-cran --no-manual tidyactuarial_0.1.6.9000.tar.gz`.
+Resultado **0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE:
+`Version contains large components (0.1.6.9000)`.
+Pasaron análisis de código y dependencias, correspondencia código/Rd,
+ejemplos (25 s), pruebas instaladas (52 s) y reconstrucción de las cuatro
+viñetas (12 s). Windows/R 4.6.1, locale English_United States.utf8,
+Pandoc de RStudio y `_R_CHECK_CRAN_INCOMING_REMOTE_=false`.
+
+Artefactos finales:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-tolerances/`.
+Informe: `tidyactuarial.Rcheck/00check.log`.
+SHA256 del archivo fuente:
+`388BA3DE82928D5754B92EA6152AA117D8B4CF9D1B1D4F37BCC28B0E8F90C25C`.
+Se verificó que trece archivos relevantes de código/tests/NEWS/NAMESPACE/Rd
+coinciden con el checkout, normalizando saltos de línea. DESCRIPTION mantiene
+la versión de desarrollo; los registros audit-* y AGENTS siguen excluidos
+del archivo, mientras que las dos pruebas nuevas están incluidas.
+
+La validación intermedia en precran-cancellation precede a C01 y no debe
+usarse como evidencia de ella. Esta sección corresponde al archivo final
+precran-tolerances. No se ejecutó nueva CI ni recepción remota de CRAN;
+no se reconstruyó el manual provisional ni se modificó la versión.
+
+El alcance matemático y las limitaciones están en audit-cash-flow-roots.md.
+La compatibilidad incluye conservar las llamadas posicionales; abreviaturas
+parciales como res= deben escribirse result=, al ser ambiguas con el nuevo
+residual_tol. B03 queda como siguiente bloque de revisión integral.
