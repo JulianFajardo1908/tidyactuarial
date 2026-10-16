@@ -83,10 +83,20 @@ use inside \code{dplyr::mutate()} pipelines.
 
 Times must satisfy \eqn{0 \le s \le t}. Missing times propagate as missing
 accumulation factors.
+Conventional inputs are valued using their original log accumulation rate.
+In tidy output, the annual equivalent may round to -1 or overflow to Inf
+even when the requested interval factor is positive and finite.
 }
 \examples{
 # Constant annual effective interest
 accumulation_factor(t = 5, i = 0.07)
+
+# The same financial law in three representations
+c(
+  rate = accumulation_factor(t = 5, i = 0.03, i_type = "force"),
+  accumulation = accumulation_factor(t = 5, a = function(t) exp(0.03 * t)),
+  varying_force = accumulation_factor(t = 5, delta = function(t) 0.03)
+)
 
 # One rate recycled over several times
 accumulation_factor(

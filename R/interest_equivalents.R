@@ -30,6 +30,10 @@
 #' \code{i_type} denotes the type of interest rate, and \code{m} denotes the
 #' conversion frequency for nominal rates.
 #'
+#' Calculations retain the log accumulation rate of the original input.
+#' An extreme annual effective equivalent may round to -1 or overflow to Inf
+#' while other equivalent quantities remain representable.
+#'
 #' Given the annual effective interest rate \eqn{i}, the equivalents are:
 #' \describe{
 #'   \item{Effective discount rate:}{\eqn{d = i/(1+i)}{d = i/(1+i)}}
@@ -85,13 +89,14 @@ interest_equivalents <- function(
 
   m <- as.integer(m)
 
-  i_eff <- standardize_interest(type = i_type, rate = i, m = m)
+  basis <- .interest_basis(i_type = i_type, i = i, m = m)
+  i_eff <- basis$effective
 
-  d     <- i_eff / (1 + i_eff)
-  v     <- 1 / (1 + i_eff)
-  delta <- log1p(i_eff)
-  j_m   <- m * expm1(log1p(i_eff) / m)
-  d_m   <- -m * expm1(-log1p(i_eff) / m)
+  delta <- basis$growth
+  d     <- -expm1(-delta)
+  v     <- exp(-delta)
+  j_m   <- m * expm1(delta / m)
+  d_m   <- -m * expm1(-delta / m)
 
   freq_label <- switch(
     as.character(m),

@@ -45,6 +45,9 @@ The conversion formulas are:
 Input vectors must have length 1 or a common length.
 Conversions use log1p and expm1 to retain precision near zero.
 A missing rate type produces a missing equivalent rate.
+At extreme inputs, an annual equivalent can round to -1 or overflow to
+Inf. This is a limit of its numeric representation; interval factors and
+basic cash-flow valuations retain the original log accumulation rate.
 }
 \examples{
 # Scalar cases

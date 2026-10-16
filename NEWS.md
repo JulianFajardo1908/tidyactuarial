@@ -2,6 +2,13 @@
 
 ## Bug fixes
 
+* Interval factors, equivalent-rate tables and basic cash-flow valuations
+  retain the original log accumulation rate when an annual effective
+  equivalent rounds to -1 or overflows. Interval discounts no longer require
+  a representable reciprocal accumulation. Future cash-flow ratios avoid
+  overflow of their separate accumulation levels. Public schemas are retained;
+  extreme annual-equivalent audit fields may still display -1 or Inf.
+
 * Rate conversions and accumulation/spot discount factors retain precision
   near zero using log1p and expm1. Small positive or negative rates no longer
   collapse to zero before conversion or lose their effect over long terms.

@@ -53,6 +53,9 @@ input, \code{i_type} denotes the interest-rate type, and \code{m} denotes the
 conversion frequency for nominal rates.
 
 If \eqn{t = 0}, the discount factor is 1.
+Valuation retains the original log accumulation rate. In tidy output, an
+extreme annual equivalent can round to -1 or overflow to Inf without
+invalidating a representable discount factor.
 
 Input vectors must have length 1 or a common length. Missing values are
 propagated.

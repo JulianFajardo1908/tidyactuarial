@@ -76,6 +76,11 @@ Internally, all supplied rates are converted to annual effective rates using
 \code{\link{standardize_interest}}. When \code{i} is a vector, the
 accumulation uses the implied discount-factor ratio under the spot-rate
 interpretation.
+The ratio is evaluated from log accumulation rates, avoiding overflow of
+its separate numerator and denominator. If a horizon annual equivalent
+rounds to -1 or overflows to Inf, tied horizon flows must have exactly
+equal log accumulation rates; otherwise the existing annual-rate tolerance
+applies.
 
 
 This function follows the compact actuarial notation used throughout

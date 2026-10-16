@@ -32,6 +32,11 @@
 #' \code{\link{standardize_interest}}. When \code{i} is a vector, the
 #' accumulation uses the implied discount-factor ratio under the spot-rate
 #' interpretation.
+#' The ratio is evaluated from log accumulation rates, avoiding overflow of
+#' its separate numerator and denominator. If a horizon annual equivalent
+#' rounds to -1 or overflows to Inf, tied horizon flows must have exactly
+#' equal log accumulation rates; otherwise the existing annual-rate tolerance
+#' applies.
 #'
 #' @param cf Numeric vector of cash flows.
 #' @param i Numeric scalar or numeric vector of interest-rate values.
@@ -212,7 +217,8 @@ fv_flow <- function(
   i_type <- rep_len(i_type, n_cf)
   m      <- rep_len(m, n_cf)
 
-  i_eff <- standardize_interest(type = i_type, rate = i, m = m)
+  basis <- .interest_basis(i_type = i_type, i = i, m = m)
+  i_eff <- basis$effective
 
   # ---- Accumulate to the latest cash-flow time ----
   # The horizon rate i_T is the spot rate at T. When multiple cash flows share
@@ -225,14 +231,22 @@ fv_flow <- function(
   if (length(i_h) == 0L) {
     stop("Could not determine the horizon rate.", call. = FALSE)
   }
-  if (max(i_h) - min(i_h) > tol) {
+  # Retain the existing tolerance on representable annual rates. When that
+  # representation saturates, require equal original log accumulation rates.
+  g_h <- basis$growth[idx_h]
+  agree <- if (all(is.finite(i_h) & i_h > -1)) {
+    max(i_h) - min(i_h) <= tol
+  } else {
+    all(g_h == g_h[1L])
+  }
+  if (!isTRUE(agree)) {
     stop(
       "When multiple cash flows occur at the horizon, their associated spot rates must agree.",
       call. = FALSE
     )
   }
 
-  i_T <- i_h[1]
-
-  sum(cf * ((1 + i_T)^T_horizon / (1 + i_eff)^t_cf))
+  log_ratio <- g_h[1L] * (T_horizon - t_cf) +
+    (g_h[1L] - basis$growth) * t_cf
+  sum(cf * exp(log_ratio))
 }

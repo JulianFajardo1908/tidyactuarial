@@ -79,6 +79,10 @@ for a time-varying force of interest.
 
 
 Exactly one of \code{i}, \code{a}, or \code{delta} must be supplied.
+The requested discount factor is evaluated from the log accumulation,
+without requiring its reciprocal to be representable. It must be positive
+and finite. In tidy output, an unrepresentable intermediate accumulation
+factor may be Inf or zero; the discount factor is computed independently.
 
 Numeric arguments may have length 1 or a common length. Scalars are
 recycled over the remaining scenarios, making the function suitable for

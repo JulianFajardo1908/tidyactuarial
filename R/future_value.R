@@ -37,6 +37,10 @@
 #' accumulation factors, and future values.
 #'
 #' @details
+#' Valuation retains the log accumulation rate of the original specification.
+#' In tidy output, an extreme annual equivalent can round to -1 or overflow
+#' to Inf while the requested accumulation factor remains representable.
+#'
 #' This function follows the compact actuarial notation used throughout
 #' \code{tidyactuarial}: \code{C} denotes the initial payment amount or capital,
 #' \code{t} denotes time, \code{i} denotes the interest-rate input,
@@ -173,16 +177,9 @@ future_value <- function(
   }
 
   # --- Compute equivalent rates ---
-  i_effective <- standardize_interest(i_type = i_type, i = i, m = m)
-
-  if (any(!is.na(i_effective) & (!is.finite(i_effective) | i_effective <= -1))) {
-    stop(
-      "The standardized annual effective interest rates must be greater than -1.",
-      call. = FALSE
-    )
-  }
-
-  accumulation_factor <- (1 + i_effective)^t
+  basis <- .interest_basis(i_type = i_type, i = i, m = m)
+  i_effective <- basis$effective
+  accumulation_factor <- exp(t * basis$growth)
 
   future_value_out <- rep(NA_real_, size)
 

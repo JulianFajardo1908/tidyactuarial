@@ -50,6 +50,10 @@ The input interest rate may be supplied as:
 
 Internally, all rate specifications are first converted to the equivalent
 annual effective interest rate using \code{\link{standardize_interest}}.
+Valuation retains the log accumulation rate of the original specification
+instead of reconstructing it from a rounded annual equivalent. In tidy
+output, extreme annual equivalents may round to -1 or overflow to Inf;
+the annual discount factor and present value are calculated independently.
 
 
 This function follows the compact actuarial notation used throughout

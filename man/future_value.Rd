@@ -51,6 +51,10 @@ Internally, all rate specifications are first converted to the equivalent
 annual effective interest rate using \code{\link{standardize_interest}}.
 
 
+Valuation retains the log accumulation rate of the original specification.
+In tidy output, an extreme annual equivalent can round to -1 or overflow
+to Inf while the requested accumulation factor remains representable.
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{C} denotes the initial payment amount or capital,
 \code{t} denotes time, \code{i} denotes the interest-rate input,

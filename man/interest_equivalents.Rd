@@ -46,6 +46,10 @@ This function follows the compact actuarial notation used throughout
 \code{i_type} denotes the type of interest rate, and \code{m} denotes the
 conversion frequency for nominal rates.
 
+Calculations retain the log accumulation rate of the original input.
+An extreme annual effective equivalent may round to -1 or overflow to Inf
+while other equivalent quantities remain representable.
+
 Given the annual effective interest rate \eqn{i}, the equivalents are:
 \describe{
   \item{Effective discount rate:}{\eqn{d = i/(1+i)}{d = i/(1+i)}}

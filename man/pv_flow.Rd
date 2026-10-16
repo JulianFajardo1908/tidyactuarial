@@ -68,6 +68,8 @@ Rate types may be supplied in FM-style notation:
 
 Internally, all supplied rates are converted to annual effective rates using
 \code{\link{standardize_interest}}.
+Discounting retains the original log accumulation rates, including when
+annual effective equivalents round to -1 or overflow to Inf.
 
 
 This function follows the compact actuarial notation used throughout

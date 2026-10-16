@@ -94,3 +94,87 @@ validación de este nuevo código ni se declara lista una release.
 El siguiente paso de mayor valor es el pendiente 1 con los consumidores B02,
 antes de marcar B01 como cerrado. El inventario completo está en
 audit-thematic-review.md.
+
+## Continuación: B01-04, base logarítmica original y consumidores B02
+
+Estado: confirmado, implementado y probado. Resuelve el pendiente 1 anterior
+y concreta la distinción de dominio del pendiente 2; las secciones previas
+se conservan como registro histórico.
+
+Sea g=log A(0,1). Desde la especificación original:
+
+- efectiva: g=log1p(i);
+- nominal de interés: g=m log1p(j/m);
+- nominal de descuento: g=-m log1p(-d/m);
+- fuerza: g=delta.
+
+El helper privado .interest_basis reutiliza la validación de
+standardize_interest y conserva g, además del equivalente anual habitual.
+No cambia la API pública ni se fuerza ese equivalente a un valor distinto
+del representable. Por ejemplo, con delta=-40, i_e sigue redondeando a -1,
+pero el factor anual se obtiene de exp(-40), no de 1+i_e. La documentación
+advierte que los campos de auditoría i_effective pueden contener -1 o Inf
+mientras la valoración del intervalo es válida.
+
+Se emplea la base original en interest_equivalents, accumulation_factor,
+discount_factor_spot, present_value, future_value, pv_flow y fv_flow.
+En las equivalencias, v=exp(-g), d=-expm1(-g), delta=g; se conservan las
+seis filas y todas las columnas. Los casos nominales se contrastan con
+un único periodo: j=-500,m=1000 implica factor .5; j=2000,m=1000 factor 3;
+d=500,m=1000 factor 2. Fuerzas +/-800 con plazo .001 implican exp(+/-.8).
+
+## B01-05: descuento bloqueado por acumulación recíproca desbordada
+
+Estado: confirmado, implementado y probado.
+
+exp(740) no es representable, pero exp(-740) sí lo es como subnormal.
+Antes discount_factor exigía calcular primero la acumulación y fallaba.
+Ahora un núcleo privado .interval_factor comparte la validación de los tres
+modelos, pero evalúa directamente el factor solicitado. Se mantienen
+las firmas públicas y los errores de acumulación no positiva o no finita.
+El descuento solicitado también debe ser positivo y finito; resultados
+realmente no representables se rechazan. En salida tidy, la acumulación
+intermedia puede mostrar Inf o cero sin impedir un descuento representable.
+
+Se contrasta tasa constante, integración de una fuerza constante y una
+función de acumulación con a(0)=1e-200, a(1)=1e110, cuyo descuento es
+1e-310 aunque la acumulación sobrepase el rango double. Las regresiones
+fallaron antes y pasan después.
+
+## B02-01: cocientes de niveles de acumulación en fv_flow
+
+Estado: confirmado, implementado y probado.
+
+La fórmula spot conserva su significado: FV=sum C_k exp(g_T T-g_k t_k).
+El exponente se evalúa como g_T(T-t_k)+(g_T-g_k)t_k para evitar tanto
+Inf/Inf y 0/0 como la resta de dos productos comunes desbordados.
+Con g=1 y fechas 1000,1001, el valor es C_1 exp(1)+C_2 aunque los niveles
+separados desborden. En la propia fecha de valoración, g=1e308 da factor 1.
+
+La tolerancia existente para tasas anuales de flujos coincidentes en el
+horizonte se conserva cuando esos equivalentes son representables. Si
+redondean a -1 o Inf, se exige igualdad de g: dos fuerzas diferentes no
+se aceptan como iguales solo porque ambas anualizaciones desborden.
+La regla se documenta; no se añade un parámetro o columna de transición.
+
+## Verificación de esta continuación
+
+58 comprobaciones nuevas en test-interest-log-basis.R, aprobadas.
+Incluyen seis especificaciones extremas y siete consumidores, equivalencias,
+ratios de flujos, factores subnormales y valoraciones de tasas pequeñas.
+La prueba de fuerza -40 y las primeras pruebas de flujos/equivalencias
+fallaron antes de la base logarítmica; los casos de descuento y producto
+desbordado en el horizonte fallaron antes del segundo ajuste.
+Las pruebas existentes de acumulación y descuento también pasan.
+La suite completa terminó sin fallos y salida 0 tras estos cambios.
+
+Se añadió un ejemplo docente en accumulation_factor con la misma ley
+financiera expresada como tasa, función de acumulación y fuerza. Se
+implementó así la oportunidad docente sin añadir una función pública.
+Roxygen regenera solo los Rd correspondientes. No se reconstruye el manual
+ni se presenta la CI anterior como validación de esta continuación.
+
+Pendiente para cerrar B01: resolver y documentar coherencia de validación
+de m ignorado, y ampliar la revisión de resultados realmente desbordados
+en consumidores. B02 continúa con TIR y ecuaciones de valor, sin afirmar
+que el barrido integral ya terminó.

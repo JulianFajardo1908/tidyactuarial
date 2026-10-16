@@ -33,6 +33,9 @@
 #' Input vectors must have length 1 or a common length.
 #' Conversions use log1p and expm1 to retain precision near zero.
 #' A missing rate type produces a missing equivalent rate.
+#' At extreme inputs, an annual equivalent can round to -1 or overflow to
+#' Inf. This is a limit of its numeric representation; interval factors and
+#' basic cash-flow valuations retain the original log accumulation rate.
 #'
 #' @seealso \code{\link{interest_equivalents}},
 #'   \code{\link{discount_factor_spot}}
@@ -217,4 +220,25 @@ standardize_interest <- function(
   out[ok_force] <- expm1(i[ok_force])
 
   out
+}
+
+# Keep the log accumulation rate from the original specification: converting
+# through an annual effective rate can round to -1 or overflow to Inf.
+# standardize_interest remains the single source of input validation.
+.interest_basis <- function(i_type, i, m) {
+  effective <- standardize_interest(i_type = i_type, i = i, m = m)
+  size <- length(effective)
+  type <- rep_len(tolower(i_type), size)
+  rate <- rep_len(i, size)
+  frequency <- rep_len(m, size)
+  growth <- log1p(effective)
+  nominal_i <- !is.na(type) & type == "nominal_interest"
+  nominal_d <- !is.na(type) & type == "nominal_discount"
+  force <- !is.na(type) & type == "force"
+  growth[nominal_i] <- frequency[nominal_i] *
+    log1p(rate[nominal_i] / frequency[nominal_i])
+  growth[nominal_d] <- -frequency[nominal_d] *
+    log1p(-rate[nominal_d] / frequency[nominal_d])
+  growth[force] <- rate[force]
+  list(effective = effective, growth = growth)
 }
