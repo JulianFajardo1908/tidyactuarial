@@ -31,6 +31,8 @@
 #' }
 #'
 #' Input vectors must have length 1 or a common length.
+#' Conversions use log1p and expm1 to retain precision near zero.
+#' A missing rate type produces a missing equivalent rate.
 #'
 #' @seealso \code{\link{interest_equivalents}},
 #'   \code{\link{discount_factor_spot}}
@@ -157,10 +159,10 @@ standardize_interest <- function(
     stop("`i` must contain only finite numeric values or NA.", call. = FALSE)
   }
 
-  idx_nom_i <- i_type == "nominal_interest"
-  idx_nom_d <- i_type == "nominal_discount"
-  idx_eff   <- i_type == "effective"
-  idx_force <- i_type == "force"
+  idx_nom_i <- !is.na(i_type) & i_type == "nominal_interest"
+  idx_nom_d <- !is.na(i_type) & i_type == "nominal_discount"
+  idx_eff   <- !is.na(i_type) & i_type == "effective"
+  idx_force <- !is.na(i_type) & i_type == "force"
   idx_nom   <- idx_nom_i | idx_nom_d
 
   missing_m <- idx_nom & is.na(m)
@@ -206,13 +208,13 @@ standardize_interest <- function(
   out[ok_eff] <- i[ok_eff]
 
   ok_nom_i <- idx_nom_i & !is.na(i)
-  out[ok_nom_i] <- (1 + i[ok_nom_i] / m[ok_nom_i])^m[ok_nom_i] - 1
+  out[ok_nom_i] <- expm1(m[ok_nom_i] * log1p(i[ok_nom_i] / m[ok_nom_i]))
 
   ok_nom_d <- idx_nom_d & !is.na(i)
-  out[ok_nom_d] <- (1 - i[ok_nom_d] / m[ok_nom_d])^(-m[ok_nom_d]) - 1
+  out[ok_nom_d] <- expm1(-m[ok_nom_d] * log1p(-i[ok_nom_d] / m[ok_nom_d]))
 
   ok_force <- idx_force & !is.na(i)
-  out[ok_force] <- exp(i[ok_force]) - 1
+  out[ok_force] <- expm1(i[ok_force])
 
   out
 }

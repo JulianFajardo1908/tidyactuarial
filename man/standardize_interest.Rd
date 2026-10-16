@@ -43,6 +43,8 @@ The conversion formulas are:
 }
 
 Input vectors must have length 1 or a common length.
+Conversions use log1p and expm1 to retain precision near zero.
+A missing rate type produces a missing equivalent rate.
 }
 \examples{
 # Scalar cases

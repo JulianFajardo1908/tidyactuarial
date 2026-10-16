@@ -165,7 +165,7 @@ discount_factor_spot <- function(
     )
   }
 
-  discount_factor <- (1 + i_effective)^(-t)
+  discount_factor <- exp(-t * log1p(i_effective))
 
   if (!tidy) {
     return(discount_factor)

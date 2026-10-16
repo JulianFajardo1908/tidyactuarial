@@ -23,8 +23,8 @@ rates.}
 \value{
 A tibble with columns:
 \describe{
-  \item{family}{Rate family: \code{"effective"}, \code{"discount"},
-    \code{"force"}, \code{"nominal_interest"}, or
+  \item{family}{Rate or factor family: \code{"effective"}, \code{"discount"},
+    \code{"discount_factor"}, \code{"force"}, \code{"nominal_interest"}, or
     \code{"nominal_discount"}.}
   \item{notation}{Actuarial notation for the equivalent rate.}
   \item{m}{Conversion frequency used for nominal rates.}

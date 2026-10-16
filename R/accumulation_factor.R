@@ -287,7 +287,7 @@ accumulation_factor <- function(
     ok <- !is.na(elapsed_time) & !is.na(i_effective)
 
     accumulation_out[ok] <-
-      (1 + i_effective[ok])^elapsed_time[ok]
+      exp(elapsed_time[ok] * log1p(i_effective[ok]))
   }
 
   if (identical(model, "accumulation_function")) {

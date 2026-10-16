@@ -2,6 +2,11 @@
 
 ## Bug fixes
 
+* Rate conversions and accumulation/spot discount factors retain precision
+  near zero using log1p and expm1. Small positive or negative rates no longer
+  collapse to zero before conversion or lose their effect over long terms.
+  Missing rate conventions now propagate missing equivalents as documented.
+
 * Deferred two-life insurance now retains survival conditioning from issue.
   Last-survivor continuation includes paths with only one survivor at the
   end of deferment, instead of restarting both lives at advanced ages.
