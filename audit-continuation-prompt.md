@@ -8,6 +8,13 @@ justificadas. Se acordó objetivo **0.2.0** y decidir sobre **1.0.0 al cerrar
 el barrido**. El manual es provisional; la publicación no es la prioridad.
 No cambiar DESCRIPTION a versión de release todavía.
 
+Actualización posterior del usuario: incorporar explícitamente exactitud
+matemática, experiencia tidyverse y auditoría de firmas. Consultar
+`audit-api-signatures.md` (101 firmas y parámetros documentados) y
+`audit-api-review.md` (evaluación B01/B02 y propuestas A/B/C). No implementar
+cambios de API C sin autorización. No hacer push, publicaciones, cambios
+de versión ni operaciones destructivas de Git durante este barrido.
+
 Consultar primero `audit-thematic-review.md` (inventario completo de los
 101 nombres públicos) y `audit-interest-foundations.md` (B01 iniciado y
 con pendientes), además de los registros anteriores.

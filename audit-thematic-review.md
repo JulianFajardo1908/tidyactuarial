@@ -38,6 +38,11 @@ corresponde al código previo a las nuevas correcciones B01.
 Las llamadas directas en tests se detectan estáticamente. Su presencia no
 demuestra cobertura de ramas ni incluye llamadas indirectas.
 
+La matriz complementaria audit-api-signatures.md incorpora firmas,
+defaults, parámetros y retornos Rd de las 101 entradas. La evaluación
+semántica de B01/B02 y las propuestas A/B/C están en audit-api-review.md.
+Extraer las firmas no equivale a aprobar las nueve áreas.
+
 | Bloque | Nombre | Fuente | Tests con llamada directa |
 |---|---|---|---|
 | B01 | `accumulation_factor` | `R/s_angle.R` | `test-accumulation_factor.R`, `test-interest-audit-regressions.R`, `test-interest-log-basis.R` |
