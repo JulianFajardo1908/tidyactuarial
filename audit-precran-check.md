@@ -132,3 +132,16 @@ Quedan resueltas la ejecución de esta matriz y la prueba del R mínimo en
 Ubuntu. Siguen pendientes el manual con índice, la revisión remota de
 recepción de CRAN y la conciliación con el informe externo original.
 No se hizo merge, cambio de versión ni envío a CRAN.
+
+## Manual con índice compilado
+
+Se resolvió la falta de makeindex en TinyTeX y `R CMD Rd2pdf` compiló
+con índice, salida 0. El PDF entregable tiene 232 páginas y su índice
+ocupa las páginas 229–232; 1197 entradas aceptadas, ninguna rechazada.
+Los ajustes locales de presentación y las verificaciones se describen
+en `audit-manual-index.md`. No cambió el código del paquete ni sus Rd.
+
+La antigua limitación sobre makeindex queda resuelta. No se repitió
+R CMD check con la fase del manual habilitada: esta evidencia corresponde
+a la compilación independiente del manual. Siguen pendientes la revisión
+remota de recepción y la conciliación del informe externo.
