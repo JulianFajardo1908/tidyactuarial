@@ -17,6 +17,34 @@
   documentation now gives the chain-rule conversion. Bond output meanings
   are preserved. Examples now use convexities on the liability yield basis.
 
+* Negative-binomial and geometric frequency thinning now avoids intermediate
+  overflow for tiny original `prob`. Conversions that would round a positive
+  payment frequency to zero now fail explicitly and retain the per-loss
+  model as the available representation.
+
+* Discrete VaR now compares the requested level directly with cumulative
+  probabilities, without shifting it by an absolute epsilon. Levels just
+  above an atom or the represented aggregate mass no longer select the
+  previous atom or slip into an uncomputed tail.
+
+* VaR from FFT aggregates now checks whether omitted claim-count probability
+  could change the selected quantile, using the minimum possible loss of
+  omitted counts. Ambiguous quantiles are rejected with advice to reduce
+  `tol`. Documentation distinguishes unrepresented mass from an upper loss
+  tail: omitted large counts can still produce small aggregate losses.
+
+* Aggregate distributions now infer decimal lattices relative to the severity
+  magnitude and merge support points using relative monetary tolerances.
+  Small monetary units no longer collapse distinct losses into zero, and
+  convolution/FFT `max_loss` cutoffs respect the same scale. Strictly positive
+  masses below 1e-18 are retained rather than silently discarded.
+
+* Stop-loss premiums for covered exponential per-loss severities now use
+  closed forms for ordinary and franchise deductibles, inflation, coinsurance,
+  and finite or infinite limits. Very large limits no longer produce spurious
+  zero premiums through quadrature. Their reported method changes from
+  `numerical_survival` to `closed_form`; TVaR uses the corrected premiums too.
+
 * Corrected complete `e_xy(..., cohort = "last")` calculations to preserve
   conditioning on both lives being alive at the initial ages. Annual
   integration now uses survival from those original ages, including paths

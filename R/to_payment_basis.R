@@ -49,6 +49,10 @@
 #' payment is resolved from the exact source CDF or finite discrete masses.
 #' Continuous per-payment severities inherit only the registered exact
 #' operations of their source; unavailable moment orders remain unavailable.
+#' For negative binomial and geometric frequencies, thinning uses
+#' \eqn{p_P=p/(p+q(1-p))}. If a positive payment frequency would round to
+#' the degenerate parameter `prob = 1`, the conversion stops and the
+#' per-loss model should be retained; positive risk is never silently removed.
 #'
 #' @return
 #' For `q > 0`, a `tidyact_payment_basis_spec` that also inherits from
@@ -157,16 +161,25 @@ to_payment_basis <- function(x, label = NULL) {
   if (q == 1) return(x)
   p <- x$params
   label <- x$label
+  if (x$dist %in% c("negative_binomial", "geometric")) {
+    # p/(p+q(1-p)) avoids overflow in q(1-p)/p for tiny original p.
+    thinned_prob <- p$prob / (p$prob + q * (1 - p$prob))
+    if (thinned_prob == 1 && p$prob < 1 && q > 0) {
+      stop("The thinned frequency cannot be represented by a `prob` below 1 ",
+           "at machine precision. Retain the per-loss model instead.",
+           call. = FALSE)
+    }
+  }
   switch(
     x$dist,
     poisson = frequency_spec("poisson", lambda = p$lambda * q, label = label),
     binomial = frequency_spec("binomial", size = p$size,
                               prob = p$prob * q, label = label),
     negative_binomial = frequency_spec("negative_binomial", size = p$size,
-                         prob = 1 / (1 + q * (1 - p$prob) / p$prob),
+                         prob = thinned_prob,
                          label = label),
     geometric = frequency_spec("geometric",
-                               prob = 1 / (1 + q * (1 - p$prob) / p$prob),
+                               prob = thinned_prob,
                                label = label),
     empirical = {
       tab <- .payment_basis_thin_pmf(p$values, p$probs, q)

@@ -54,6 +54,8 @@
 }
 
 .risk_masses <- function(x, value = NULL) {
+  count_tail <- 0
+  count_tail_lower <- Inf
   if (inherits(x, "tidyact_zero_payment_basis_spec")) {
     return(list(loss = 0, probability = 1, tail = 0,
                 method = "degenerate"))
@@ -67,6 +69,12 @@
     tail <- x$tail_probability
     method <- if (isTRUE(x$metadata$exact)) "aggregate_grid_exact" else
       "aggregate_grid_approximate_or_unverified"
+    if (identical(x$method, "fft") &&
+        isTRUE(x$metadata$count_tail_probability > 0)) {
+      count_tail <- x$metadata$count_tail_probability
+      count_tail_lower <- (x$metadata$count_truncation + 1) *
+        x$model$severity$support$lower
+    }
   } else if (inherits(x, "tidyact_severity_spec") &&
              x$dist %in% c("discrete", "empirical", "degenerate")) {
     if (!is.null(value)) stop("`value` is only for data frames.", call. = FALSE)
@@ -114,20 +122,29 @@
     stop("Retained probabilities and omitted tail must sum to one.",
          call. = FALSE)
   }
-  list(loss = loss, probability = probability, tail = tail, method = method)
+  list(loss = loss, probability = probability, tail = tail, method = method,
+       count_tail = count_tail, count_tail_lower = count_tail_lower)
 }
 
 .risk_discrete_var <- function(masses, level) {
   cumulative <- cumsum(masses$probability)
   max_captured <- cumulative[length(cumulative)]
   vapply(level, function(p) {
-    if (p > max_captured + 1e-12) {
+    if (p > max_captured) {
       stop("Requested VaR quantile lies in the uncomputed aggregate tail.",
            call. = FALSE)
     }
-    k <- which(cumulative >= p - 8 * .Machine$double.eps)[1L]
+    k <- which(cumulative >= p)[1L]
     if (is.na(k)) {
       stop("Requested VaR quantile lies in the uncomputed aggregate tail.",
+           call. = FALSE)
+    }
+    previous <- if (k == 1L) 0 else cumulative[k - 1L]
+    if (isTRUE(masses$count_tail > 0) &&
+        masses$loss[k] > masses$count_tail_lower &&
+        previous + masses$count_tail >= p) {
+      stop("Requested VaR is unresolved because FFT count truncation can ",
+           "change the quantile. Reduce `tol` in aggregate_distribution().",
            call. = FALSE)
     }
     masses$loss[k]
@@ -156,6 +173,26 @@
 }
 
 .risk_stop_loss_exact <- function(x, d) {
+  if (.risk_exponential_payment(x)) {
+    t <- .coverage_effective_terms(x$coverage)
+    if (t$coinsurance == 0 || t$limit == 0) return(0)
+    a <- d / t$coinsurance
+    if (a >= t$limit) return(0)
+    rate <- x$source$params$rate / t$inflation
+    if (t$deductible_type == "ordinary") {
+      threshold <- t$deductible + a
+      width <- t$limit - a
+      base <- 0
+    } else {
+      threshold <- max(t$deductible, a)
+      width <- max(0, t$limit - threshold)
+      base <- max(0, min(threshold, t$limit) - a)
+    }
+    # Integrate the exponential survival analytically. expm1 preserves
+    # thin layers; no quadrature over a possibly enormous contract limit.
+    return(t$coinsurance * exp(-rate * threshold) *
+             (base + (-expm1(-rate * width)) / rate))
+  }
   p <- x$params
   if (identical(x$dist, "exponential")) {
     return(exp(-p$rate * d) / p$rate)
@@ -240,7 +277,13 @@
 }
 
 .risk_stop_loss_method <- function(x) {
+  if (.risk_exponential_payment(x)) return("closed_form")
   if (identical(x$dist, "custom") ||
       x$dist %in% c("burr", "loglogistic")) "numerical_survival" else
     "closed_form"
+}
+
+.risk_exponential_payment <- function(x) {
+  inherits(x, "tidyact_payment_spec") &&
+    identical(x$source$dist, "exponential")
 }

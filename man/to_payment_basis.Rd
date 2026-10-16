@@ -64,6 +64,10 @@ frequency family is silently approximated. The probability of a positive
 payment is resolved from the exact source CDF or finite discrete masses.
 Continuous per-payment severities inherit only the registered exact
 operations of their source; unavailable moment orders remain unavailable.
+For negative binomial and geometric frequencies, thinning uses
+\eqn{p_P=p/(p+q(1-p))}. If a positive payment frequency would round to
+the degenerate parameter \code{prob = 1}, the conversion stops and the
+per-loss model should be retained; positive risk is never silently removed.
 }
 \examples{
 # Fully executable Poisson collective model with an ordinary deductible.

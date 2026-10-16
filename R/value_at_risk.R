@@ -16,6 +16,9 @@
 #' @details The tail probability retained by an aggregate-distribution object
 #'   is never renormalized away. Quantiles in its uncomputed tail are rejected.
 #'   For sampled losses the definition is empirical, not a model-based claim.
+#'   FFT count truncation can omit probability at small losses as well as
+#'   large losses. If the omitted count mass could move the selected quantile
+#'   to a smaller amount, VaR is rejected; recompute with a smaller `tol`.
 #' @examples
 #' value_at_risk(c(0, 100, 100, 300), level = c(0.5, 0.9))
 #' value_at_risk(severity_spec("exponential", rate = 0.01), level = 0.95)

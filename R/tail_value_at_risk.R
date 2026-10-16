@@ -9,8 +9,8 @@
 #' @param level Probabilities strictly between zero and one.
 #' @param value Optional loss column name for data frames.
 #' @return A tibble with `level`, `tail_value_at_risk`, and `method`.
-#' @details An aggregate distribution with unresolved tail probability cannot
-#'   yield exact TVaR, even when its VaR is known: the missing upper-tail
+#' @details An aggregate distribution with unresolved probability mass cannot
+#'   yield exact TVaR, even when its VaR is known: the missing loss
 #'   expectation is not assumed to be zero. For continuous severity families
 #'   with implemented stop-loss formulas, TVaR = VaR + E[(X-VaR)+]/(1-p).
 #' @examples

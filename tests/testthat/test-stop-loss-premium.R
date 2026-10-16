@@ -33,14 +33,14 @@ test_that("stop-loss handles simulation tibbles and invalid retentions", {
   expect_error(stop_loss_premium(x, -1), "retention")
 })
 
-test_that("bounded custom covered severity has auditable numerical stop-loss", {
+test_that("covered exponential severity has exact stop-loss", {
   x <- severity_spec("exponential", rate = 0.01)
   paid <- apply_coverage(x, coverage_spec(deductible = 50, limit = 200))
   out <- stop_loss_premium(paid, retention = 0)
   # E[min((X-50)+, 200)] = P(X>50)(1-exp(-.01*200))/.01
   expected <- exp(-0.5) * (1 - exp(-2)) / 0.01
   expect_equal(out$premium, expected, tolerance = 1e-5)
-  expect_identical(out$method, "numerical_survival")
+  expect_identical(out$method, "closed_form")
 })
 
 test_that("log-logistic with infinite mean has infinite stop-loss", {

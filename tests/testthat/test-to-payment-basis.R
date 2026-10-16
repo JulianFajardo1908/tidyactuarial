@@ -136,3 +136,28 @@ test_that("finite-binomial aggregate PMFs coincide across payment bases", {
   expect_equal(a$tail_probability, 0)
   expect_equal(b$tail_probability, 0)
 })
+test_that("thinning never silently rounds a positive payment count to zero", {
+  paid <- apply_coverage(severity_spec("discrete", values = c(0, 1e20),
+    probs = c(1, 1e-20)), coverage_spec())
+  for (family in c("negative_binomial", "geometric")) {
+    f <- if (family == "negative_binomial")
+      frequency_spec(family, size = 2, prob = .5) else
+      frequency_spec(family, prob = .5)
+    model <- collective_risk_spec(f, paid)
+    expect_equal(aggregate_moments(model, order = 1)$value,
+                 if (family == "negative_binomial") 2 else 1)
+    expect_error(to_payment_basis(model), "cannot be represented")
+  }
+})
+
+test_that("thinning preserves representable tiny negative-binomial probabilities", {
+  paid <- apply_coverage(severity_spec("discrete", values = c(0, 1),
+    probs = c(.5, .5)), coverage_spec())
+  for (family in c("negative_binomial", "geometric")) {
+    f <- if (family == "negative_binomial")
+      frequency_spec(family, size = 2, prob = 1e-310) else
+      frequency_spec(family, prob = 1e-310)
+    out <- to_payment_basis(collective_risk_spec(f, paid))
+    expect_equal(out$frequency$params$prob / 1e-310, 2, tolerance = 1e-12)
+  }
+})

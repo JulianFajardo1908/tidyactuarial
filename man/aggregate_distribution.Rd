@@ -26,7 +26,7 @@ at least \code{1 - tol} of the aggregate probability.}
 \item{max_loss}{Optional nonnegative finite numeric scalar giving the
 largest aggregate-loss value to retain in the returned grid. Probability
 above the retained grid is not renormalized; it is reported separately as
-\code{tail_probability}.}
+\code{tail_probability}, together with any omitted claim-count probability.}
 
 \item{...}{Reserved for future computational controls. Additional arguments
 are currently rejected.}
@@ -179,10 +179,16 @@ The grid is intentionally not renormalized when a positive tail remains.
 Consequently,
 
 \deqn{
-\sum p_s + P(S > s_{\max}) = 1
+\sum p_s + p_{\mathrm{omitted}} = 1
 }
 
 up to numerical tolerance.
+With loss-grid truncation alone, omitted mass is above the grid. FFT count
+truncation also omits events with large claim counts but potentially small
+aggregate losses (especially when zero severities are possible).
+Thus \code{tail_probability} is total unrepresented mass, not necessarily
+\code{P(S > max(grid$loss))}. VaR checks whether omitted count mass could change
+its selected quantile; TVaR and stop-loss reject unresolved mass.
 }
 }
 \examples{

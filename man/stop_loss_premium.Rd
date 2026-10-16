@@ -31,6 +31,9 @@ Closed forms are available for exponential, gamma, lognormal,
   are summed exactly over their mass distributions. A missing aggregate
   tail forbids an exact stop-loss expectation; no renormalization or zero
   assumption is made. The Pareto II premium is infinite when shape <= 1.
+  Per-loss exponential severities transformed by [apply_coverage()] use
+  closed forms for ordinary and franchise deductibles, including unlimited
+  coverage. This avoids numerical integration over very large limits.
 }
 \examples{
 stop_loss_premium(c(0, 100, 200, 500), retention = c(0, 150))

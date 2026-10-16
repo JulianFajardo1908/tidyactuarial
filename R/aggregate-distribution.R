@@ -22,7 +22,7 @@
 #' @param max_loss Optional nonnegative finite numeric scalar giving the
 #'   largest aggregate-loss value to retain in the returned grid. Probability
 #'   above the retained grid is not renormalized; it is reported separately as
-#'   `tail_probability`.
+#'   `tail_probability`, together with any omitted claim-count probability.
 #' @param ... Reserved for future computational controls. Additional arguments
 #'   are currently rejected.
 #'
@@ -140,10 +140,16 @@
 #' Consequently,
 #'
 #' \deqn{
-#' \sum p_s + P(S > s_{\max}) = 1
+#' \sum p_s + p_{\mathrm{omitted}} = 1
 #' }
 #'
 #' up to numerical tolerance.
+#' With loss-grid truncation alone, omitted mass is above the grid. FFT count
+#' truncation also omits events with large claim counts but potentially small
+#' aggregate losses (especially when zero severities are possible).
+#' Thus `tail_probability` is total unrepresented mass, not necessarily
+#' `P(S > max(grid$loss))`. VaR checks whether omitted count mass could change
+#' its selected quantile; TVaR and stop-loss reject unresolved mass.
 #'
 #' @return
 #' An object with classes `"tidyact_aggregate_distribution"` and
@@ -1240,6 +1246,13 @@ print.tidyact_aggregate_distribution <- function(x, ...) {
     return(values)
   }
 
+  # Work in units of the support magnitude so monetary units cannot turn
+  # strictly positive amounts into zero lattice indices.
+  magnitude <- max(values)
+  unit <- if (magnitude > 0) 10^floor(log10(magnitude)) else 1
+  if (!is.finite(unit) || unit == 0) return(NULL)
+  values <- values / unit
+
   for (digits in 0:10) {
     scale <- 10^digits
     scaled <- values * scale
@@ -1257,7 +1270,7 @@ print.tidyact_aggregate_distribution <- function(x, ...) {
           scaled -
             rounded
         ) <= tolerance
-      ) &&
+      ) && !any(values > 0 & rounded == 0) &&
         max(abs(rounded)) <
           2^52
     ) {
@@ -1287,7 +1300,7 @@ print.tidyact_aggregate_distribution <- function(x, ...) {
 
       if (gcd_value > 0) {
         return(
-          gcd_value / scale
+          (gcd_value / scale) * unit
         )
       }
     }
@@ -1532,7 +1545,6 @@ print.tidyact_aggregate_distribution <- function(x, ...) {
       max_loss +
         1e-12 *
           max(
-            1,
             max_loss
           )
 
@@ -1660,8 +1672,7 @@ print.tidyact_aggregate_distribution <- function(x, ...) {
     )
   }
 
-  keep <- probs >
-    1e-18
+  keep <- probs > 0
 
   values <- values[keep]
   probs <- probs[keep]
@@ -1691,7 +1702,6 @@ print.tidyact_aggregate_distribution <- function(x, ...) {
       32 *
         .Machine$double.eps *
         max(
-          1,
           abs(current_value),
           abs(values[i])
         )
@@ -2192,7 +2202,6 @@ print.tidyact_aggregate_distribution <- function(x, ...) {
       max_loss +
         1e-12 *
           max(
-            1,
             max_loss
           )
 

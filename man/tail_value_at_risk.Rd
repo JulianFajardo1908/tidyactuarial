@@ -23,8 +23,8 @@ v = VaR_p(X). This correctly allocates only the necessary fraction of
 a probability atom at v to the upper tail.
 }
 \details{
-An aggregate distribution with unresolved tail probability cannot
-  yield exact TVaR, even when its VaR is known: the missing upper-tail
+An aggregate distribution with unresolved probability mass cannot
+  yield exact TVaR, even when its VaR is known: the missing loss
   expectation is not assumed to be zero. For continuous severity families
   with implemented stop-loss formulas, TVaR = VaR + E[(X-VaR)+]/(1-p).
 }
