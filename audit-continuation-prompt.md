@@ -32,8 +32,14 @@ tasas pequeñas, saturación anual y el uso de tol monetario para clasificar
 tasas como cero; firmas y columnas intactas. La continuación B03-05/B03-07
 ya aborda annuity_arith/annuity_geom: productos ponderados, i próximo a g,
 spread calculado antes de conversión periódica y perpetuidades convergentes.
-Se conserva la interfaz. Próximo paso: extras, recálculo y cancelación
-anticipada de préstamos; no dar por cerrado B03 ni todos sus extremos.
+Se conserva la interfaz. B03-08/B03-10 ya verifican extras, recálculo y
+cancelación anticipada, y corrigen el flag de amortización negativa due,
+nombres fraccionarios de anticipos, tol infinito y rango monetario.
+**B03 cerrado dentro del alcance documentado**, con 216 comprobaciones nuevas,
+suite completa y R CMD check final aprobados. No repetir esos pendientes.
+Consultar el registro y su sección de límites antes de ampliar ese alcance.
+Próximo paso: B04, empezando por flujos/precio de bonos y sus convenciones
+de calendario y rendimiento; preservar los arreglos previos de inmunización.
 
 Hubo autorización puntual posterior para subir los diez commits acumulados:
 el push hasta 8dba06e a origin/audit/0.2.0-precran se realizó y verificó.

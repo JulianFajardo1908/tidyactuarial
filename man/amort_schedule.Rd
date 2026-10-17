@@ -49,7 +49,8 @@ If \code{NULL}, it is computed from the loan data.}
 \item{adjust}{Character string. One of \code{"none"}, \code{"term"}, or
 \code{"payment"}.}
 
-\item{tol}{Numeric tolerance for zero-balance detection.}
+\item{tol}{Finite positive numeric tolerance in monetary units for
+zero-balance detection.}
 }
 \value{
 A tibble with one row per realized period and columns:
@@ -111,6 +112,25 @@ the period and interest accrues on the balance after the payment.
 If the user supplies a custom \code{payment} that is smaller than the
 periodic interest, principal repayment will be negative (negative
 amortization). This is permitted but the user should be aware.
+
+Named extra payments must identify exact integer periods; repeated names
+are summed. On a payoff row, requested extra principal has priority and
+the regular payment is reduced to the remaining amount due. Interest
+still follows the selected timing, and no rows follow full payoff.
+The general schedule uses a different allocation priority; see
+\code{\link{amort_schedule_general}}.
+
+With \code{adjust = "payment"}, the payment is recalculated after every
+realized period for the remaining contractual periods, even if no extra
+payment occurred. A supplied \code{payment} is the initial payment.
+The \code{"none"} and \code{"term"} policies keep the regular amount;
+both stop when the debt is repaid and may realize fewer than \code{n} rows.
+A requested loan below \code{tol} may produce an empty schedule.
+Calculated payments for active balances must be representable and positive;
+non-finite monetary ledger entries cause an explicit error. This does not
+require a representable displayed annual effective equivalent.
+The schedule allocates up to \code{n} rows; feasible terms are limited by
+integer indexing and available memory.
 }
 \examples{
 amort_schedule(

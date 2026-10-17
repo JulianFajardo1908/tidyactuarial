@@ -54,7 +54,8 @@ be a scalar or a numeric vector of length \code{n}. Defaults to zero.}
 \item{output}{Character scalar. Either \code{"schedule"} for the complete
 amortization table or \code{"summary"} for a compact actuarial summary.}
 
-\item{tol}{Positive numeric scalar used for zero-balance detection.}
+\item{tol}{Finite positive numeric scalar in monetary units used for
+zero-balance detection and the negative-amortization threshold.}
 }
 \value{
 With \code{output = "schedule"}, a tibble with one row per realized period.
@@ -102,6 +103,25 @@ For payments in advance, the discount factors correspond to payment times
 
 A payment smaller than the interest charged may produce negative
 amortization. The schedule identifies such periods explicitly.
+
+Negative amortization means that interest exceeds the total payment,
+including extras, by more than \code{tol}. This condition applies to both
+timings, including interest accrued after an advance payment. Under due
+timing, the principal columns continue to record payments before interest;
+the negative-amortization flag refers to the net debt movement.
+
+On a payoff row the regular payment is applied first and extras are capped
+at the remaining debt; no callback is evaluated after full payoff. This
+allocation differs from \code{\link{amort_schedule}}, which preserves the
+requested extra first. Both cap total cash flow at the amount due.
+Automatically calculated level payments are determined before extras and
+are not recast by this function. The discount sum is evaluated in log space
+before combining it with the principal. Active balances require a positive,
+representable calculated payment; non-finite monetary ledgers cause errors.
+A principal below \code{tol} may produce an empty schedule, and small
+residual balances may be treated as zero within that absolute tolerance.
+Storage grows with \code{n}; feasible terms are limited by integer indexing
+and available memory.
 }
 \examples{
 # Level payments and a constant rate

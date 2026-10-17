@@ -18,9 +18,13 @@ se transforma automáticamente. Los m/j_m ignorados matemáticamente pero
 validados conservan su dominio. g es un incremento monetario por pago en
 annuity_arith y una tasa anual de crecimiento en annuity_geom: se explica,
 sin forzar nombres idénticos para conceptos diferentes. Las sumas, extremos,
-NA y usos con mutate de ambas anualidades tienen evidencia nueva; quedan
-extras/cancelación y otros extremos de préstamos antes de cerrar B03.
-No se añaden nuevas propuestas C en esta unidad.
+NA y usos con mutate de ambas anualidades tienen evidencia nueva. Anticipos,
+recálculo y liquidación ya se contrastaron por saldos y flujos independientes:
+B03 queda cerrado dentro de su alcance y límites documentados. Las firmas y
+columnas de los calendarios se verificaron contra HEAD 579efdb; no cambian.
+Se mantiene la prioridad local de extras/cuota en cada calendario y se
+explica la amortización negativa due sin redefinir columnas de principal.
+No se añaden propuestas C; C02–C04 siguen separadas del cierre matemático.
 
 ## B01/B02: evaluación separada por dimensión
 

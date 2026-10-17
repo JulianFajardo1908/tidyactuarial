@@ -286,3 +286,46 @@ Entorno R 4.6.1/Windows, locale English_United States.utf8, Pandoc de RStudio,
 para disponer de bibliotecas instaladas. Sin nuevo push, CI remota, manual,
 publicación ni cambio de versión. El push de respaldo anterior hasta 8dba06e
 se conserva; no valida por sí solo este código posterior.
+
+## Cierre B03: anticipos, recálculo y liquidación
+
+Se completaron las verificaciones B03-08/B03-10, con 216 comprobaciones
+nuevas en test-loan-prepayment-audit.R y suite local completa aprobada,
+salida 0. Log local: b03-prepayment-local-tests.log en el directorio de
+visualizaciones de esta conversación. Se contrastaron saldos, valores
+fechados, recast, liquidación, flags, callbacks, períodos nombrados y fondos
+con déficit/excedente. Las referencias son sumas, libro y Decimal a 90 dígitos.
+
+Defectos corregidos: flag de amortización negativa due; truncado de nombres
+fraccionarios; tol infinito; cuota recuperable de un factor de descuento
+desbordado; y salida monetaria no representable sin diagnóstico explícito.
+Formals, clases y nombres de columnas de los tres calendarios coinciden con
+HEAD 579efdb. Se preservan 101 nombres públicos/960 apariciones de parámetros,
+sin nuevas funciones, helpers o dependencias. Roxygen modificó solo tres Rd.
+
+Build y check finales: R CMD build --no-manual y
+R CMD check --as-cran --no-manual tidyactuarial_0.1.6.9000.tar.gz.
+Resultado **0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE: Version
+contains large components (0.1.6.9000). Pasaron código (43 s), dependencias,
+documentación, ejemplos (26 s), pruebas instaladas (50 s) y reconstrucción
+de las cuatro viñetas (12 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b03-prepayments-verified/`.
+Informe: tidyactuarial.Rcheck/00check.log.
+SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`04F0AEA54E116DBC3A8E13E97409B4E74E805A21B813DD6D5E445B263F28185C`.
+Nueve archivos fuente/tests/NEWS/NAMESPACE/Rd coinciden con el checkout
+normalizando saltos de línea; la regresión nueva está incluida y audit-*/
+AGENTS quedan excluidos. La versión de desarrollo sigue intacta.
+
+La carpeta precran-b03-prepayments corresponde al intento intermedio con
+una captura incorrecta de la tabla en expect_warning. Se corrigió el test,
+se comprobó específicamente y se repitieron suite y build/check. Solo
+verified y el SHA256 anterior acreditan el código/test final.
+
+Entorno R 4.6.1/Windows, locale English_United States.utf8, Pandoc de RStudio
+y `_R_CHECK_CRAN_INCOMING_REMOTE_=false`; bibliotecas accesibles mediante
+ejecución fuera del aislamiento. Sin nuevo push, CI remota, manual,
+publicación o cambio de versión. B03 queda cerrado en el alcance documentado;
+B04 es la siguiente revisión integral. No se declara cerrado el paquete.

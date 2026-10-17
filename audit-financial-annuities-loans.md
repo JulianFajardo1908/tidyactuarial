@@ -4,8 +4,10 @@ Rama audit/0.2.0-precran; versión 0.1.6.9000; objetivo 0.2.0.
 Continuación del barrido, sin reiniciar B01/B02 ni la auditoría previa.
 La primera unidad aborda a_angle, s_angle, amort_schedule,
 amort_schedule_general y sinking_fund_schedule. La continuación B03-05 a
-B03-07 añade annuity_arith y annuity_geom. B03 sigue abierto: faltan casos
-de pagos extraordinarios/cancelación y extremos adicionales de calendarios.
+B03-07 añade annuity_arith y annuity_geom; B03-08 a B03-10 completa
+anticipos, recálculo, liquidación y límites de los calendarios.
+Estado: **revisión B03 cerrada dentro del alcance documentado**, con suite
+completa y R CMD check final aprobados. Esto no cierra la auditoría del paquete.
 
 ## Modelo, unidades y convenciones conservadas
 
@@ -132,9 +134,9 @@ en conversiones nominales; no se cambia su dominio aceptado.
 |---|---|---|---|
 | a_angle | Sumas, integrales, deferimiento y perpetuidad positiva; base original y extremos probados | Vector o tibble; mutate, pipe vectorial, NA y valores monetarios comprobados | n años; k pagos/año; m nominal; firma intacta |
 | s_angle | Sumas e integrales al final del plazo; ceros y extremos probados | Vector/tibble y columnas preservadas; h metadato del desplazamiento | Horizonte aclarado; la continuación corrige la explicación de perpetuidades sin añadir soporte |
-| amort_schedule | Cuota fija y recalculada con misma fórmula estable; reconstrucción de saldo | Tibble por período, principal primero; sin imponer vectorización | n períodos; tol monetario; políticas de extras y casos de escala extrema aún requieren barrido específico |
-| amort_schedule_general | Cuota descontada con log crecimiento acumulado; período representable | Tibble; payment escalar/vector/función conservado | i por período es especificación anual, no spot de horizonte; eventos y límites de magnitud pendientes |
-| sinking_fund_schedule | Depósito y saldo final con tipo no nulo; moneda escalada | Tibble de flujos auditables; firmas/columnas conservadas | j tasa del fondo; j_m su conversión; preservar validación anual, revisar calendarios extremos después |
+| amort_schedule | Cuota, recálculo y anticipos contrastados por saldos y valores fechados | Tibble por período, principal primero; sin imponer vectorización | n períodos; tol monetario finito; prioridad de extras preservada y nombres enteros comprobados |
+| amort_schedule_general | Tipos variables, callbacks y amortización negativa en ambos timings comprobados | Tibble; payment escalar/vector/función y summary conservados | Cuota por suma logarítmica; prioridad de pago regular; ledgers monetarios finitos |
+| sinking_fund_schedule | Depósito, redención, déficit y excedente contrastados con flujos | Tibble de flujos auditables; firmas/columnas conservadas | j tasa del fondo; j_m su conversión; validar anual/monetario; sin redención anticipada en este contrato |
 | annuity_arith | Sumas ponderadas, base original, pagos firmados y productos extremos probados en B03-05 | Vector/tibble, mutate y esquema conservados | g monetario por pago, n años; memoria lineal y pagos ya desbordados limitan el rango |
 | annuity_geom | Sumas logarítmicas, i próximo a g, perpetuidades y plazos largos probados en B03-06 | Vector/tibble, mutate, NA y esquema conservados | g tasa anual, g_m independiente; no se garantiza cancelación arbitraria de exponentes extremos |
 
@@ -297,8 +299,8 @@ No se implementa ninguna propuesta C nueva, ni se cambia versión/dependencias.
 Referencias consultadas: fórmulas explícitas, Decimal 80 y código/Rd locales;
 no se inventan consultas bibliográficas. Límites: precisión double y posible
 cancelación de exponentes enormes con deferimientos enormes; no se promete
-precisión arbitraria. El siguiente paso de B03 son extras, recálculo y
-cancelación anticipada en préstamos, antes de avanzar a B04.
+precisión arbitraria. Los pendientes de extras, recálculo y cancelación
+anticipada se atienden en las secciones B03-08 a B03-10 siguientes.
 
 Validación final de esta continuación: 91 comprobaciones nuevas (41+50),
 suite local completa y R CMD check del paquete instalado aprobados, salida 0.
@@ -306,3 +308,132 @@ Resultado 0 ERROR, 0 WARNING, 1 NOTE por versión de desarrollo; ejemplos y
 cuatro viñetas aprobados. Diez archivos relevantes coinciden con el archivo
 fuente comprobado. El entorno, las ejecuciones intermedias y el SHA256
 definitivo están en audit-precran-check.md. Sin nuevo push o publicación.
+
+## B03-08 (A): amortización negativa con pagos anticipados
+
+Estado: confirmado, implementado y probado.
+Sean B el saldo inicial, I los intereses y C=P+E el cobro total de cuota y
+extra. Ambos timings cumplen B_final=B+I-C. Por tanto la amortización neta
+es C-I; hay amortización negativa si I-C>tol, en las mismas unidades monetarias.
+En due, I=(B-C)*i_period; no puede inferirse la condición de la columna
+total_principal, que conserva los pagos realizados antes del interés.
+
+Antes, amort_schedule_general(100,2,i=.1,timing="due",payment=1) daba saldos
+108.9 y 118.69, pero negative_amortization=FALSE y summary también FALSE.
+Se confirmó el fallo en la tabla y el resumen antes de editar.
+Ahora el flag usa I-C>tol para ambos timings. Las columnas de principal
+no se redefinen y los importes no cambian. Los extras cuentan al decidir
+si el pago total cubre el interés. NEWS registra el cambio de diagnóstico.
+
+## B03-09 (A): períodos fraccionarios y tolerancias infinitas
+
+Estado: confirmado, implementado y probado.
+El calendario fijo convertía los nombres de extra_principal a integer antes
+de validarlos: "2.9" se aplicaba al período 2 y "1.5" al 1. Esto mueve
+un flujo a otra fecha sin autorización y puede alterar interés y plazo.
+Ahora se analiza el número, se exige finitud/integridad/rango y después se
+convierte. Se mantienen los nombres enteros, el agregado de duplicados y
+la equivalencia con el vector denso correspondiente.
+
+amort_schedule y sinking_fund_schedule también admitían tol=Inf. El primero
+devolvía cero filas para un préstamo positivo; el segundo suprimía toda
+alerta de saldo final. Se reproducen ambos casos antes del cambio. Ahora
+se exige tol finito positivo, sin modificar su significado monetario ni
+convertirlo en una tolerancia relativa nueva. El general ya lo validaba.
+
+## B03-10 (A): rango del cálculo de cuota y del libro monetario
+
+Estado: confirmado, implementado y probado en el rango documentado.
+Para el modelo general, sea ell_j el log del descuento de cada pago:
+-sum(delta_h/k,h=1..j) en immediate, y el mismo acumulado hasta j-1 en due.
+Con a=max(ell_j), el log del factor de anualidad se calcula como
+a+log(sum(exp(ell_j-a))). No se evalúan descuentos individuales desbordados.
+La cuota L*exp(-log_factor) se combina con el capital mediante el helper
+existente .cash_flow_value.
+
+Antes, L=2^1000, n=400, fuerza=-2 y timing immediate daba cuota cero en el
+calendario general porque algunos descuentos eran Inf. La cuota sí es
+representable. Referencia Decimal a 90 dígitos:
+2^1000*(1-exp(-2))/(exp(800)-1)=
+3.398269980284984497553256732270649864740366220343048271008021014043376E-47.
+Se contrasta también el calendario fijo, que ya conservaba esa cuota.
+El factor exp(-2) corresponde a pagos al final del período, no al origen.
+
+Si la cuota calculada de un saldo activo no cabe como número finito positivo,
+se rechaza explícitamente. Por ejemplo L=1e-300,n=400,fuerza=-2,tol=1e-310
+ya no devuelve un calendario de cuotas cero. Saldos considerados inactivos
+por tol conservan la posibilidad previa de una tabla vacía.
+
+Los tres calendarios rechazan filas monetarias no finitas. Antes podían
+producir Inf en interés/saldo (L=1e308,i=10,payment=1), o un excedente Inf
+en el fondo con un depósito demasiado grande. Se conservan las tasas
+anuales de auditoría saturadas cuando el período y los importes son
+representables en los dos calendarios de amortización; no se confunde
+ese metadato con una columna monetaria. El fondo mantiene su requisito
+previo de tasa anual finita >-1.
+
+## Verificación independiente de anticipos, recálculo y liquidación
+
+test-loan-prepayment-audit.R incorpora 216 comprobaciones:
+
+- Ecuación de valor: L=sum(C_j*v_j)+B_T*v_T, con fechas j en immediate y
+  j-1 en due, en tasas -.02,0,.08 y las tres políticas none/term/payment.
+- Identidad de libro B_final=B_inicial+I-C por fila, no negatividad de pagos
+  y saldos y C=P+E. No se afirma que total_principal due sea el cambio neto
+  de saldo: se conserva su definición local antes de interés.
+- Recast: después de cada período, P_siguiente por la suma explícita de
+  descuentos restantes reproduce el saldo; se conserva n si no se liquida
+  anticipadamente. Un payment suministrado es inicial y se recalcula después
+  del primer paso incluso sin extras, tal como hacía la implementación.
+- Liquidación total por anticipo: no se cobra de más y no se evalúa ningún
+  callback tras extinguir la deuda. Se preservan ambas prioridades locales:
+  fijo conserva el extra solicitado y reduce la cuota; general aplica primero
+  la cuota regular. Con L=100,i=.1,P=20,E=1000, ambos cobran 110 en immediate
+  o 100 en due, pero el reparto de columnas es distinto por contrato.
+- Tipos variables: descuentos por producto explícito, resumen y saldo final
+  concordantes con los flujos. Pruebas previas de callbacks y tipos se conservan.
+- Fondo con j=.5,n=2,L=100: depósito 25 deja deuda 37.5; depósito 40 redime
+  exactamente; depósito 75 deja excedente 87.5. Los warnings de déficit o
+  excedente se conservan, y la redención interna no duplica el cobro externo.
+- Regresiones de períodos fraccionarios, tol infinito, flag due, cuotas
+  recuperables y rechazo de importes no representables descritas arriba.
+
+La primera ejecución completa detectó un problema del test del fondo:
+expect_warning devuelve la condición capturada; se corrigió la asignación
+de la tabla dentro de la expresión evaluada. Esa ejecución no es evidencia
+de cierre; se repiten suite y check con el test final. Las referencias de
+valores proceden de sumas explícitas, identidades de libro y Decimal, sin
+usar una llamada a otro calendario como único oráculo.
+
+## Alcance de cierre de B03
+
+Las siete funciones tienen ahora revisión matemática, numérica, de interfaz
+y de unidades documentada, con regresiones nuevas y pruebas independientes.
+Las políticas de anticipos y liquidación pendientes quedaron contrastadas.
+La validación final del paquete se registra en audit-precran-check.md.
+
+Límites que permanecen explícitos, sin dar por garantizado el rango arbitrario:
+
+- Memoria e indexación factibles para n/N; annuity_arith enumera los pagos.
+- Precisión double; cuotas y libros monetarios activos representables.
+- tol monetario absoluto: al cambiar moneda debe escalarse también tol;
+  los residuos dentro de ese umbral se tratan según cada contrato.
+- Cancelación aritmética extrema y pagos ya fuera de rango no se recuperan
+  universalmente; el spread geométrico entre convenciones distintas conserva
+  los límites de las conversiones individuales.
+- Tipos de retorno, parámetros, columnas y prioridades locales se mantienen.
+  C02–C04 son propuestas de API separadas, no correcciones matemáticas que
+  se ejecuten sin autorización. No se añade simulación, RNG, funciones o deps.
+
+El cierre de revisión de B03 dentro de este alcance no certifica todos los
+valores posibles ni el paquete completo. La siguiente revisión integral es
+B04: bonos, curvas, sensibilidad e inmunización, preservando sus fixes previos.
+
+Cierre verificado: suite local completa y 216 comprobaciones nuevas de esta
+unidad aprobadas. R CMD check final: 0 ERROR, 0 WARNING, 1 NOTE por versión
+de desarrollo, salida 0; ejemplos y cuatro viñetas aprobados. Se verificaron
+formals, clases y nombres de columnas de los tres calendarios contra HEAD
+579efdb: idénticos. La matriz conserva 101 entradas/960 parámetros.
+Nueve archivos relevantes coinciden con el archivo fuente comprobado.
+Entorno, SHA256 e intento intermedio en audit-precran-check.md. No se hizo
+nuevo push, publicación, cambio de versión o manual.

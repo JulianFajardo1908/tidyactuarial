@@ -371,7 +371,7 @@ Documentación: `man/amort_schedule.Rd`. Semántica: revisión por bloque pendie
 | `payment` | `NULL` | Optional numeric scalar. Initial regular payment per period. If NULL , it is computed from the loan data. |
 | `extra_principal` | `NULL` | Optional extra principal payments. Can be: NULL , a scalar, an unnamed numeric vector of length n , a named numeric vector with names interpreted as period numbers. |
 | `adjust` | `c("none", "term", "payment")` | Character string. One of "none" , "term" , or "payment" . |
-| `tol` | `1e-08` | Numeric tolerance for zero-balance detection. |
+| `tol` | `1e-08` | Finite positive numeric tolerance in monetary units for zero-balance detection. |
 
 ## B03 — amort_schedule_general
 
@@ -389,7 +389,7 @@ Documentación: `man/amort_schedule_general.Rd`. Semántica: revisión por bloqu
 | `payment` | `NULL` | Payment specification. It may be: NULL , in which case a level payment is calculated; a nonnegative numeric scalar; a nonnegative numeric vector of length n ; a function with arguments period , ob_start , and i_effective_period , returning one nonnegative payment. |
 | `extra_principal` | `0` | Optional nonnegative extra-principal payments. It may be a scalar or a numeric vector of length n . Defaults to zero. |
 | `output` | `c("schedule", "summary")` | Character scalar. Either "schedule" for the complete amortization table or "summary" for a compact actuarial summary. |
-| `tol` | `1e-08` | Positive numeric scalar used for zero-balance detection. |
+| `tol` | `1e-08` | Finite positive numeric scalar in monetary units used for zero-balance detection and the negative-amortization threshold. |
 
 ## B03 — annuity_arith
 
@@ -463,7 +463,7 @@ Documentación: `man/sinking_fund_schedule.Rd`. Semántica: revisión por bloque
 | `m` | `1L` | Positive integer. Conversion frequency for nominal loan rates. Validated for every rate family, although it affects conversion only for nominal rates. |
 | `j_m` | `1L` | Positive integer. Conversion frequency for nominal sinking-fund rates. Validated for every rate family, although it affects conversion only for nominal rates. |
 | `deposit` | `NULL` | Optional numeric scalar. Level sinking-fund deposit per period. If NULL , it is computed so that the fund accumulates to principal at the end of period n ( n / k years). |
-| `tol` | `1e-08` | Numeric tolerance used for zero checks and final-balance checks. |
+| `tol` | `1e-08` | Finite positive numeric tolerance in monetary units used for final-balance checks. |
 
 ## B04 — accrued_interest
 

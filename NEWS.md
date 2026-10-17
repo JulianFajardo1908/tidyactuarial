@@ -2,6 +2,14 @@
 
 ## Bug fixes
 
+* General amortization now identifies negative amortization under advance
+  payments when accrued interest exceeds regular and extra payments combined.
+* Named extra-payment periods are checked before integer conversion, preventing
+  fractional names from silently assigning prepayments to the wrong period.
+* Loan schedules require finite balance tolerances and reject nonrepresentable
+  calculated payments or monetary ledgers explicitly. General level payments
+  use a log discount sum to preserve finite payments when discounts overflow.
+
 * Arithmetic annuities retain original log rates and recover representable
   monetary products when standalone factors lose range, preserving signed
   and known zero payments.

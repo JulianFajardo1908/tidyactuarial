@@ -31,7 +31,8 @@
 #' @param deposit Optional numeric scalar. Level sinking-fund deposit per
 #'   period. If \code{NULL}, it is computed so that the fund accumulates to
 #'   \code{principal} at the end of period \code{n} (\code{n / k} years).
-#' @param tol Numeric tolerance used for zero checks and final-balance checks.
+#' @param tol Finite positive numeric tolerance in monetary units used for
+#'   final-balance checks.
 #'
 #' @return A tibble with one row per period and columns:
 #' \describe{
@@ -70,6 +71,14 @@
 #' rate uses the zero-rate limit \code{principal / n}. The monetary balance
 #' tolerance does not determine whether a rate is zero. The existing
 #' requirement of finite annual and period equivalents is retained.
+#' Non-finite monetary ledger entries cause an explicit error.
+#' A user-supplied deposit is not adjusted to force exact redemption: any
+#' uncovered loan balance or fund surplus remains in the corresponding final
+#' column and triggers the existing mismatch warning when it exceeds
+#' \code{tol}. Redemption from the fund is an internal transfer and is not
+#' counted again in the borrower's external cash flow.
+#' Storage grows with \code{n}; feasible terms are limited by integer indexing
+#' and available memory.
 #'
 #' Otherwise, the standard sinking-fund formula is used:
 #' \deqn{deposit = \frac{principal}{s_{\overline{n}|j_p}}}
@@ -188,8 +197,8 @@ sinking_fund_schedule <- function(
   }
   j_m <- as.integer(j_m)
 
-  if (!is.numeric(tol) || length(tol) != 1L || is.na(tol) || tol <= 0) {
-    stop("`tol` must be a single positive numeric value.", call. = FALSE)
+  if (!is.numeric(tol) || length(tol) != 1L || is.na(tol) || !is.finite(tol) || tol <= 0) {
+    stop("`tol` must be a single finite positive numeric value.", call. = FALSE)
   }
 
   # --- Rate conversion ---
@@ -258,6 +267,10 @@ sinking_fund_schedule <- function(
   v_loan_bal_end        <- rep(principal, n)
   v_total_cf            <- rep(principal * i_loan_period + deposit, n)
 
+  if (any(!is.finite(c(v_interest_loan[1L], v_total_cf[1L])))) {
+    stop("The sinking-fund schedule exceeds the finite monetary range.", call. = FALSE)
+  }
+
   fund_balance <- 0
 
   for (period_idx in seq_len(n)) {
@@ -274,6 +287,11 @@ sinking_fund_schedule <- function(
     v_fund_bal_end[period_idx] <-
       v_fund_bal_end_before[period_idx] - v_redemption[period_idx]
 
+    if (any(!is.finite(c(v_interest_fund[period_idx], v_fund_bal_end_before[period_idx],
+                        v_fund_bal_end[period_idx], v_redemption[period_idx],
+                        v_loan_bal_end[period_idx])))) {
+      stop("The sinking-fund schedule exceeds the finite monetary range.", call. = FALSE)
+    }
     fund_balance <- v_fund_bal_end[period_idx]
   }
 

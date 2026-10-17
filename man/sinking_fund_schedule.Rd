@@ -49,7 +49,8 @@ only for nominal rates.}
 period. If \code{NULL}, it is computed so that the fund accumulates to
 \code{principal} at the end of period \code{n} (\code{n / k} years).}
 
-\item{tol}{Numeric tolerance used for zero checks and final-balance checks.}
+\item{tol}{Finite positive numeric tolerance in monetary units used for
+final-balance checks.}
 }
 \value{
 A tibble with one row per period and columns:
@@ -102,6 +103,14 @@ evaluated stably from the original log fund rate. Only an exactly zero
 rate uses the zero-rate limit \code{principal / n}. The monetary balance
 tolerance does not determine whether a rate is zero. The existing
 requirement of finite annual and period equivalents is retained.
+Non-finite monetary ledger entries cause an explicit error.
+A user-supplied deposit is not adjusted to force exact redemption: any
+uncovered loan balance or fund surplus remains in the corresponding final
+column and triggers the existing mismatch warning when it exceeds
+\code{tol}. Redemption from the fund is an internal transfer and is not
+counted again in the borrower's external cash flow.
+Storage grows with \code{n}; feasible terms are limited by integer indexing
+and available memory.
 
 Otherwise, the standard sinking-fund formula is used:
 \deqn{deposit = \frac{principal}{s_{\overline{n}|j_p}}}
