@@ -9,14 +9,18 @@ concepto, dominio y unidades cuando existen; no prueban su implementación.
 La semántica de B03 se revisa progresivamente; B04–B09 conservan pendientes
 de revisión integral por bloques.
 
-Actualización B03: se inició la evaluación de a_angle, s_angle y los tres
-calendarios de préstamos. La tabla por dimensión, unidades y pendientes
-está en audit-financial-annuities-loans.md. Las cinco firmas públicas y
+Actualización B03: se abordaron a_angle, s_angle, annuity_arith, annuity_geom
+y los tres calendarios de préstamos. La tabla por dimensión, unidades y pendientes
+está en audit-financial-annuities-loans.md. Las siete firmas públicas y
 las columnas se mantienen. La diferencia n=años en anualidades frente a
 n=períodos en préstamos es contractual: se documenta, no se renombra ni
 se transforma automáticamente. Los m/j_m ignorados matemáticamente pero
-validados conservan su dominio. annuity_arith/annuity_geom siguen pendientes
-de revisión integral; no se añaden nuevas propuestas C en esta unidad.
+validados conservan su dominio. g es un incremento monetario por pago en
+annuity_arith y una tasa anual de crecimiento en annuity_geom: se explica,
+sin forzar nombres idénticos para conceptos diferentes. Las sumas, extremos,
+NA y usos con mutate de ambas anualidades tienen evidencia nueva; quedan
+extras/cancelación y otros extremos de préstamos antes de cerrar B03.
+No se añaden nuevas propuestas C en esta unidad.
 
 ## B01/B02: evaluación separada por dimensión
 

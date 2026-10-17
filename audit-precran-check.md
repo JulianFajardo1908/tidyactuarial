@@ -244,3 +244,45 @@ Entorno: R 4.6.1/Windows, locale English_United States.utf8 y Pandoc de RStudio.
 para acceder normalmente a las bibliotecas instaladas. No se ejecutó nueva
 CI, comprobación remota de recepción de CRAN ni manual. No hay push,
 publicación o cambio de versión. Este check no sustituye la revisión integral.
+
+## B03: anualidades aritméticas y geométricas
+
+Se implementaron y probaron B03-05/B03-07 de
+audit-financial-annuities-loans.md: base original/productos aritméticos,
+spreads geométricos pequeños, perpetuidades convergentes sin umbral
+arbitrario, propagación de plazo NA y aclaraciones de unidades/horizonte.
+No se cierra B03: faltan extras, recálculo y cancelación anticipada de préstamos.
+
+La suite local final completa pasó, salida 0, con **91 comprobaciones nuevas**:
+41 aritméticas y 50 geométricas. Se verificaron formals, clases y nombres de
+columnas contra HEAD 8dba06e para las dos anualidades y s_angle (solo texto
+en esta última): idénticos. Se conservan 101 nombres públicos y 960 apariciones
+de parámetros, sin funciones/dependencias nuevas ni cambios de firma.
+Roxygen regeneró solo tres Rd; git diff --check sin errores.
+
+Construcción y check definitivos: R CMD build --no-manual y
+R CMD check --as-cran --no-manual tidyactuarial_0.1.6.9000.tar.gz.
+Resultado **0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE:
+Version contains large components (0.1.6.9000). Pasaron análisis de código
+(40 s), dependencias/documentación, ejemplos (23 s), pruebas instaladas
+(52 s) y reconstrucción de las cuatro viñetas (12 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b03-varying-verified/`.
+Informe: tidyactuarial.Rcheck/00check.log.
+SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`F25714AD4130CF4D45F424B5009277B8F754AB0702D28879A79E136EC432D9BF`.
+Diez archivos de código, tests, NEWS, NAMESPACE y Rd coinciden con el checkout
+tras normalizar saltos de línea; se incluye la versión de desarrollo y las
+dos nuevas regresiones, mientras que audit-* y AGENTS siguen excluidos.
+
+Las ejecuciones en precran-b03-varying y precran-b03-varying-final fueron
+intermedias: nuevos fallos reproducidos en familias coincidentes y límites
+de ratios justificaron ampliar las regresiones y repetir la validación.
+Solo la carpeta verified y el SHA256 anterior corresponden al código final.
+
+Entorno R 4.6.1/Windows, locale English_United States.utf8, Pandoc de RStudio,
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`. Se ejecutó fuera del aislamiento
+para disponer de bibliotecas instaladas. Sin nuevo push, CI remota, manual,
+publicación ni cambio de versión. El push de respaldo anterior hasta 8dba06e
+se conserva; no valida por sí solo este código posterior.

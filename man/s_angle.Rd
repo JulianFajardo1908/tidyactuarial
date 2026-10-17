@@ -77,8 +77,8 @@ time does not change the accumulation factor when the payment pattern is
 otherwise unchanged. Therefore, \code{h} is recorded and validated, but it
 does not modify the factor.
 
-The future value of a perpetuity diverges, so perpetuities are not supported
-in \code{s_angle()}.
+Only finite payment terms are supported. A perpetuity has no finite terminal
+date at which this function defines an accumulated value.
 
 
 This function follows the compact actuarial notation used throughout

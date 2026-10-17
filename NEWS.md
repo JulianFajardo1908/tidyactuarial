@@ -2,6 +2,14 @@
 
 ## Bug fixes
 
+* Arithmetic annuities retain original log rates and recover representable
+  monetary products when standalone factors lose range, preserving signed
+  and known zero payments.
+* Geometric annuities use stable log sums instead of subtracting nearly equal
+  rates or accumulation levels. Small interest-growth spreads are retained
+  before period conversion, and convergent perpetuities no longer face an
+  arbitrary rate-gap cutoff. Missing finite terms propagate missing values.
+
 * Level annuities retain original log interest rates, small-rate effects over
   long terms and representable monetary values when standalone factors lose
   range. Strictly positive perpetuity rates no longer face an arbitrary cutoff.

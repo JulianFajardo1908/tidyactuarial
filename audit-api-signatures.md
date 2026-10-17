@@ -401,7 +401,7 @@ Documentación: `man/annuity_arith.Rd`. Semántica: revisión por bloque pendien
 | `k` | `1L` | Positive integer vector giving the number of payments per year. |
 | `i` | `<obligatorio>` | Numeric vector of interest-rate values. |
 | `i_type` | `"effective"` | Character vector indicating the interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
-| `m` | `1L` | Positive integer vector giving the conversion frequency for nominal rates. Ignored for "effective" and "force" . |
+| `m` | `1L` | Positive integer vector giving the conversion frequency for nominal rates. Observed values are validated for every rate family, although only nominal conversions use this frequency. |
 | `h` | `0` | Numeric vector of deferment times in years. Must be greater than or equal to 0. |
 | `timing` | `"immediate"` | Character vector. One of "immediate" or "due" . |
 | `pattern` | `"increasing"` | Character vector. One of "increasing" , "decreasing" , or "custom" . |
@@ -420,10 +420,10 @@ Documentación: `man/annuity_geom.Rd`. Semántica: revisión por bloque pendient
 | `k` | `1L` | Positive integer vector giving the number of payments per year. |
 | `i` | `<obligatorio>` | Numeric vector of interest-rate values. |
 | `i_type` | `"effective"` | Character vector indicating the interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
-| `m` | `1L` | Positive integer vector giving the conversion frequency for nominal interest-rate inputs. Ignored for "effective" and "force" . |
+| `m` | `1L` | Positive integer vector giving the conversion frequency for nominal interest-rate inputs. Observed values are validated for every rate family, although only nominal conversions use this frequency. |
 | `g` | `0` | Numeric vector of annual growth-rate values for the payments. |
 | `g_type` | `"effective"` | Character vector indicating the growth-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
-| `g_m` | `1L` | Positive integer vector giving the conversion frequency for nominal growth-rate inputs. Ignored for "effective" and "force" . |
+| `g_m` | `1L` | Positive integer vector giving the conversion frequency for nominal growth-rate inputs. Observed values are validated for every rate family, although only nominal conversions use this frequency. |
 | `h` | `0` | Numeric vector of deferment times in years. Must be greater than or equal to 0. For present values, the deferment discounts the payment block. For accumulated values, it is recorded but does not change the factor under the adopted terminal-horizon convention. |
 | `timing` | `"immediate"` | Character vector. One of "immediate" or "due" . |
 | `P1` | `1` | Numeric vector giving the first payment of the geometric sequence. |

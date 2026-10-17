@@ -20,7 +20,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 |---|---|---:|---|
 | B01 | Tasas y factores financieros | 5 | En revisión; ver audit-interest-foundations.md |
 | B02 | Flujos y ecuaciones de valor | 8 | En revisión; ver audit-cash-flow-roots.md y audit-interest-foundations.md |
-| B03 | Anualidades financieras y préstamos | 7 | En revisión: cinco funciones abordadas; ver audit-financial-annuities-loans.md; aritméticas/geométricas pendientes |
+| B03 | Anualidades financieras y préstamos | 7 | Siete funciones abordadas; ver audit-financial-annuities-loans.md; pendientes extras/cancelación y extremos de calendarios |
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Pendiente de revisión integral; preservar evidencia previa |
 | B05 | Tablas, mortalidad y probabilidades | 12 | Pendiente de revisión integral; preservar evidencia previa |
 | B06 | Contingencias de una vida y contratos | 13 | Pendiente de revisión integral; preservar evidencia previa |

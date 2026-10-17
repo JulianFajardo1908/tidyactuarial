@@ -23,8 +23,8 @@
 #' otherwise unchanged. Therefore, \code{h} is recorded and validated, but it
 #' does not modify the factor.
 #'
-#' The future value of a perpetuity diverges, so perpetuities are not supported
-#' in \code{s_angle()}.
+#' Only finite payment terms are supported. A perpetuity has no finite terminal
+#' date at which this function defines an accumulated value.
 #'
 #' @param n Numeric vector of payment durations in years. Each value must be
 #'   positive and finite.

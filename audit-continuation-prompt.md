@@ -29,9 +29,16 @@ como si siguieran sin estudiar.
 B03 ya está iniciado: audit-financial-annuities-loans.md recoge la primera
 unidad de a_angle, s_angle y los tres calendarios de préstamos. Se corrigieron
 tasas pequeñas, saturación anual y el uso de tol monetario para clasificar
-tasas como cero; firmas y columnas intactas. La próxima unidad debe revisar
-annuity_arith/annuity_geom (sumas ponderadas, i próximo a g y límites), sin
-dar por cerrados todos los extremos de préstamos ni el bloque completo.
+tasas como cero; firmas y columnas intactas. La continuación B03-05/B03-07
+ya aborda annuity_arith/annuity_geom: productos ponderados, i próximo a g,
+spread calculado antes de conversión periódica y perpetuidades convergentes.
+Se conserva la interfaz. Próximo paso: extras, recálculo y cancelación
+anticipada de préstamos; no dar por cerrado B03 ni todos sus extremos.
+
+Hubo autorización puntual posterior para subir los diez commits acumulados:
+el push hasta 8dba06e a origin/audit/0.2.0-precran se realizó y verificó.
+No interpretar ese respaldo como autorización para subir automáticamente
+unidades futuras, cambiar la rama principal o publicar una versión.
 
 Consultar primero `audit-thematic-review.md` (inventario completo de los
 101 nombres públicos) y `audit-interest-foundations.md` (B01 iniciado y

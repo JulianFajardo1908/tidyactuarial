@@ -2,9 +2,10 @@
 
 Rama audit/0.2.0-precran; versión 0.1.6.9000; objetivo 0.2.0.
 Continuación del barrido, sin reiniciar B01/B02 ni la auditoría previa.
-Esta unidad aborda a_angle, s_angle, amort_schedule,
-amort_schedule_general y sinking_fund_schedule. No cierra todavía B03:
-annuity_arith y annuity_geom requieren revisión integral propia.
+La primera unidad aborda a_angle, s_angle, amort_schedule,
+amort_schedule_general y sinking_fund_schedule. La continuación B03-05 a
+B03-07 añade annuity_arith y annuity_geom. B03 sigue abierto: faltan casos
+de pagos extraordinarios/cancelación y extremos adicionales de calendarios.
 
 ## Modelo, unidades y convenciones conservadas
 
@@ -130,14 +131,14 @@ en conversiones nominales; no se cambia su dominio aceptado.
 | Función | Matemática / estabilidad en esta unidad | API y tidyverse | Homogeneidad y pendiente |
 |---|---|---|---|
 | a_angle | Sumas, integrales, deferimiento y perpetuidad positiva; base original y extremos probados | Vector o tibble; mutate, pipe vectorial, NA y valores monetarios comprobados | n años; k pagos/año; m nominal; firma intacta |
-| s_angle | Sumas e integrales al final del plazo; ceros y extremos probados | Vector/tibble y columnas preservadas; h metadato del desplazamiento | Horizonte aclarado; queda pulir la afirmación general sobre divergencia de perpetuidades con tasas negativas, sin añadir soporte |
+| s_angle | Sumas e integrales al final del plazo; ceros y extremos probados | Vector/tibble y columnas preservadas; h metadato del desplazamiento | Horizonte aclarado; la continuación corrige la explicación de perpetuidades sin añadir soporte |
 | amort_schedule | Cuota fija y recalculada con misma fórmula estable; reconstrucción de saldo | Tibble por período, principal primero; sin imponer vectorización | n períodos; tol monetario; políticas de extras y casos de escala extrema aún requieren barrido específico |
 | amort_schedule_general | Cuota descontada con log crecimiento acumulado; período representable | Tibble; payment escalar/vector/función conservado | i por período es especificación anual, no spot de horizonte; eventos y límites de magnitud pendientes |
 | sinking_fund_schedule | Depósito y saldo final con tipo no nulo; moneda escalada | Tibble de flujos auditables; firmas/columnas conservadas | j tasa del fondo; j_m su conversión; preservar validación anual, revisar calendarios extremos después |
-| annuity_arith | Aún pendiente de revisión integral | Preservar contrato existente | Próxima unidad: sumas ponderadas y límites |
-| annuity_geom | Aún pendiente de revisión integral | Preservar contrato existente | Próxima unidad: i cercano a g, convergencia y plazos largos |
+| annuity_arith | Sumas ponderadas, base original, pagos firmados y productos extremos probados en B03-05 | Vector/tibble, mutate y esquema conservados | g monetario por pago, n años; memoria lineal y pagos ya desbordados limitan el rango |
+| annuity_geom | Sumas logarítmicas, i próximo a g, perpetuidades y plazos largos probados en B03-06 | Vector/tibble, mutate, NA y esquema conservados | g tasa anual, g_m independiente; no se garantiza cancelación arbitraria de exponentes extremos |
 
-## Diff, evidencia y alcance de cierre
+## Diff, evidencia y alcance de la primera unidad
 
 Cinco fuentes públicas modificadas, un archivo nuevo de dos helpers privados
 para sumas/integrales de anualidades, dos archivos de regresiones y cinco
@@ -166,3 +167,142 @@ aprobados. Resultado 0 ERROR, 0 WARNING, 1 NOTE (versión de desarrollo),
 salida 0; ejemplos y las cuatro viñetas reconstruidas correctamente.
 Quince archivos relevantes coinciden con el archivo fuente comprobado;
 detalles, entorno y SHA256 en la última sección de audit-precran-check.md.
+
+## B03-05 (A): base y productos de anualidades aritméticas
+
+Estado: confirmado, implementado y probado en el alcance descrito.
+Con C_j=P1+(j-1)*g para custom, se valoran directamente los pagos en las
+fechas del contrato. Los patrones increasing/decreasing conservan sus
+pagos 1,...,N y N,...,1; P1/g se ignoran en ellos, incluidos sus NA.
+g es dinero por pago, no la tasa anual llamada g en annuity_geom.
+
+Antes se anualizaba la tasa y se construían factores separados con potencias.
+Fuerzas +/-800 eran rechazadas aun con cuatro pagos en 4/1600 años y todos
+los valores representables. También N=1, h=1, delta=550*log(2), P1=2^1000
+y g=0 daba PV=0, aunque 2^1000*2^-1100=2^-100. Un flujo custom de ceros
+con deferimiento 200 y delta=-log(100) daba NaN en vez de cero.
+Los fallos se reprodujeron antes de editar.
+
+Diff: .interest_basis conserva la fuerza original; expm1(delta/k) y
+exp(-delta/k) dan los campos periódicos; .cash_flow_sum valora los mismos
+pagos explícitos por la base logarítmica. Se reutilizan helpers de B01/B02,
+sin nueva función pública/privada ni una arquitectura adicional.
+Se preserva la alineación de h*k y n*k y el horizonte h+n.
+
+Pruebas: test-annuity-arithmetic-regressions.R, 41 comprobaciones.
+Incluyen ambos signos de fuerza, tres patrones, dos timings, pagos que
+cambian de signo, cero, NA, productos binarios independientes, mutate y
+validaciones de m/custom. Las referencias son sumas explícitas en años,
+no llamadas a pv_flow o a otra función del paquete.
+
+Límites documentados: se sigue enumerando N pagos, con memoria O(N).
+No se recupera un pago que ya desborde al generar P1+(j-1)*g, ni cancelación
+extrema arbitraria entre factores diferentes. No se introduce fórmula cerrada
+para esquivar esos casos sin estudiar estabilidad y compatibilidad.
+
+## B03-06 (A): interés y crecimiento casi iguales
+
+Estado: confirmado, implementado y probado.
+Definiciones: r=delta_i/k, s=delta_g/k, d=(delta_g-delta_i)/k,
+b=0 immediate/1 due, H=h*k, N=n*k y G_N(z)=sum(exp(z*j),j=0,...,N-1).
+
+- PV=P1*exp(-r*(H+1-b))*G_N(d).
+- FV=P1*exp(b*r+(N-1)*max(r,s))*G_N(-abs(d)), al horizonte h+n.
+- Perpetuidad: si delta_i>delta_g, PV=P1*exp(-r*(H+1-b))/(1-exp(d)).
+  Se exige esa desigualdad estricta; no una separación mínima arbitraria.
+
+La fórmula finita se obtiene sumando los pagos P1*exp(s*j). Para FV se
+invierten los índices si es necesario, anclando los exponentes en la tasa
+mayor. Así se evita restar dos niveles de acumulación desbordados.
+Cuando d=0, G_N(0)=N es el límite exacto de la misma suma, no una hipótesis
+de igualdad basada en un umbral de 1e-12.
+
+Antes, delta_i=.03 y delta_g=.03-1e-10, N=48, k=12, h=2 y P1=100 daba
+PV inmediato 4509.1758 frente a 4509.1827 por suma explícita. El cociente
+de diferencias cancelaba cifras. Para i=0, delta_g=+/-5e-13 y n=1e12,
+la rama de igualdad daba 1e12 en vez de los límites por integral ya registrados
+(1.2974425414002563e12 o .7869386805747332e12); su error no era pequeño.
+La perpetuidad efectiva i=2^-42,g=0 se rechazaba aunque su PV=2^42.
+
+Incluso dividir cada fuerza primero puede perder el spread: delta_i=1,
+delta_g=1+2^-52,k=10,N=1e17 tiene d=2^-52/10. Restar los tipos logarítmicos
+ya redondeados por período cambió el resultado a aproximadamente .59 de
+la referencia. La prueba falló y se corrigió calculando el spread anual
+antes de dividir. Referencia Decimal a 80 dígitos sobre entradas exactas:
+334618217753837351.97066129644432653999712571332637401089174873826447.
+Es exp(-.1)*(exp(N*d)-1)/(exp(d)-1). No se usó el algoritmo del paquete
+como referencia. La tolerancia relativa 1e-12 admite redondeo log/exp,
+pero no esa desviación de aproximadamente 41%.
+
+Una segunda regresión detectó que restar logaritmos ya redondeados todavía
+degrada tasas efectivas/nominales cercanas. Para i=.06,g=i-1e-12, la
+perpetuidad efectiva daba .9999967 de 1/(i-g), y la nominal de descuento,
+aproximadamente .9999944 de la identidad racional. Se reprodujeron tres
+fallos antes de añadir identidades de log-ratios para familias coincidentes:
+
+- Efectivas: D=log1p((g-i)/(1+i)).
+- Nominales de interés, m común: D=m*log1p((g-i)/(m+i)).
+- Nominales de descuento, m común: D=-m*log1p((i-g)/(m-i)).
+
+Después d=D/k y la convergencia de la perpetuidad exige D<0. Para fuerzas,
+D=delta_g-delta_i. Si un ratio muy separado sale del rango, se conserva
+el cálculo de las dos fuerzas; no se devuelve un spread infinito artificial.
+Las familias/frecuencias distintas conservan la precisión de sus conversiones
+individuales, lo cual queda explícito en Rd en vez de prometer precisión
+arbitraria. Otro control Decimal, con i=1/2, g=1/2+2^-52, N=1e16, da
+15286352891704535.00905127023730291732030834599677392302585988391467.
+
+Diff: dos .interest_basis (financiera y crecimiento), sumas logarítmicas del
+helper existente, comparación de fuerzas originales en perpetuidad y
+.cash_flow_value para combinar P1 firmado con el factor. Se recuperan
+primeros pagos pequeños/grandes, cero y factores aislados fuera de rango.
+El pago único no tiene exponente de crecimiento y se trata como suma de
+un término. NA en un plazo finito ahora propaga NA, en lugar del error
+accidental «missing value where TRUE/FALSE needed».
+
+Pruebas: test-annuity-geometric-regressions.R, 50 comprobaciones.
+Incluyen sumas explícitas con cinco spreads, dos timings, plazos largos,
+tasas originales saturadas, referencias binarias, primeros pagos negativos,
+perpetuidades con tasas negativas pero convergentes, NA, mutate y conversión
+nominal independiente de i/m y g/g_m. Siguen rechazándose igualdad o
+crecimiento mayor en perpetuidades. Los tests anteriores se conservan.
+Las identidades racionales de perpetuidad se comprobaron para las tres
+familias coincidentes y se añadió una referencia Decimal de plazo largo
+con tasas efectivas adyacentes, junto a un caso de fallback por ratio extremo.
+Dos controles de límite adicionales impiden que un denominador nominal
+m+i o m-i desbordado convierta el spread en cero por una división entre Inf.
+La ruta de log-ratio se usa solo con ese denominador finito; en caso contrario
+se conservan las fuerzas originales. Antes del resguardo, dos pagos due
+nominales con m=1e308 daban 2 en lugar de 1: el segundo aporte era despreciable
+por un spread negativo enorme. Las dos regresiones fallaron y luego pasaron.
+
+## B03-07 (B): interfaz y claridad docente
+
+Se verificaron formals, clases y nombres de columnas contra HEAD 8dba06e
+para annuity_arith, annuity_geom y s_angle: idénticos. Las dos primeras
+conservan n primero, escenarios vectoriales, tidy=TRUE y valuation escalar.
+mutate permite operaciones tabulares naturales sin añadir .data o aliases.
+Las columnas *_factor ya incorporaban P1/importes: se mantiene ese contrato,
+sin crear columnas redundantes ni renombramientos públicos.
+
+m y g_m observados siguen validándose incluso cuando no participan en una
+conversión no nominal; ahora los Rd lo explican. No se normaliza su dominio.
+También se corrige la explicación pendiente de s_angle: el motivo para no
+definir una perpetuidad acumulada es que no tiene fecha terminal finita.
+No se sostiene que s_n diverja para todas las tasas, pues con tasa negativa
+puede tener límite finito. No cambia su soporte ni su implementación.
+
+La matriz se mantiene en 101 nombres públicos y 960 apariciones de parámetros.
+No se implementa ninguna propuesta C nueva, ni se cambia versión/dependencias.
+Referencias consultadas: fórmulas explícitas, Decimal 80 y código/Rd locales;
+no se inventan consultas bibliográficas. Límites: precisión double y posible
+cancelación de exponentes enormes con deferimientos enormes; no se promete
+precisión arbitraria. El siguiente paso de B03 son extras, recálculo y
+cancelación anticipada en préstamos, antes de avanzar a B04.
+
+Validación final de esta continuación: 91 comprobaciones nuevas (41+50),
+suite local completa y R CMD check del paquete instalado aprobados, salida 0.
+Resultado 0 ERROR, 0 WARNING, 1 NOTE por versión de desarrollo; ejemplos y
+cuatro viñetas aprobados. Diez archivos relevantes coinciden con el archivo
+fuente comprobado. El entorno, las ejecuciones intermedias y el SHA256
+definitivo están en audit-precran-check.md. Sin nuevo push o publicación.
