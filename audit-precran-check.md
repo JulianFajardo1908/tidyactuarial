@@ -390,3 +390,39 @@ bibliotecas instaladas. Sin push, CI remota nueva, manual, publicación o
 cambio de versión. Segunda unidad cerrada en sus límites documentados;
 B04 tiene seis de veinte funciones revisadas y sigue abierto. Próximo paso:
 curvas spot/forward/par, después sensibilidad e inmunización.
+
+## B04: curvas spot, forward, bootstrap y cupón par
+
+Tercera unidad sobre a5d8948: 79 comprobaciones nuevas y suite local
+completa aprobadas sin fallos ni advertencias, salida 0. Logs:
+b04-curves-before.log (reproducción previa), b04-curves-local-tests.log
+(suite final) y b04-curves-compatibility.log (contratos y reproducción de par).
+Se contrastaron descuentos originales, forwards planos/no planos, origen
+grande, interpolación efectiva, escala monetaria, NA/gráficos y recuperación
+triangular independiente encadenada con par/forward. B04 acumula 320
+comprobaciones nuevas entre sus tres unidades.
+
+Las cinco firmas, clases y nombres/clases de columnas coinciden con a5d8948.
+Bootstrap conserva su cuerpo ejecutable; solo se aclararon límites en Rd.
+Inventario: 101 nombres públicos/960 apariciones de parámetros. Sin funciones,
+helpers, dependencias, exportaciones, argumentos o columnas nuevas. No hay
+decisión C nueva. C05 sigue implementada como se autorizó; C02–C04 pendientes.
+
+R CMD build --no-manual y R CMD check --as-cran --no-manual terminaron con
+**0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE: versión de desarrollo
+0.1.6.9000. Pasaron código, documentación, ejemplos (24 s), pruebas instaladas
+(53 s), cuatro viñetas y su reconstrucción (12 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b04-curves-verified/`.
+Informe tidyactuarial.Rcheck/00check.log; snapshot-verification.txt acredita
+27 archivos de fuente/tests/NEWS/NAMESPACE/Rd iguales al checkout normalizando
+CRLF: las once funciones revisadas de B04 y las tres regresiones están incluidas.
+AGENTS/audit-* quedan excluidos. SHA256 del archivo fuente:
+`9FA785A5EB2101B940991486A42543606D822FBB0880002D23215EC92786CCD5`.
+
+R 4.6.1/Windows, locale UTF-8 y Pandoc de RStudio;
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`, ejecución con bibliotecas instaladas
+fuera del aislamiento. Sin push, CI remota nueva, manual, publicación ni
+cambio de versión. Tercera unidad cerrada en el alcance documentado; once
+de veinte funciones B04 revisadas. Siguen sensibilidades e inmunización.

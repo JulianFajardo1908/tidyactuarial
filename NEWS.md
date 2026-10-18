@@ -2,6 +2,15 @@
 
 ## Bug fixes
 
+* Spot discount and forward calculations retain original log growth rates,
+  avoiding overflowed power ratios and preserving small rates and flat curves
+  across intervals with large common origins. Linear interpolation remains
+  on annual effective spot rates.
+* Par coupon rates separate monetary scale from discount sums and preserve
+  small positive or negative coupons instead of rounding them to zero.
+* Missing spot curves keep their plot list positions; forward intervals with
+  missing start times now follow the requested missing-value policy.
+
 * Bond book values retain original log yields when valuing remaining payments.
   Callable scenarios pass the original yield specification to pricing rather
   than an effective equivalent that may have rounded to -1 or overflowed.

@@ -15,8 +15,10 @@
 #' so the annual effective forward rate is
 #' \deqn{f_{t_{j-1},t_j}=\left(
 #'       \frac{v(t_{j-1})}{v(t_j)}\right)^{1/(t_j-t_{j-1})}-1.}
-#' The function computes the forward rate using log discount-factor ratios
-#' for better numerical stability. Discount factors are obtained from the
+#' The function evaluates log discount-factor ratios from original log spot
+#' growth rates, retaining small rates even when reported discounts round to 1.
+#' Equal spot log rates are preserved across intervals with a large common
+#' origin. Discount factors are obtained from the
 #' existing [discount_factor_spot()] function, which standardizes the chosen
 #' interest-rate convention. Negative spot and forward rates are supported
 #' when the discount factors are positive and finite.
@@ -211,6 +213,7 @@ forward_curve <- function(
     discounts <- discount_factor_spot(
       t = times, i = rates, i_type = typ, m = frequency
     )
+    growth <- .interest_basis(i_type = typ, i = rates, m = frequency)$growth
     if (length(discounts) != length(times) || anyNA(discounts) ||
         any(!is.finite(discounts)) || any(discounts <= 0)) {
       abort(sprintf("Curve %s implies nonpositive or nonfinite discount factors.",
@@ -220,6 +223,7 @@ forward_curve <- function(
     if (include_origin && times[[1L]] > 0) {
       nodes <- c(0, times)
       factors <- c(1, discounts)
+      growth <- c(0, growth)
     } else {
       nodes <- times
       factors <- discounts
@@ -234,7 +238,13 @@ forward_curve <- function(
     start_v <- head(factors, -1L)
     end_v <- tail(factors, -1L)
     period <- end - start
-    forward <- expm1((log(start_v) - log(end_v)) / period)
+    start_growth <- head(growth, -1L)
+    end_growth <- tail(growth, -1L)
+    forward_growth <- end_growth
+    nonzero <- start != 0
+    forward_growth[nonzero] <- end_growth[nonzero] + start[nonzero] *
+      ((end_growth[nonzero] - start_growth[nonzero]) / period[nonzero])
+    forward <- expm1(forward_growth)
     if (any(!is.finite(forward)) || any(forward <= -1)) {
       abort(sprintf("Curve %s produces nonfinite or invalid forward rates.",
                     curve_ids[[row]]))

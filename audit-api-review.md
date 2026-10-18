@@ -38,6 +38,13 @@ autorizada e implementada: el flag de peor rescate identifica el mínimo
 calculado y los empates exactos, sin reutilizar tolerancia temporal en dinero.
 No se da por cerrado B04.
 
+Tercera unidad B04: cinco funciones de curvas revisadas en el registro B04,
+con 79 comprobaciones nuevas. Conservar bases originales recupera precisión
+sin cambiar argumentos ni columnas; linear sigue sobre efectivos anuales.
+Se conservan .keep, .na, formas de curvas y parámetros nodewise. No se añade
+otra propuesta C ni se uniforma m. Bootstrap conserva su algoritmo triangular;
+par_rate mantiene cupón firmado y métricas de reconstrucción del precio.
+
 ## B01/B02: evaluación separada por dimensión
 
 Las referencias de exactitud y estabilidad se desarrollan en

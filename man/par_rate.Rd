@@ -93,6 +93,11 @@ the function does not impose a contractual zero floor.
 
 This model assumes regular coupons paid in arrears, no stub periods,
 no accrued interest, and a deterministic redemption at maturity.
+Calculation separates the dimensionless rate from monetary amounts and uses
+the original log spot growth at maturity to retain small coupon rates.
+Final amounts and the positive coupon discount sum must be representable.
+\code{repricing_error} reports the floating-point price discrepancy; extreme
+cancellation, especially with negative coupons, can still limit precision.
 }
 \examples{
 # An annual-pay bond whose spot curve was obtained from market prices.

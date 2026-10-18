@@ -28,6 +28,11 @@
 #' extrapolate, fit a curve, or estimate a least-squares solution. An annual
 #' effective spot rate can be negative; its discount factor must be positive.
 #' Input prices and cash flows must use the same monetary units.
+#' Both the positive finite discount factor and its annual effective rate above
+#' -1 must be representable. Rounded input prices can make a small terminal
+#' residual ill-conditioned; no tolerance silently replaces a nonpositive
+#' residual. `repricing_error` reports the recomputed floating-point discrepancy,
+#' not an independent accuracy guarantee or a convergence test.
 #'
 #' @param .data Nonempty data frame with one row per priced instrument.
 #' @param col_instrument Character scalar naming the unique instrument-ID column.

@@ -34,6 +34,11 @@
 #'
 #' This model assumes regular coupons paid in arrears, no stub periods,
 #' no accrued interest, and a deterministic redemption at maturity.
+#' Calculation separates the dimensionless rate from monetary amounts and uses
+#' the original log spot growth at maturity to retain small coupon rates.
+#' Final amounts and the positive coupon discount sum must be representable.
+#' `repricing_error` reports the floating-point price discrepancy; extreme
+#' cancellation, especially with negative coupons, can still limit precision.
 #'
 #' @param .data Optional data frame containing a spot curve as numeric columns,
 #'   or multiple curves as list-columns. For pipe-friendly usage.
@@ -249,9 +254,23 @@ par_rate <- function(
     if (!is.finite(annuity) || annuity <= 0) {
       abort(sprintf("Curve %d has an invalid coupon discount sum.", row))
     }
-    rate <- freq * (nominal - redemption * v_terminal) / (nominal * annuity)
-    coupon <- nominal * rate / freq
-    repriced <- coupon * annuity + redemption * v_terminal
+    # Work per unit of face and retain 1 - exp(z) for small rates and spreads.
+    growth <- .interest_basis(i_type = typ, i = rates, m = frequency)$growth
+    log_v_terminal <- -times[tail(matched, 1L)] * growth[tail(matched, 1L)]
+    ratio <- redemption / nominal
+    log_ratio <- if (abs(redemption - nominal) <= nominal / 2) {
+      log1p((redemption - nominal) / nominal)
+    } else if (is.finite(ratio) && ratio >= .Machine$double.xmin) {
+      log(ratio)
+    } else {
+      log(redemption) - log(nominal)
+    }
+    z <- log_ratio + log_v_terminal
+    balance_sign <- -sign(z)
+    log_balance <- if (z > 0) z + log(-expm1(-z)) else log(-expm1(z))
+    rate <- .cash_flow_value(balance_sign, log(freq) + log_balance - log(annuity))
+    coupon <- .cash_flow_value(balance_sign * nominal, log_balance - log(annuity))
+    repriced <- .cash_flow_sum(c(coupon, redemption), c(log(annuity), log_v_terminal))
     if (!is.finite(rate) || !is.finite(coupon) || !is.finite(repriced)) {
       abort(sprintf("Curve %d implies a nonfinite par coupon rate or price.", row))
     }

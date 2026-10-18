@@ -173,8 +173,113 @@ no sustituye la especificación original. El calendario explícito sigue O(N)
 y requiere memoria. No se añade tratamiento entre cupones, stubs, riesgo de
 crédito, opción estocástica ni modificación de convenciones de interés corrido.
 
+## Tercera unidad: spot, forwards, bootstrap y cupón par
+
+Inicio sobre a5d8948, árbol limpio y cuatro commits locales sin push. Funciones:
+yield_curve, forward_rate, forward_curve, bootstrap_spot_curve y par_rate.
+Se preservan firmas, unidades, nombres y forma de las salidas; no hay decisión
+nueva de API C. C05 se conserva tal como fue autorizada.
+
+### Modelo y contrastes independientes
+
+Sea a(t) la acumulación logarítmica anual del spot original:
+log1p(i), m*log1p(i/m), -m*log1p(-i/m) o la fuerza. Entonces
+v(t)=exp(-t*a(t)) y log1p(f(s,t))=[t*a(t)-s*a(s)]/(t-s).
+Se evalúa esta última expresión como a(t)+s*[a(t)-a(s)]/(t-s), evitando
+potencias desbordadas y preservando curvas planas con un origen grande.
+Desde s=0, la expresión es a(t). La composición por intervalos se contrasta
+con el descuento acumulado independiente. No se exige monotonía de descuentos
+cuando las tasas pueden ser negativas.
+
+forward_rate(method="linear") sigue interpolando tasas efectivas anuales,
+no log descuentos ni fuerzas. Su cálculo del forward posterior es logarítmico,
+pero su modelo de interpolación permanece intacto. No hay extrapolación nueva.
+forward_curve ordena los nodos y sus convenciones conjuntas, incluye origen
+solo cuando se pide y conserva sus límites de factores/forwards representables.
+
+Para cupón par: A=sum(v_j), z=log(R/F)+log(v_N) y b=1-exp(z).
+Así c=k*b/A y C=F*b/A. Se calculan el signo y logaritmo de b con expm1:
+para z<=0, log(abs(b))=log(-expm1(z)); para z>0,
+log(abs(b))=z+log(-expm1(-z)). Esto evita multiplicar F por A antes de
+dividir y evita cancelar 1-v_N con tasas pequeñas. R=0 y b=0 conservan
+sus límites exactos. El log de v_N usa el spot original; los factores y A
+reportados siguen en double y la discrepancia de repricing se conserva.
+
+Bootstrap usa el sistema triangular P_j=sum(CF_jk*v_k), despejando el
+nuevo factor de un residuo positivo y su pago terminal. La referencia nueva
+construye precios por multiplicación matricial con descuentos conocidos,
+reordena instrumentos, separa pagos terminales y escala la moneda. Se
+contrasta recuperación de v, tasa, precio reconstruido y encadenamiento con
+par_rate y forward_curve. No se modificó su algoritmo al no aparecer un
+defecto adicional en esos contrastes.
+
+### Hallazgos y correcciones
+
+| ID | Reproducción y causa | Cambio mínimo | Estado |
+|---|---|---|---|
+| B04-10 | yield_curve rechaza fuerza -100 aunque descuentos a .01/.02 sean exp(1)/exp(2); también pierde spots pequeños al volver a 1+i | Conservar base original y equivalentes informativos; descuento exponencial directo | Implementado y probado |
+| B04-11 | forward_rate en curva plana 10% entre años 10000/20000 devuelve NaN por Inf/Inf; forward_curve devuelve 0 para spots 1e-20 y pierde precisión con origen 1e12 | Fórmula logarítmica con spread de crecimiento y origen común; exact usa base original, linear conserva interpolación efectiva | Implementado y probado |
+| B04-12 | Con plot=TRUE, asignar [[fila]]<-NULL elimina una posición y puede reciclar un gráfico de otra curva; inicio NA con fin conocido produce error lógico antes de propagar | Asignación [fila]<-list(NULL) preserva longitud; comparación de extremos solo si ambos conocidos | Implementado y probado |
+| B04-13 | par_rate con face=1e308, dos años al 5%, da cupón cero y error de precio -9.30e306 por denominador F*A desbordado; spots +/-1e-20 dan cupón cero | Fórmula adimensional y logaritmos firmados de 1-exp(z); productos monetarios con helpers existentes | Implementado y probado |
+
+Evidencia previa: b04-curves-before.log reproduce los fallos antes de editar;
+testthat limita su detalle tras diez fallos. La reproducción directa de par
+también mostró c_par=0 y repricing_error=-9.30e306. Se corrigió una referencia
+de prueba: la tasa efectiva de fuerza 1e-12 es expm1(1e-12), no exactamente
+1e-12. Ese ajuste del oráculo no fue una corrección funcional.
+
+### API, tidyverse y límites
+
+| Función | Contrato y unidades conservados | Evaluación |
+|---|---|---|
+| yield_curve | Un escenario por fila con t/i list-columns; v e i_effective como vectores en listas; t en años | Pipe conserva ID y .keep; NA de curva se propaga por fila, con NULL como gráfico de esa fila |
+| forward_rate | Una tasa anual efectiva por intervalo y fila; i_start/i_end efectivos; exact o linear | .data y nombres personalizados se conservan; interpolación sigue efectiva anual; se conserva .na error/drop/propagate |
+| forward_curve | Una fila por intervalo consecutivo, curve character y descuentos de extremos | Admite nodos largos, listas y múltiples IDs con orden documentado; m/i_type nodewise siguen al nodo al ordenar |
+| bootstrap_spot_curve | Una fila por instrumento y nuevo plazo, precios/cf monetarios y t en años | Pipe triangular sin interpolación; agrupa cupones/rescate simultáneos, ignora ceros y conserva IDs/métricas de repricing |
+| par_rate | Una fila por curva, c_par nominal anual y coupon_per_period monetario | Conserva metadatos de listas y parámetros escalares/por curva; admite cupón negativo si lo exige la ecuación, sin piso cero |
+
+No se añaden funciones ni helpers, dependencias, exportaciones o parámetros.
+Las cinco firmas, clases de retorno y nombres/clases de columnas se compararon
+con a5d8948 y coinciden; el cuerpo ejecutable de bootstrap también coincide
+(comparación sin atributos de referencias a líneas de fuente). Evidencia en
+b04-curves-compatibility.log. Se mantienen 101 nombres públicos y 960
+apariciones de parámetros, sin descripciones Rd faltantes.
+Se documenta un dominio recuperado en yield_curve y forward_rate exact:
+el equivalente efectivo puede ser -1/Inf por representación, aunque la
+especificación original finita permita calcular factores/forwards. Linear
+requiere equivalentes efectivos finitos >-1 para interpolarlos. forward_curve
+y par_rate mantienen sus validaciones de descuentos positivos finitos;
+forward_curve sigue rechazando forwards no representables >-1. No se impone
+una nueva política común de m: C02–C04 permanecen separadas y sin implementar.
+
+Finales fuera de double pueden ser 0/Inf en yield_curve o forward_rate;
+las columnas de equivalentes pueden saturarse. En todos los modelos los
+datos ya redondeados y spreads de spots muy próximos limitan la precisión.
+La mejora del origen común no promete precisión arbitraria para cualquier
+cancelación entre grandes spots distintos. par_rate todavía puede perder
+precisión cuando pagos positivos y negativos grandes se cancelan; no se
+oculta repricing_error ni se promete un umbral monetario nuevo.
+
+Bootstrap conserva su dominio de factor y equivalente representables: no
+estima nodos ausentes, no ajusta precios negativos/residuos no positivos y no
+inventa factores ante falta de resolución. Su repricing_error es diagnóstico,
+no una validación independiente. Un sistema casi singular o un residuo pequeño
+respecto del precio puede ser inestable incluso con repricing cercano a cero.
+No hay tolerancia nueva ni contraste bibliográfico/externo atribuido a esta unidad.
+
+test-curves-numerical-audit.R añade 79 comprobaciones: bases pequeñas y
+extremas, curva plana y no plana, origen grande, interpolación efectiva,
+composición, tipos nodewise, escalas monetarias, tres políticas NA, espacios
+NULL de gráficos, sistema triangular independiente y flujos encadenados.
+Los resultados de suite/build/check se registran en audit-precran-check.md.
+Las tres unidades B04 acumulan 320 comprobaciones nuevas.
+La suite y el paquete instalado pasaron: 0 ERROR, 0 WARNING y 1 NOTE de
+versión de desarrollo, salida 0; también ejemplos y las cuatro viñetas.
+La tercera unidad y B04-10/B04-13 quedan cerrados dentro del alcance y
+límites descritos; bootstrap queda contrastado sin modificación de algoritmo.
+
 ## Continuación del bloque
 
-Siguiente unidad: curvas spot, forward y par; después sensibilidad por variable
-de derivación y nueva comprobación de inmunización preservando arreglos
-anteriores. Se han revisado seis de las veinte funciones de B04; no está cerrado.
+Se han revisado once de las veinte funciones de B04. Siguen duración y
+convexidad de flujos, bonos y portafolios, y después inmunización y su gráfico,
+preservando los arreglos previos. B04 no está cerrado.

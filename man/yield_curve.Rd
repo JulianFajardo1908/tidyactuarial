@@ -81,8 +81,12 @@ This function follows the compact actuarial notation used throughout
 rate, \code{i_type} denotes the interest-rate type, and \code{m} denotes the
 conversion frequency for nominal spot rates.
 
-The spot-rate input is converted to annual effective form through
-\code{\link{standardize_interest}} before discount factors are computed.
+Discount factors use the original log accumulation rate under the supplied
+convention. The reported annual effective equivalent may round to -1 or
+overflow to Inf while a finite discount factor remains recoverable.
+Final factors remain subject to double precision range. With
+\code{.na = "propagate"}, an incomplete row keeps its position and has a
+\code{NULL} plot entry when plotting is requested.
 }
 \examples{
 # Simple example

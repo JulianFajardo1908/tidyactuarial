@@ -61,8 +61,10 @@ be their spot discount factors. For each consecutive interval,
 so the annual effective forward rate is
 \deqn{f_{t_{j-1},t_j}=\left(
       \frac{v(t_{j-1})}{v(t_j)}\right)^{1/(t_j-t_{j-1})}-1.}
-The function computes the forward rate using log discount-factor ratios
-for better numerical stability. Discount factors are obtained from the
+The function evaluates log discount-factor ratios from original log spot
+growth rates, retaining small rates even when reported discounts round to 1.
+Equal spot log rates are preserved across intervals with a large common
+origin. Discount factors are obtained from the
 existing \code{\link[=discount_factor_spot]{discount_factor_spot()}} function, which standardizes the chosen
 interest-rate convention. Negative spot and forward rates are supported
 when the discount factors are positive and finite.

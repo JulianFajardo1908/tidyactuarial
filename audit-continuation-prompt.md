@@ -48,8 +48,14 @@ La segunda unidad ya revisa bond_book_value y bond_callable_price, conserva
 descuentos originales y valida los períodos de rescate; añade 142 comprobaciones.
 El usuario autorizó C05: is_worst_case señala el mínimo calculado y todos sus
 empates exactos; no se usa tol temporal como umbral monetario. Ver el registro
-B04 y audit-api-review.md. Siguiente unidad: curvas spot/forward/par y luego
-sensibilidad, preservando los arreglos previos de inmunización. B04 no cerrado.
+B04 y audit-api-review.md. La tercera unidad revisa yield_curve, forward_rate,
+forward_curve, bootstrap_spot_curve y par_rate, con 79 comprobaciones nuevas:
+descuento y forwards desde base original, tasa par independiente de moneda,
+NA con extremos incompletos y posiciones de gráficos, y sistema triangular.
+Bootstrap conserva su algoritmo; no hay decisión C nueva. Consultar los
+resultados exactos de validación global en audit-precran-check.md. Siguen
+duración/convexidad de flujos, bonos y portafolios; después inmunización y su
+gráfico, preservando arreglos previos. B04 lleva once de veinte, no cerrado.
 
 Hubo autorización puntual posterior para subir los diez commits acumulados:
 el push hasta 8dba06e a origin/audit/0.2.0-precran se realizó y verificó.
