@@ -748,7 +748,7 @@ Documentación: `man/plot_immunization_gap.Rd`. Semántica: revisión por bloque
 | `i_type` | `"effective"` | Character string indicating the interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
 | `m` | `1L` | Positive integer. Conversion frequency for nominal rates. Ignored for i_type = "effective" and i_type = "force" . |
 | `delta` | `0.01` | A numeric value defining the range of annual effective rates: from i_effective - delta to i_effective + delta , where i_effective is the annual effective rate equivalent to i , i_type , and m . |
-| `n_grid` | `200L` | Number of rate values to evaluate. |
+| `n_grid` | `200L` | Number of rate values to evaluate. Integer from 2 through .Machine$integer.max , with sufficient memory for the requested grid. |
 
 ## B04 — portfolio_convexity
 

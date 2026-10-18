@@ -95,6 +95,15 @@
 #' Matching convexity makes the surplus's second derivative zero at the
 #' base yield. This differs from Redington's strict positive-curvature
 #' condition and does not guarantee a nonnegative surplus after rate shifts.
+#' Liability values retain the original log accumulation rate; convexity is
+#' still with respect to the annual effective yield. Relative moments and row
+#' scaling before monetary products prevent avoidable overflow. Scaling uses
+#' common monetary and moment magnitudes, preserving the minimum norm over
+#' asset units, without rescaling asset columns independently. Time-zero
+#' liabilities contribute value but zero duration and convexity. Final values,
+#' weights and sensitivities must be finite; nearly cancelled liability values
+#' are rejected. Rank and cancellation tests remain subject to double precision;
+#' reported portfolio moments should be inspected for ill-conditioned systems.
 #'
 #' @seealso \code{\link{immunize_duration}}, \code{\link{bond_duration}},
 #'   \code{\link{bond_convexity}}
@@ -235,30 +244,14 @@ immunize_duration_convexity <- function(
     stop("`m` must be a single positive integer.", call. = FALSE)
   }
 
-  m <- as.integer(round(m))
-
-  i_effective <- standardize_interest(
-    type = i_type,
-    rate = i,
-    m = m
-  )
-
-  if (!is.numeric(i_effective) ||
-      length(i_effective) != 1L ||
-      is.na(i_effective) ||
-      !is.finite(i_effective) ||
-      i_effective <= -1) {
-    stop(
-      "The standardized effective interest rate must be greater than -1.",
-      call. = FALSE
-    )
+  m <- round(m)
+  growth <- .interest_basis(i_type, i, m)$growth
+  if (length(growth) != 1L || !is.finite(growth)) {
+    stop("The original log accumulation rate must be finite.", call. = FALSE)
   }
 
   # --- Liabilities: PV, duration, convexity ---
-  v <- 1 / (1 + i_effective)
-  disc <- v^t
-
-  discounted <- L * disc
+  discounted <- .cash_flow_value(L, -t * growth)
   pv_L <- sum(discounted)
   pv_scale <- sum(abs(discounted))
 
@@ -270,19 +263,26 @@ immunize_duration_convexity <- function(
          call. = FALSE)
   }
 
-  D_L <- sum(t * discounted) / pv_L
-  C_L <- sum(discounted * (t * (t + 1) * v^2)) / pv_L
+  D_L <- sign(pv_L) * sum(.cash_flow_value(
+    discounted, log(t) - log(abs(pv_L))))
+  C_L <- sign(pv_L) * sum(.cash_flow_value(
+    discounted, log(t) + log1p(t) - 2 * growth - log(abs(pv_L))))
   if (!is.finite(D_L) || !is.finite(C_L)) {
     stop("Liability duration or convexity is non-finite.", call. = FALSE)
   }
 
   # --- Build linear system A w = b (3 x n_assets) ---
-  A <- rbind(
-    P,
-    P * D,
-    P * C
-  )
-  b <- c(pv_L, pv_L * D_L, pv_L * C_L)
+  price_scale <- max(P, abs(pv_L))
+  duration_scale <- max(abs(D), abs(D_L))
+  convexity_scale <- max(abs(C), abs(C_L))
+  if (duration_scale == 0) duration_scale <- 1
+  if (convexity_scale == 0) convexity_scale <- 1
+  scaled_prices <- P / price_scale
+  scaled_durations <- D / duration_scale
+  scaled_convexities <- C / convexity_scale
+  A <- rbind(scaled_prices, scaled_prices * scaled_durations,
+             scaled_prices * scaled_convexities)
+  b <- (pv_L / price_scale) * c(1, D_L / duration_scale, C_L / convexity_scale)
 
   # --- Solve for weights ---
   if (n_assets == 3L) {
@@ -302,9 +302,19 @@ immunize_duration_convexity <- function(
   }
 
   # --- Portfolio measures ---
-  pv_A <- sum(w * P)
-  D_A  <- sum(w * P * D) / pv_A
-  C_A  <- sum(w * P * C) / pv_A
+  market_scaled <- w * scaled_prices
+  portfolio_scaled <- sum(market_scaled)
+  if (any(!is.finite(market_scaled)) || !is.finite(portfolio_scaled) || portfolio_scaled == 0) {
+    stop("Resulting portfolio present value is zero or non-finite.", call. = FALSE)
+  }
+  pv_A <- .cash_flow_value(portfolio_scaled, log(price_scale))
+  D_A <- sign(portfolio_scaled) * .cash_flow_value(
+    sum(market_scaled * scaled_durations), log(duration_scale) - log(abs(portfolio_scaled)))
+  C_A <- sign(portfolio_scaled) * .cash_flow_value(
+    sum(market_scaled * scaled_convexities), log(convexity_scale) - log(abs(portfolio_scaled)))
+  if (any(!is.finite(c(pv_A, D_A, C_A)))) {
+    stop("Resulting portfolio measures are non-finite.", call. = FALSE)
+  }
 
   tibble::tibble(
     w = w,

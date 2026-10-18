@@ -2,6 +2,15 @@
 
 ## Bug fixes
 
+* Immunization retains original log liability rates and forms relative moments
+  and scaled constraints before monetary products overflow. The existing
+  minimum norm over asset units, SVD rank checks and sensitivity conventions
+  are preserved; resulting portfolio measures must be finite.
+* Immunization gap plots combine signed weighted cash flows with log discounts,
+  preserving finite surplus values and zero-weight assets when individual
+  valuations lose range. The grid respects representable annual effective
+  rates above -1; invalid grids and nonfinite gaps are rejected explicitly.
+
 * Cash-flow duration and convexity form relative contributions directly,
   avoiding overflowing monetary numerators and recovering representable
   discounted products. Signed near-cancellation checks remain unchanged.

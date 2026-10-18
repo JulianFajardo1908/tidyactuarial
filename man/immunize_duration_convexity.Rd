@@ -112,6 +112,15 @@ on the asset cash flows at the annual effective yield.
 Matching convexity makes the surplus's second derivative zero at the
 base yield. This differs from Redington's strict positive-curvature
 condition and does not guarantee a nonnegative surplus after rate shifts.
+Liability values retain the original log accumulation rate; convexity is
+still with respect to the annual effective yield. Relative moments and row
+scaling before monetary products prevent avoidable overflow. Scaling uses
+common monetary and moment magnitudes, preserving the minimum norm over
+asset units, without rescaling asset columns independently. Time-zero
+liabilities contribute value but zero duration and convexity. Final values,
+weights and sensitivities must be finite; nearly cancelled liability values
+are rejected. Rank and cancellation tests remain subject to double precision;
+reported portfolio moments should be inspected for ill-conditioned systems.
 }
 \examples{
 # Three-asset immunization

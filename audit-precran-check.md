@@ -465,3 +465,39 @@ fuera del aislamiento. Sin push, CI remota nueva, manual, publicación ni
 cambio de versión. Cuarta unidad y C06 cerradas en el alcance documentado;
 B04 sigue abierto: diecisiete de veinte funciones revisadas, pendientes las
 dos funciones de inmunización y su gráfico. C02–C04 siguen sin implementar.
+
+
+## B04: cierre de inmunización y del bloque temático
+
+Quinta unidad sobre d22e77e: immunize_duration, immunize_duration_convexity
+y plot_immunization_gap. Añade 113 comprobaciones independientes; pasaron
+además las 31 de regresiones previas de inmunización y la suite completa
+local, salida 0. B04 acumula 686 comprobaciones nuevas entre cinco unidades.
+El registro audit-bonds-curves-immunization.md detalla identidades, fallos
+previos, correcciones, compatibilidad y límites. Se preservaron las tres
+firmas, clases y columnas, y el helper SVD original: la norma mínima sigue
+sobre cantidades de activos. Se renderizaron e inspeccionaron dos gráficos
+PNG de 1100x660; ver b04-duration-gap.png y b04-convexity-gap.png en artefactos.
+
+R CMD build --no-manual y R CMD check --as-cran --no-manual terminaron con
+**0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE: versión de desarrollo
+0.1.6.9000. Pasaron análisis de código, documentación, ejemplos (22 s),
+pruebas instaladas (53 s), las cuatro viñetas y su reconstrucción (12 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b04-closure-verified/`.
+Informe tidyactuarial.Rcheck/00check.log; snapshot-verification.txt acredita
+49 archivos fuente/tests/NEWS/NAMESPACE/Rd iguales al checkout normalizando
+CRLF. Incluye las veinte funciones de B04, el helper de inmunización y las
+seis regresiones nuevas del bloque. AGENTS/audit-* excluidos; DESCRIPTION
+sigue en desarrollo. SHA256 del archivo tidyactuarial_0.1.6.9000.tar.gz:
+`51EBF79029669E629824E79A51E08D8294BB089FDE78C62E8A47226A0083349B`.
+
+R 4.6.1/Windows, locale UTF-8, Pandoc de RStudio y
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`, con bibliotecas instaladas accesibles
+fuera del aislamiento. Sin push, CI remota nueva, manual, publicación ni
+cambio de versión. B04 cerrado dentro del alcance y límites documentados:
+20/20 funciones revisadas; esto no cierra la auditoría integral ni valida
+R mínimo/CI remota para estos cambios. C02–C04 siguen sin implementar.
+Siguiente bloque: B05, empezando por lifetable y mortality_law_table,
+preservando la evidencia y los arreglos históricos.

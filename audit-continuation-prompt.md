@@ -60,8 +60,17 @@ productos monetarios desbordados, base log de bonos y tol solo de calendario.
 Firmas/columnas intactas. C06 fue autorizada expresamente e implementada:
 se conserva fila ID NA con métricas NA bajo propagate en los dos portafolios;
 drop/error intactos. Ver audit-api-review.md y la validación global vigente.
-Siguen inmunización y su gráfico, preservando arreglos previos. B04 tiene
-diecisiete de veinte funciones con revisión numérica, no está cerrado.
+La quinta unidad ya revisa immunize_duration, immunize_duration_convexity y
+plot_immunization_gap, con 113 comprobaciones nuevas y QA visual de dos PNG.
+Se preservó el helper SVD y el mínimo de norma sobre unidades: se anticipa
+el escalado a los productos monetarios, se retiene la base log de pasivos y
+se calcula el gap como flujos firmados, con malla válida sobre -1. Las veinte
+funciones B04 quedan cerradas dentro del alcance y límites documentados, con
+686 comprobaciones nuevas y check final 0 ERROR, 0 WARNING, 1 NOTE por versión
+de desarrollo. Consultar el registro B04 y el archivo verificado/huella en
+audit-precran-check.md. Siguen B05, tablas de vida,
+mortalidad y probabilidades: lifetable y mortality_law_table primero, sin
+reiniciar ni presentar como nuevos los arreglos previos.
 
 Hubo autorización puntual posterior para subir los diez commits acumulados:
 el push hasta 8dba06e a origin/audit/0.2.0-precran se realizó y verificó.

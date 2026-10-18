@@ -6,7 +6,7 @@ La matriz `audit-api-signatures.md` contiene 101 entradas y 960 apariciones
 de parámetros, en orden real y con defaults extraídos de formals(). A_xj
 permanece como alias de insurance_xj. Las descripciones Rd transcriben
 concepto, dominio y unidades cuando existen; no prueban su implementación.
-B03 queda cerrado dentro del alcance documentado; B04 está en revisión y
+B03 y B04 quedan cerrados dentro de sus respectivos alcances documentados;
 B05–B09 conservan pendientes de revisión integral por bloques.
 
 Actualización B03: se abordaron a_angle, s_angle, annuity_arith, annuity_geom
@@ -36,7 +36,7 @@ La segunda unidad incorpora bond_book_value y bond_callable_price, con
 142 comprobaciones independientes y firmas/columnas preservadas. C05 fue
 autorizada e implementada: el flag de peor rescate identifica el mínimo
 calculado y los empates exactos, sin reutilizar tolerancia temporal en dinero.
-No se da por cerrado B04.
+En esa segunda unidad aún no se daba por cerrado B04; véase el cierre posterior.
 
 Tercera unidad B04: cinco funciones de curvas revisadas en el registro B04,
 con 79 comprobaciones nuevas. Conservar bases originales recupera precisión
@@ -44,6 +44,15 @@ sin cambiar argumentos ni columnas; linear sigue sobre efectivos anuales.
 Se conservan .keep, .na, formas de curvas y parámetros nodewise. No se añade
 otra propuesta C ni se uniforma m. Bootstrap conserva su algoritmo triangular;
 par_rate mantiene cupón firmado y métricas de reconstrucción del precio.
+
+Actualización B04, quinta unidad: las tres funciones de inmunización/gráfico
+mantienen firmas, tablas y datos i/gap. Se conservan norma sobre unidades,
+posiciones cortas y variable efectiva anual de convexidad. Solo se mejora
+rango, escalado previo y diagnóstico de valores no finitos/mallas inválidas.
+No hay propuesta C nueva; C02–C04 no se implementaron. Ver el registro B04
+para las veinte funciones, límites y continuación a B05. El check final
+terminó con 0 ERROR, 0 WARNING y 1 NOTE por versión de desarrollo; B04 queda
+cerrado dentro de ese alcance, sin ampliar la autorización de API.
 
 ## B01/B02: evaluación separada por dimensión
 

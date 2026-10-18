@@ -103,6 +103,15 @@ normal equations. Short positions are allowed. Matching present value
 and duration gives a zero value and first derivative of the surplus at
 the base yield, but does not ensure nonnegative surplus after rate shifts;
 the Redington convexity condition must be checked separately.
+Liability values retain the original log accumulation rate, and relative
+moments avoid monetary numerator overflow. Payment times include zero:
+a liability at time zero contributes value but no duration. Constraints are
+scaled by a common monetary magnitude and by moment magnitudes before
+products are formed. These are row transformations, preserving the norm over
+units; asset columns are not rescaled independently. Final values, weights
+and sensitivities must be finite, and nearly cancelled liability value is
+rejected. Rank and cancellation tests remain subject to double precision;
+reported portfolio moments should be inspected for ill-conditioned systems.
 }
 \examples{
 # Two-asset immunization

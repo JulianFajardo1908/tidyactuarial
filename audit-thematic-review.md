@@ -21,7 +21,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B01 | Tasas y factores financieros | 5 | En revisión; ver audit-interest-foundations.md |
 | B02 | Flujos y ecuaciones de valor | 8 | En revisión; ver audit-cash-flow-roots.md y audit-interest-foundations.md |
 | B03 | Anualidades financieras y préstamos | 7 | Revisión cerrada dentro del alcance documentado; ver audit-financial-annuities-loans.md, B03-08/B03-10 y límites expresos |
-| B04 | Bonos, curvas, sensibilidad e inmunización | 20 | En revisión: diecisiete funciones con contraste numérico; C06 autorizada/implementada; siguen inmunización y gráfico; ver audit-bonds-curves-immunization.md |
+| B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
 | B05 | Tablas, mortalidad y probabilidades | 12 | Pendiente de revisión integral; preservar evidencia previa |
 | B06 | Contingencias de una vida y contratos | 13 | Pendiente de revisión integral; preservar evidencia previa |
 | B07 | Contingencias multivida | 6 | Pendiente de revisión integral; preservar evidencia previa |
@@ -51,10 +51,11 @@ audit-cash-flow-roots.md, B02-07/B02-08, y audit-api-review.md. Se preservan
 101 nombres públicos; la matriz contiene ahora 960 apariciones de parámetros.
 Las propuestas C02–C04 quedan separadas de los defectos obligatorios y no
 se implementaron. B03 ya se cerró en el alcance documentado de anualidades
-y préstamos. B04 está iniciado con calendario, precio, rendimiento e interés
-corrido, valor contable, bonos rescatables, curvas y sensibilidad; siguen
-inmunización y su gráfico. Esto no da por aprobados
-los bloques posteriores.
+y préstamos. B04 ya tiene evidencia de sus veinte funciones: bonos, curvas,
+sensibilidad e inmunización/gráfico. Queda cerrado dentro de los límites
+documentados, con 686 comprobaciones nuevas y check final 0 ERROR, 0 WARNING,
+1 NOTE por versión de desarrollo. Siguen tablas de vida y mortalidad de B05; esto
+no da por aprobados los bloques posteriores.
 
 | Bloque | Nombre | Fuente | Tests con llamada directa |
 |---|---|---|---|

@@ -379,9 +379,122 @@ económica de un flujo firmado y la homogeneidad de tasas del portafolio son
 responsabilidad del modelo, no se infieren desde una etiqueta. No se atribuye
 contraste bibliográfico o con paquetes externos no ejecutado en esta unidad.
 
-## Continuación del bloque
+## Quinta unidad: inmunización y gráfico del excedente
 
-Revisión numérica realizada en diecisiete de las veinte funciones B04.
-Quedan immunize_duration, immunize_duration_convexity y plot_immunization_gap,
-preservando sus arreglos previos. C06 ya autorizada e implementada; no se
-declara cerrado B04.
+Inicio sobre d22e77e, árbol limpio y seis commits locales sin push. Se revisan
+immunize_duration, immunize_duration_convexity y plot_immunization_gap,
+completando las veinte funciones inventariadas de B04. El helper
+R/utils-immunization.R permanece idéntico a HEAD: se preservan SVD, umbral
+relativo de rango y mínimo de norma euclídea sobre unidades w, no fracciones
+de valor de mercado. Tampoco se modifican los arreglos de convexidad anteriores.
+
+### Modelo y comprobaciones independientes
+
+P_L=sum(L*exp(-t*g)), con g=log1p(i_e) obtenido de la especificación original.
+D_L=sum(t*PV_t)/P_L y C_L=sum(t*(t+1)*PV_t)*exp(-2*g)/P_L siguen referidas
+a la tasa anual efectiva, aunque la entrada se exprese como fuerza o nominal.
+Los pagos en tiempo cero se incluyen en P_L y no en los momentos derivados.
+Se mantiene el rechazo relativo de PV cancelado, 100*eps*sum(abs(PV_t)).
+
+El sistema en unidades exige sum(w*P)=P_L, sum(w*P*D)=P_L*D_L y, cuando
+corresponde, sum(w*P*C)=P_L*C_L. Antes de multiplicar se divide por una escala
+monetaria común y por máximos de cada momento, tanto en A como en b. Son
+transformaciones de filas que preservan conjunto factible y mínimo de norma;
+no se normalizan columnas, lo que cambiaría el objetivo sobre unidades.
+Se conservan fórmula cerrada de dos activos, solve para tres restricciones
+cuadradas y SVD para sistemas con más activos que restricciones.
+
+Las referencias nuevas verifican las ecuaciones originales usando unidades
+monetarias normalizadas solo en el oráculo, y ortogonalidad con vectores nulos
+conocidos: (3,-3,1) en duración y (-1,3,-3,1) en tres momentos equiespaciados.
+Se revaloran flujos cero cupón independientes con tasas positivas y negativas
+y se contrastan derivadas centrales del excedente en la tasa base.
+
+El gráfico calcula G(i_e)=sum(w_j*CF_j*exp(-t_j*log1p(i_e)))-sum(L*descuento)
+como una sola suma de flujos firmados con log pesos. Las cantidades cero se
+omiten tras validar sus datos; no se evalúa 0*Inf. Se usa el helper monetario
+existente, incluida su recuperación de cancelación con factor común finito.
+No se resta un PV_A infinito de un PV_L infinito para obtener un falso NaN.
+La malla sigue en efectivos anuales, con n_grid filas y sin puntos extra;
+solo se recorta al dominio representable i_e>-1 cuando es necesario.
+
+### Hallazgos
+
+| ID | Evidencia previa y causa | Cambio mínimo | Estado |
+|---|---|---|---|
+| B04-19 | L=1e308,t=5 produce duración/convexidad no finitas antes de resolver; P*D, P*C o PV_L*momentos también desbordan antes del escalado SVD | Base log original, contribuciones relativas de pasivos, escalado de filas previo a productos y medidas finales desde valores escalados; SVD original intacta | Implementado y probado |
+| B04-20 | i=1e-20,t=1e20 valora L=100 como 100 en lugar de 100*exp(-1); fuerza -100 se rechaza aunque los momentos sean finitos | Retener acumulación logarítmica de entrada; la convexidad continúa referida al efectivo anual | Implementado y probado |
+| B04-21 | Gráfico devuelve NaN para activo de peso cero con PV desbordado o para activo/pasivo exactamente iguales; productos ponderados finitos se pierden y gaps no finitos se entregan al gráfico | Suma conjunta de flujos ponderados firmados, log descuentos y rechazo explícito de gaps no finitos; validación de cada activo una sola vez | Implementado y probado |
+| B04-22 | Piso -0.999999 impide una malla válida alrededor de -0.9999999; n_grid fuera del rango entero produce coerción NA; m grande se castea innecesariamente | Límite inferior al double más cercano por encima de -1, extremos finitos y límite entero de n_grid; redondear m sin cast para conservar su dominio matemático | Implementado y probado |
+
+La reproducción sobre d22e77e está en b04-immunization-before.log. Se ajustó
+una referencia de prueba: con peso 1e-300 el resultado supuesto finito todavía
+excedía double; se cambió a 1e-310, cuyo excedente sí es representable. Este
+ajuste del oráculo no modificó el algoritmo ni ocultó un resultado no finito.
+
+### API, interfaz y visualización
+
+Las tres firmas y clases de retorno coinciden con d22e77e; columnas de las
+dos tablas y columnas i/gap del data.frame del gráfico conservan nombres y
+clases. Ver b04-immunization-compatibility.log. Sin parámetros, columnas,
+dependencias, funciones, helpers o exportaciones nuevos. C01/C05/C06 siguen
+como se aprobaron; C02–C04 no se implementaron. El dominio local de m sigue
+validándose incluso cuando no interviene en tasas efectivas/fuerzas: no se
+uniforma la política. Se eliminó solo el cast entero innecesario.
+
+L/t y P/D/C conservan sus papeles; los w son cantidades, con cortos permitidos.
+Son operaciones de un escenario con vectores de flujos o activos; los retornos
+tabulares permiten encadenar cálculos y map/pmap entre escenarios, sin imponer
+una interfaz .data universal. El gráfico usa los flujos reales entregados y no
+puede inferirlos de P/D/C; el usuario debe asegurar su coherencia con la base.
+
+Se renderizaron e inspeccionaron visualmente dos PNG de 1100x660 en el
+directorio de artefactos: b04-duration-gap.png y b04-convexity-gap.png.
+Título, ejes, referencia cero y curvas son legibles y no presentan recortes.
+La primera muestra tangencia con curvatura positiva y la segunda cambio de
+signo con valor/primera/segunda derivadas nulas en la base: igualar convexidad
+no asegura excedente no negativo a ambos lados. No se alteró el estilo ni
+se confundió este resultado con la condición estricta de Redington.
+
+test-immunization-completion-audit.R añade 113 comprobaciones: monedas
+1e-250/1/1e305, dos/tres/cuatro activos, ortogonalidad de norma mínima,
+pasivos firmados y en tiempo cero, tasas pequeñas/fuerza, recálculo de PV y
+derivadas, pesos cero y productos ponderados, cancelación recuperable,
+malla próxima a -1 y coerción de índices. También pasaron las 31 comprobaciones
+de test-immunization-regressions.R y la suite completa local. B04 acumula
+686 comprobaciones nuevas en las cinco unidades. Build/check final y huella
+del archivo se registran en audit-precran-check.md.
+
+### Límites del cierre
+
+El modelo es de perturbación de una tasa plana común, no de desplazamientos
+no paralelos de una estructura temporal, riesgo de crédito ni optimización
+con restricciones de posiciones largas. Igualar dos o tres momentos es local;
+no garantiza solvencia para cualquier desplazamiento de tasas ni constituye
+una nueva promesa financiera. La escala previa mejora rango, no elimina
+mal condicionamiento, pérdida de precisión en datos o cancelación arbitraria.
+Los factores originales, sistemas escalados, pesos y medidas deben caber en
+double; se conservan rango completo y rechazo de PV casi cancelado.
+
+El gráfico requiere base efectiva y malla representables para definir el eje;
+no sustituye un equivalente redondeado a -1/Inf por otra tasa. Puede recuperar
+cancelación bajo un factor log común finito, pero no cualquier combinación
+de log factores desbordados o flujos firmados extremos. n_grid requiere
+memoria, y su límite entero no garantiza que toda malla permitida quepa.
+No se cambió el helper compartido de sumas para ampliar esas garantías.
+
+La revisión cubre las veinte funciones y sus supuestos documentados, no
+conciliación con el informe externo original ausente ni ausencia universal
+de errores. No se atribuye verificación bibliográfica o con paquetes externos
+no ejecutada. CI remota y R mínimo de la versión actual siguen fuera de esta
+validación local, y no se publica ni se cambia DESCRIPTION a release.
+
+## Estado del bloque y continuación
+
+B04 queda cerrado dentro del alcance y límites documentados: veinte de veinte
+funciones revisadas, 686 comprobaciones nuevas y build/check final con
+0 ERROR, 0 WARNING y 1 NOTE por la versión de desarrollo. Los hallazgos de
+la quinta unidad quedan cerrados en ese alcance; evidencia y huella del
+archivo fuente en audit-precran-check.md.
+Siguiente bloque: B05, tablas de vida, mortalidad y probabilidades; empezar
+por lifetable y mortality_law_table, conservando los arreglos históricos.
