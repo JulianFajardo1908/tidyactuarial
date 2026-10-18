@@ -553,7 +553,7 @@ Documentación: `man/bond_convexity.Rd`. Semántica: revisión por bloque pendie
 | `y_type` | `"effective"` | Character string indicating the annual yield type: "effective" , "nominal_interest" , "nominal_discount" , or "force" . |
 | `y_m` | `1L` | Positive integer. Conversion frequency for nominal annual yields. |
 | `R` | `NULL` | Numeric scalar. Redemption value at maturity. If NULL , defaults to face . |
-| `tol` | `1e-10` | Numeric scalar. Tolerance used to check maturity alignment. |
+| `tol` | `1e-10` | Finite positive numeric scalar. Tolerance used to check maturity alignment with integer coupon periods, not a monetary price threshold. |
 | `check` | `TRUE` | Logical scalar. If TRUE , performs input validation. |
 
 ## B04 — bond_duration
@@ -571,7 +571,7 @@ Documentación: `man/bond_duration.Rd`. Semántica: revisión por bloque pendien
 | `y_type` | `"effective"` | Character string indicating the annual yield type: "effective" , "nominal_interest" , "nominal_discount" , or "force" . |
 | `y_m` | `1L` | Positive integer. Conversion frequency for nominal annual yields. |
 | `R` | `NULL` | Numeric scalar. Redemption value at maturity. If NULL , defaults to face . |
-| `tol` | `1e-10` | Numeric scalar. Tolerance used to check maturity alignment. |
+| `tol` | `1e-10` | Finite positive numeric scalar. Tolerance used to check maturity alignment with integer coupon periods, not a monetary price threshold. |
 | `check` | `TRUE` | Logical scalar. If TRUE , performs input validation. |
 
 ## B04 — bond_price

@@ -91,6 +91,7 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C03 | C | Reordenar i/i_type o s/t para favorecer cierto pipe posicional | No recomendado como cambio automático: rompe llamadas posicionales y no hace falta para mutate/pmap |
 | C04 | C | Unificar C/cf, .data o tidy/output en todo el paquete | No ejecutar en bloque; los contratos y tipos de operación son distintos. Revisar solo propuestas concretas por familia |
 | C05 | C | is_worst_case de callable identifica el mínimo calculado y sus empates exactos, sin umbral monetario derivado de tol temporal | Autorizada expresamente el 17 de octubre; implementada y probada sin cambiar firmas ni columnas |
+| C06 | C | Conservar una fila de ID NA con métricas NA bajo propagate en las dos funciones de portafolio; error/drop intactos | Autorizada expresamente e implementada con 90 comprobaciones; firmas/columnas intactas |
 
 ## Mejoras compatibles y categorías A realizadas
 
@@ -176,3 +177,22 @@ un escenario próximo pero no idéntico puede pasar de TRUE a FALSE.
 Se comprueba el indicador con escalas, empates exactos y precios cercanos.
 No se promete recuperar empates matemáticos ocultos por redondeo o precios
 finales fuera de representación. C02–C04 siguen pendientes sin implementar.
+
+## C06: identificadores faltantes en portafolios, autorizada e implementada
+
+Reproducción: portfolio_duration(P=c(100,200),D=c(2,4),
+portfolio_id=c("a",NA_character_)) devuelve solo la posición de a, sin advertir,
+aunque .na=propagate. portfolio_convexity tiene el mismo split que elimina NA.
+El diseño aprobado conserva al final una fila con identificador NA y sensibilidad,
+P_total y n_positions NA. Esto no asigna esas posiciones a un portafolio
+conocido ni calcula un falso agregado. drop conservaría la advertencia y
+eliminación; error conservaría el rechazo. No cambiarían argumentos/columnas.
+El usuario respondió «Sí, conservar la fila NA como se propone». Se implementó
+esa regla tras su autorización, con fila NA al final, separada de etiquetas
+literales "NA". Se conservan tipos de identificador de texto, numéricos y
+factores. Noventa comprobaciones cubren mezcla de IDs, todos faltantes,
+entrada directa/tidy, nombres personalizados y las tres políticas NA.
+Las 163 comprobaciones numéricas independientes llevan esta unidad a 253.
+Suite completa y build/check final aprobados (0 ERROR, 0 WARNING, 1 NOTE
+de versión de desarrollo). C06 queda cerrada dentro del alcance autorizado;
+no habilita C02–C04 ni otros cambios públicos.

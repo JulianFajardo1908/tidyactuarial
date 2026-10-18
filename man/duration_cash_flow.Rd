@@ -82,6 +82,13 @@ duration immediately after any cash flow paid at that time.
 For streams containing both positive and negative cash flows, duration
 remains a yield-sensitivity measure, but it may not have the usual
 interpretation as a weighted-average payment time.
+Relative contributions are computed without first forming a monetary
+duration numerator. Representable products can be recovered when a standalone
+discount factor underflows; its audit column can then be zero while present
+value is positive. Discount factors, present values, their total/absolute sum,
+and the selected contributions/result must remain finite. A signed stream
+is rejected when absolute total value is at most
+`sqrt(.Machine$double.eps)` times the sum of absolute present values.
 }
 \examples{
 duration_cash_flow(

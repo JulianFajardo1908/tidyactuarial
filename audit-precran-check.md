@@ -426,3 +426,42 @@ R 4.6.1/Windows, locale UTF-8 y Pandoc de RStudio;
 fuera del aislamiento. Sin push, CI remota nueva, manual, publicación ni
 cambio de versión. Tercera unidad cerrada en el alcance documentado; once
 de veinte funciones B04 revisadas. Siguen sensibilidades e inmunización.
+
+## B04: duración, convexidad y C06 de identificadores faltantes
+
+Cuarta unidad sobre 20a9b48: 163 comprobaciones numéricas nuevas más 90 de
+C06, autorizada expresamente por el usuario: 253 nuevas en total. Pasaron
+los focos y la suite completa final, salida 0 y sin fallos/advertencias.
+B04 acumula 573 comprobaciones nuevas entre cuatro unidades. La regla de
+cadena distingue convexidad nominal anual de efectiva anual; se preservan
+esa convención y las correcciones previas de inmunización.
+
+Logs locales en el directorio de artefactos de la conversación:
+b04-sensitivity-before.log y b04-c06-before.log reproducen los fallos;
+b04-sensitivity-local-tests.log acredita la suite numérica previa a C06;
+b04-sensitivity-c06-local-tests.log acredita la suite final con C06;
+b04-sensitivity-compatibility.log y b04-sensitivity-c06-compatibility.log
+comparan las seis firmas, clases y nombres/clases de columnas con 20a9b48
+y muestran la fila autorizada antes/después. Se mantienen 101 nombres
+públicos y 960 apariciones de parámetros. Sin dependencias, funciones,
+helpers, exportaciones, parámetros o columnas nuevos.
+
+R CMD build --no-manual y R CMD check --as-cran --no-manual terminaron con
+**0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE: versión de desarrollo
+0.1.6.9000. Pasaron análisis de código, documentación, ejemplos (21 s),
+pruebas instaladas (52 s), las cuatro viñetas y su reconstrucción (12 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b04-sensitivity-c06-verified/`.
+Informe tidyactuarial.Rcheck/00check.log; snapshot-verification.txt acredita
+41 archivos fuente/tests/NEWS/NAMESPACE/Rd iguales al checkout normalizando
+CRLF. Incluye las diecisiete funciones revisadas de B04 y las cinco regresiones.
+AGENTS/audit-* excluidos; DESCRIPTION sigue en desarrollo. SHA256:
+`25CBBC7C177A74F796EDE89E7F2FEBC59183F3FE580BA974D09BE039355EA4D4`.
+
+R 4.6.1/Windows, locale UTF-8, Pandoc de RStudio y
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`, con bibliotecas instaladas accesibles
+fuera del aislamiento. Sin push, CI remota nueva, manual, publicación ni
+cambio de versión. Cuarta unidad y C06 cerradas en el alcance documentado;
+B04 sigue abierto: diecisiete de veinte funciones revisadas, pendientes las
+dos funciones de inmunización y su gráfico. C02–C04 siguen sin implementar.

@@ -278,8 +278,110 @@ versión de desarrollo, salida 0; también ejemplos y las cuatro viñetas.
 La tercera unidad y B04-10/B04-13 quedan cerrados dentro del alcance y
 límites descritos; bootstrap queda contrastado sin modificación de algoritmo.
 
+## Cuarta unidad: duración y convexidad de flujos, bonos y portafolios
+
+Inicio sobre 20a9b48, árbol limpio y cinco commits locales sin push. Se sigue
+el orden aprobado: duration_cash_flow, convexity_cash_flow, bond_duration,
+bond_convexity, portfolio_duration y portfolio_convexity. Se preservan los
+arreglos de inmunización y la conversión de convexidad ya documentada.
+
+### Modelo y referencias
+
+Después de la fecha de valoración tau, u=t-tau>0 y P=sum(CF*(1+i)^(-u)).
+Duración de Macaulay E_PV[u]; duración modificada -P'/P=E_PV[u]/(1+i);
+convexidad P''/P=E_PV[u*(u+1)]/(1+i)^2. Los flujos en tau se excluyen.
+Las derivadas se contrastan con sumas independientes y diferencias centrales
+de la función de precio, incluyendo flujos firmados y valoraciones diferidas.
+
+En bonos, r cuenta cupones y j es rendimiento efectivo por cupón:
+D_j=E_PV[r]/(1+j), C_j=E_PV[r*(r+1)]/(1+j)^2. Macaulay en años es
+E_PV[r]/k. Para z=k*j, C_z=C_j/k^2 es la columna discrete_convexity_years;
+no es C_i para i=(1+j)^k-1. Con j'=(1+j)/(k*(1+i)) y
+j''=(1+j)*(1-k)/(k^2*(1+i)^2), D_i=D_j*j' y
+C_i=C_j*(j')^2-D_j*j''. No se cambian nombres ni significado de esas columnas.
+La documentación aclara que una aproximación de Taylor debe emparejar
+duración modificada y convexidad respecto de la misma variable de tasa.
+
+Para portafolios, la media ponderada por valor solo representa sensibilidad
+a un cambio común si las medidas individuales usan la misma variable y
+unidades. Se contrasta un precio agregado independiente, sus derivadas y el
+error de Taylor de segundo orden al reducir a la mitad la perturbación.
+Las funciones conservan su dominio de P/D/C no negativos: no se convierten
+en un modelo genérico de posiciones cortas o convexidades firmadas.
+
+### Hallazgos
+
+| ID | Reproducción y causa | Cambio | Estado |
+|---|---|---|---|
+| B04-14 | cf=1e308,t=2,i=0 produce error en vez de duración 2/convexidad 6; el numerador monetario desborda; contribuciones de audit pueden perder rango | Contribuciones relativas mediante log pesos y helper monetario existente, sin numerador monetario ni peso PV/P redondeado primero; recuperación de productos descontados finitos | Implementado y probado |
+| B04-15 | Un cero cupón con nominal 1e-250 es rechazado por abs(price)<=tol de calendario; nominal 1e308 da convexidad Inf aunque es 6/1.05^2; precios y tasas extremas pierden rango | Precio positivo finito sin piso monetario; base log original y momentos de valores presentes normalizados; escalado derivado estable y diagnóstico de métricas realmente no finitas | Implementado y probado |
+| B04-16 | P=(1e307,1e307), D=(100,200) devuelve Inf; P=(1e-300,1e-300), C=(1e-100,2e-100) devuelve 0 | Media ponderada directa y recuperación logarítmica si el peso pierde rango; se exige que P_total siga siendo positivo finito | Implementado y probado |
+| B04-17 | n fuera del entero admite coerción NA antes de evaluar duración/convexidad | Usar calendario validado y sus índices period, sin reconstruirlos desde t*k ni castear antes de comprobar rango | Implementado y probado |
+| B04-18 / C06 | Una posición con portfolio_id=NA desaparece silenciosamente bajo .na=propagate por split() | Fila NA con métricas NA al final, manteniendo drop/error; sin asignar a un grupo conocido | Autorizado expresamente, implementado y probado |
+
+Evidencia previa: b04-sensitivity-before.log registra errores y resultados
+Inf/0 reproducidos antes de editar. La ejecución directa también reprodujo
+la pérdida del identificador faltante, conservada en el log de compatibilidad.
+Se pidió autorización por modificar las filas públicas. El usuario respondió
+«Sí, conservar la fila NA como se propone» y después se implementó C06.
+
+### API y verificación
+
+Las seis firmas, clases y nombres/clases de columnas normales coinciden con
+20a9b48: ver b04-sensitivity-compatibility.log y la comparación final
+b04-sensitivity-c06-compatibility.log, que registra además las filas antes y
+después de C06. No se añaden funciones,
+helpers, dependencias, exportaciones, argumentos o columnas. Los 101 nombres
+públicos y 960 apariciones de parámetros se conservan. C01 y C05 siguen como
+se aprobaron; C02–C04 permanecen separados. C06 está autorizada e implementada.
+
+Flujos: escalares o tibble audit según output; cf primero, tasa efectiva por
+unidad temporal, misma unidad para t y valuation_time. Conservan orden
+cronológico estable de los flujos futuros, duplicados y la guarda relativa
+de cancelación abs(P)<=sqrt(eps)*sum(abs(PV)). No se añade piso monetario.
+Los PV, factores y sumas total/absoluta deben ser finitos. El log producto
+recupera un PV finito aunque el factor aislado subdesborde a cero; ese cero
+puede aparecer en audit. Se conserva el rechazo de factores infinitos.
+
+Bonos: n en años y k cupones/año; y directo conserva prioridad; el log original
+se usa aunque la equivalencia informativa anual llegue a -1/Inf. Deben ser
+representables precio y métricas; en n=0 se conserva rescate inmediato con
+riesgo cero y yields NA. No se equipara esta convención al flujo ex-pago sin
+flujos futuros, que sigue produciendo error.
+
+Portafolios: .data primero, reducción por grupo y nombres personalizados;
+aliases existentes intactos. No se fuerza vectorización de bonos ni una
+interfaz única para las seis operaciones. Los grupos de total cero/no finito
+siguen rechazándose y las posiciones de valor cero siguen en el conteo.
+La decisión C06 conserva una fila final con ID y métricas NA bajo propagate,
+sin mezclarla con el identificador literal "NA" ni asignarla a un grupo conocido.
+Se conserva la clase de identificador para texto, numéricos y factores; las
+políticas error/drop no cambian. Todos los IDs faltantes producen una fila
+NA; con drop se conserva el tibble vacío después de advertir.
+
+test-sensitivity-numerical-audit.R incorpora 163 comprobaciones nuevas:
+tasas negativas/cero/positivas, flujos firmados y total negativo, ex-pago,
+derivadas y contribuciones, nominales pequeños/grandes, descuento subnormal,
+pesos que pierden rango antes de multiplicar, regla de cadena con k=1/2/4,
+límites de índice y PV nulo/cancelado, agregación y resto de Taylor.
+Junto a las 90 comprobaciones de test-portfolio-missing-id-audit.R, esta
+unidad suma 253 nuevas y B04 acumula 573 entre las cuatro unidades.
+Suite/build/check se registran por separado en audit-precran-check.md.
+La suite final con C06 y el chequeo del paquete instalado pasaron: 0 ERROR,
+0 WARNING y 1 NOTE de versión de desarrollo, salida 0, con ejemplos y las
+cuatro viñetas aprobados. B04-14/B04-18, incluida C06 autorizada, quedan
+cerrados dentro de este alcance; no se declara cerrado B04.
+
+Límites: permanecen el calendario explícito O(N), el rango double y la guarda
+de cancelación; no se promete recuperar cancelación arbitraria entre términos
+firmados extremos o precisión perdida en datos de entrada. La interpretación
+económica de un flujo firmado y la homogeneidad de tasas del portafolio son
+responsabilidad del modelo, no se infieren desde una etiqueta. No se atribuye
+contraste bibliográfico o con paquetes externos no ejecutado en esta unidad.
+
 ## Continuación del bloque
 
-Se han revisado once de las veinte funciones de B04. Siguen duración y
-convexidad de flujos, bonos y portafolios, y después inmunización y su gráfico,
-preservando los arreglos previos. B04 no está cerrado.
+Revisión numérica realizada en diecisiete de las veinte funciones B04.
+Quedan immunize_duration, immunize_duration_convexity y plot_immunization_gap,
+preservando sus arreglos previos. C06 ya autorizada e implementada; no se
+declara cerrado B04.

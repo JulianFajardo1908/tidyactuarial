@@ -41,7 +41,8 @@ or \code{"force"}.}
 \item{R}{Numeric scalar. Redemption value at maturity. If \code{NULL},
 defaults to \code{face}.}
 
-\item{tol}{Numeric scalar. Tolerance used to check maturity alignment.}
+\item{tol}{Finite positive numeric scalar. Tolerance used to check maturity
+alignment with integer coupon periods, not a monetary price threshold.}
 
 \item{check}{Logical scalar. If \code{TRUE}, performs input validation.}
 }
@@ -76,8 +77,8 @@ Yield input conventions:
   \item If \code{y_effective_per_period} is supplied, it is interpreted as the
         effective yield per coupon period.
   \item Otherwise, \code{y}, \code{y_type}, and \code{y_m} define an annual
-        yield specification, which is converted first to annual effective
-        yield and then to effective yield per coupon period.
+        yield specification. Calculations retain its original log growth;
+        reported effective equivalents remain subject to numeric range.
 }
 
 
@@ -105,6 +106,12 @@ there or compute \code{convexity_cash_flow()} from annual cash-flow times.
 This is the second-order sensitivity of the bond price to changes in the
 yield per period. Together with \code{\link{bond_duration}}, it is used in
 the second-order Taylor approximation of price changes.
+Prices use original log yields and moments use relative present values,
+avoiding monetary numerator overflow. Nonzero-term bonds require a positive
+finite price and finite risk measures; changing currency alone does not
+create an undefined sensitivity. Reported equivalent yields may reach -1 or
+Inf by rounding while the original specification remains usable. At zero
+term, the existing convention returns immediate redemption and zero risk.
 }
 \examples{
 bond_convexity(

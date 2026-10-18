@@ -86,6 +86,18 @@ The function is deliberately agnostic about the duration convention, but all
 individual durations must be expressed on the same basis within each
 portfolio. For example, do not mix Macaulay durations in years with
 durations measured in coupon periods.
+All measures must refer to the same yield coordinate as well as the same
+time units for an interpretation as price sensitivity to a common shift.
+Values and durations are finite and nonnegative, and each portfolio requires
+a finite positive total value. Zero-value positions remain in the position
+count. Relative weights are combined with durations without forming monetary
+duration products, recovering representable weighted contributions when
+separate products or weights lose range.
+Under \code{.na = "propagate"}, incomplete known portfolios have missing
+results. Positions with missing portfolio identifiers are retained as one
+final row with an \code{NA} identifier and missing duration, total value and
+position count. They are not assigned to any known portfolio. \code{"drop"}
+removes incomplete positions with a warning; \code{"error"} rejects them.
 }
 \examples{
 # Simple example: one portfolio

@@ -92,6 +92,13 @@ convexity immediately after any cash flow paid at that time.
 For streams containing both positive and negative cash flows, convexity
 remains a yield-sensitivity measure, but it may be negative and may not
 have the usual interpretation associated with conventional bonds.
+Relative contributions retain log weights rather than first forming a
+monetary convexity numerator. Representable products can be recovered when
+a standalone discount factor underflows; its audit column can then be zero
+while present value is positive. Discount factors, present values, their
+total/absolute sum, and the contributions/result must remain finite. Signed
+streams with absolute total value at most `sqrt(.Machine$double.eps)` times
+the sum of absolute present values are rejected as numerically cancelled.
 }
 \examples{
 convexity_cash_flow(

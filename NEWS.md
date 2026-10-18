@@ -2,6 +2,21 @@
 
 ## Bug fixes
 
+* Cash-flow duration and convexity form relative contributions directly,
+  avoiding overflowing monetary numerators and recovering representable
+  discounted products. Signed near-cancellation checks remain unchanged.
+* Bond duration and convexity retain original log yields and normalized
+  present-value moments. Calendar tolerances no longer reject small positive
+  prices solely because of currency units; unsupported indices and truly
+  nonrepresentable risk measures fail explicitly.
+* Portfolio duration and convexity avoid monetary products that overflow or
+  underflow before taking a finite weighted average. Yield-coordinate and
+  time-unit requirements for aggregation are now explicit in documentation.
+* Approved API decision C06: with `.na = "propagate"`, portfolio positions
+  with missing identifiers now produce a final row with an NA identifier and
+  missing sensitivity, value and position count, instead of silently vanishing.
+  Missing-value `drop` and `error` policies are preserved.
+
 * Spot discount and forward calculations retain original log growth rates,
   avoiding overflowed power ratios and preserving small rates and flat curves
   across intervals with large common origins. Linear interpolation remains

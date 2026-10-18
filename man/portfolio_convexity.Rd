@@ -85,6 +85,18 @@ The function is deliberately agnostic about the convexity convention, but all
 individual convexities must be expressed on the same basis within each
 portfolio. For example, do not mix convexities measured in coupon periods
 with convexities measured in years.
+All convexities must also use the same yield coordinate; nominal and annual
+effective yield convexities generally differ even when both use years.
+Values and convexities are finite and nonnegative, and each portfolio
+requires a finite positive total value. Zero-value positions remain in the
+position count. Relative weights are combined with convexities without
+forming monetary convexity products, recovering representable weighted
+contributions when separate products or weights lose range.
+Under \code{.na = "propagate"}, incomplete known portfolios have missing
+results. Positions with missing portfolio identifiers are retained as one
+final row with an \code{NA} identifier and missing convexity, total value and
+position count. They are not assigned to any known portfolio. \code{"drop"}
+removes incomplete positions with a warning; \code{"error"} rejects them.
 }
 \examples{
 # Simple example: one portfolio

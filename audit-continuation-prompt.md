@@ -53,9 +53,15 @@ forward_curve, bootstrap_spot_curve y par_rate, con 79 comprobaciones nuevas:
 descuento y forwards desde base original, tasa par independiente de moneda,
 NA con extremos incompletos y posiciones de gráficos, y sistema triangular.
 Bootstrap conserva su algoritmo; no hay decisión C nueva. Consultar los
-resultados exactos de validación global en audit-precran-check.md. Siguen
-duración/convexidad de flujos, bonos y portafolios; después inmunización y su
-gráfico, preservando arreglos previos. B04 lleva once de veinte, no cerrado.
+resultados exactos de validación global en audit-precran-check.md.
+La cuarta unidad ya revisa duración/convexidad de flujos, bonos y portafolios:
+253 comprobaciones nuevas, contribuciones relativas, medias ponderadas sin
+productos monetarios desbordados, base log de bonos y tol solo de calendario.
+Firmas/columnas intactas. C06 fue autorizada expresamente e implementada:
+se conserva fila ID NA con métricas NA bajo propagate en los dos portafolios;
+drop/error intactos. Ver audit-api-review.md y la validación global vigente.
+Siguen inmunización y su gráfico, preservando arreglos previos. B04 tiene
+diecisiete de veinte funciones con revisión numérica, no está cerrado.
 
 Hubo autorización puntual posterior para subir los diez commits acumulados:
 el push hasta 8dba06e a origin/audit/0.2.0-precran se realizó y verificó.
