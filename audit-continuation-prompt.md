@@ -44,7 +44,11 @@ brackets de bonos largos, descuento y conversión de tasas fuera de rango,
 productos de cupón e interés corrido, índices y convergencia del rendimiento.
 Las 99 comprobaciones nuevas y la validación global están documentadas;
 consultar audit-precran-check.md para su resultado y alcance exactos.
-Siguiente unidad: bond_book_value y bond_callable_price; luego curvas y
+La segunda unidad ya revisa bond_book_value y bond_callable_price, conserva
+descuentos originales y valida los períodos de rescate; añade 142 comprobaciones.
+El usuario autorizó C05: is_worst_case señala el mínimo calculado y todos sus
+empates exactos; no se usa tol temporal como umbral monetario. Ver el registro
+B04 y audit-api-review.md. Siguiente unidad: curvas spot/forward/par y luego
 sensibilidad, preservando los arreglos previos de inmunización. B04 no cerrado.
 
 Hubo autorización puntual posterior para subir los diez commits acumulados:

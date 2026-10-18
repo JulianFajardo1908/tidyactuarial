@@ -2,6 +2,16 @@
 
 ## Bug fixes
 
+* Bond book values retain original log yields when valuing remaining payments.
+  Callable scenarios pass the original yield specification to pricing rather
+  than an effective equivalent that may have rounded to -1 or overflowed.
+* Callable dates must identify distinct coupon periods strictly inside
+  maturity after alignment; nonrepresentable period counts are rejected before
+  integer conversion in book-value and callable schedules.
+* Approved API decision C05: callable `is_worst_case` now marks exactly the
+  computed minimum price and all exact computed ties. Calendar tolerance no
+  longer determines monetary near ties. Arguments and columns are unchanged.
+
 * Bond prices retain original log yields and recover representable discounted
   amounts when intermediate powers overflow or underflow. Coupon schedules and
   accrued interest also recover finite coupons from overflowing products.

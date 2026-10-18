@@ -11,7 +11,8 @@ Funciones examinadas: bond_cash_flows, bond_price, bond_ytm y accrued_interest.
 También se examinan sus helpers privados .validate_bond_core y
 .resolve_bond_yield, alojados en R/bond_book_value.R. Modificar esos helpers
 no constituye una revisión integral de book value, callable, duración o
-convexidad. Permanecen 16 funciones del bloque por revisar integralmente.
+convexidad. Esta primera unidad abarca cuatro funciones; la segunda unidad
+siguiente incorpora otras dos y deja 14 por revisar integralmente.
 
 ### Modelo y referencias independientes
 
@@ -95,8 +96,85 @@ ex-cupón, impuestos, calendarios de mercado, precio a mitad de período o
 cash flows de signo mixto. check=FALSE conserva el uso interno sin validación
 completa y no es garantía para entradas arbitrarias.
 
+## Segunda unidad: valor contable y rescates opcionales
+
+Inicio sobre 185423b. El usuario pidió continuar en orden y autorizó C05:
+«Sí, mínimo calculado y empates exactos». No se interpreta esa decisión como
+autorización para cambiar otros retornos, columnas o tolerancias.
+
+### Identidades
+
+En la fecha de cupón s, inmediatamente después del pago, el valor contable
+es B_s=sum(r>s, pago_r*(1+j)^(-(r-s))). El pago_N incluye cupón y rescate.
+También B_s=P*(1+j)^s-sum(r<=s, pago_r*(1+j)^(s-r)), y el movimiento del
+libro es B_s=B_(s-1)*(1+j)-pago_s. Así B_0=P y B_N=0, incluso si R difiere
+de face. n=t=0 es saldo cero después del rescate, distinto del precio que
+representa el pago inmediato. No se uniforman esas convenciones distintas.
+
+Para rescate opcional en u, el escenario paga cupones en r=1..u*k y además
+call_R en u. La madurez se añade con R. El precio máximo compatible con un
+rendimiento objetivo en todos los escenarios es min_u P_u(j), porque cada
+precio es decreciente en j si tiene pagos positivos. El caso de todos los
+pagos cero produce precio cero, pero no identifica una TIR. Este cálculo
+no es una valoración de opción con tasas estocásticas y no garantiza una
+rentabilidad reinvertida hasta la madurez original tras rescate anticipado.
+
+### Hallazgos y decisión de API
+
+| ID | Evidencia previa y causa | Cambio | Estado |
+|---|---|---|---|
+| B04-06 | book value devolvía NaN con fuerza -100 y perdía precios finitos con tasa extrema; el helper de tasa retenía el log pero la fórmula volvía a potencias de ip | Usar períodos almacenados y .cash_flow_sum con log original de los pagos restantes; mantener salida cero después de vencimiento | Implementado y probado |
+| B04-07 | callable con fuerza -100 abortaba por ip=-1; con fuerza 1000 y k=1 abortaba por ip=Inf aun teniendo un precio finito de rescate | Pasar a bond_price los argumentos originales de rendimiento; conservar prioridad explícita del rendimiento directo y equivalentes informativos | Implementado y probado |
+| B04-08 | Contadores fuera de rango emitían coerciones NA; fechas como 1 y 1+1e-12 se admitían como rescates distintos en el mismo período, y 1e-12 se convertía en rescate inmediato | Comprobar N antes del cast; validar unicidad e interioridad del período de rescate una vez alineado | Implementado y probado |
+| C05 / B04-09 | Tres precios distintos aparecían todos como peor caso al reducir la escala monetaria, por usar sqrt(tol) de calendario como umbral de dinero | is_worst_case = precio_calculado == mínimo_calculado, incluidos empates exactos; decisión pública autorizada expresamente | Implementado y probado |
+
+La salida tidy de book value preserva orden y duplicados de t; el escalar
+vectorial sirve dentro de mutate sin agregar interfaz .data. Callable conserva
+filas ordenadas por t, identificación original de escenario y emparejamiento
+call_t/call_R. Conserva precio escalar o tibble según tidy. c sigue siendo
+cupón nominal anual, n/t/call_t están en años, k es frecuencia de pago y y_m
+es frecuencia de conversión del rendimiento. tol no mide dinero ni define
+empates. No se añaden funciones, argumentos, columnas, aliases o dependencias.
+
+### Pruebas, compatibilidad y límites
+
+test-bond-book-callable-audit.R añade 142 comprobaciones: frecuencias 1/2/4,
+tasas negativas/cero/positivas, tres identidades de libro independientes,
+orden y duplicados, fecha posterior a cada pago y madurez, tabla vacía,
+cuatro familias de rendimiento, extremos y tasas pequeñas, mutate, rescates
+desordenados con importes asociados, cupones hasta fecha de ejercicio,
+prioridad del rendimiento directo, escalas 1e-12/1/1e12, empates exactos y
+precios próximos que no son empates, períodos inválidos sin coerción NA.
+
+La ejecución previa sobre 185423b está en b04-book-callable-before.log en el
+directorio de artefactos; reproduce errores de valoración, flags y coerción.
+Se corrigió una referencia de prueba de prioridad: el mínimo era el escenario
+a un año, 105/1.04, no el precio a dos años. No fue una corrección de código.
+Las 142 comprobaciones finales pasan sin advertencias. La validación global
+se registra en audit-precran-check.md, separada de la primera unidad.
+
+Impacto: firmas, clases y columnas intactas. C05 puede reducir los indicadores
+TRUE entre escenarios próximos que antes se aceptaban por un umbral fijo;
+es la modificación semántica aprobada. Fechas que se convierten en el mismo
+cupón o en un extremo inválido se rechazan en lugar de valorar silenciosamente
+otro escenario. Extremos monetarios recuperables reciben valores corregidos.
+Las dos firmas y los nombres/clases de columnas tidy se compararon
+directamente con 185423b y coinciden. El inventario sigue en 101 nombres
+públicos y 960 apariciones de parámetros, sin descripciones Rd faltantes.
+Suite completa, build y check del paquete instalado aprobados: 0 ERROR,
+0 WARNING y 1 NOTE de versión de desarrollo, salida 0. La segunda unidad
+queda cerrada dentro de los límites siguientes; ver artefactos y SHA256
+en audit-precran-check.md. Ambas unidades suman 241 comprobaciones nuevas.
+
+Los precios finales irrepresentables todavía pueden redondearse a cero o Inf;
+los flags de C05 comparan los precios calculados, no una precisión arbitraria
+ni empates matemáticos ocultos por double. Una equivalencia informativa -1/Inf
+no sustituye la especificación original. El calendario explícito sigue O(N)
+y requiere memoria. No se añade tratamiento entre cupones, stubs, riesgo de
+crédito, opción estocástica ni modificación de convenciones de interés corrido.
+
 ## Continuación del bloque
 
-Siguiente unidad: bond_book_value y bond_callable_price; luego curvas spot,
-forward y par; sensibilidad por variable de derivación y nueva comprobación
-de inmunización preservando arreglos anteriores. B04 no está cerrado.
+Siguiente unidad: curvas spot, forward y par; después sensibilidad por variable
+de derivación y nueva comprobación de inmunización preservando arreglos
+anteriores. Se han revisado seis de las veinte funciones de B04; no está cerrado.

@@ -47,7 +47,8 @@ or \code{"force"}.}
 \item{R}{Numeric scalar. Redemption value at final maturity. If \code{NULL},
 defaults to \code{face}.}
 
-\item{tol}{Numeric scalar. Tolerance used in alignment checks.}
+\item{tol}{Finite positive numeric scalar. Absolute tolerance for alignment
+of \code{n * k} and \code{t * k} with integer periods, not a monetary tolerance.}
 
 \item{check}{Logical scalar. If \code{TRUE}, performs input validation.}
 
@@ -93,8 +94,8 @@ Yield input conventions:
         \code{y}, \code{y_type}, and \code{y_m}, and is interpreted as the
         effective yield per coupon period.
   \item Otherwise, \code{y}, \code{y_type}, and \code{y_m} define an annual
-        yield specification, which is converted first to annual effective
-        yield and then to effective yield per coupon period.
+        yield specification. Valuation retains its original log accumulation
+        rate even if an equivalent reported rate loses numeric range.
 }
 
 
@@ -111,6 +112,10 @@ period, then the book value at time \eqn{s} is
 \deqn{BV_s = \sum_{r=s+1}^{N} C_r (1+i_p)^{-(r-s)}.}
 
 This is the prospective book value on the bond's yield basis.
+Valuation times retain their supplied order and duplicates. At maturity the
+final coupon and redemption have both been paid, so the value is zero;
+the same convention gives zero for \code{n = t = 0}. Integer period counts
+must fit the cash-flow schedule, with sufficient memory for its rows.
 }
 \examples{
 # Book value at time 0 equals price

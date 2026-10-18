@@ -355,3 +355,38 @@ Entorno R 4.6.1/Windows, locale UTF-8 y Pandoc de RStudio; check con
 aislamiento. Sin nueva CI remota, manual, publicación, push ni cambio de
 versión. El usuario pidió continuar en orden: siguen book value y callable.
 Esta verificación acredita la primera unidad, no los cambios posteriores.
+
+## B04: valor contable y escenarios de rescate, C05 autorizada
+
+Segunda unidad sobre 185423b: 142 comprobaciones nuevas aprobadas y suite
+local completa sin fallos ni advertencias, salida 0. Log de suite:
+b04-book-callable-local-tests.log; reproducción previa:
+b04-book-callable-before.log, ambos en el directorio de artefactos.
+Se verificaron tres identidades independientes de libro, precios por escenario,
+tasas extremas, períodos de ejercicio y el indicador de mínimo de C05.
+El usuario autorizó expresamente mínimo calculado y empates exactos.
+
+Las dos firmas públicas y nombres/clases de columnas tidy coinciden con
+185423b. Se mantienen 101 nombres públicos y 960 apariciones de parámetros.
+Sin dependencias, exportaciones, helpers, argumentos o columnas nuevos.
+Roxygen modificó únicamente los dos Rd correspondientes en esta unidad.
+
+R CMD build --no-manual y R CMD check --as-cran --no-manual:
+**0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE: versión de desarrollo
+0.1.6.9000. Pasaron análisis de código (49 s), ejemplos (29 s), pruebas
+instaladas (62 s), viñetas y reconstrucción de las cuatro viñetas (17 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b04-book-callable-verified/`.
+Informe tidyactuarial.Rcheck/00check.log; snapshot-verification.txt acredita
+16 archivos fuente/tests/NEWS/NAMESPACE/Rd iguales al checkout normalizando
+CRLF. Ambas regresiones de B04 están incluidas; audit-*/AGENTS excluidos.
+SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`4E86D9DD1C978B0DE5F866A9B8B18AB74F1A8B6A4051A775E89111ED4C76E7E9`.
+
+Entorno R 4.6.1/Windows, locale UTF-8, Pandoc de RStudio y
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`, ejecutado fuera del aislamiento con
+bibliotecas instaladas. Sin push, CI remota nueva, manual, publicación o
+cambio de versión. Segunda unidad cerrada en sus límites documentados;
+B04 tiene seis de veinte funciones revisadas y sigue abierto. Próximo paso:
+curvas spot/forward/par, después sensibilidad e inmunización.

@@ -32,7 +32,11 @@ unidades, firmas y uso tidyverse en audit-bonds-curves-immunization.md.
 No cambian formals ni columnas. tol de bond_ytm sigue en unidades de tasa;
 tol de calendario controla alineación y tol de accrued_interest conserva
 su regla de conciliación con piso monetario 1, ahora explícita en Rd.
-No se implementan nuevas propuestas C ni se da por cerrado B04.
+La segunda unidad incorpora bond_book_value y bond_callable_price, con
+142 comprobaciones independientes y firmas/columnas preservadas. C05 fue
+autorizada e implementada: el flag de peor rescate identifica el mínimo
+calculado y los empates exactos, sin reutilizar tolerancia temporal en dinero.
+No se da por cerrado B04.
 
 ## B01/B02: evaluación separada por dimensión
 
@@ -79,6 +83,7 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C02 | C | Elegir una política común para m no nominal en consumidores financieros. Ignorarlo o exigirlo globalmente cambia el dominio aceptado y los errores | Pendiente de decisión; las diferencias actuales quedan documentadas |
 | C03 | C | Reordenar i/i_type o s/t para favorecer cierto pipe posicional | No recomendado como cambio automático: rompe llamadas posicionales y no hace falta para mutate/pmap |
 | C04 | C | Unificar C/cf, .data o tidy/output en todo el paquete | No ejecutar en bloque; los contratos y tipos de operación son distintos. Revisar solo propuestas concretas por familia |
+| C05 | C | is_worst_case de callable identifica el mínimo calculado y sus empates exactos, sin umbral monetario derivado de tol temporal | Autorizada expresamente el 17 de octubre; implementada y probada sin cambiar firmas ni columnas |
 
 ## Mejoras compatibles y categorías A realizadas
 
@@ -150,3 +155,17 @@ con `residual_tol` según el matching de R. Usar `result=` completo conserva
 el extractor (se reprodujo una solución 2 antes y después). No se añaden
 aliases para sostener abreviaturas parciales. La garantía posicional
 descrita arriba se mantiene; no se promete preservar esas abreviaturas.
+
+## C05: indicador de peor rescate autorizado e implementado
+
+El usuario aprobó expresamente «Sí, mínimo calculado y empates exactos».
+bond_callable_price(tidy=TRUE) ahora define is_worst_case por igualdad con
+el mínimo de price_at_target_yield, incluyendo todas las filas empatadas
+exactamente en el cálculo. La antigua diferencia absoluta <=sqrt(tol)
+mezclaba tolerancia de calendario y dinero, por lo que al cambiar de moneda
+se marcaban escenarios claramente diferentes. No se añade tolerancia de
+precio ni argumento nuevo. No cambian precio escalar, firmas ni columnas;
+un escenario próximo pero no idéntico puede pasar de TRUE a FALSE.
+Se comprueba el indicador con escalas, empates exactos y precios cercanos.
+No se promete recuperar empates matemáticos ocultos por redondeo o precios
+finales fuera de representación. C02–C04 siguen pendientes sin implementar.

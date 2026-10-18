@@ -30,8 +30,8 @@
 #'         \code{y}, \code{y_type}, and \code{y_m}, and is interpreted as the
 #'         effective yield per coupon period.
 #'   \item Otherwise, \code{y}, \code{y_type}, and \code{y_m} define an annual
-#'         yield specification, which is converted first to annual effective
-#'         yield and then to effective yield per coupon period.
+#'         yield specification. Valuation retains its original log accumulation
+#'         rate even if an equivalent reported rate loses numeric range.
 #' }
 #'
 #' @param face Numeric scalar. Face or par value of the bond.
@@ -50,7 +50,8 @@
 #' @param y_m Positive integer. Conversion frequency for nominal annual yields.
 #' @param R Numeric scalar. Redemption value at final maturity. If \code{NULL},
 #'   defaults to \code{face}.
-#' @param tol Numeric scalar. Tolerance used in alignment checks.
+#' @param tol Finite positive numeric scalar. Absolute tolerance for alignment
+#'   of \code{n * k} and \code{t * k} with integer periods, not a monetary tolerance.
 #' @param check Logical scalar. If \code{TRUE}, performs input validation.
 #' @param tidy Logical scalar. If \code{FALSE}, returns a numeric vector of book
 #'   values. If \code{TRUE}, returns a tibble with intermediate quantities.
@@ -76,6 +77,10 @@
 #' \deqn{BV_s = \sum_{r=s+1}^{N} C_r (1+i_p)^{-(r-s)}.}
 #'
 #' This is the prospective book value on the bond's yield basis.
+#' Valuation times retain their supplied order and duplicates. At maturity the
+#' final coupon and redemption have both been paid, so the value is zero;
+#' the same convention gives zero for \code{n = t = 0}. Integer period counts
+#' must fit the cash-flow schedule, with sufficient memory for its rows.
 #'
 #' @seealso \code{\link{bond_price}}, \code{\link{bond_cash_flows}},
 #'   \code{\link{bond_duration}}, \code{\link{bond_convexity}}
@@ -222,6 +227,10 @@ bond_book_value <- function(
   y_m <- as.integer(round(y_m))
 
   N_raw <- n * k
+  if (!is.finite(N_raw) || N_raw < 0 || round(N_raw) >= .Machine$integer.max) {
+    stop("`n * k` must be finite, nonnegative and below the integer index limit.",
+         call. = FALSE)
+  }
 
   if (abs(N_raw - round(N_raw)) > tol) {
     stop(
@@ -267,7 +276,7 @@ bond_book_value <- function(
     check = FALSE
   )
 
-  cf_period <- as.integer(round(cf_tbl$t * k))
+  cf_period <- cf_tbl$period
 
   book_value <- vapply(
     seq_along(t),
@@ -286,7 +295,7 @@ bond_book_value <- function(
 
       rel_periods <- cf_period[idx] - s
 
-      sum(cf_tbl$cf[idx] / (1 + ip)^rel_periods)
+      .cash_flow_sum(cf_tbl$cf[idx], -rel_periods * yield$log_period)
     },
     numeric(1L)
   )

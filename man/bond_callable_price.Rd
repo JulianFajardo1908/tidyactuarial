@@ -49,7 +49,9 @@ or \code{"force"}.}
 \item{R}{Numeric scalar. Redemption value at final maturity. If \code{NULL},
 defaults to \code{face}.}
 
-\item{tol}{Numeric scalar. Tolerance used in alignment checks.}
+\item{tol}{Finite positive numeric scalar. Absolute tolerance for alignment
+of \code{n * k} and \code{call_t * k} with integer periods. It is not a
+monetary tolerance and does not define ties between scenario prices.}
 
 \item{check}{Logical scalar. If \code{TRUE}, performs input validation.}
 
@@ -62,7 +64,9 @@ If \code{tidy = FALSE}, a numeric scalar: the worst-case callable-bond price
 consistent with the target yield.
 
 If \code{tidy = TRUE}, a tibble with one row per redemption scenario,
-including scenario prices and the worst-case indicator.
+including scenario prices and the worst-case indicator. \code{is_worst_case}
+is \code{TRUE} exactly when a computed scenario price equals the computed
+minimum, including all exact computed ties. Near ties are not marked.
 }
 \description{
 Computes the maximum price an investor should pay for a callable bond in
@@ -101,8 +105,8 @@ Yield input conventions:
         \code{y}, \code{y_type}, and \code{y_m}, and is interpreted as the
         effective yield per coupon period.
   \item Otherwise, \code{y}, \code{y_type}, and \code{y_m} define an annual
-        yield specification, which is converted first to annual effective
-        yield and then to effective yield per coupon period.
+        yield specification. Scenario prices retain its original log
+        accumulation rate even if a reported equivalent loses numeric range.
 }
 
 
@@ -124,6 +128,13 @@ when \code{tidy = FALSE}.
 
 This is the maximum price an investor can pay while still guaranteeing at
 least the target yield under the least favorable redemption scenario.
+A scenario pays all coupons through its redemption date, including the coupon
+on that date, plus its specified redemption value. There is no assumption of
+reinvestment at the target yield after early redemption and no stochastic
+model of interest rates or the issuer's exercise decision.
+Call dates must remain distinct and strictly inside maturity after alignment
+to integer coupon periods; two dates cannot represent the same coupon date.
+Rows are sorted by time and retain their original \code{scenario_id}.
 }
 \examples{
 # Callable bond with two possible call dates
