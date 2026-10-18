@@ -348,6 +348,11 @@ bond_book_value <- function(
     R <- face
   }
 
+  if (!is.numeric(tol) || length(tol) != 1L || is.na(tol) ||
+      !is.finite(tol) || tol <= 0) {
+    stop("`tol` must be a single finite positive numeric value.", call. = FALSE)
+  }
+
   if (!is.numeric(face) ||
       length(face) != 1L ||
       is.na(face) ||
@@ -376,7 +381,7 @@ bond_book_value <- function(
       length(k) != 1L ||
       is.na(k) ||
       !is.finite(k) ||
-      k <= 0 ||
+      k <= 0 || k > .Machine$integer.max ||
       abs(k - round(k)) > tol) {
     stop("`k` must be a positive integer.", call. = FALSE)
   }
@@ -385,7 +390,7 @@ bond_book_value <- function(
       length(y_m) != 1L ||
       is.na(y_m) ||
       !is.finite(y_m) ||
-      y_m <= 0 ||
+      y_m <= 0 || y_m > .Machine$integer.max ||
       abs(y_m - round(y_m)) > tol) {
     stop("`y_m` must be a positive integer.", call. = FALSE)
   }
@@ -396,13 +401,6 @@ bond_book_value <- function(
       !is.finite(R) ||
       R < 0) {
     stop("`R` must be a single finite nonnegative number.", call. = FALSE)
-  }
-
-  if (!is.numeric(tol) ||
-      length(tol) != 1L ||
-      is.na(tol) ||
-      tol <= 0) {
-    stop("`tol` must be a single positive numeric value.", call. = FALSE)
   }
 
   invisible(TRUE)
@@ -444,7 +442,8 @@ bond_book_value <- function(
     }
 
     ip <- y_effective_per_period
-    i_annual <- (1 + ip)^k - 1
+    growth <- k * log1p(ip)
+    i_annual <- expm1(growth)
   } else {
     if (is.null(y)) {
       stop(
@@ -453,14 +452,11 @@ bond_book_value <- function(
       )
     }
 
-    i_annual <- standardize_interest(
-      type = y_type,
-      rate = y,
-      m = y_m
-    )
-
-    ip <- (1 + i_annual)^(1 / k) - 1
+    basis <- .interest_basis(i_type = y_type, i = y, m = y_m)
+    i_annual <- basis$effective
+    growth <- basis$growth
+    ip <- expm1(growth / k)
   }
 
-  list(ip = ip, i_annual = i_annual)
+  list(ip = ip, i_annual = i_annual, log_period = growth / k)
 }

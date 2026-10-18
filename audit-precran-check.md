@@ -329,3 +329,29 @@ y `_R_CHECK_CRAN_INCOMING_REMOTE_=false`; bibliotecas accesibles mediante
 ejecución fuera del aislamiento. Sin nuevo push, CI remota, manual,
 publicación o cambio de versión. B03 queda cerrado en el alcance documentado;
 B04 es la siguiente revisión integral. No se declara cerrado el paquete.
+
+## B04: calendario, precio, rendimiento e interés corrido
+
+Primera unidad B04-01/B04-05 implementada: 99 comprobaciones nuevas y suite
+local completa aprobadas, sin fallos ni advertencias. Log b04-bond-local-tests.log
+en el directorio de artefactos de esta conversación. Cinco firmas públicas
+se compararon con 49da88a y coinciden; 101 nombres públicos/960 parámetros.
+Los cambios de Rd se limitan a las cuatro funciones revisadas.
+
+R CMD build --no-manual y R CMD check --as-cran --no-manual terminaron con
+**0 ERROR, 0 WARNING, 1 NOTE**. Única NOTE: versión de desarrollo 0.1.6.9000.
+Pasaron código (41 s), ejemplos (25 s), pruebas instaladas (57 s), viñetas
+y reconstrucción de las cuatro viñetas (12 s).
+
+Artefactos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b04-bonds-verified/`.
+Informe tidyactuarial.Rcheck/00check.log; snapshot-verification.txt compara
+12 archivos fuente/tests/NEWS/NAMESPACE/Rd con el checkout (normalizando
+CRLF). La prueba nueva está incluida; audit-*/AGENTS quedan excluidos.
+SHA256: `75CF0FEB71A796657FFCB4EDD852829F79DBE3B5B0E5139F7D96A18FE0F7FE8A`.
+
+Entorno R 4.6.1/Windows, locale UTF-8 y Pandoc de RStudio; check con
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false` y bibliotecas accesibles fuera del
+aislamiento. Sin nueva CI remota, manual, publicación, push ni cambio de
+versión. El usuario pidió continuar en orden: siguen book value y callable.
+Esta verificación acredita la primera unidad, no los cambios posteriores.

@@ -32,10 +32,11 @@ positive.}
 \item{R}{Numeric scalar. Redemption value at maturity. If \code{NULL},
 defaults to \code{face}.}
 
-\item{interval}{Optional numeric vector of length 2 giving a bracket for the
-effective yield per coupon period.}
+\item{interval}{Optional finite numeric vector of length 2 giving an increasing
+bracket for the effective yield per coupon period, with both bounds above -1.}
 
-\item{tol}{Numeric scalar. Tolerance passed to \code{\link[stats]{uniroot}}.}
+\item{tol}{Finite positive numeric scalar. Yield-coordinate tolerance passed
+to \code{\link[stats]{uniroot}}, not a monetary price tolerance.}
 
 \item{maxiter}{Positive integer. Maximum number of iterations passed to
 \code{\link[stats]{uniroot}}.}
@@ -80,10 +81,16 @@ value.
 The effective yield per coupon period \eqn{j} is the solution to
 \deqn{P = \sum_{r=1}^{N} C_r (1+j)^{-r}.}
 
-The root is found numerically using \code{\link[stats]{uniroot}}. If no
-\code{interval} is supplied, the function automatically brackets the root
-starting from \eqn{(-0.999999, 0.10)} and progressively widens the upper
-bound until a sign change is detected.
+With nonnegative payments and at least one positive future payment, price
+is strictly decreasing in \eqn{j > -1}, so the yield is unique. The root is
+found with \code{\link[stats]{uniroot}}, using the log of the discounted
+cash-flow sum relative to price to avoid monetary overflow or underflow.
+If no \code{interval} is supplied, the lower bound is the nearest double
+precision number above -1 and the upper bound starts at 0.10 and is widened
+until the root is bracketed. A yield outside the representable domain or an
+exhausted iteration limit causes an error. Tolerance applies to the yield
+coordinate according to \code{uniroot}; it does not guarantee a given price
+residual, particularly for yields near -1.
 
 From the per-period yield, the annual equivalents are:
 \deqn{j^{(k)} = k j, \qquad i = (1 + j)^k - 1.}

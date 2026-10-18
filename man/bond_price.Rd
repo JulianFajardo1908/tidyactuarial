@@ -41,7 +41,7 @@ or \code{"force"}.}
 \item{R}{Numeric scalar. Redemption value at maturity. If \code{NULL},
 defaults to \code{face}.}
 
-\item{tol}{Numeric scalar. Tolerance used when checking alignment of maturity
+\item{tol}{Finite positive numeric scalar. Tolerance used when checking alignment of maturity
 with coupon periods.}
 
 \item{check}{Logical scalar. If \code{TRUE}, performs basic input validation.}
@@ -70,9 +70,8 @@ The yield may be supplied in either of two ways:
         \code{y_m}.
 }
 
-If an annual rate specification is supplied, it is first converted to the
-equivalent annual effective yield and then to the effective yield per coupon
-period.
+Annual yield specifications are valued using their original log accumulation
+rate, avoiding loss of precision or range in intermediate annual equivalents.
 
 
 This function follows the compact bond notation used in

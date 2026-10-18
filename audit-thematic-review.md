@@ -21,7 +21,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B01 | Tasas y factores financieros | 5 | En revisión; ver audit-interest-foundations.md |
 | B02 | Flujos y ecuaciones de valor | 8 | En revisión; ver audit-cash-flow-roots.md y audit-interest-foundations.md |
 | B03 | Anualidades financieras y préstamos | 7 | Revisión cerrada dentro del alcance documentado; ver audit-financial-annuities-loans.md, B03-08/B03-10 y límites expresos |
-| B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Pendiente de revisión integral; preservar evidencia previa |
+| B04 | Bonos, curvas, sensibilidad e inmunización | 20 | En revisión: calendario, precio, rendimiento e interés corrido; ver audit-bonds-curves-immunization.md |
 | B05 | Tablas, mortalidad y probabilidades | 12 | Pendiente de revisión integral; preservar evidencia previa |
 | B06 | Contingencias de una vida y contratos | 13 | Pendiente de revisión integral; preservar evidencia previa |
 | B07 | Contingencias multivida | 6 | Pendiente de revisión integral; preservar evidencia previa |
@@ -50,9 +50,10 @@ de términos desbordados con factor común también fue corregida. Ver
 audit-cash-flow-roots.md, B02-07/B02-08, y audit-api-review.md. Se preservan
 101 nombres públicos; la matriz contiene ahora 960 apariciones de parámetros.
 Las propuestas C02–C04 quedan separadas de los defectos obligatorios y no
-se implementaron. El siguiente bloque de revisión integral es B03, empezando
-por identidades de anualidades, límites de tasa cero y reconstrucción de
-saldos de préstamos. Esto no da por aprobados los bloques posteriores.
+se implementaron. B03 ya se cerró en el alcance documentado de anualidades
+y préstamos. B04 está iniciado con calendario, precio, rendimiento e interés
+corrido; sigue valor contable y bonos rescatables. Esto no da por aprobados
+los bloques posteriores.
 
 | Bloque | Nombre | Fuente | Tests con llamada directa |
 |---|---|---|---|

@@ -37,7 +37,10 @@
 #'   is provided, the other is determined by the clean/dirty price identity.
 #'   If both are supplied, their consistency is checked.
 #' @param tol Positive scalar tolerance for reconciling prices when both are
-#'   supplied; used as a scaled absolute tolerance.
+#'   supplied; finite and used as a scaled absolute tolerance. The bound is
+#'   `tol * max(1, abs(clean_price), abs(dirty_price), abs(accrued_interest))`
+#'   for each row. The unit floor is part of this price-reconciliation rule;
+#'   it is not a yield-solver tolerance.
 #'
 #' @details
 #' Let `F` be face value, `c` the nominal annual coupon rate, and `k`
@@ -63,6 +66,8 @@
 #' All direct-input arguments of length greater than one must have the same
 #' length; length-one values are recycled. Calendar dates must have class
 #' `Date`, not bare character strings or numeric date serials.
+#' Finite coupon and accrued amounts are recovered from overflowing intermediate
+#' products when possible; nonrepresentable final amounts cause an error.
 #'
 #' @return A `tibble`. For direct input, it contains the bond parameters,
 #'   settlement/coupon dates, the chosen convention, `coupon_per_period`,
@@ -266,6 +271,14 @@ accrued_interest <- function(
   }
   coupon_per_period <- face * c / k
   accrued <- face * c * year_fraction
+  recover_coupon <- !is.finite(coupon_per_period) |
+    (coupon_per_period == 0 & c > 0)
+  coupon_per_period[recover_coupon] <- .cash_flow_value(
+    face[recover_coupon], log(c[recover_coupon]) - log(k[recover_coupon]))
+  recover_accrued <- !is.finite(accrued) |
+    (accrued == 0 & c > 0 & year_fraction > 0)
+  accrued[recover_accrued] <- .cash_flow_value(
+    face[recover_accrued], log(c[recover_accrued]) + log(year_fraction[recover_accrued]))
   if (any(!is.finite(coupon_per_period)) || any(!is.finite(accrued))) {
     stop("Coupon/accrued interest overflowed; check monetary inputs.",
          call. = FALSE)

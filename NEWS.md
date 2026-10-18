@@ -2,6 +2,15 @@
 
 ## Bug fixes
 
+* Bond prices retain original log yields and recover representable discounted
+  amounts when intermediate powers overflow or underflow. Coupon schedules and
+  accrued interest also recover finite coupons from overflowing products.
+* Bond yields use a stable log price equation, avoiding bracket failures on
+  ordinary long bonds and dependence on currency scale. Automatic brackets
+  cover representable yields above -1; exhausted iterations now cause an error.
+  Nonfinite tolerances, intervals and unsupported integer indices are rejected.
+  Public arguments and result columns are preserved.
+
 * General amortization now identifies negative amortization under advance
   payments when accrued interest exceeds regular and extra payments combined.
 * Named extra-payment periods are checked before integer conversion, preventing

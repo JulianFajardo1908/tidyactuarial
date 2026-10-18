@@ -6,8 +6,8 @@ La matriz `audit-api-signatures.md` contiene 101 entradas y 960 apariciones
 de parámetros, en orden real y con defaults extraídos de formals(). A_xj
 permanece como alias de insurance_xj. Las descripciones Rd transcriben
 concepto, dominio y unidades cuando existen; no prueban su implementación.
-La semántica de B03 se revisa progresivamente; B04–B09 conservan pendientes
-de revisión integral por bloques.
+B03 queda cerrado dentro del alcance documentado; B04 está en revisión y
+B05–B09 conservan pendientes de revisión integral por bloques.
 
 Actualización B03: se abordaron a_angle, s_angle, annuity_arith, annuity_geom
 y los tres calendarios de préstamos. La tabla por dimensión, unidades y pendientes
@@ -25,6 +25,14 @@ columnas de los calendarios se verificaron contra HEAD 579efdb; no cambian.
 Se mantiene la prioridad local de extras/cuota en cada calendario y se
 explica la amortización negativa due sin redefinir columnas de principal.
 No se añaden propuestas C; C02–C04 siguen separadas del cierre matemático.
+
+Actualización B04: las cuatro funciones de calendario/precio/rendimiento e
+interés corrido tienen una evaluación separada de matemática, estabilidad,
+unidades, firmas y uso tidyverse en audit-bonds-curves-immunization.md.
+No cambian formals ni columnas. tol de bond_ytm sigue en unidades de tasa;
+tol de calendario controla alineación y tol de accrued_interest conserva
+su regla de conciliación con piso monetario 1, ahora explícita en Rd.
+No se implementan nuevas propuestas C ni se da por cerrado B04.
 
 ## B01/B02: evaluación separada por dimensión
 

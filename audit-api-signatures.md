@@ -481,7 +481,7 @@ Documentación: `man/accrued_interest.Rd`. Semántica: revisión por bloque pend
 | `day_count` | `"act/act"` | Day-count convention, one of "act/act" , "act/360" , "act/365" , or "30e/360" . The default is "act/act" , defined as actual days divided by actual days in the coupon period, with annual coupon fraction 1/k . For data-frame input, a day_count column, if present, takes precedence over this argument. "30e/360" denotes the European 30E/360 convention with both day-of-month values capped at 30. |
 | `clean_price` | `NULL` | Optional quoted clean price, in the same currency units and for the same face value as face . |
 | `dirty_price` | `NULL` | Optional dirty price, on the same basis. If either price is provided, the other is determined by the clean/dirty price identity. If both are supplied, their consistency is checked. |
-| `tol` | `1e-10` | Positive scalar tolerance for reconciling prices when both are supplied; used as a scaled absolute tolerance. |
+| `tol` | `1e-10` | Positive scalar tolerance for reconciling prices when both are supplied; finite and used as a scaled absolute tolerance. The bound is tol * max(1, abs(clean_price), abs(dirty_price), abs(accrued_interest)) for each row. The unit floor is part of this price-reconciliation rule; it is not a yield-solver tolerance. |
 
 ## B04 — bond_book_value
 
@@ -535,7 +535,7 @@ Documentación: `man/bond_cash_flows.Rd`. Semántica: revisión por bloque pendi
 | `n` | `<obligatorio>` | Numeric scalar. Years to maturity. |
 | `k` | `1L` | Positive integer. Number of coupon payments per year. |
 | `R` | `NULL` | Numeric scalar. Redemption value. If NULL , it is set equal to face . |
-| `tol` | `1e-10` | Numeric scalar. Tolerance. |
+| `tol` | `1e-10` | Finite positive numeric scalar. Absolute tolerance for integer alignment of k and n * k ; it is not a monetary tolerance. |
 | `check` | `TRUE` | Logical scalar. Input validation. |
 
 ## B04 — bond_convexity
@@ -589,7 +589,7 @@ Documentación: `man/bond_price.Rd`. Semántica: revisión por bloque pendiente 
 | `y_type` | `"effective"` | Character string indicating the annual yield type: "effective" , "nominal_interest" , "nominal_discount" , or "force" . |
 | `y_m` | `1L` | Positive integer. Conversion frequency for nominal annual yields. |
 | `R` | `NULL` | Numeric scalar. Redemption value at maturity. If NULL , defaults to face . |
-| `tol` | `1e-10` | Numeric scalar. Tolerance used when checking alignment of maturity with coupon periods. |
+| `tol` | `1e-10` | Finite positive numeric scalar. Tolerance used when checking alignment of maturity with coupon periods. |
 | `check` | `TRUE` | Logical scalar. If TRUE , performs basic input validation. |
 
 ## B04 — bond_ytm
@@ -604,8 +604,8 @@ Documentación: `man/bond_ytm.Rd`. Semántica: revisión por bloque pendiente sa
 | `n` | `<obligatorio>` | Numeric scalar. Time to maturity in years. Must be strictly positive. |
 | `k` | `1L` | Positive integer. Number of coupon payments per year. |
 | `R` | `NULL` | Numeric scalar. Redemption value at maturity. If NULL , defaults to face . |
-| `interval` | `NULL` | Optional numeric vector of length 2 giving a bracket for the effective yield per coupon period. |
-| `tol` | `1e-12` | Numeric scalar. Tolerance passed to uniroot . |
+| `interval` | `NULL` | Optional finite numeric vector of length 2 giving an increasing bracket for the effective yield per coupon period, with both bounds above -1. |
+| `tol` | `1e-12` | Finite positive numeric scalar. Yield-coordinate tolerance passed to uniroot , not a monetary price tolerance. |
 | `maxiter` | `1000` | Positive integer. Maximum number of iterations passed to uniroot . |
 | `check` | `TRUE` | Logical scalar. If TRUE , performs basic input checks. |
 

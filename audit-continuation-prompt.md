@@ -38,8 +38,14 @@ nombres fraccionarios de anticipos, tol infinito y rango monetario.
 **B03 cerrado dentro del alcance documentado**, con 216 comprobaciones nuevas,
 suite completa y R CMD check final aprobados. No repetir esos pendientes.
 Consultar el registro y su sección de límites antes de ampliar ese alcance.
-Próximo paso: B04, empezando por flujos/precio de bonos y sus convenciones
-de calendario y rendimiento; preservar los arreglos previos de inmunización.
+B04 ya iniciado: audit-bonds-curves-immunization.md registra la primera unidad
+de bond_cash_flows, bond_price, bond_ytm y accrued_interest. Se corrigieron
+brackets de bonos largos, descuento y conversión de tasas fuera de rango,
+productos de cupón e interés corrido, índices y convergencia del rendimiento.
+Las 99 comprobaciones nuevas y la validación global están documentadas;
+consultar audit-precran-check.md para su resultado y alcance exactos.
+Siguiente unidad: bond_book_value y bond_callable_price; luego curvas y
+sensibilidad, preservando los arreglos previos de inmunización. B04 no cerrado.
 
 Hubo autorización puntual posterior para subir los diez commits acumulados:
 el push hasta 8dba06e a origin/audit/0.2.0-precran se realizó y verificó.
