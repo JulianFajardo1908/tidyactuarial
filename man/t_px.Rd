@@ -55,5 +55,8 @@ The fractional-year factor \eqn{{}_s p_y} depends on the assumption:
 }
 
 If \eqn{x + t > \omega} (the terminal age), the function returns 0
-since no survival is possible beyond the table's limiting age.
+by the established table-horizon convention, including open tables.
+This is truncation, not inference about survival beyond observed ages;
+extend the table before evaluating a longer horizon. Interval tables with
+nonannual widths from \code{km_lifetable} require annual conversion first.
 }

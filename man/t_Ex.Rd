@@ -70,8 +70,12 @@ mathematics. It serves as the actuarial discount factor, combining financial
 discounting with mortality:
 \deqn{{}_tE_x = v^t \cdot {}_tp_x.}
 
-The interest-rate input is converted to an annual effective rate before
-applying the discount factor:
+Discounted products use the original log accumulation rate, retaining
+representable values when the annual effective equivalent loses range.
+This is an actuarial present value, not a probability: it can exceed one
+with negative interest rates and is not capped. The equivalent rate in
+tidy output may round to -1 or overflow, without being used for valuation.
+In ordinary notation the discount factor is:
 \deqn{v = (1+i_e)^{-1}.}
 
 Key identities involving \eqn{{}_nE_x}:

@@ -70,6 +70,12 @@ in closed form under the selected fractional-age assumption
   \item Balducci (Sec. 24.3): \eqn{\int_0^s {}_u p_y \, du = \frac{p_y}{q_y} \ln \left( \frac{p_y + q_y s}{p_y} \right)}
 }
 
+Integrals use stable exponential/logarithmic increments for small durations.
+Extinct cohorts contribute zero to later intervals, even if their
+conditional probabilities are undefined. The CF/Balducci zero-survival
+interval has integral zero; UDD retains its linear decline.
+Unknown survivor counts propagate as missing expectations.
+
 Under UDD, the complete expectancy satisfies the well-known approximation
 (Finan, Example 20.24):
 \deqn{\breve{e}_x \approx e_x + \frac{1}{2}.}

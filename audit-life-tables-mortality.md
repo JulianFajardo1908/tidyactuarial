@@ -117,9 +117,9 @@ Los hallazgos de esta unidad y C07 quedan cerrados dentro del alcance indicado.
 
 ## Límites y continuación
 
-Primera unidad de B05: dos de doce funciones revisadas. No se declara cerrado
-el bloque. Siguen probabilidades/supervivencia y esperanza de vida, preservando
-los arreglos históricos de t_px y e_xy, además de los restantes constructores.
+Estado registrado en d50c212: dos de doce funciones revisadas; el bloque
+seguía abierto. La conciliación posterior de las diez funciones restantes
+y el cierre documentado se encuentran en la sección siguiente.
 
 No se cambia la política NA/prioridad salvo NaN prohibido y C07; check=FALSE
 no certifica datos ni supuestos. No se normalizan datos incompatibles. Las
@@ -141,3 +141,152 @@ No se amplía ahora el dominio de omega de DeMoivre ni se cambia su redondeo;
 ese contrato debe estudiarse junto a límites de tablas antes de ampliarlo.
 No se atribuye contraste con paquetes externos/bibliografía no ejecutado.
 Sin push, publicación, cambio de versión o cierre de CI/R mínimo actuales.
+
+
+## Conciliación de cierre de las doce funciones (18 de octubre)
+
+El usuario pidió cerrar la revisión después de aclarar que existían pruebas
+anteriores. Se inspeccionó implementación, documentación y pruebas de las diez
+funciones restantes. Se reutilizó esa evidencia y se añadieron solo regresiones
+para vacíos reproducidos, sin presentar las pruebas previas como trabajo nuevo.
+Base de esta unidad: d50c212. Se preservan las correcciones históricas.
+
+| Función | Modelo/evidencia previa conciliada | Aporte específico al cierre |
+|---|---|---|
+| lifetable | Identidades lx/dx/qx/px/mx y pruebas de exposición ax; d50c212 | C07 y 62 comprobaciones compartidas con mortality_law_table, ya verificadas |
+| mortality_law_table | Integración independiente de fuerzas, leyes directas, Beta/HP y límites; d50c212 | Misma unidad anterior; no se repite su implementación |
+| t_px | test-survival-death-probabilities y test-e-xy-regressions: cocientes enteros, extinción, interpolación y reciclado | Controles/edades anuales y NA de cohortes seguros; se preservan los arreglos enteros/extintos |
+| t_qx | test-survival-death-probabilities: complementos, fracciones y salida tidy | Pérdidas fraccionarias pequeñas calculadas antes de complementar supervivencia |
+| t_Ex | test-life-expectancy-endowment: descuento, nominales, tiempo cero y columnas | C08 autorizada, base original log y frecuencias grandes sin coerción NA |
+| e_x | test-life-expectancy-endowment y test-e-xy-regressions: sumas, integrales, inclusión-exclusión y fracciones | Integrales pequeñas y cohortes extintas/desconocidas sin errores o NaN espurios |
+| commutation_table | test-commutation-table: seis funciones clásicas, sumas y Mx=lx a tasa cero | Productos de descuento originales y validación de tabla anual/monotonicidad |
+| md_table | test-multiple-decrement-table: suma de causas, cohortes y cierres | Rechazo de nombres que sobrescribían causas/totales; controles/radix finitos |
+| lt_tau | test-multiple-decrement-probabilities: mismo lx/q_total/p_total y supervivencia | Sin cambio funcional: delegación revisada; radix debe suministrarse en ... |
+| t_qxj | test-multiple-decrement-probabilities: enumeración entera, proporciones de causas y cola fraccionaria | CF pequeña estable y control de horizontes no finitos/índices |
+| km_lifetable | test-kaplan-meier-actuarial: producto manual, Greenwood, entrada demorada y exposiciones | C09 autorizada; escala de radix, límites cero y colas/intervalos de confianza |
+| plot_km | test-plot-km: lista/tabla, nombres personalizados, banda escalonada y edición | Orden cronológico, validación de probabilidades/bandas y QA visual |
+
+### Defectos reproducidos e identidades de la segunda unidad
+
+**B05-04, C08 autorizada.** El dotal es E(t)=p(t)*exp(-g*t), no una
+probabilidad. Con supervivencia uno y i=-.5, E(1)=2; el código devolvía 1.
+El usuario autorizó quitar ese cap. Se usa la base log original y el producto
+estable existente, sin cambiar argumentos/columnas. El caso binario p=2^-1000,
+g=-1100*log(2), t=1 devuelve 2^100, aunque el factor separado desborda.
+La columna i_effective sigue siendo diagnóstica y puede saturarse; no se usa
+para valorar. nEx no se limita ni se normaliza. Grandes m válidos conservan
+almacenamiento double cuando no caben en integer; casos ordinarios mantienen
+el tipo previo. No se aplica la política global C02.
+
+**B05-05.** Para t=k+s, q(t)=q(k)+p(k)*q_frac(s). Formar q_frac antes de
+restar de uno conserva pérdidas ~1e-20 que antes eran cero. UDD usa s*q;
+CF usa -expm1(s*log(p)), con log1p(-q) en probabilidades pequeñas; Balducci
+usa s*q/(p+s*q). El componente entero sigue los conteos observados, el horizonte
+sigue delegado a t_px y se respetan edades redondeadas dentro de tol.
+t_qxj aplica el mismo incremento CF a su proporción causal existente.
+No se cambia la hipótesis de proporciones de causas constantes durante el año.
+
+**B05-06.** CF integra s*(-expm1(-a*s)/(a*s)), a=-log(p), con límite s;
+Balducci integra s*log1p(z)/z, z=q*s/p, con límite s y tratamiento de cola.
+Antes los cocientes daban cero para horizontes pequeños. En cohortes extintas
+se anulan contribuciones posteriores antes de multiplicar por probabilidades
+indefinidas: UDD de (100,0,0,0) integra .5 y CF/Balducci integran cero,
+en lugar de NA. Las cuentas desconocidas propagan NA sin indexaciones inválidas.
+Se conservan los horizontes, modelos y pruebas multivida anteriores.
+
+**B05-07.** D_x=l_x*exp(-g*x), C_x=d_x*exp(-g*(x+1)); convertir primero
+una fuerza grande a i_effective impedía productos representables. El producto
+binario 2^1000*2^-1100=2^-100 es el oráculo nuevo. Se conserva el cierre
+l_(omega+1)=0 de este constructor, incluso para metadatos abiertos del input.
+No se redefine el significado de M/N/S/R ni el exponente de las edades.
+
+**B05-08.** En md_table, una causa d_a podía ser sobrescrita al generar el
+decremento de q_a, corrompiendo después otras causas. Ahora se rechazan
+colisiones con totales, edad y columnas derivadas; se mantiene make.unique
+entre nombres derivados que no sobrescriben datos. El control incluye nombres
+finales tras make.unique y age_col, para evitar colisiones indirectas con
+edades o causas ya presentes. Los conteos, tolerancias
+y sumas de causas válidas conservan su contrato. No se inventa una conversión
+de causas dependientes a fuerzas independientes.
+
+**B05-09, C09 autorizada.** En la tabla KM, L=width*l_next+ax*d, de donde
+ax=(L-width*l_next)/d es tiempo vivido en años. El código anterior devolvía
+su complemento temporal. C09 fue autorizada antes de implementarse. UDD
+conserva width/2; CF/Balducci se corrigen y usan sus límites estables cerca
+de q=0. Sin muertes, ax sigue NA.
+
+Las exposiciones se forman con factores de supervivencia normalizados antes
+de aplicar radix y width. El umbral monetario 1e-12 y el piso de supervivencia
+1e-16 alteraban CF/Balducci al cambiar radix; lx*lx_next también desbordaba.
+Se retiraron esos pisos: pruebas con radix=1e-250/1000/1e250 y width=2
+contrastan L por integración independiente de la supervivencia interpolada.
+Un extremo de supervivencia exactamente cero tiene integral CF/Balducci cero,
+ax=0 y mx=Inf si hay muertes; las cohortes extintas conservan ratios indefinidos.
+Las probabilidades q/p se forman desde los estimadores S de los extremos,
+conservando p positivo aun cuando 1-q redondea a cero.
+
+Se calcula seS=S*sqrt(Greenwood) antes de que S^2 pierda rango y el error
+log-log como sqrt(Greenwood)/abs(log(S)), sin piso artificial de S. El oráculo
+con 600 eventos y entrada demorada mantiene siempre n_risk=2,d=1: S=2^-600,
+G=300. Verifica error estándar e intervalos de confianza y exposición CF.
+Los intervalos en S=0/1 siguen NA; no se inventan límites en esas fronteras.
+
+### Verificación de cierre y compatibilidad
+
+Segunda unidad: **77 comprobaciones nuevas** en test-b05-closure.R; B05
+acumula **139 nuevas** en las dos unidades. Las 170 comprobaciones enfocadas
+previas de supervivencia, esperanza, conmutación, KM y decrementos se conservaron
+y aprobaron; no se cuentan como nuevas. Logs b05-closure-before.log y
+b05-closure-additional-before.log y b05-names-before.log reproducen los fallos; el segundo usa
+funciones obtenidas de d50c212, sin alterar el checkout. El log intermedio
+b05-closure-tests.log detectó pérdida de precisión subnormal en una integral
+CF; fue corregida. b05-closure-compatibility.log acredita los 75 focos finales
+y las diez firmas/clases/nombres/tipos ordinarios frente a d50c212. Dos
+casos suplementarios de colisión de nombres completan los 77 focos en
+b05-closure-focused-final.log; el check final incluye ese archivo actualizado.
+La suite local global se registra en b05-closure-final-tests.log; el chequeo
+instalado del archivo definitivo es la referencia final de entrega.
+
+Se generó e inspeccionó b05-km-closure.png (1350x750), con PDF vectorial,
+en artefactos. Curva y banda escalonadas, ejes/título legibles y sin recortes;
+la banda no imputa los límites estadísticamente indefinidos. No se añadieron
+funciones, dependencias, columnas ni versión. Matriz: 102 nombres públicos,
+973 apariciones de parámetros documentadas; C02–C04 no implementadas.
+
+B05 queda **cerrado dentro del alcance documentado: 12/12 funciones**.
+R CMD build/check definitivos: 0 ERROR, 0 WARNING, 1 NOTE por versión de
+desarrollo, salida 0. Pasaron ejemplos, suite instalada y cuatro viñetas.
+La huella y entorno del archivo construido están en audit-precran-check.md.
+El cierre corresponde al código final con 77 regresiones nuevas de esta unidad;
+precran-b05-closure es evidencia preliminar, reemplazada por
+precran-b05-closure-final después de completar las guardas de nombres.
+
+### Alcance del cierre integral de B05
+
+La revisión cubre los doce nombres públicos y sus modelos documentados,
+con datos de entrada actuarialmente válidos; check=FALSE no certifica datos.
+No se afirma perfección, conciliación del informe externo ausente ni cierre
+de otros bloques. La configuración de CI anterior no valida estos cambios;
+R mínimo y validación remota quedan pendientes para release.
+
+Se preserva la convención de t_px/t_qx/t_Ex/e_x hasta la última edad observada,
+incluidas tablas abiertas. Ese truncamiento no prueba que la cola biológica
+sea cero. Conmutación tiene cierre terminal propio; no se uniforma. Los KM
+mantienen su estimador constante más allá del último dato y el riesgo con
+entrada <= evento (convención inclusiva conservada). Su tabla de intervalos
+usa interpolación de extremos para L, no la integral de la escalera KM.
+Una clase lifetable con intervalos no anuales no convierte por sí sola ese
+objeto a una tabla anual: las funciones anuales ahora rechazan mallas irregulares
+con check=TRUE. Para usar todo el horizonte KM hay que incluir los extremos
+observados necesarios en la conversión. No se añaden extrapolaciones ni clases.
+
+Los datos de tiempo/entrada no finitos omitidos por KM producen ahora una
+advertencia; no se esconden pérdidas de filas. La probabilidad por causa usa
+los decrementos del productor md_table y proporciones intranuales fijas.
+No se sustituye ese modelo por independencia de causas. Fuera del rango
+double, los agregados o tasas diagnósticas pueden no ser representables;
+no se normalizan o capan para obtener un valor aparente. Se conservan los
+límites de la primera unidad y los contratos locales de NA/radix/frac.
+
+Siguiente bloque: B06, contingencias de una vida
+y contratos, preservando la función gráfica contingente ya revisada.

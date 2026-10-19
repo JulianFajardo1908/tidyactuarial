@@ -22,7 +22,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B02 | Flujos y ecuaciones de valor | 8 | En revisión; ver audit-cash-flow-roots.md y audit-interest-foundations.md |
 | B03 | Anualidades financieras y préstamos | 7 | Revisión cerrada dentro del alcance documentado; ver audit-financial-annuities-loans.md, B03-08/B03-10 y límites expresos |
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
-| B05 | Tablas, mortalidad y probabilidades | 12 | Iniciado: lifetable/mortality_law_table y C07; ver audit-life-tables-mortality.md; diez funciones pendientes |
+| B05 | Tablas, mortalidad y probabilidades | 12 | Revisión cerrada: 12/12 dentro del alcance de audit-life-tables-mortality.md; 139 comprobaciones nuevas y check final aprobado |
 | B06 | Contingencias de una vida y contratos | 14 | Pendiente de revisión integral; preservar evidencia previa |
 | B07 | Contingencias multivida | 6 | Pendiente de revisión integral; preservar evidencia previa |
 | B08 | Simulación de vidas y Monte Carlo | 11 | Pendiente de revisión integral; preservar evidencia previa |
@@ -56,8 +56,10 @@ se implementaron. B03 ya se cerró en el alcance documentado de anualidades
 y préstamos. B04 ya tiene evidencia de sus veinte funciones: bonos, curvas,
 sensibilidad e inmunización/gráfico. Queda cerrado dentro de los límites
 documentados, con 686 comprobaciones nuevas y check final 0 ERROR, 0 WARNING,
-1 NOTE por versión de desarrollo. Siguen tablas de vida y mortalidad de B05; esto
-no da por aprobados los bloques posteriores.
+1 NOTE por versión de desarrollo. B05 también quedó cerrado dentro de su
+alcance documentado: doce funciones conciliadas, 139 comprobaciones nuevas,
+C07/C08/C09 autorizadas y check final 0 ERROR, 0 WARNING, 1 NOTE por desarrollo.
+Sigue B06; esto no da por aprobados los bloques posteriores.
 
 | Bloque | Nombre | Fuente | Tests con llamada directa |
 |---|---|---|---|

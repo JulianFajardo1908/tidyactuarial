@@ -98,9 +98,24 @@ Additional columns follow Finan, Sections 23.3, 23.8--23.9:
   \item \eqn{\mathring{e}_x = T_x / \ell_x}: complete life expectancy
     (Finan, Sec. 23.3).
   \item \eqn{m_x = d_x / L_x}: central death rate (Finan, Sec. 23.9).
-  \item \eqn{a_x = (\ell_x \Delta - L_x) / d_x}: average fraction of the
-    interval lived by those who die.
+  \item \eqn{a_x = (L_x - \ell_{x+\Delta}\Delta) / d_x}: mean time
+    lived within the interval by those who die, in years (not a fraction
+    when interval width differs from one). Undefined if there are no deaths.
 }
+
+Nonfinite time/entry rows are omitted with a warning; the remaining sample
+must be nonempty. Breaks are sorted and deduplicated. Beyond the last
+observation, the KM step is held constant (no tail extrapolation is fitted).
+CF/Balducci exposure at an interval ending at zero survival uses its zero
+limit; positive deaths with zero exposure give infinite central mortality.
+Confidence intervals remain undefined at survival zero or one.
+Standard errors and intervals use Greenwood sums directly, preserving
+small positive survival estimates without a fixed survival floor.
+For delayed entry the risk set uses the existing inclusive convention
+\code{entry <= time}; this is a deliberate convention at tied entries/events.
+The lifetable component may have arbitrary interval widths: annual consumers
+such as \code{t_px} require conversion to an annual grid with the needed
+endpoint survivors; its class alone does not certify that conversion.
 }
 \examples{
 set.seed(1)

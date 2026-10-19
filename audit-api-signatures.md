@@ -886,7 +886,7 @@ Documentación: `man/md_table.Rd`. Semántica: revisión por bloque pendiente sa
 |---|---|---|
 | `qx_df` | `<obligatorio>` | A data.frame/tibble with an age column (default x ) and one or more cause columns containing annual probabilities in [0,1] . Recommended naming convention: cause columns start with "q_" (e.g., q_death , q_disability ). |
 | `age_col` | `"x"` | Character. Name of the age column (default "x" ). |
-| `cause_cols` | `NULL` | Character vector. Names of the cause columns. If NULL (default), all columns other than age_col are treated as causes. |
+| `cause_cols` | `NULL` | Character vector. Names of the cause columns. If NULL (default), all columns other than age_col are treated as causes. Cause names must not collide with reserved totals or generated death columns. |
 | `radix` | `1e+05` | Numeric. Starting cohort size at the first age (default 1e5 ). |
 | `close` | `TRUE` | Logical. If TRUE , requires q_{\omega}^{(\tau)} = 1 at the last age (default TRUE ). |
 | `check` | `TRUE` | Logical. If TRUE , performs input validation (default TRUE ). |

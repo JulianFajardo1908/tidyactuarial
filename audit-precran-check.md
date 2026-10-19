@@ -580,3 +580,47 @@ fuera del aislamiento. Sin push, publicación o CI remota/R mínimo actuales.
 Primera unidad y C07 cerradas en el alcance documentado; B05 sigue abierto,
 dos de doce funciones revisadas. Siguen t_px/t_qx/t_Ex/e_x y luego los demás
 constructores, conservando los arreglos multivida previos al llegar a B07.
+
+
+## B05: conciliación y cierre de las doce funciones (18 de octubre)
+
+Sobre d50c212 se conciliaron las diez funciones restantes con la evidencia
+previa. C08 (dotal sin cap) y C09 (ax KM como años vividos) fueron autorizadas
+expresamente antes de implementarse. La matriz de doce funciones, fórmulas,
+causas raíz, impacto y límites está en audit-life-tables-mortality.md.
+
+Esta unidad añade 77 comprobaciones; B05 acumula 139 nuevas entre ambas
+unidades. Se conservaron y aprobaron las 170 comprobaciones enfocadas anteriores,
+sin atribuirlas como nuevas. La suite local global pasó; los 77 focos finales
+y las diez firmas/clases/tipos ordinarios están en b05-closure-focused-final.log
+y b05-closure-compatibility.log. Este último recoge los 75 casos anteriores a
+las dos guardas suplementarias de nombres. b05-closure-before.log,
+b05-closure-additional-before.log y b05-names-before.log documentan fallos
+previos; b05-closure-final-tests.log documenta la suite local. La referencia
+exhaustiva final es la suite instalada del archivo construido (77 focos).
+
+R CMD build --no-manual y R CMD check --as-cran --no-manual definitivos:
+**0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE: versión de desarrollo
+0.1.6.9000. Pasaron análisis de código (33 s), documentación, ejemplos (22 s),
+pruebas instaladas (51 s), cuatro viñetas y su reconstrucción (10 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b05-closure-final/`.
+Informe tidyactuarial.Rcheck/00check.log; snapshot-verification.txt acredita
+372 archivos R/tests/Rd/ejemplo/NEWS/NAMESPACE iguales al checkout normalizando
+CRLF. AGENTS/audit-* excluidos; pruebas de cierre incluidas. DESCRIPTION
+conserva 0.1.6.9000. SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`075B3DDD3587AAC705FBCA9F87D5B423B45DB52697E3EC75A2E005F4EE2D636C`.
+El directorio precran-b05-closure es evidencia preliminar; no incluye las dos
+últimas guardas de nombres y queda reemplazado por la validación definitiva.
+
+Se inspeccionó b05-km-closure.png (1350x750), con exportación PDF vectorial:
+curva/banda escalonadas legibles, sin recortes ni imputar CI indefinidos.
+Sin funciones, dependencias, columnas o versión nuevas; inventario estable:
+102 nombres públicos, 973 apariciones de parámetros documentadas.
+R 4.6.1/Windows, locale UTF-8, Pandoc de RStudio y
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`, con bibliotecas instaladas accesibles
+fuera del aislamiento. Sin push, publicación, CI remota nueva ni prueba actual
+de R mínimo. B05 cerrado dentro del alcance y límites documentados: 12/12;
+C07/C08/C09 implementadas y verificadas. Sigue B06. La auditoría global y la
+conciliación del informe externo ausente no se dan por cerradas.

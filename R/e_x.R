@@ -41,6 +41,12 @@
 #'   \item Balducci (Sec. 24.3): \eqn{\int_0^s {}_u p_y \, du = \frac{p_y}{q_y} \ln \left( \frac{p_y + q_y s}{p_y} \right)}
 #' }
 #'
+#' Integrals use stable exponential/logarithmic increments for small durations.
+#' Extinct cohorts contribute zero to later intervals, even if their
+#' conditional probabilities are undefined. The CF/Balducci zero-survival
+#' interval has integral zero; UDD retains its linear decline.
+#' Unknown survivor counts propagate as missing expectations.
+#'
 #' Under UDD, the complete expectancy satisfies the well-known approximation
 #' (Finan, Example 20.24):
 #' \deqn{\breve{e}_x \approx e_x + \frac{1}{2}.}
@@ -60,6 +66,13 @@ e_x <- function(
     tol = 1e-10
 ) {
   type <- match.arg(type)
+  for (name in c("check", "tidy")) {
+    value <- get(name, inherits = FALSE)
+    if (!is.logical(value) || length(value) != 1L || is.na(value))
+      stop("`", name, "` must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.numeric(tol) || length(tol) != 1L || !is.finite(tol) || tol < 0)
+    stop("`tol` must be finite and nonnegative.", call. = FALSE)
 
   # --- inherit frac from lifetable attribute if not supplied ---
   if (missing(frac)) {
@@ -83,6 +96,7 @@ e_x <- function(
   x <- as.numeric(x)
   if (check) {
     if (any(!is.finite(x))) stop("`x` must be finite.")
+    if (any(abs(x) > .Machine$integer.max)) stop("`x` must be representable as integer ages.")
     if (any(abs(x - round(x)) > tol)) stop("`x` must be integer ages.")
   }
   x <- as.integer(round(x))
@@ -108,6 +122,11 @@ e_x <- function(
   if (nx == 1L && n > 1L) x <- rep(x, n)
   if (nt == 1L && n > 1L) t <- rep(t, n)
 
+  if (check && (!is.numeric(lt$x) || any(!is.finite(lt$x)) ||
+      any(abs(lt$x - round(lt$x)) > tol) ||
+      any(abs(lt$x) > .Machine$integer.max) || anyDuplicated(lt$x) ||
+      any(diff(sort(round(lt$x))) != 1)))
+    stop("`lt` must contain consecutive annual integer ages.", call. = FALSE)
   ages <- as.integer(lt$x)
   lx   <- as.numeric(lt$lx)
   omega <- max(ages)
@@ -132,12 +151,17 @@ e_x <- function(
       if (py >= 1) return(s)
       if (py <= 0) return(0)
       a <- -log(py)
-      return((1 - py^s) / a)
+      if (a * s == 0) return(s)
+      return(s * (-expm1(-a * s) / (a * s)))
     }
 
     # Balducci (Sec. 24.3): int_0^s p/(1-(1-u)q) du = (p/q)*ln((p+qs)/p)
     if (qy <= 0) return(s)
-    (py / qy) * log((py + qy * s) / py)
+    if (py <= 0) return(0)
+    z <- qy * s / py
+    if (z == 0) return(s)
+    if (is.finite(z)) return(s * (log1p(z) / z))
+    (py / qy) * (log(py + qy * s) - log(py))
   }
 
   ex <- rep(NA_real_, n)
@@ -147,7 +171,7 @@ e_x <- function(
     tm <- t[m]
 
     i0 <- match(xm, ages)
-    if (is.na(i0) || lx[i0] <= 0) {
+    if (is.na(i0) || is.na(lx[i0]) || lx[i0] <= 0) {
       ex[m] <- NA_real_
       next
     }
@@ -212,12 +236,14 @@ e_x <- function(
     need <- is.na(qy) | is.na(py)
     if (any(need)) {
       iy1 <- match(ys + 1L, ages)
-      okd <- need & !is.na(iy1) & (lx[iy] > 0)
+      okd <- need & !is.na(iy1) & !is.na(lx[iy]) & (lx[iy] > 0)
       qy[okd] <- (lx[iy[okd]] - lx[iy1[okd]]) / lx[iy[okd]]
       py[okd] <- 1 - qy[okd]
     }
 
-    I1 <- vapply(seq_along(py), function(j) int_ps(py[j], qy[j], 1, frac), numeric(1))
+    I1 <- vapply(seq_along(py), function(j) {
+      if (is.na(p_k[j])) NA_real_ else if (p_k[j] == 0) 0 else int_ps(py[j], qy[j], 1, frac)
+    }, numeric(1))
     part1 <- sum(p_k[seq_along(I1)] * I1)
 
     # Partial last year at age x+n
@@ -229,12 +255,13 @@ e_x <- function(
       qN <- qx_col[iN]; pN <- px_col[iN]
       if (is.na(qN) || is.na(pN)) {
         iN1 <- match(yN + 1L, ages)
-        if (!is.na(iN1) && lx[iN] > 0) {
+        if (!is.na(iN1) && !is.na(lx[iN]) && lx[iN] > 0) {
           qN <- (lx[iN] - lx[iN1]) / lx[iN]
           pN <- 1 - qN
         }
       }
-      part2 <- p_k[length(p_k)] * int_ps(pN, qN, s, frac)
+      part2 <- if (is.na(p_k[length(p_k)])) NA_real_ else if (p_k[length(p_k)] == 0) 0 else
+        p_k[length(p_k)] * int_ps(pN, qN, s, frac)
     }
 
     ex[m] <- part1 + part2

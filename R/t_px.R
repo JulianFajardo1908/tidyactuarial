@@ -37,7 +37,10 @@
 #' }
 #'
 #' If \eqn{x + t > \omega} (the terminal age), the function returns 0
-#' since no survival is possible beyond the table's limiting age.
+#' by the established table-horizon convention, including open tables.
+#' This is truncation, not inference about survival beyond observed ages;
+#' extend the table before evaluating a longer horizon. Interval tables with
+#' nonannual widths from \code{km_lifetable} require annual conversion first.
 #'
 #' @return Numeric vector of \eqn{{}_t p_x}, or a tibble if
 #'   \code{tidy = TRUE}.
@@ -51,6 +54,14 @@ t_px <- function(
     check = TRUE,
     tol = 1e-10
 ) {
+
+  for (name in c("check", "tidy")) {
+    value <- get(name, inherits = FALSE)
+    if (!is.logical(value) || length(value) != 1L || is.na(value))
+      stop("`", name, "` must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.numeric(tol) || length(tol) != 1L || !is.finite(tol) || tol < 0)
+    stop("`tol` must be a single finite nonnegative number.", call. = FALSE)
 
   # --- inherit frac from lifetable attribute if not supplied ---
   if (missing(frac)) {
@@ -76,6 +87,8 @@ t_px <- function(
 
   if (check) {
     if (any(!is.finite(x)) || any(!is.finite(t))) stop("`x` and `t` must be finite.")
+    if (any(abs(x) > .Machine$integer.max))
+      stop("`x` must be representable as integer ages.", call. = FALSE)
     if (any(abs(x - round(x)) > tol)) stop("`x` must be integer ages.")
     if (any(t < 0)) stop("`t` must be nonnegative.")
   }
@@ -92,6 +105,11 @@ t_px <- function(
   if (nt == 1L && n > 1L) t <- rep(t, n)
 
   # --- extract table vectors ---
+  if (check && (!is.numeric(lt$x) || any(!is.finite(lt$x)) ||
+      any(abs(lt$x - round(lt$x)) > tol) ||
+      any(abs(lt$x) > .Machine$integer.max) || anyDuplicated(lt$x) ||
+      any(diff(sort(round(lt$x))) != 1)))
+    stop("`lt` must contain consecutive annual integer ages.", call. = FALSE)
   ages <- as.integer(lt$x)
   lx   <- as.numeric(lt$lx)
   omega <- max(ages)
@@ -125,9 +143,9 @@ t_px <- function(
   x_todo <- x[todo]
 
   i0 <- match(x_todo, ages)
-  i1 <- match(x_todo + as.integer(n_int), ages)
+  i1 <- match(as.numeric(x_todo) + n_int, ages)
 
-  ok <- !is.na(i0) & !is.na(i1) & (lx[i0] > 0)
+  ok <- !is.na(i0) & !is.na(i1) & !is.na(lx[i0]) & !is.na(lx[i1]) & (lx[i0] > 0)
 
   # Integer survival part: n_p_x = l_{x+n} / l_x
   p_int <- rep(NA_real_, length(todo))
@@ -135,7 +153,7 @@ t_px <- function(
 
   # --- fractional part: s_p_{x+n} ---
   # Get q_y and p_y at y = x + n_int
-  y  <- x_todo + as.integer(n_int)
+  y  <- as.numeric(x_todo) + n_int
   iy <- match(y, ages)
 
   qy <- py <- rep(NA_real_, length(todo))

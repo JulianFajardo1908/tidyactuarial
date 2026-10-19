@@ -13,7 +13,12 @@ lifetable y mortality_law_table, con 62 comprobaciones nuevas; ver
 audit-life-tables-mortality.md y la validación final en audit-precran-check.md.
 C07 fue autorizada expresamente e implementada: con solo lx y close=FALSE,
 el intervalo terminal desconocido se devuelve NA; probabilidades terminales
-suministradas y tablas cerradas se conservan. B05 sigue abierto (2/12 revisadas).
+suministradas y tablas cerradas se conservan. El usuario pidió cerrar la conciliación B05: las doce funciones tienen ahora
+matriz de evidencia en audit-life-tables-mortality.md; 139 comprobaciones nuevas
+entre las dos unidades. C08 (dotal sin cap de uno) y C09 (ax KM como años vividos)
+fueron autorizadas expresamente. B05 queda cerrado dentro del alcance y límites documentados: 12/12 funciones,
+139 comprobaciones nuevas y check final 0 ERROR, 0 WARNING, 1 NOTE por versión
+de desarrollo. La huella/entorno están en audit-precran-check.md. Sigue B06.
 B04 conserva su cierre dentro del alcance documentado. No reiniciar la auditoría.
 
 ## Actualización de dirección acordada con el usuario

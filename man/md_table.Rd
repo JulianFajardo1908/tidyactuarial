@@ -23,7 +23,8 @@ Recommended naming convention: cause columns start with \code{"q_"}
 \item{age_col}{Character. Name of the age column (default \code{"x"}).}
 
 \item{cause_cols}{Character vector. Names of the cause columns. If \code{NULL}
-(default), all columns other than \code{age_col} are treated as causes.}
+(default), all columns other than \code{age_col} are treated as causes.
+Cause names must not collide with reserved totals or generated death columns.}
 
 \item{radix}{Numeric. Starting cohort size at the first age (default \code{1e5}).}
 

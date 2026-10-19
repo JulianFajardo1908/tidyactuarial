@@ -6,8 +6,8 @@ La matriz `audit-api-signatures.md` contiene 102 entradas y 973 apariciones
 de parámetros, en orden real y con defaults extraídos de formals(). A_xj
 permanece como alias de insurance_xj. Las descripciones Rd transcriben
 concepto, dominio y unidades cuando existen; no prueban su implementación.
-B03 y B04 quedan cerrados dentro de sus respectivos alcances documentados;
-B05–B09 conservan pendientes de revisión integral por bloques.
+B03, B04 y B05 quedan cerrados dentro de sus respectivos alcances documentados;
+B06–B09 conservan pendientes de revisión integral por bloques.
 
 Actualización B03: se abordaron a_angle, s_angle, annuity_arith, annuity_geom
 y los tres calendarios de préstamos. La tabla por dimensión, unidades y pendientes
@@ -102,6 +102,8 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C05 | C | is_worst_case de callable identifica el mínimo calculado y sus empates exactos, sin umbral monetario derivado de tol temporal | Autorizada expresamente el 17 de octubre; implementada y probada sin cambiar firmas ni columnas |
 | C06 | C | Conservar una fila de ID NA con métricas NA bajo propagate en las dos funciones de portafolio; error/drop intactos | Autorizada expresamente e implementada con 90 comprobaciones; firmas/columnas intactas |
 | C07 | C | Con solo lx y close=FALSE, el intervalo terminal sin observación queda NA; se conservan probabilidades terminales suministradas y cierre TRUE | Autorizada expresamente el 18 de octubre; implementada y probada en B05 |
+| C08 | C | t_Ex devuelve el APV v^t*p sin límite superior 1, también con tasas negativas | Autorizada expresamente el 18 de octubre; implementada en el cierre B05 |
+| C09 | C | KM ax = (Lx-lx_next*width)/dx, tiempo vivido en años, NA si no hay muertes | Autorizada expresamente el 18 de octubre; implementada en el cierre B05 |
 
 ## Mejoras compatibles y categorías A realizadas
 
@@ -241,3 +243,22 @@ siguen sin implementar. Inventario estable: 102 nombres, 973 parámetros.
 La validación final aprobó suite completa y R CMD check (0 ERROR, 0 WARNING,
 1 NOTE por desarrollo). C07 queda cerrada dentro de ese alcance autorizado;
 no cierra B05 ni modifica políticas de otros constructores.
+
+
+## Cierre B05: C08/C09 y compatibilidad
+
+El usuario autorizó C08 y C09 antes de implementar los cambios semánticos.
+El valor del dotal puro puede superar uno con interés negativo; el resto de
+columnas y el orden de argumentos se conservan. ax de KM mide años vividos,
+no el tiempo perdido ni una fracción adimensional de intervalos no unitarios.
+Las diez firmas restantes se compararon con d50c212; clases, nombres y tipos
+de columnas ordinarias conservados. Para m mayor que el rango entero de R,
+t_Ex usa almacenamiento double en esa columna, evitando la coerción anterior
+que producía NA; los casos ordinarios conservan el tipo integer previo.
+C02–C04 siguen sin implementar. Se preservan convenciones locales de horizonte,
+frac, radix, clases y retorno escalar/tabular; ver matriz de conciliación B05.
+
+Cierre C08/C09 y B05: doce funciones conciliadas y check final 0 ERROR,
+0 WARNING, 1 NOTE por desarrollo. Se preservan las firmas; 139 comprobaciones
+nuevas entre ambas unidades. Ver matriz de evidencia y límites de
+audit-life-tables-mortality.md; el cierre no implica cambios globales de API.

@@ -10,6 +10,21 @@
 
 ## Bug fixes
 
+* Approved C08: `t_Ex()` returns discounted survival without an upper cap of
+  one, allowing actuarial values above one under negative interest rates.
+  Pure endowments and commutation values retain original log discount rates.
+* Survival/death probabilities preserve small fractional decrement losses;
+  complete expectancy integrals retain small horizons and treat extinct
+  cohorts and unknown survivor counts without spurious NaN/index errors.
+* Approved C09: Kaplan-Meier `ax` measures time lived by interval decedents
+  in years. Empirical exposures are stable across radix scales and use the
+  CF/Balducci zero-survival limits; positive deaths at zero exposure yield Inf.
+  Standard errors and confidence limits retain very small survival estimates.
+* Multiple-decrement tables reject cause names that overwrite totals or other
+  causes; fractional cause probabilities retain rare losses. Annual consumers
+  validate annual age grids, and KM plots sort and validate step/band data.
+
+
 * Approved API decision C07: open life tables built only from `lx` now leave
   terminal deaths/probabilities/central rates missing instead of implying certain
   death. Supplied terminal probabilities and closed-table conventions remain.

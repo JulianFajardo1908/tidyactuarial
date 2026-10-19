@@ -39,8 +39,10 @@ using an annual life table, allowing for fractional ages under standard
 actuarial assumptions.
 }
 \details{
-This is a thin wrapper around \code{\link{t_px}}:
+Uses \code{\link{t_px}} for input and horizon conventions; the identity is:
 \deqn{{}_t q_x = 1 - {}_t p_x.}
+Small fractional losses are formed directly before subtracting from one,
+preserving probabilities whose survival rounds to one.
 
 The identity \eqn{{}_tq_x = {}_td_x / \ell_x} (Finan, Section 22) holds
 for integer \eqn{t}, where \eqn{{}_td_x = \ell_x - \ell_{x+t}} is the
