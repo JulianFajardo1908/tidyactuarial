@@ -69,10 +69,10 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 | B06 | `add_insurance` | `add_insurance(contract, type = c("whole", "term", "endowment", "pure_endowment", "variable_k"), benefit = 1, n = Inf, h = 0L, k = 1L, frac = c("UDD", "CF", "CML", "Balducci"))` | contract primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | The original contract with an `insurance` component. |
 | B06 | `add_premium_schedule` | `add_premium_schedule(contract, k = 1L, timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, woolhouse = c("none", "first", "second"), frac = NULL)` | contract primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | The original contract with a `premium_schedule` component. |
 | B06 | `annuity_multi` | `annuity_multi(lt, ages, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, annuity = c("cohort", "reversionary"), cohort = c("first", "last"), alpha = NULL, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"))` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A single numeric value representing the APV. |
-| B06 | `annuity_x` | `annuity_x(lt, x, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac = NULL, tidy = FALSE)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric scalar containing the actuarial present value. If tidy = TRUE , a one-row tibble with the main input values, equivalent interest rate, deferment factor, pure endowment factor, and APV. |
+| B06 | `annuity_x` | `annuity_x(lt, x, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac = NULL, tidy = FALSE)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric vector of actuarial present values, of length one for a single scenario. If tidy = TRUE , a tibble with one row per scenario, the main input values, equivalent interest rate, deferment factor, pure endowment factor, and APV. |
 | B06 | `apv_life_flow` | `apv_life_flow(lt, ages, t = NULL, date = NULL, date0 = NULL, cf, i, i_type = "effective", m = 1L, status = c("single", "first", "last", "reversionary"), alpha = NULL, plot = FALSE)` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A tibble with one row per payment and columns: t , cf , surv_prob , discount , expected_cf , pv , and pv_cum . If date was provided, a date column is included. The total APV is stored as attr(result, "apv") . The contingency attribute identifies "survival" or "weighted" (reversionary benefit fraction) for plot_contingent_cash_flow() . |
 | B06 | `insurance_variable_k` | `insurance_variable_k(lt, x, i, benefit, n = NULL, h = 0, k = 12, i_type = "effective", m = 1L, frac, tidy = FALSE, check = TRUE, tol = 1e-10)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | A numeric actuarial present value, or a one-row tibble if tidy = TRUE . |
-| B06 | `insurance_x` | `insurance_x(lt, x, i, i_type = "effective", m = 1L, n = Inf, h = 0L, type = c("whole", "term", "endowment"), benefit = 1, tidy = FALSE, ...)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric scalar containing the actuarial present value. If tidy = TRUE , a one-row tibble with the main input values, equivalent interest rate, deferral factor, pure endowment factor, annuity-due value used in the standard identities, and APV. |
+| B06 | `insurance_x` | `insurance_x(lt, x, i, i_type = "effective", m = 1L, n = Inf, h = 0L, type = c("whole", "term", "endowment"), benefit = 1, tidy = FALSE, ...)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric vector of actuarial present values, of length one for a single scenario. If tidy = TRUE , a tibble with one row per scenario, the main input values, equivalent interest rate, deferral factor, pure endowment factor, annuity-due value used in the standard identities, and APV. |
 | B06 | `insurance_xj` | `insurance_xj(md, x, i, cause, type = c("whole", "term"), benefit = 1, n = NULL, h = 0L, i_type = "effective", m = 1L, tidy = FALSE, check = TRUE, tol = 1e-10)` | md primero; pipe posicional posible, revisar pertinencia | `tidy = FALSE` | Numeric vector of APVs, or a tibble if tidy = TRUE . |
 | B06 | `life_contract` | `life_contract(lt, lives = c("single", "joint", "last_survivor"), x = NULL, y = NULL, i, i_type = "effective", m = 1L, ...)` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | An object of class `"tidyact_life_contract"`. |
 | B06 | `plot_contingent_cash_flow` | `plot_contingent_cash_flow(.data, view = c("all", "contractual", "probability", "expected", "pv"), title = NULL, subtitle = NULL, x_label = NULL, show_labels = TRUE, label_size = 3.2, label_digits = 2L, label_format = c("auto", "full", "compact"), currency = "", col_inflow = "#1B9E77", col_outflow = "#D95F02", date_labels = "%Y-%m-%d")` | .data primero; entrada tabular explícita | `Sin selector con esos nombres; ver retorno` | An editable ggplot2 object. Its tibble data has one row per payment per selected measure: row , t , x , event , measure , value , plot_value and label . value retains original units; extreme monetary panels use scaled plot_value with the power of ten in the panel title. |
@@ -1061,8 +1061,8 @@ Documentación: `man/annuity_x.Rd`. Semántica: revisión por bloque pendiente s
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `lt` | `<obligatorio>` | A life table as produced by lifetable , or a tidyact_life_contract object created by life_contract . A life table must contain columns x and lx . |
-| `x` | `<obligatorio>` | Integer actuarial age. Optional when lt is a single-life tidyact_life_contract . |
-| `i` | `<obligatorio>` | Numeric scalar. Annual interest-rate input. Optional when lt is a single-life tidyact_life_contract . |
+| `x` | `<obligatorio>` | Integer actuarial age, or a vector of scenario ages. Optional when lt is a single-life tidyact_life_contract . |
+| `i` | `<obligatorio>` | Numeric annual interest-rate input, scalar or by scenario. Optional when lt is a single-life tidyact_life_contract . |
 | `i_type` | `"effective"` | Character string indicating the interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
 | `m` | `1L` | Positive integer. Conversion frequency for nominal interest rates. Ignored for i_type = "effective" and i_type = "force" . In tidyactuarial , m is reserved for interest conversion frequency, not deferment. |
 | `n` | `NULL` | Numeric term in years. Use NULL or Inf for a whole-life annuity. For exact k-thly valuation ( woolhouse = "none" ), fractional terms are allowed when n * k is an integer. Woolhouse approximations require an integer number of years. |
@@ -1071,7 +1071,7 @@ Documentación: `man/annuity_x.Rd`. Semántica: revisión por bloque pendiente s
 | `timing` | `c("immediate", "due")` | Character string. Either "immediate" for payments at the end of each payment period or "due" for payments at the beginning of each payment period. |
 | `woolhouse` | `c("none", "first", "second")` | Character string. For k > 1 , use "none" for exact fractional-age computation, "first" for the first-order Woolhouse approximation, or "second" for the second-order Woolhouse approximation. |
 | `frac` | `NULL` | Character string. Fractional-age assumption used when k > 1 and woolhouse = "none" . Allowed values are "UDD" , "CF" , "CML" , and "Balducci" . If NULL , the frac attribute of lt is used when available; otherwise "UDD" is used. |
-| `tidy` | `FALSE` | Logical. If FALSE , returns a numeric APV. If TRUE , returns a one-row tibble with intermediate quantities. |
+| `tidy` | `FALSE` | Logical. If FALSE , returns a numeric APV. If TRUE , returns one tibble row per scenario with intermediate quantities. |
 
 ## B06 — apv_life_flow
 
@@ -1119,15 +1119,15 @@ Documentación: `man/insurance_x.Rd`. Semántica: revisión por bloque pendiente
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `lt` | `<obligatorio>` | A life table as produced by lifetable . It must contain columns x and lx . |
-| `x` | `<obligatorio>` | Integer actuarial age at issue. |
-| `i` | `<obligatorio>` | Numeric scalar. Annual interest-rate input. |
+| `x` | `<obligatorio>` | Integer actuarial age at issue, or a vector of scenario ages. |
+| `i` | `<obligatorio>` | Numeric annual interest-rate input, scalar or by scenario. |
 | `i_type` | `"effective"` | Character string indicating the interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
 | `m` | `1L` | Positive integer. Conversion frequency for nominal rates. Ignored for i_type = "effective" and i_type = "force" . |
 | `n` | `Inf` | Integer insurance term in years. Required for type = "term" and type = "endowment" . Use Inf only for whole-life insurance. |
 | `h` | `0L` | Integer deferment period in years. |
 | `type` | `c("whole", "term", "endowment")` | Character string. One of "whole" , "term" , or "endowment" . |
-| `benefit` | `1` | Numeric scalar. Benefit amount. |
-| `tidy` | `FALSE` | Logical scalar. If FALSE , returns a numeric APV. If TRUE , returns a one-row tibble with intermediate quantities. |
+| `benefit` | `1` | Numeric benefit amount, scalar or by scenario. A vector represents separate contracts, not a benefit schedule within one contract. |
+| `tidy` | `FALSE` | Logical scalar. If FALSE , returns a numeric APV. If TRUE , returns one tibble row per scenario with intermediate quantities. |
 | `...` | `<argumentos adicionales; sin default>` | Transitional compatibility for older calls using mortality_table , age , rate , rate_type , term_years , deferral_years , insurance_type , and output . |
 
 ## B06 — insurance_xj

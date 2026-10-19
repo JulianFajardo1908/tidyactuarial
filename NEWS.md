@@ -1,5 +1,18 @@
 # tidyactuarial 0.2.0
 
+* `annuity_x()` and `insurance_x()` now value parallel single-life scenarios
+  on a shared mortality table, recycling only length-one arguments. Numeric
+  vectors work in `mutate()`; tidy output has one row per scenario. Missing or
+  incompatible scenario inputs fail explicitly. Existing formals are retained.
+* Exact single-life valuations retain original log interest and survival ratios,
+  value deferred payments from issue, and handle extinct tails. Annual death
+  probabilities use survivor decrements before division. Explicit interest
+  overrides on insurance contracts are respected. Woolhouse reports negative
+  approximations and rejects undefined positive-survival boundary forces.
+* Approved C10: zero-term endowments pay on survival at deferred maturity.
+  Approved C11: empty annuities retain zero APV, with a pure endowment factor
+  of one and the ordinary `annuity_value_at_start` diagnostic column.
+
 * Life cash-flow APVs retain original log interest rates and combine monetary,
   survival and discount factors before rounding the product. Rare last-survivor
   probabilities avoid subtractive cancellation. Missing numeric times remain

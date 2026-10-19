@@ -657,3 +657,45 @@ tidyactuarial.Rcheck; pruebas instaladas: 4876 aprobadas, 0 fallos/advertencias
 Pandoc de RStudio, _R_CHECK_CRAN_INCOMING_REMOTE_=false y bibliotecas locales
 accesibles fuera del aislamiento. Sin push/publicación/CI remota nueva ni
 prueba actual de R mínimo. B06 sigue abierto; próximos annuity_x/insurance_x.
+
+## B06-02: anualidades, seguros y escenarios (18 de octubre)
+
+Base ede40b7. El usuario priorizó rigor y generalidad con vectorización de
+escenarios. Dos archivos funcionales, un archivo de helpers privados compartidos,
+dos archivos nuevos de tests, NEWS/Rd y registros/matriz de API actualizados.
+Firmas públicas, versión 0.1.6.9000 y dependencias conservadas. C10/C11 fueron
+autorizadas expresamente antes de aplicar los resultados públicos de plazo cero.
+Ver audit-single-life-contracts.md B06-02 para fórmulas, causas, compatibilidad
+y generalidad/límites; la ampliación no implica modelos de muerte continua.
+
+74 comprobaciones nuevas matemáticas/validación y 44 de escenarios/C10/C11:
+118 en esta unidad, 178 nuevas acumuladas B06. Suite local completa aprobada,
+salida 0, sin fallos/advertencias (b06-annuity-insurance-tests.log). Las pruebas
+previas de anualidades, seguros, primas/reservas y SOA permanecen aprobadas.
+Las regresiones previas están en b06-annuity-insurance-before.log,
+b06-woolhouse-before.log y b06-scenarios-c10-c11-before.log (este último
+reproduce C10/C11 antes de aplicarlas). b06-annuity-insurance-compatibility.log
+reproduce el rechazo previo de vectores y los casos cero, y compara 60 casos
+ordinarios con ede40b7: mismas firmas, clases, columnas/tipos y valores con
+tolerancia relativa 1e-12. Los cambios C10/C11 se verifican aparte.
+
+R CMD build --no-manual y R CMD check --as-cran --no-manual definitivos:
+salida 0, **0 ERROR, 0 WARNING, 1 NOTE** por versión de desarrollo 0.1.6.9000.
+Pruebas instaladas: 4994 aprobadas, 0 fallos/advertencias (50 s);
+ejemplos aprobados (20 s), cuatro viñetas
+y reconstrucción aprobadas (10 s). Informe tidyactuarial.Rcheck/00check.log.
+Artefactos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b06-annuity-insurance/`.
+snapshot-verification.txt acredita 376 archivos R/tests/Rd/ejemplo/NEWS/NAMESPACE
+iguales al checkout normalizando CRLF; incluye helpers/tests nuevos y excluye
+AGENTS/audit-*. SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`7012ADF80F94412411AF9CA61870D27E7A178A4F4F4D9B9C5C792819C076A35E`.
+
+Inventario estable: 102 nombres públicos, 973 apariciones de parámetros,
+cero descripciones ausentes. Matriz regenerada solo para los textos Rd nuevos.
+R 4.6.1/Windows, UTF-8, Pandoc de RStudio, bibliotecas instaladas accesibles
+fuera del aislamiento y _R_CHECK_CRAN_INCOMING_REMOTE_=false. lifecontingencies
+no está instalado en la biblioteca configurada; oráculos independientes son
+enumeración de pagos, decrementos de lx e identidades exactas/expansión CF.
+Sin push/publicación, CI remota nueva o prueba actual de R mínimo. B06 sigue
+abierto: continuar primas y reservas, componentes y modelos restantes.

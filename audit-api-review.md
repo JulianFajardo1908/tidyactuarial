@@ -105,6 +105,8 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C07 | C | Con solo lx y close=FALSE, el intervalo terminal sin observación queda NA; se conservan probabilidades terminales suministradas y cierre TRUE | Autorizada expresamente el 18 de octubre; implementada y probada en B05 |
 | C08 | C | t_Ex devuelve el APV v^t*p sin límite superior 1, también con tasas negativas | Autorizada expresamente el 18 de octubre; implementada en el cierre B05 |
 | C09 | C | KM ax = (Lx-lx_next*width)/dx, tiempo vivido en años, NA si no hay muertes | Autorizada expresamente el 18 de octubre; implementada en el cierre B05 |
+| C10 | C | Seguro dotal de plazo cero paga benefit E_h al vencimiento diferido; temporal vacío conserva cero | Autorizada expresamente e implementada en B06-02 |
+| C11 | C | Anualidad vacía conserva APV cero, factor dotal uno y columna annuity_value_at_start cero en posición ordinaria | Autorizada expresamente e implementada en B06-02 |
 
 ## Mejoras compatibles y categorías A realizadas
 
@@ -276,3 +278,33 @@ con faltantes el primero es un subtotal. No se ha autorizado cambiar este
 contrato, limitar alpha, rechazar varias edades en single ni uniformar m/frac
 con otros consumidores. No se implementan C02–C04 ni se añade una decisión C.
 Ver audit-single-life-contracts.md para límites numéricos y tareas restantes.
+
+## B06-02: escenarios y generalidad de annuity_x/insurance_x
+
+La petición actual del usuario prioriza vectorización y amplitud actuarial.
+Se extiende la interfaz a escenarios paralelos, sin cambiar formals ni añadir
+parámetros. lt es la tabla compartida, tidy un control escalar, y los demás
+argumentos de escenario deben tener longitud uno o común positiva. NULL de
+n/frac en anualidad conserva su default. El resultado es numérico para mutate
+o tibble por filas. Se rechazan longitudes incompatibles y NA; errores con
+número de escenario. benefit vectorial designa pólizas, no un calendario.
+Los selectores explícitos vectoriales designan escenarios, incluyendo listas
+que antes podían ser tratadas por match.arg como candidatos de default; los
+defaults omitidos conservan el primer valor. Esta es una ampliación solicitada,
+no una promesa de cómputo matricial ni de mayor velocidad.
+
+C10/C11 fueron autorizadas expresamente tras presentar su efecto concreto,
+y sus regresiones fallaron antes de aplicar esas dos decisiones. La primera
+cambia el pago del seguro dotal vacío a benefit E_h; la segunda uniforma la
+columna diagnóstica de la anualidad vacía y corrige su factor dotal a uno.
+Sesenta casos ordinarios conservan firma, clases, nombres, tipos y valores
+frente a ede40b7, con tolerancia relativa 1e-12. C02–C04 no se implementan.
+
+Los controles y convenciones n/k/h/timing/frac mantienen su significado.
+Las funciones siguen usando lx anual y cierre implícito en omega+1; no se
+propaga C07 automáticamente. Seguros pagaderos al final de subperíodos ya
+tienen insurance_variable_k; continuos/al momento exacto de muerte y edades
+fraccionarias requieren diseño actuarial/API explícito adicional. La matriz
+de capacidades, ecuaciones y 118 comprobaciones nuevas está en
+audit-single-life-contracts.md; no se declara máxima generalidad ni se
+atribuye esta implementación al informe de Claude que no se proporcionó.

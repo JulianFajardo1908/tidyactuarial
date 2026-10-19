@@ -1,5 +1,28 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B06-02: anualidades y seguros (18 de octubre)
+
+El usuario pidió especial cuidado con generalidad y vectorización de
+annuity_x/insurance_x. Se añade vectorización paralela de escenarios con
+reciclaje solo de longitud uno, lt/tidy compartidos, resultado numérico para
+mutate o tibble por filas, sin cambiar firmas ni añadir dependencias.
+Tasas originales y cocientes log mantienen APV representables; decrementos de
+lx evitan cancelación, extinción y overrides explícitos quedan corregidos.
+Woolhouse explicita límites y advierte aproximaciones negativas. C10 y C11
+fueron autorizadas expresamente: dotal n=0 paga benefit E_h; anualidad vacía
+con APV=0 tiene factor dotal uno y la columna ordinaria annuity_value_at_start.
+Ver audit-single-life-contracts.md B06-02 para fórmula, compatibilidad,
+generalidad, 118 comprobaciones nuevas y límites. B06 acumula 178 nuevas;
+no se presenta como máxima generalidad ni como revisión externa conciliada.
+Se conserva el horizonte implícito cerrado de estos consumidores: no confundir
+con C07. Seguros subanuales variables ya tienen insurance_variable_k, pendiente
+de revisión; muerte exacta/continuos/edades fraccionarias requieren otro diseño.
+Continuar primas y reservas, luego componentes y modelos restantes, sin rehacer
+esta unidad. Leer primero el resultado B06-02 en audit-precran-check.md.
+Validación final: check 0 ERROR, 0 WARNING, 1 NOTE por desarrollo y 4994
+comprobaciones instaladas aprobadas; ejemplos/viñetas aprobados. Archivo
+precran-b06-annuity-insurance verificado (376 archivos); huella en el registro.
+
 ## Continuación B06 (18 de octubre de 2026)
 
 Sobre fdd2d1f se inició B06 con apv_life_flow: tasas log originales,
