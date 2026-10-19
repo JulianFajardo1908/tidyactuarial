@@ -59,10 +59,12 @@ not all are alive, \code{alpha} times the benefit is paid.}
 }
 \value{
 A tibble with one row per payment and columns:
-  \code{t}, \code{cf}, \code{surv_prob}, \code{discount},
-  \code{expected_cf}, \code{pv}, and \code{pv_cum}. If \code{date} was
-  provided, a \code{date} column is included. The total APV is stored as
-  \code{attr(result, "apv")}.
+\code{t}, \code{cf}, \code{surv_prob}, \code{discount},
+\code{expected_cf}, \code{pv}, and \code{pv_cum}. If \code{date} was
+provided, a \code{date} column is included. The total APV is stored as
+\code{attr(result, "apv")}.
+The \code{contingency} attribute identifies \code{"survival"} or \code{"weighted"}
+(reversionary benefit fraction) for \code{\link[=plot_contingent_cash_flow]{plot_contingent_cash_flow()}}.
 }
 \description{
 Computes the actuarial present value (APV) of a cash-flow stream contingent
@@ -76,7 +78,6 @@ common statuses: single-life, first-death (all alive), last-survivor
 (any alive), and reversionary (joint-and-survivor) with fraction
 \code{alpha}.
 
-
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{t} denotes payment time, \code{cf} denotes cash
 flows, \code{i} denotes the interest rate, \code{i_type} denotes the
@@ -88,13 +89,13 @@ For each payment at time \eqn{t}, the APV contribution is
 
 The survival probability depends on the \code{status}:
 \itemize{
-  \item \code{"single"}: \eqn{{}_t p_x} for a single life.
-  \item \code{"first"}: \eqn{{}_t p_{x_1} \cdot {}_t p_{x_2} \cdots},
-    so all lives must be alive.
-  \item \code{"last"}: \eqn{1 - \prod_j (1 - {}_t p_{x_j})},
-    so at least one life must be alive.
-  \item \code{"reversionary"}: full benefit while all lives are alive, and
-    fraction \eqn{\alpha} while at least one but not all lives are alive.
+\item \code{"single"}: \eqn{{}_t p_x} for a single life.
+\item \code{"first"}: \eqn{{}_t p_{x_1} \cdot {}_t p_{x_2} \cdots},
+so all lives must be alive.
+\item \code{"last"}: \eqn{1 - \prod_j (1 - {}_t p_{x_j})},
+so at least one life must be alive.
+\item \code{"reversionary"}: full benefit while all lives are alive, and
+fraction \eqn{\alpha} while at least one but not all lives are alive.
 }
 
 Fractional-year survival is computed under UDD within each year.

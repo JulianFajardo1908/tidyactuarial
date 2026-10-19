@@ -41,13 +41,13 @@ plot_cash_flow(
 \arguments{
 \item{.data}{Optional data.frame or tibble containing cash-flow columns.}
 
-\item{C}{Numeric vector of cash flows, or a column name when `.data` is supplied.}
+\item{C}{Numeric vector of cash flows, or a column name when \code{.data} is supplied.}
 
-\item{t}{Optional numeric vector of times in years, or a column name when `.data` is supplied.}
+\item{t}{Optional numeric vector of times in years, or a column name when \code{.data} is supplied.}
 
-\item{date}{Optional date vector, or a column name when `.data` is supplied.}
+\item{date}{Optional date vector, or a column name when \code{.data} is supplied.}
 
-\item{i}{Optional annual interest-rate input used to compute present value if `PV` is `NULL`.}
+\item{i}{Optional annual interest-rate input used to compute present value if \code{PV} is \code{NULL}.}
 
 \item{i_type}{Character string indicating the interest-rate type.}
 
@@ -55,13 +55,13 @@ plot_cash_flow(
 
 \item{PV}{Optional numeric present value to display.}
 
-\item{payment}{Deprecated. Use `C`.}
+\item{payment}{Deprecated. Use \code{C}.}
 
-\item{time}{Deprecated. Use `t`. Kept explicit to avoid partial matching with `timeline_size`.}
+\item{time}{Deprecated. Use \code{t}. Kept explicit to avoid partial matching with \code{timeline_size}.}
 
-\item{rate}{Deprecated. Use `i`.}
+\item{rate}{Deprecated. Use \code{i}.}
 
-\item{pv}{Deprecated. Use `PV`.}
+\item{pv}{Deprecated. Use \code{PV}.}
 
 \item{title}{Optional plot title.}
 
@@ -69,15 +69,15 @@ plot_cash_flow(
 
 \item{x_label}{Optional x-axis label.}
 
-\item{amount_label}{Optional y-axis label when `normalize = FALSE`.}
+\item{amount_label}{Optional y-axis label when \code{normalize = FALSE}.}
 
-\item{financial}{Logical. If `TRUE`, positive cash flows point upward and negative cash flows point downward.}
+\item{financial}{Logical. If \code{TRUE}, positive cash flows point upward and negative cash flows point downward.}
 
-\item{normalize}{Logical. If `TRUE`, arrow heights are normalized.}
+\item{normalize}{Logical. If \code{TRUE}, arrow heights are normalized.}
 
-\item{aggregate}{Logical. If `TRUE`, cash flows occurring at the same time or date are summed before plotting.}
+\item{aggregate}{Logical. If \code{TRUE}, cash flows occurring at the same time or date are summed before plotting.}
 
-\item{show_labels}{Logical. If `TRUE`, labels are shown next to cash-flow arrows.}
+\item{show_labels}{Logical. If \code{TRUE}, labels are shown next to cash-flow arrows.}
 
 \item{label_size}{Numeric text size for labels.}
 
@@ -85,27 +85,27 @@ plot_cash_flow(
 
 \item{timeline_size}{Numeric line width for the time axis.}
 
-\item{label_digits}{Integer number of decimal digits for cash-flow labels.}
+\item{label_digits}{Integer between 0 and 50: decimal digits for cash-flow labels.}
 
 \item{label_format}{Character string controlling label notation. Use
 \code{"auto"} to abbreviate values from one million onward,
 \code{"full"} for unabridged values, or \code{"compact"} for
 abbreviated values such as \code{1.25M}.}
 
-\item{currency}{Optional currency or unit prefix, such as `$`.}
+\item{currency}{Optional currency or unit prefix, such as \code{$}.}
 
 \item{col_inflow}{Character color for inflow arrows.}
 
 \item{col_outflow}{Character color for outflow arrows.}
 
-\item{date_labels}{Character date-label format passed to `ggplot2::scale_x_date()`.}
+\item{date_labels}{Character date-label format passed to \code{ggplot2::scale_x_date()}.}
 
-\item{day_count}{Day-count convention used when `date` is supplied.}
+\item{day_count}{Day-count convention used when \code{date} is supplied.}
 
 \item{...}{Reserved for future extensions.}
 }
 \value{
-A `ggplot2` object.
+A \code{ggplot2} object.
 }
 \description{
 Creates a professional cash-flow diagram with arrows representing inflows
@@ -118,10 +118,21 @@ log factors are netted if individual present values overflow.
 Numeric timelines may include negative times; the valuation origin remains
 zero. Dated timelines use the earliest date
 as origin. Non-finite inferred present values or aggregated amounts are
-rejected. The returned ggplot remains editable with additional layers.
+rejected. Extreme monetary magnitudes use scaled graphical coordinates,
+with the power of ten stated on the axis; raw amounts remain in \code{plot$data$C}.
+Automatic/compact labels use scientific notation beyond the available
+suffixes or when fixed decimals would show a nonzero amount as zero.
+\code{label_format = "full"} retains explicit fixed-decimal formatting.
+Overlapping text labels may be omitted at rendering time; every arrow
+remains. For dense streams, use \code{show_labels = FALSE}. Simultaneous flows
+are netted by default; \code{aggregate = FALSE} keeps their exact positions,
+so arrows at identical times can overlap. No dates are jittered.
+\code{PV} is a supplied annotation when present, not a recalculation or check.
+Date origins and day counts differ from \code{\link[=apv_life_flow]{apv_life_flow()}} and are not
+silently unified. The returned ggplot remains editable with additional layers.
 
-This function uses compact actuarial notation: `C` denotes cash-flow amounts,
-`t` denotes times in years, `i` denotes the interest-rate input, and `PV`
+This function uses compact actuarial notation: \code{C} denotes cash-flow amounts,
+\code{t} denotes times in years, \code{i} denotes the interest-rate input, and \code{PV}
 denotes present value.
 }
 \examples{
@@ -157,7 +168,7 @@ plot_cash_flow(
 
 }
 \seealso{
-`pv_flow`, `fv_flow`, `irr_flow`, `standardize_interest`
+\code{pv_flow}, \code{fv_flow}, \code{irr_flow}, \code{standardize_interest}
 
 Other time-value:
 \code{\link[=accumulation_factor]{accumulation_factor()}},

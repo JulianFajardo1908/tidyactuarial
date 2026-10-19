@@ -2,7 +2,7 @@
 
 Objetivo 0.2.0. Clasificación: **A**, defecto matemático/computacional;
 **B**, mejora compatible; **C**, cambio público pendiente de autorización.
-La matriz `audit-api-signatures.md` contiene 101 entradas y 960 apariciones
+La matriz `audit-api-signatures.md` contiene 102 entradas y 973 apariciones
 de parámetros, en orden real y con defaults extraídos de formals(). A_xj
 permanece como alias de insurance_xj. Las descripciones Rd transcriben
 concepto, dominio y unidades cuando existen; no prueban su implementación.
@@ -205,3 +205,20 @@ Las 163 comprobaciones numéricas independientes llevan esta unidad a 253.
 Suite completa y build/check final aprobados (0 ERROR, 0 WARNING, 1 NOTE
 de versión de desarrollo). C06 queda cerrada dentro del alcance autorizado;
 no habilita C02–C04 ni otros cambios públicos.
+
+
+## Paréntesis autorizado de visualizaciones (18 de octubre de 2026)
+
+Se añade plot_contingent_cash_flow por petición expresa del usuario; .data
+primero y retorno ggplot con datos tibble. Las firmas de plot_cash_flow y
+apv_life_flow conservan formals frente a 989b4cf; solo se añade el atributo
+contingency al resultado de apv_life_flow, sin cambiar columnas/cálculos.
+El atributo distingue supervivencia de fracción esperada reversible; cuando
+falta, el gráfico usa Payment weight para evitar inferir una probabilidad.
+La nueva entrada usa cf como el productor apv_life_flow; el gráfico financiero
+conserva C. Los parámetros gráficos compartidos tienen iguales nombres,
+defaults (salvo tamaño de texto adaptado a paneles) y significado.
+No se implementan C02–C04. El límite documentado label_digits=0..50 evita
+coerción/clamping de formatC; full sigue disponible para formato fijo explícito.
+Ver audit-cash-flow-visualizations.md para matemática, defectos A frente a
+mejoras visuales B y los límites del nuevo contrato.

@@ -1,6 +1,6 @@
 # Matriz global de firmas públicas
 
-Extracción de las 101 entradas de NAMESPACE sobre la rama audit/0.2.0-precran.
+Extracción de las 102 entradas de NAMESPACE sobre la rama audit/0.2.0-precran.
 Se conservan los nombres, orden y defaults reales de formals(). El alias A_xj
 se identifica expresamente. Este inventario no modifica ninguna firma.
 
@@ -22,7 +22,7 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 | B02 | `fv_flow` | `fv_flow(cf, i, i_type = "effective", m = 1L, t = NULL, date = NULL, day_count = c("act/365", "act/360"), tol = 1e-10)` | cf primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | Numeric scalar: the future value of the cash flow accumulated to the latest cash-flow time. |
 | B02 | `irr_flow` | `irr_flow(cf, t = NULL, date = NULL, m = 1L, interval = c(-0.99, 10), tol = 1e-10, maxiter = 1000, day_count = c("act/365", "act/360"))` | cf primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | A one-row tibble with: irr Estimated IRR as an annual effective rate. i_effective_annual Same as irr , reported explicitly. j_nominal_interest Equivalent nominal annual interest rate convertible m times. delta Equivalent force of interest. npv Present value at the estimated IRR, close to zero. interval_left Left endpoint of the search interval. interval_right Right endpoint of the search interval. converged Logical flag indicating whether a root was found. n_iter Number of iterations used by uniroot . n_cashflows Length of cf . has_both_signs Whether the cash flow has at least one positive and one negative value. n_sign_changes Number of sign changes in the nonzero cash-flow sequence. If no sign change is present in the cash flow, or if the NPV does not change sign over interval , the function returns converged = FALSE and irr = NA_real_ . |
 | B02 | `irr_flow_multi` | `irr_flow_multi(cf, t = NULL, date = NULL, m = 1L, search_interval = c(-0.99, 10), grid_points = 2000L, tol = 1e-10, maxiter = 1000L, day_count = c("act/365", "act/360"))` | cf primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | A tibble with one row per detected IRR and columns: root_id Root index. irr Detected IRR as an annual effective rate. i_effective_annual Same as irr , reported explicitly. j_nominal_interest Equivalent nominal annual interest rate convertible m times. delta Equivalent force of interest. npv NPV evaluated at the detected root, approximately zero. interval_left Left endpoint of the local search bracket. interval_right Right endpoint of the local search bracket. n_cashflows Length of cf . has_both_signs Whether the cash flow has at least one positive and one negative value. n_sign_changes_cashflow Number of sign changes in the nonzero cash-flow sequence. If no roots are detected, the function returns a tibble with zero rows. |
-| B02 | `plot_cash_flow` | `plot_cash_flow(.data = NULL, C, t = NULL, date = NULL, i = NULL, i_type = "effective", m = 1L, PV = NULL, payment = NULL, time = NULL, rate = NULL, pv = NULL, title = NULL, subtitle = NULL, x_label = NULL, amount_label = "Cash flow", financial = TRUE, normalize = FALSE, aggregate = TRUE, show_labels = TRUE, label_size = 3.5, arrow_size = 0.8, timeline_size = 0.7, label_digits = 2L, label_format = c("auto", "full", "compact"), currency = "", col_inflow = "#1B9E77", col_outflow = "#D95F02", date_labels = "%Y-%m-%d", day_count = c("act/365", "act/360"), ...)` | .data primero; entrada tabular explícita | `Sin selector con esos nombres; ver retorno` | A `ggplot2` object. |
+| B02 | `plot_cash_flow` | `plot_cash_flow(.data = NULL, C, t = NULL, date = NULL, i = NULL, i_type = "effective", m = 1L, PV = NULL, payment = NULL, time = NULL, rate = NULL, pv = NULL, title = NULL, subtitle = NULL, x_label = NULL, amount_label = "Cash flow", financial = TRUE, normalize = FALSE, aggregate = TRUE, show_labels = TRUE, label_size = 3.5, arrow_size = 0.8, timeline_size = 0.7, label_digits = 2L, label_format = c("auto", "full", "compact"), currency = "", col_inflow = "#1B9E77", col_outflow = "#D95F02", date_labels = "%Y-%m-%d", day_count = c("act/365", "act/360"), ...)` | .data primero; entrada tabular explícita | `Sin selector con esos nombres; ver retorno` | A ggplot2 object. |
 | B02 | `present_value` | `present_value(C, i, i_type = "effective", m = 1, t, tidy = FALSE)` | C primero; pipe posicional posible, revisar pertinencia | `tidy = FALSE` | If tidy = FALSE , a numeric vector of present values. If tidy = TRUE , a tibble with input values, equivalent rates, discount factors, and present values. |
 | B02 | `pv_flow` | `pv_flow(cf, i, i_type = "effective", m = 1L, t = NULL, date = NULL, day_count = c("act/365", "act/360"))` | cf primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | Numeric scalar: the present value of the cash flow. |
 | B02 | `solve_value` | `solve_value(fn, solve_for, target, args = list(), result = NULL, interval = NULL, start = NULL, derivative = NULL, method = c("auto", "uniroot", "newton"), multiple = c("error", "all", "first"), tol = 1e-10, maxiter = 1000L, scan_points = 401L, max_expand = 6L, output = c("value", "summary", "audit"), residual_tol = tol)` | fn primero; pipe posicional posible, revisar pertinencia | `output = c("value", "summary", "audit")` | Depending on `output`: `"value"`: numeric scalar or vector containing the solution(s). `"summary"`: compact tibble with the unknown, solution, target, achieved value, residual, and method. `"audit"`: detailed tibble with convergence diagnostics and search information. |
@@ -70,11 +70,12 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 | B06 | `add_premium_schedule` | `add_premium_schedule(contract, k = 1L, timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, woolhouse = c("none", "first", "second"), frac = NULL)` | contract primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | The original contract with a `premium_schedule` component. |
 | B06 | `annuity_multi` | `annuity_multi(lt, ages, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, annuity = c("cohort", "reversionary"), cohort = c("first", "last"), alpha = NULL, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"))` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A single numeric value representing the APV. |
 | B06 | `annuity_x` | `annuity_x(lt, x, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac = NULL, tidy = FALSE)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric scalar containing the actuarial present value. If tidy = TRUE , a one-row tibble with the main input values, equivalent interest rate, deferment factor, pure endowment factor, and APV. |
-| B06 | `apv_life_flow` | `apv_life_flow(lt, ages, t = NULL, date = NULL, date0 = NULL, cf, i, i_type = "effective", m = 1L, status = c("single", "first", "last", "reversionary"), alpha = NULL, plot = FALSE)` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A tibble with one row per payment and columns: t , cf , surv_prob , discount , expected_cf , pv , and pv_cum . If date was provided, a date column is included. The total APV is stored as attr(result, "apv") . |
+| B06 | `apv_life_flow` | `apv_life_flow(lt, ages, t = NULL, date = NULL, date0 = NULL, cf, i, i_type = "effective", m = 1L, status = c("single", "first", "last", "reversionary"), alpha = NULL, plot = FALSE)` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A tibble with one row per payment and columns: t , cf , surv_prob , discount , expected_cf , pv , and pv_cum . If date was provided, a date column is included. The total APV is stored as attr(result, "apv") . The contingency attribute identifies "survival" or "weighted" (reversionary benefit fraction) for plot_contingent_cash_flow() . |
 | B06 | `insurance_variable_k` | `insurance_variable_k(lt, x, i, benefit, n = NULL, h = 0, k = 12, i_type = "effective", m = 1L, frac, tidy = FALSE, check = TRUE, tol = 1e-10)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | A numeric actuarial present value, or a one-row tibble if tidy = TRUE . |
 | B06 | `insurance_x` | `insurance_x(lt, x, i, i_type = "effective", m = 1L, n = Inf, h = 0L, type = c("whole", "term", "endowment"), benefit = 1, tidy = FALSE, ...)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric scalar containing the actuarial present value. If tidy = TRUE , a one-row tibble with the main input values, equivalent interest rate, deferral factor, pure endowment factor, annuity-due value used in the standard identities, and APV. |
 | B06 | `insurance_xj` | `insurance_xj(md, x, i, cause, type = c("whole", "term"), benefit = 1, n = NULL, h = 0L, i_type = "effective", m = 1L, tidy = FALSE, check = TRUE, tol = 1e-10)` | md primero; pipe posicional posible, revisar pertinencia | `tidy = FALSE` | Numeric vector of APVs, or a tibble if tidy = TRUE . |
 | B06 | `life_contract` | `life_contract(lt, lives = c("single", "joint", "last_survivor"), x = NULL, y = NULL, i, i_type = "effective", m = 1L, ...)` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | An object of class `"tidyact_life_contract"`. |
+| B06 | `plot_contingent_cash_flow` | `plot_contingent_cash_flow(.data, view = c("all", "contractual", "probability", "expected", "pv"), title = NULL, subtitle = NULL, x_label = NULL, show_labels = TRUE, label_size = 3.2, label_digits = 2L, label_format = c("auto", "full", "compact"), currency = "", col_inflow = "#1B9E77", col_outflow = "#D95F02", date_labels = "%Y-%m-%d")` | .data primero; entrada tabular explícita | `Sin selector con esos nombres; ver retorno` | An editable ggplot2 object. Its tibble data has one row per payment per selected measure: row , t , x , event , measure , value , plot_value and label . value retains original units; extreme monetary panels use scaled plot_value with the power of ten in the panel title. |
 | B06 | `premium_gross` | `premium_gross(prem, alpha = 0, beta = 0, gamma = 0, k = NULL, output = c("value", "summary", "audit", "table"), tidy = NULL, check = TRUE, tol = 1e-10, ...)` | prem primero; pipe posicional posible, revisar pertinencia | `output = c("value", "summary", "audit", "table"); tidy = NULL` | For output = "value" , a numeric scalar containing the annualized gross premium G^{(k)} . For output = "summary" , a one-row tibble with six columns: annualized gross premium, gross premium per payment, annualized net premium, annualized loading, payment frequency, and equivalence residual. For output = "audit" , a long-format tibble with the APVs of gross premiums, benefits, and each expense component. |
 | B06 | `premium_x` | `premium_x(lt, x, i, i_type = "effective", m = 1L, type = c("whole", "term", "endowment", "variable_k"), benefit = 1, n = Inf, h = 0L, k = 1L, frac = c("UDD", "CF", "CML", "Balducci"), timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, woolhouse = c("none", "first", "second"), output = c("value", "summary", "audit"), tidy = NULL, check = TRUE, ...)` | lt primero; tabla/contrato según documentación | `output = c("value", "summary", "audit"); tidy = NULL` | For output = "value" , a numeric scalar containing the annualized premium P^{(k)} . For output = "summary" , a one-row tibble with six columns: annualized premium, premium per payment, payment frequency, APV of benefits, APV of the premium annuity, and equivalence residual. For output = "audit" , a long-format tibble containing the principal inputs and calculated components. |
 | B06 | `reserve_x` | `reserve_x(lt, x, i, i_type = "effective", m = 1L, type = c("whole", "term", "endowment"), n = Inf, h = 0L, benefit = 1, P = NULL, k = 1L, frac = c("UDD", "CF", "CML", "Balducci"), timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, woolhouse = c("none", "first", "second"), t = NULL, method = c("prospective", "recursive"), output = c("summary", "value", "audit", "table"), tidy = NULL, check = TRUE, ...)` | lt primero; tabla/contrato según documentación | `output = c("summary", "value", "audit", "table"); tidy = NULL` | For output = "summary" , a tibble with at most six columns: duration, attained age, reserve, annualized premium, premium per payment, and method. For output = "value" , a named numeric vector. For output = "audit" , a long-format tibble containing future benefit APV, future premium APV, reserve, and premium amounts at each duration. |
@@ -117,8 +118,8 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 
 ## Cobertura de extracción
 
-- Entradas públicas: 101.
-- Apariciones de parámetros, incluyendo alias y ...: 960.
+- Entradas públicas: 102.
+- Apariciones de parámetros, incluyendo alias y ...: 973.
 - Apariciones sin descripción Rd: 0.
 - Todas las apariciones tienen descripción; esto no garantiza dominio o unidades completos.
 
@@ -257,35 +258,35 @@ Documentación: `man/plot_cash_flow.Rd`. Semántica: revisión por bloque pendie
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `.data` | `NULL` | Optional data.frame or tibble containing cash-flow columns. |
-| `C` | `<obligatorio>` | Numeric vector of cash flows, or a column name when `.data` is supplied. |
-| `t` | `NULL` | Optional numeric vector of times in years, or a column name when `.data` is supplied. |
-| `date` | `NULL` | Optional date vector, or a column name when `.data` is supplied. |
-| `i` | `NULL` | Optional annual interest-rate input used to compute present value if `PV` is `NULL`. |
+| `C` | `<obligatorio>` | Numeric vector of cash flows, or a column name when .data is supplied. |
+| `t` | `NULL` | Optional numeric vector of times in years, or a column name when .data is supplied. |
+| `date` | `NULL` | Optional date vector, or a column name when .data is supplied. |
+| `i` | `NULL` | Optional annual interest-rate input used to compute present value if PV is NULL . |
 | `i_type` | `"effective"` | Character string indicating the interest-rate type. |
 | `m` | `1L` | Positive integer. Conversion frequency for nominal rates. |
 | `PV` | `NULL` | Optional numeric present value to display. |
-| `payment` | `NULL` | Deprecated. Use `C`. |
-| `time` | `NULL` | Deprecated. Use `t`. Kept explicit to avoid partial matching with `timeline_size`. |
-| `rate` | `NULL` | Deprecated. Use `i`. |
-| `pv` | `NULL` | Deprecated. Use `PV`. |
+| `payment` | `NULL` | Deprecated. Use C . |
+| `time` | `NULL` | Deprecated. Use t . Kept explicit to avoid partial matching with timeline_size . |
+| `rate` | `NULL` | Deprecated. Use i . |
+| `pv` | `NULL` | Deprecated. Use PV . |
 | `title` | `NULL` | Optional plot title. |
 | `subtitle` | `NULL` | Optional plot subtitle. |
 | `x_label` | `NULL` | Optional x-axis label. |
-| `amount_label` | `"Cash flow"` | Optional y-axis label when `normalize = FALSE`. |
-| `financial` | `TRUE` | Logical. If `TRUE`, positive cash flows point upward and negative cash flows point downward. |
-| `normalize` | `FALSE` | Logical. If `TRUE`, arrow heights are normalized. |
-| `aggregate` | `TRUE` | Logical. If `TRUE`, cash flows occurring at the same time or date are summed before plotting. |
-| `show_labels` | `TRUE` | Logical. If `TRUE`, labels are shown next to cash-flow arrows. |
+| `amount_label` | `"Cash flow"` | Optional y-axis label when normalize = FALSE . |
+| `financial` | `TRUE` | Logical. If TRUE , positive cash flows point upward and negative cash flows point downward. |
+| `normalize` | `FALSE` | Logical. If TRUE , arrow heights are normalized. |
+| `aggregate` | `TRUE` | Logical. If TRUE , cash flows occurring at the same time or date are summed before plotting. |
+| `show_labels` | `TRUE` | Logical. If TRUE , labels are shown next to cash-flow arrows. |
 | `label_size` | `3.5` | Numeric text size for labels. |
 | `arrow_size` | `0.8` | Numeric line width for arrows. |
 | `timeline_size` | `0.7` | Numeric line width for the time axis. |
-| `label_digits` | `2L` | Integer number of decimal digits for cash-flow labels. |
+| `label_digits` | `2L` | Integer between 0 and 50: decimal digits for cash-flow labels. |
 | `label_format` | `c("auto", "full", "compact")` | Character string controlling label notation. Use "auto" to abbreviate values from one million onward, "full" for unabridged values, or "compact" for abbreviated values such as 1.25M . |
-| `currency` | `""` | Optional currency or unit prefix, such as `$`. |
+| `currency` | `""` | Optional currency or unit prefix, such as $ . |
 | `col_inflow` | `"#1B9E77"` | Character color for inflow arrows. |
 | `col_outflow` | `"#D95F02"` | Character color for outflow arrows. |
-| `date_labels` | `"%Y-%m-%d"` | Character date-label format passed to `ggplot2::scale_x_date()`. |
-| `day_count` | `c("act/365", "act/360")` | Day-count convention used when `date` is supplied. |
+| `date_labels` | `"%Y-%m-%d"` | Character date-label format passed to ggplot2::scale_x_date() . |
+| `day_count` | `c("act/365", "act/360")` | Day-count convention used when date is supplied. |
 | `...` | `<argumentos adicionales; sin default>` | Reserved for future extensions. |
 
 ## B02 — present_value
@@ -1163,6 +1164,26 @@ Documentación: `man/life_contract.Rd`. Semántica: revisión por bloque pendien
 | `i_type` | `"effective"` | Character string indicating the interest-rate type. Allowed values are `"effective"`, `"nominal_interest"`, `"nominal_discount"`, and `"force"`. |
 | `m` | `1L` | Positive integer. Conversion frequency for nominal rates. Ignored for `i_type = "effective"` and `i_type = "force"`. |
 | `...` | `<argumentos adicionales; sin default>` | Reserved for future extensions. Deprecated argument names such as `mortality_table`, `age`, `age_x`, `age_y`, `rate`, and `rate_type` are not accepted. |
+
+## B06 — plot_contingent_cash_flow
+
+Documentación: `man/plot_contingent_cash_flow.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+
+| Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
+|---|---|---|
+| `.data` | `<obligatorio>` | A nonempty data frame or tibble. Supply an apv_life_flow() result, or columns t , cf , probability , discount and event . Optional date supplies the horizontal calendar axis. Optional expected_cf and pv are reused after consistency checks. |
+| `view` | `c("all", "contractual", "probability", "expected", "pv")` | One of "all" , "contractual" , "probability" , "expected" , or "pv" . The default shows four panels with separate vertical scales. |
+| `title` | `NULL` | Optional plot title and subtitle. |
+| `subtitle` | `NULL` | Optional plot title and subtitle. |
+| `x_label` | `NULL` | Optional horizontal axis label. |
+| `show_labels` | `TRUE` | Logical. Show amount/probability labels, omitting text that overlaps at rendering time. All payment rows remain in the plot. |
+| `label_size` | `3.2` | Positive text size. |
+| `label_digits` | `2L` | Integer between 0 and 50 for monetary labels. |
+| `label_format` | `c("auto", "full", "compact")` | Monetary notation: "auto" , "full" , or "compact" , as in plot_cash_flow() . Probabilities/weights use separate unitless labels. |
+| `currency` | `""` | Monetary prefix; never applied to probabilities or weights. |
+| `col_inflow` | `"#1B9E77"` | Colors for positive and negative monetary flows. |
+| `col_outflow` | `"#D95F02"` | Colors for positive and negative monetary flows. |
+| `date_labels` | `"%Y-%m-%d"` | Calendar label format for ggplot2::scale_x_date() . |
 
 ## B06 — premium_gross
 

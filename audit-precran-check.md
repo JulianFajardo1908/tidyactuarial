@@ -501,3 +501,43 @@ cambio de versión. B04 cerrado dentro del alcance y límites documentados:
 R mínimo/CI remota para estos cambios. C02–C04 siguen sin implementar.
 Siguiente bloque: B05, empezando por lifetable y mortality_law_table,
 preservando la evidencia y los arreglos históricos.
+
+## Paréntesis: visualizaciones financieras y contingentes (18 de octubre)
+
+Sobre 989b4cf se perfeccionó plot_cash_flow y se añadió la función solicitada
+plot_contingent_cash_flow. El único cambio al productor apv_life_flow es el
+atributo aditivo contingency y documentación; firmas y cálculos existentes
+se preservan. Registro matemático, regresiones, compatibilidad y límites en
+audit-cash-flow-visualizations.md. Hay 76 comprobaciones nuevas (19+57),
+suite completa local aprobada, salida 0 y sin advertencias. Log local:
+cash-flow-visualizations/local-tests.log en el directorio de artefactos.
+
+La ayuda de los tres consumidores se regeneró con Markdown explícito para
+obtener código y enlaces navegables. El build/check definitivo posterior a
+esa edición documental terminó con **0 ERROR, 0 WARNING, 1 NOTE**, salida 0.
+Única NOTE: versión de desarrollo 0.1.6.9000. Pasaron análisis de código,
+metadatos/enlaces/consistencia de ayuda, ejemplos (28 s), pruebas instaladas
+(63 s), las cuatro viñetas y su reconstrucción (15 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-visualizations-final/`.
+Informe tidyactuarial.Rcheck/00check.log; snapshot-verification.txt acredita
+370 archivos R/tests/Rd/ejemplo/NEWS/NAMESPACE iguales al checkout normalizando
+CRLF. Incluye las pruebas y ejemplos nuevos. AGENTS/audit-* excluidos;
+DESCRIPTION conserva 0.1.6.9000. SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`BA63842CFF37EF448C1333F576C37A5DBC2CB3A1373EAABB9295CCF2402E8691`.
+El directorio preliminar precran-visualizations-verified queda como evidencia
+anterior; el definitivo incluye el formato final de ayuda y lo reemplaza
+como referencia de entrega.
+
+Siete gráficos PNG inspeccionados y PDF vectoriales exportados en
+cash-flow-visualizations; ZIP de entrega con figuras y script reproducible.
+Inventario: 102 nombres públicos, 973 apariciones de parámetros y ninguna
+sin descripción Rd. Sin dependencias nuevas ni cambios de versión.
+
+R 4.6.1/Windows, locale UTF-8, Pandoc de RStudio y
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`, con bibliotecas instaladas accesibles
+fuera del aislamiento. Sin push, publicación, CI remota nueva o prueba de R
+mínimo para estos cambios. Paréntesis cerrado dentro del alcance documentado;
+se retoma B05 cuando el usuario continúe el barrido, preservando B04 y todos
+los pendientes históricos. La incorporación de una gráfica no cierra B06.

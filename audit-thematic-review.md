@@ -23,12 +23,14 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B03 | Anualidades financieras y préstamos | 7 | Revisión cerrada dentro del alcance documentado; ver audit-financial-annuities-loans.md, B03-08/B03-10 y límites expresos |
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
 | B05 | Tablas, mortalidad y probabilidades | 12 | Pendiente de revisión integral; preservar evidencia previa |
-| B06 | Contingencias de una vida y contratos | 13 | Pendiente de revisión integral; preservar evidencia previa |
+| B06 | Contingencias de una vida y contratos | 14 | Pendiente de revisión integral; preservar evidencia previa |
 | B07 | Contingencias multivida | 6 | Pendiente de revisión integral; preservar evidencia previa |
 | B08 | Simulación de vidas y Monte Carlo | 11 | Pendiente de revisión integral; preservar evidencia previa |
 | B09 | Riesgo colectivo, coberturas y colas | 19 | Pendiente de revisión integral; preservar evidencia previa |
 
-101 nombres asignados exactamente una vez: 100 funciones y el alias A_xj.
+102 nombres asignados exactamente una vez: 101 funciones y el alias A_xj.
+El paréntesis de visualizaciones añade plot_contingent_cash_flow a B06;
+no cierra B06 ni inicia el barrido B05. Ver audit-cash-flow-visualizations.md.
 B01 se inicia por su uso transversal. La existencia de correcciones previas
 en otros bloques no implica su cierre integral. La CI aprobada anteriormente
 corresponde al código previo a las nuevas correcciones B01.
@@ -124,6 +126,7 @@ no da por aprobados los bloques posteriores.
 | B06 | `premium_gross` | `R/premium_gross.R` | `test-premium_gross-v2.R` |
 | B06 | `premium_x` | `R/premium_x.R` | `test-lifetable-ax.R`, `test-premium_gross-v2.R`, `test-premium_x-v2.R`, `test-reserve_x-v2.R` |
 | B06 | `reserve_x` | `R/reserve_x.R` | `test-reserve_x-v2.R` |
+| B06 | `plot_contingent_cash_flow` | `R/plot_contingent_cash_flow.R` | `test-plot-contingent-cash-flow.R` |
 | B07 | `annuity_xy` | `R/annuity_xy.R` | `test-annuity-multi-actuarial.R`, `test-annuity-xy-state-benefits.R`, `test-annuity_xy-v2.R`, `test-insurance-xy-identities.R`, `test-premium_xy-v2.R`, `test-reserve_xy-v2.R`, `test-soa08lt.R` |
 | B07 | `e_xy` | `R/e_xy.R` | `test-e-xy-regressions.R`, `test-multilife-survival-expectancy.R` |
 | B07 | `insurance_xy` | `R/insurance_xy.R` | `test-insurance-xy-deferred-conditioning.R`, `test-insurance-xy-identities.R`, `test-premium_xy-v2.R`, `test-reserve_xy-v2.R` |

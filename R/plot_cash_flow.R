@@ -26,7 +26,7 @@
 #' @param label_size Numeric text size for labels.
 #' @param arrow_size Numeric line width for arrows.
 #' @param timeline_size Numeric line width for the time axis.
-#' @param label_digits Integer number of decimal digits for cash-flow labels.
+#' @param label_digits Integer between 0 and 50: decimal digits for cash-flow labels.
 #' @param label_format Character string controlling label notation. Use
 #'   \code{"auto"} to abbreviate values from one million onward,
 #'   \code{"full"} for unabridged values, or \code{"compact"} for
@@ -47,7 +47,18 @@
 #' Numeric timelines may include negative times; the valuation origin remains
 #' zero. Dated timelines use the earliest date
 #' as origin. Non-finite inferred present values or aggregated amounts are
-#' rejected. The returned ggplot remains editable with additional layers.
+#' rejected. Extreme monetary magnitudes use scaled graphical coordinates,
+#' with the power of ten stated on the axis; raw amounts remain in `plot$data$C`.
+#' Automatic/compact labels use scientific notation beyond the available
+#' suffixes or when fixed decimals would show a nonzero amount as zero.
+#' `label_format = "full"` retains explicit fixed-decimal formatting.
+#' Overlapping text labels may be omitted at rendering time; every arrow
+#' remains. For dense streams, use `show_labels = FALSE`. Simultaneous flows
+#' are netted by default; `aggregate = FALSE` keeps their exact positions,
+#' so arrows at identical times can overlap. No dates are jittered.
+#' `PV` is a supplied annotation when present, not a recalculation or check.
+#' Date origins and day counts differ from [apv_life_flow()] and are not
+#' silently unified. The returned ggplot remains editable with additional layers.
 #'
 #' This function uses compact actuarial notation: `C` denotes cash-flow amounts,
 #' `t` denotes times in years, `i` denotes the interest-rate input, and `PV`
@@ -88,6 +99,7 @@
 #'   currency = "$"
 #' )
 #'
+#' @md
 #' @export
 plot_cash_flow <- function(
     .data = NULL,
@@ -207,7 +219,7 @@ plot_cash_flow <- function(
       stop("`m` must be a single positive integer.", call. = FALSE)
     }
 
-    m <- as.integer(round(m))
+    m <- round(m)
     basis <- .interest_basis(i_type = i_type, i = i, m = m)
     i_effective <- basis$effective
   } else {
@@ -236,8 +248,8 @@ plot_cash_flow <- function(
 
   if (!is.numeric(label_digits) || length(label_digits) != 1L ||
       is.na(label_digits) || !is.finite(label_digits) || label_digits < 0 ||
-      abs(label_digits - round(label_digits)) > 1e-10) {
-    stop("`label_digits` must be a single nonnegative integer.", call. = FALSE)
+      abs(label_digits - round(label_digits)) > 1e-10 || label_digits > 50) {
+    stop("`label_digits` must be an integer between 0 and 50.", call. = FALSE)
   }
 
   label_digits <- as.integer(round(label_digits))
@@ -248,52 +260,8 @@ plot_cash_flow <- function(
     NULL
   }
 
-  trim_trailing_zeros <- function(x) {
-    x <- sub("(\\.[0-9]*?)0+$", "\\1", x)
-    sub("\\.$", "", x)
-  }
-
-  format_compact <- function(x) {
-    abs_x <- abs(x)
-    units <- c("", "K", "M", "B", "T")
-
-    exponent <- ifelse(
-      abs_x == 0,
-      0,
-      pmin(4, pmax(0, floor(log10(abs_x) / 3)))
-    )
-
-    scaled <- abs_x / (1000^exponent)
-    formatted <- formatC(
-      scaled,
-      format = "f",
-      digits = label_digits,
-      big.mark = ""
-    )
-
-    paste0(trim_trailing_zeros(formatted), units[exponent + 1L])
-  }
-
   format_amount <- function(x) {
-    use_compact <- label_format == "compact" ||
-      (label_format == "auto" && max(abs(x), na.rm = TRUE) >= 1e6)
-
-    formatted <- if (use_compact) {
-      format_compact(x)
-    } else {
-      formatC(
-        abs(x),
-        format = "f",
-        digits = label_digits,
-        big.mark = ""
-      )
-    }
-
-    ifelse(
-      x < 0,
-      paste0("-", currency, formatted),
-      paste0(currency, formatted)
-    )
+    .cash_flow_label(x, label_digits, label_format, currency)
   }
 
   y_axis_labels <- function(x) {
@@ -376,7 +344,9 @@ plot_cash_flow <- function(
     if (length(date_vec) != length(C_vec)) {
       stop("`date` and `C` must have the same length.", call. = FALSE)
     }
-    if (any(is.na(date_vec))) stop("`date` must contain valid dates.", call. = FALSE)
+    if (any(!is.finite(as.numeric(date_vec)))) {
+      stop("`date` must contain finite valid dates.", call. = FALSE)
+    }
     origin <- min(date_vec)
     denom <- if (day_count == "act/365") 365 else 360
     x_values <- date_vec
@@ -414,11 +384,18 @@ plot_cash_flow <- function(
     plot_data$height <- abs(plot_data$C)
   }
 
+  # Keep raw amounts/heights; only graphical coordinates need a safe scale.
+  display <- if (normalize) list(divisor = 1, exponent = 0) else
+    .cash_flow_display_scale(plot_data$height)
+  if (display$exponent != 0) {
+    amount_label <- paste0(amount_label, " (x 10^", display$exponent, ")")
+  }
   plot_data$yend <- if (financial) {
     ifelse(plot_data$C >= 0, plot_data$height, -plot_data$height)
   } else {
     plot_data$height
   }
+  plot_data$yend <- plot_data$yend / display$divisor
   plot_data$y <- 0
 
   y_range <- max(abs(plot_data$yend))
@@ -544,23 +521,17 @@ plot_cash_flow <- function(
 
   if (show_labels) {
     p <- p +
-      ggplot2::geom_label(
+      ggplot2::geom_text(
         ggplot2::aes(
           y = .data[["label_y"]],
           label = .data[["label"]],
-          fill = .data[["type"]],
+          color = .data[["type"]],
           hjust = .data[["label_hjust"]]
         ),
         size = label_size,
-        linewidth = 0,
-        alpha = 0.92,
-        color = "white",
+        fontface = "bold",
+        check_overlap = TRUE,
         show.legend = FALSE
-      ) +
-      ggplot2::scale_fill_manual(
-        values = c(inflow = col_inflow, outflow = col_outflow),
-        guide = "none",
-        drop = TRUE
       )
   }
 

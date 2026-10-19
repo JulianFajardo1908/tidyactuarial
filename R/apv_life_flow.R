@@ -64,6 +64,8 @@
 #'   \code{expected_cf}, \code{pv}, and \code{pv_cum}. If \code{date} was
 #'   provided, a \code{date} column is included. The total APV is stored as
 #'   \code{attr(result, "apv")}.
+#'   The `contingency` attribute identifies `"survival"` or `"weighted"`
+#'   (reversionary benefit fraction) for [plot_contingent_cash_flow()].
 #'
 #' @examples
 #' lt <- data.frame(
@@ -88,6 +90,7 @@
 #'   status = "first"
 #' )
 #'
+#' @md
 #' @export
 apv_life_flow <- function(
     lt,
@@ -367,6 +370,8 @@ apv_life_flow <- function(
   }
 
   attr(out, "apv") <- sum(pv, na.rm = TRUE)
+  attr(out, "contingency") <- if (status == "reversionary" && length(ages) > 1L)
+    "weighted" else "survival"
 
   if (isTRUE(plot)) {
     plot_df <- out

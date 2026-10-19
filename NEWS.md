@@ -1,6 +1,21 @@
 # tidyactuarial 0.2.0
 
+## New features
+
+* `plot_contingent_cash_flow()` plots payment-level contractual amounts,
+  unconditional event probabilities, expected cash flows and APV contributions.
+  It reuses `apv_life_flow()` outputs and accepts explicit discrete death-event
+  tables. Reversionary benefit weights are labeled separately from probabilities;
+  `apv_life_flow()` now attaches additive contingency metadata for this purpose.
+
 ## Bug fixes
+
+* Cash-flow diagrams retain finite graphical coordinates at extreme monetary
+  magnitudes, use scientific labels for tiny nonzero/very large amounts, reject
+  infinite dates explicitly and avoid unnecessary integer coercion of `m`.
+  Overlapping labels may be omitted while all arrows and payment times remain;
+  existing argument names, raw cash-flow columns and financial valuation remain.
+
 
 * Immunization retains original log liability rates and forms relative moments
   and scaled constraints before monetary products overflow. The existing

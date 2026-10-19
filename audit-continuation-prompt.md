@@ -1,5 +1,16 @@
 # Prompt maestro para continuar tidyactuarial
 
+## Paréntesis solicitado: visualizaciones financieras y contingentes
+
+El 18 de octubre de 2026 el usuario pidió perfeccionar plot_cash_flow y crear
+plot_contingent_cash_flow, con documentación, pruebas matemáticas y gráficos.
+Ver audit-cash-flow-visualizations.md para alcance, evidencia y validación.
+Esta adición pública está autorizada por esa petición. La matriz pasa a 102
+nombres (101 funciones y A_xj), con 973 apariciones de parámetros. No se
+modifican firmas existentes ni la versión, ni se hace push/publicación.
+El barrido B05 queda pendiente para retomar tras este paréntesis; B04 conserva
+su cierre dentro del alcance documentado. No reiniciar la auditoría.
+
 ## Actualización de dirección acordada con el usuario
 
 El 16 de octubre de 2026 el usuario pidió un barrido crítico de **todas las
