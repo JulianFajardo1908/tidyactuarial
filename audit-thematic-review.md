@@ -22,7 +22,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B02 | Flujos y ecuaciones de valor | 8 | En revisión; ver audit-cash-flow-roots.md y audit-interest-foundations.md |
 | B03 | Anualidades financieras y préstamos | 7 | Revisión cerrada dentro del alcance documentado; ver audit-financial-annuities-loans.md, B03-08/B03-10 y límites expresos |
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
-| B05 | Tablas, mortalidad y probabilidades | 12 | Pendiente de revisión integral; preservar evidencia previa |
+| B05 | Tablas, mortalidad y probabilidades | 12 | Iniciado: lifetable/mortality_law_table y C07; ver audit-life-tables-mortality.md; diez funciones pendientes |
 | B06 | Contingencias de una vida y contratos | 14 | Pendiente de revisión integral; preservar evidencia previa |
 | B07 | Contingencias multivida | 6 | Pendiente de revisión integral; preservar evidencia previa |
 | B08 | Simulación de vidas y Monte Carlo | 11 | Pendiente de revisión integral; preservar evidencia previa |

@@ -101,6 +101,7 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C04 | C | Unificar C/cf, .data o tidy/output en todo el paquete | No ejecutar en bloque; los contratos y tipos de operación son distintos. Revisar solo propuestas concretas por familia |
 | C05 | C | is_worst_case de callable identifica el mínimo calculado y sus empates exactos, sin umbral monetario derivado de tol temporal | Autorizada expresamente el 17 de octubre; implementada y probada sin cambiar firmas ni columnas |
 | C06 | C | Conservar una fila de ID NA con métricas NA bajo propagate en las dos funciones de portafolio; error/drop intactos | Autorizada expresamente e implementada con 90 comprobaciones; firmas/columnas intactas |
+| C07 | C | Con solo lx y close=FALSE, el intervalo terminal sin observación queda NA; se conservan probabilidades terminales suministradas y cierre TRUE | Autorizada expresamente el 18 de octubre; implementada y probada en B05 |
 
 ## Mejoras compatibles y categorías A realizadas
 
@@ -222,3 +223,21 @@ No se implementan C02–C04. El límite documentado label_digits=0..50 evita
 coerción/clamping de formatC; full sigue disponible para formato fijo explícito.
 Ver audit-cash-flow-visualizations.md para matemática, defectos A frente a
 mejoras visuales B y los límites del nuevo contrato.
+
+
+## B05, primera unidad y C07 autorizada
+
+lifetable y mortality_law_table conservan firmas, clases, nombres/orden de
+columnas y atributos. C07 cambia explícitamente el significado del extremo
+abierto: falta l_(omega+1), por tanto dx/qx/px/mx terminales son NA si no se
+suministra una probabilidad. No se cambia close=TRUE ni el terminal con dato.
+Se rechazan datos contradictorios/NaN y controles inválidos en vez de ocultarlos.
+Las bases ax/a_x, frac y radix/l0 siguen teniendo contratos locales distintos:
+no se añaden aliases, vectorización, columnas ni interfaz .data universal.
+La salida tibble permite continuar con mutate/select y consumidores actuariales;
+las funciones no reciben una tabla como primer argumento por diseño actual.
+Ver audit-life-tables-mortality.md para matemática, precisión y límites. C02–C04
+siguen sin implementar. Inventario estable: 102 nombres, 973 parámetros.
+La validación final aprobó suite completa y R CMD check (0 ERROR, 0 WARNING,
+1 NOTE por desarrollo). C07 queda cerrada dentro de ese alcance autorizado;
+no cierra B05 ni modifica políticas de otros constructores.

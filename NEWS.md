@@ -10,6 +10,17 @@
 
 ## Bug fixes
 
+* Approved API decision C07: open life tables built only from `lx` now leave
+  terminal deaths/probabilities/central rates missing instead of implying certain
+  death. Supplied terminal probabilities and closed-table conventions remain.
+* Annual life tables reject contradictory `qx`/`px`, forbidden NaN values,
+  invalid controls/radices and unsupported integer ages. Input lengths are
+  checked before truncation; accepted near-integer ages are rounded consistently.
+* Mortality laws avoid intermediate power overflow in Gompertz/Makeham and
+  Logistic forces. Weibull annual increments retain tiny positive hazards;
+  Heligman-Pollard handles a unit childhood base with very large exponents.
+
+
 * Cash-flow diagrams retain finite graphical coordinates at extreme monetary
   magnitudes, use scientific labels for tiny nonzero/very large amounts, reject
   infinite dates explicitly and avoid unnecessary integer coercion of `m`.

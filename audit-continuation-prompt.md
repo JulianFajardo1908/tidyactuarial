@@ -8,8 +8,13 @@ Ver audit-cash-flow-visualizations.md para alcance, evidencia y validación.
 Esta adición pública está autorizada por esa petición. La matriz pasa a 102
 nombres (101 funciones y A_xj), con 973 apariciones de parámetros. No se
 modifican firmas existentes ni la versión, ni se hace push/publicación.
-El barrido B05 queda pendiente para retomar tras este paréntesis; B04 conserva
-su cierre dentro del alcance documentado. No reiniciar la auditoría.
+El paréntesis quedó cerrado en 67c2b70. B05 se retoma el 18 de octubre:
+lifetable y mortality_law_table, con 62 comprobaciones nuevas; ver
+audit-life-tables-mortality.md y la validación final en audit-precran-check.md.
+C07 fue autorizada expresamente e implementada: con solo lx y close=FALSE,
+el intervalo terminal desconocido se devuelve NA; probabilidades terminales
+suministradas y tablas cerradas se conservan. B05 sigue abierto (2/12 revisadas).
+B04 conserva su cierre dentro del alcance documentado. No reiniciar la auditoría.
 
 ## Actualización de dirección acordada con el usuario
 

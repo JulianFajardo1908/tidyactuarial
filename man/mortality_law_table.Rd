@@ -150,7 +150,10 @@ evaluated at age \eqn{x}, not its annual integral. Exponential, Gompertz,
 Makeham and Weibull use analytic integrals; Logistic uses numerical
 integration with relative tolerance \code{1e-10}.
 The \code{frac} label records a within-year interpolation convention;
-it does not replace integration of the continuous law.
+it does not replace integration of the continuous law. Force products and
+Logistic ratios use logarithmic evaluation to avoid intermediate power
+overflow; Weibull annual increments use \code{log1p/expm1} instead of
+subtracting nearly equal cumulative hazards.
 }
 
 \section{Direct qx laws}{

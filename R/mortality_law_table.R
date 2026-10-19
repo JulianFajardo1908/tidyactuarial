@@ -55,7 +55,10 @@
 #' Makeham and Weibull use analytic integrals; Logistic uses numerical
 #' integration with relative tolerance \code{1e-10}.
 #' The \code{frac} label records a within-year interpolation convention;
-#' it does not replace integration of the continuous law.
+#' it does not replace integration of the continuous law. Force products and
+#' Logistic ratios use logarithmic evaluation to avoid intermediate power
+#' overflow; Weibull annual increments use \code{log1p/expm1} instead of
+#' subtracting nearly equal cumulative hazards.
 #'
 #' @section Direct qx laws:
 #' \code{"DeMoivre"}, \code{"Beta"}, and \code{"HeligmanPollard"} define
@@ -283,6 +286,9 @@ mortality_law_table <- function(
   }
 
   if (isTRUE(check)) {
+    if (!is.numeric(tol) || length(tol) != 1L || !is.finite(tol) || tol < 0) {
+      stop("`tol` must be a single nonnegative finite number.", call. = FALSE)
+    }
     if (!is.numeric(x_min) ||
         !is.numeric(x_max) ||
         length(x_min) != 1L ||
@@ -299,6 +305,9 @@ mortality_law_table <- function(
       stop("`x_min` and `x_max` must be integer-valued.", call. = FALSE)
     }
 
+    if (abs(x_min) > .Machine$integer.max || abs(x_max) > .Machine$integer.max) {
+      stop("Ages must be representable in the R integer range.", call. = FALSE)
+    }
     if (x_min >= x_max) {
       stop("Require `x_min < x_max`.", call. = FALSE)
     }
@@ -322,12 +331,6 @@ mortality_law_table <- function(
       stop("`a_x` must be a single number in [0, 1].", call. = FALSE)
     }
 
-    if (!is.numeric(tol) ||
-        length(tol) != 1L ||
-        !is.finite(tol) ||
-        tol < 0) {
-      stop("`tol` must be a single nonnegative finite number.", call. = FALSE)
-    }
   }
 
   x_min <- as.integer(round(x_min))
@@ -396,9 +399,11 @@ mortality_law_table <- function(
       }
     }
 
-    mu_x <- B * (c0 ^ x)
     log_c <- log(c0)
-    integrated_mu <- mu_x * if (log_c == 0) 1 else expm1(log_c) / log_c
+    log_mu <- log(B) + as.numeric(x) * log_c
+    mu_x <- exp(log_mu)
+    annual_factor <- if (log_c == 0) 1 else expm1(log_c) / log_c
+    integrated_mu <- exp(log_mu + log(annual_factor))
   }
 
   if (law == "Makeham") {
@@ -426,10 +431,11 @@ mortality_law_table <- function(
       }
     }
 
-    mu_x <- A + B * (c0 ^ x)
     log_c <- log(c0)
-    integrated_mu <- A + B * c0^x *
-      if (log_c == 0) 1 else expm1(log_c) / log_c
+    log_gompertz <- log(B) + as.numeric(x) * log_c
+    mu_x <- A + exp(log_gompertz)
+    annual_factor <- if (log_c == 0) 1 else expm1(log_c) / log_c
+    integrated_mu <- A + exp(log_gompertz + log(annual_factor))
   }
 
   if (law == "Weibull") {
@@ -459,8 +465,16 @@ mortality_law_table <- function(
       }
     }
 
-    mu_x <- (shape / scale) * ((x / scale) ^ (shape - 1))
-    integrated_mu <- ((x + 1) / scale)^shape - (x / scale)^shape
+    xx <- as.numeric(x)
+    mu_x <- if (shape == 1) rep(1 / scale, n_age) else
+      exp(log(shape) - log(scale) + (shape - 1) * (log(xx) - log(scale)))
+    integrated_mu <- numeric(n_age)
+    positive <- xx > 0
+    increment <- shape * log1p(1 / xx[positive])
+    log_increment <- ifelse(increment > log(2),
+      increment + log1p(-exp(-increment)), log(expm1(pmin(increment, log(2)))))
+    integrated_mu[positive] <- exp(shape * (log(xx[positive]) - log(scale)) + log_increment)
+    integrated_mu[!positive] <- exp(-shape * log(scale))
   }
 
   if (law == "Logistic") {
@@ -493,19 +507,26 @@ mortality_law_table <- function(
       }
     }
 
-    cx <- c0 ^ x
-    denominator <- 1 + C * cx
-
-    if (isTRUE(check) && any(denominator <= 0)) {
-      stop("Logistic: denominator must be positive for all ages.", call. = FALSE)
+    # Stable log sums avoid overflowing numerator/denominator powers.
+    log_add <- function(a, b) {
+      peak <- pmax(a, b)
+      result <- peak + log1p(exp(-abs(a - b)))
+      result[peak == -Inf] <- -Inf
+      result
     }
-
-    mu_x <- (A + B * cx) / denominator
+    force <- function(age) {
+      z <- age * log(c0)
+      if (C == 0) return(A + exp(log(B) + z))
+      # Divide numerator and denominator by exp(z) when it is large.
+      # This avoids subtracting nearly equal log sums of size age*log(c).
+      positive <- pmax(z, 0)
+      negative <- pmin(z, 0)
+      exp(log_add(log(A) - positive, log(B) + negative) -
+        log_add(-positive, log(C) + negative))
+    }
+    mu_x <- force(as.numeric(x))
     integrated_mu <- vapply(x, function(age) {
-      stats::integrate(function(s) {
-        cs <- c0^s
-        (A + B * cs) / (1 + C * cs)
-      }, age, age + 1, rel.tol = 1e-10)$value
+      stats::integrate(force, age, as.numeric(age) + 1, rel.tol = 1e-10)$value
     }, numeric(1))
   }
 
@@ -629,7 +650,8 @@ mortality_law_table <- function(
     xx <- as.numeric(x)
 
     # Sum the three odds components in log space to avoid Inf/Inf.
-    log_terms <- cbind(log(A) * (xx + B)^C,
+    log_child <- if (A == 1) rep(0, n_age) else log(A) * (xx + B)^C
+    log_terms <- cbind(log_child,
                        log(D) - E * (log(xx) - log(F_hp))^2,
                        log(G) + xx * log(H))
     largest <- apply(log_terms, 1, max)

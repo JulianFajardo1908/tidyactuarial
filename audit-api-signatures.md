@@ -862,11 +862,11 @@ Documentación: `man/lifetable.Rd`. Semántica: revisión por bloque pendiente s
 | `mx` | `NULL` | Optional numeric vector of central death rates m_x . NA values are allowed, but Inf / NaN are not allowed. If provided, converted to qx using ax . |
 | `radix` | `NULL` | Optional positive scalar. Required if building lx from ( qx / px / mx ) and lx is not provided. |
 | `omega` | `NULL` | Optional integer limiting age. If omega < max(x) , the table is truncated to omega . If omega > max(x) , an error is raised (the function will not invent missing ages). |
-| `close` | `TRUE` | Logical. If TRUE (default), closes the table at omega (forces terminal conditions). |
+| `close` | `TRUE` | Logical. If TRUE (default), closes the table at omega (forces terminal conditions). With FALSE and only lx , the last dx/qx/px/mx are unknown ( NA ); a supplied terminal probability is used when available. |
 | `ax` | `0.5` | Scalar in [0,1] . Average fraction of the year lived by those who die in the interval [x, x+1) . Under UDD (Finan, Sec. 24.1), ax = 0.5 . Under constant force, a_x = 1/\mu - 1/(\exp(\mu)-1) . At the terminal age with close = TRUE , mx equals 1/a_x , which is 2 for ax = 0.5 , 1 for ax = 1 , and Inf for ax = 0 . Default is 0.5 . |
 | `type` | `c("ultimate", "select")` | Character. "ultimate" or "select" (metadata). Stored as an attribute and used by downstream functions. |
 | `frac` | `c("UDD", "CF", "Balducci")` | Character. "UDD" , "CF" , or "Balducci" (metadata). Stored as an attribute and used by fractional-age functions such as t_px . |
-| `check` | `TRUE` | Logical. If TRUE (default), performs strict validity and consistency checks. |
+| `check` | `TRUE` | Logical. If TRUE (default), performs strict validity and consistency checks, including px = 1 - qx when both are provided. Validated ages within tolerance of integers are rounded before truncation. |
 | `tol` | `1e-10` | Numeric tolerance for integer checks and consistency checks. |
 
 ## B05 — lt_tau

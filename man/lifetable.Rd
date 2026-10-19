@@ -47,7 +47,9 @@ table is truncated to \code{omega}. If \code{omega > max(x)}, an error is
 raised (the function will not invent missing ages).}
 
 \item{close}{Logical. If \code{TRUE} (default), closes the table at
-\code{omega} (forces terminal conditions).}
+\code{omega} (forces terminal conditions). With \code{FALSE} and only
+\code{lx}, the last \code{dx/qx/px/mx} are unknown (\code{NA}); a supplied
+terminal probability is used when available.}
 
 \item{ax}{Scalar in \code{[0,1]}. Average fraction of the year lived by
 those who die in the interval \eqn{[x, x+1)}. Under UDD (Finan, Sec. 24.1),
@@ -64,7 +66,8 @@ Stored as an attribute and used by downstream functions.}
 such as \code{\link{t_px}}.}
 
 \item{check}{Logical. If \code{TRUE} (default), performs strict validity
-and consistency checks.}
+and consistency checks, including \code{px = 1 - qx} when both are provided.
+Validated ages within tolerance of integers are rounded before truncation.}
 
 \item{tol}{Numeric tolerance for integer checks and consistency checks.}
 }
@@ -89,7 +92,7 @@ Creates an annual life table with **integer, consecutive ages** and returns a
 **tibble** (tidyverse-friendly) with class `"lifetable"`.
 }
 \details{
-The table can be built from exactly one of:
+The table can be built from any one of:
 \itemize{
   \item \code{lx} (survivors), or
   \item \code{qx} (one-year death probabilities), or

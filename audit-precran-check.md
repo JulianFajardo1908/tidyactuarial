@@ -541,3 +541,42 @@ fuera del aislamiento. Sin push, publicación, CI remota nueva o prueba de R
 mínimo para estos cambios. Paréntesis cerrado dentro del alcance documentado;
 se retoma B05 cuando el usuario continúe el barrido, preservando B04 y todos
 los pendientes históricos. La incorporación de una gráfica no cierra B06.
+
+## B05: tablas anuales, leyes de mortalidad y C07 (18 de octubre)
+
+Primera unidad sobre 67c2b70: lifetable y mortality_law_table. C07 fue
+autorizada expresamente antes de implementar el extremo abierto desconocido.
+Registro matemático, causas, compatibilidad y límites en
+audit-life-tables-mortality.md. Se preservan los arreglos históricos de ax,
+integración de fuerzas, ocho parámetros, Beta y cohortes extintas.
+
+Hay 62 comprobaciones nuevas. La suite completa del código definitivo pasó
+sin fallos ni advertencias, salida 0; log b05-foundations-final-tests.log en
+artefactos. b05-foundations-before.log y b05-validation-before.log reproducen
+fallos del HEAD previo. La evaluación inicial de Logistic aún perdía cifras
+al restar log-sumas grandes; se confirmó el caso y se corrigió antes del cierre,
+repitiendo suite y build/check sobre el código final.
+
+R CMD build --no-manual y R CMD check --as-cran --no-manual definitivos:
+**0 ERROR, 0 WARNING, 1 NOTE**, salida 0. Única NOTE: versión de desarrollo
+0.1.6.9000. Pasaron análisis de código (39 s), documentación, ejemplos (27 s),
+pruebas instaladas (67 s), cuatro viñetas y su reconstrucción (12 s).
+
+Artefactos definitivos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b05-foundations-final/`.
+Informe tidyactuarial.Rcheck/00check.log; snapshot-verification.txt acredita
+371 archivos R/tests/Rd/ejemplo/NEWS/NAMESPACE iguales al checkout normalizando
+CRLF. AGENTS/audit-* excluidos; pruebas nuevas incluidas. DESCRIPTION conserva
+0.1.6.9000. SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`E6190AAE3FEFE5384B5294FE394C4BDA960786849D3F63A1A41C1144F391456D`.
+El directorio precran-b05-foundations corresponde al estado preliminar;
+no sustituye la validación del ajuste definitivo de Logistic.
+
+Firmas existentes preservadas, 102 nombres públicos y 973 apariciones de
+parámetros documentadas. Sin funciones, dependencias, columnas o versión nuevas.
+R 4.6.1/Windows, locale UTF-8, Pandoc de RStudio y
+`_R_CHECK_CRAN_INCOMING_REMOTE_=false`, con bibliotecas instaladas accesibles
+fuera del aislamiento. Sin push, publicación o CI remota/R mínimo actuales.
+Primera unidad y C07 cerradas en el alcance documentado; B05 sigue abierto,
+dos de doce funciones revisadas. Siguen t_px/t_qx/t_Ex/e_x y luego los demás
+constructores, conservando los arreglos multivida previos al llegar a B07.
