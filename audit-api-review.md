@@ -7,7 +7,8 @@ de parámetros, en orden real y con defaults extraídos de formals(). A_xj
 permanece como alias de insurance_xj. Las descripciones Rd transcriben
 concepto, dominio y unidades cuando existen; no prueban su implementación.
 B03, B04 y B05 quedan cerrados dentro de sus respectivos alcances documentados;
-B06–B09 conservan pendientes de revisión integral por bloques.
+B06 está en revisión (apv_life_flow, ver audit-single-life-contracts.md);
+B07–B09 conservan pendientes de revisión integral por bloques.
 
 Actualización B03: se abordaron a_angle, s_angle, annuity_arith, annuity_geom
 y los tres calendarios de préstamos. La tabla por dimensión, unidades y pendientes
@@ -262,3 +263,16 @@ Cierre C08/C09 y B05: doce funciones conciliadas y check final 0 ERROR,
 0 WARNING, 1 NOTE por desarrollo. Se preservan las firmas; 139 comprobaciones
 nuevas entre ambas unidades. Ver matriz de evidencia y límites de
 audit-life-tables-mortality.md; el cierre no implica cambios globales de API.
+
+## B06, primera unidad: apv_life_flow
+
+Firma y esquema conservados frente a fdd2d1f; comparación de clases, nombres,
+tipos y cálculos ordinarios en cuatro estados aprobada. Se preservan lt primero,
+cf y t vectoriales sin reciclaje, tibble editable y atributos de gráfica/estado.
+Las 60 comprobaciones nuevas cubren correcciones A numéricas/de validación;
+la documentación B explicita fechas actual/365.25, orden y pagos simultáneos.
+El atributo apv mantiene sum(pv,na.rm=TRUE), mientras pv_cum propaga NA:
+con faltantes el primero es un subtotal. No se ha autorizado cambiar este
+contrato, limitar alpha, rechazar varias edades en single ni uniformar m/frac
+con otros consumidores. No se implementan C02–C04 ni se añade una decisión C.
+Ver audit-single-life-contracts.md para límites numéricos y tareas restantes.

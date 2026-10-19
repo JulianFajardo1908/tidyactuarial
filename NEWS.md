@@ -1,5 +1,13 @@
 # tidyactuarial 0.2.0
 
+* Life cash-flow APVs retain original log interest rates and combine monetary,
+  survival and discount factors before rounding the product. Rare last-survivor
+  probabilities avoid subtractive cancellation. Missing numeric times remain
+  missing rows; mortality queries are bounded by table size and preserve known
+  extinction. Invalid mortality values, duplicate ages and infinite dates are
+  rejected explicitly. The existing nonmissing APV subtotal is now documented;
+  signatures, output columns and row order remain unchanged.
+
 ## New features
 
 * `plot_contingent_cash_flow()` plots payment-level contractual amounts,

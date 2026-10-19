@@ -1,5 +1,21 @@
 # Prompt maestro para continuar tidyactuarial
 
+## Continuación B06 (18 de octubre de 2026)
+
+Sobre fdd2d1f se inició B06 con apv_life_flow: tasas log originales,
+producto monetario combinado, supervivencia last sin cancelación, tiempos NA,
+consulta de horizonte acotada y validaciones de mortalidad/fechas/enteros.
+Ver audit-single-life-contracts.md: 60 comprobaciones nuevas, conciliación
+de catorce nombres y límites explícitos. Se conserva la política histórica
+del subtotal apv ante NA; no tratarlo como valoración completa si faltan pagos.
+No se cambia la gráfica contingente ya revisada ni se cuenta como nueva.
+B06 sigue abierto; continuar annuity_x/insurance_x y luego primas/reservas
+y contratos. Leer la validación B06 final de audit-precran-check.md antes
+de ampliar trabajo. No repetir como pendientes los arreglos descritos aquí.
+Validación final B06: check 0 ERROR, 0 WARNING, 1 NOTE por desarrollo;
+4876 comprobaciones instaladas aprobadas, ejemplos y viñetas aprobados.
+Archivo verificado: precran-b06-life-flow; huella en audit-precran-check.md.
+
 ## Paréntesis solicitado: visualizaciones financieras y contingentes
 
 El 18 de octubre de 2026 el usuario pidió perfeccionar plot_cash_flow y crear

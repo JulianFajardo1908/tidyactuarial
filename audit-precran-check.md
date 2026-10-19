@@ -624,3 +624,36 @@ fuera del aislamiento. Sin push, publicación, CI remota nueva ni prueba actual
 de R mínimo. B05 cerrado dentro del alcance y límites documentados: 12/12;
 C07/C08/C09 implementadas y verificadas. Sigue B06. La auditoría global y la
 conciliación del informe externo ausente no se dan por cerradas.
+
+## B06: primera unidad, apv_life_flow (18 de octubre)
+
+Base fdd2d1f; firma/esquema conservados. Ver audit-single-life-contracts.md
+para modelos, reproducciones, compatibilidad, límites y conciliación de los
+catorce nombres. Solo cambia un archivo funcional: R/apv_life_flow.R.
+Se reutilizan los helpers de interés/valoración existentes. Se actualizan
+NEWS/Rd y los registros; no se modifica la versión ni hay dependencias nuevas.
+
+test-b06-life-flow.R añade 60 comprobaciones; suite local completa aprobada,
+sin fallos/advertencias, salida 0 (b06-life-flow-tests.log). Las 24 pruebas apv
+y las 57 gráficas previas pasan y no se contabilizan como nuevas.
+b06-life-flow-before.log reproduce errores anteriores y reserva de 74.5 GB
+para un horizonte sin soporte; b06-life-flow-compatibility.log reproduce
+validaciones adicionales y compara firma, nombres, clases, tipos y cálculos
+ordinarios de cuatro estados con fdd2d1f, con tolerancia relativa 1e-12.
+
+Directorio de construcción y check:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b06-life-flow/`.
+R CMD build --no-manual aprobó construcción y viñetas. snapshot-verification.txt
+acredita 373 archivos R/tests/Rd/ejemplo/NEWS/NAMESPACE iguales al checkout,
+normalizando CRLF. Incluye la nueva prueba B06 y excluye AGENTS/audit-*.
+SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`FE524C014249BDA8315791B0C93DC73B946B038878B54973A9EBFD6DAC50050C`.
+
+R CMD check --as-cran --no-manual definitivo: salida 0, **0 ERROR, 0 WARNING,
+1 NOTE** por versión de desarrollo 0.1.6.9000. Informe 00check.log en
+tidyactuarial.Rcheck; pruebas instaladas: 4876 aprobadas, 0 fallos/advertencias
+(63 s). Ejemplos aprobados (24 s), cuatro viñetas y reconstrucción aprobadas
+(13 s). R 4.6.1/Windows, UTF-8,
+Pandoc de RStudio, _R_CHECK_CRAN_INCOMING_REMOTE_=false y bibliotecas locales
+accesibles fuera del aislamiento. Sin push/publicación/CI remota nueva ni
+prueba actual de R mínimo. B06 sigue abierto; próximos annuity_x/insurance_x.
