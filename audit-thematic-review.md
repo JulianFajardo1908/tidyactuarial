@@ -23,7 +23,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B03 | Anualidades financieras y préstamos | 7 | Revisión cerrada dentro del alcance documentado; ver audit-financial-annuities-loans.md, B03-08/B03-10 y límites expresos |
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
 | B05 | Tablas, mortalidad y probabilidades | 12 | Revisión cerrada: 12/12 dentro del alcance de audit-life-tables-mortality.md; 139 comprobaciones nuevas y check final aprobado |
-| B06 | Contingencias de una vida y contratos | 14 | En revisión: apv_life_flow y unidad annuity_x/insurance_x con escenarios, C10/C11; 178 comprobaciones nuevas; ver audit-single-life-contracts.md; gráfica previa preservada |
+| B06 | Contingencias de una vida y contratos | 14 | En revisión: flujos, anualidades/seguros y primas/reservas; 417 comprobaciones nuevas; ver audit-single-life-contracts.md; gráfica previa preservada |
 | B07 | Contingencias multivida | 6 | Pendiente de revisión integral; preservar evidencia previa |
 | B08 | Simulación de vidas y Monte Carlo | 11 | Pendiente de revisión integral; preservar evidencia previa |
 | B09 | Riesgo colectivo, coberturas y colas | 19 | Pendiente de revisión integral; preservar evidencia previa |

@@ -699,3 +699,47 @@ no está instalado en la biblioteca configurada; oráculos independientes son
 enumeración de pagos, decrementos de lx e identidades exactas/expansión CF.
 Sin push/publicación, CI remota nueva o prueba actual de R mínimo. B06 sigue
 abierto: continuar primas y reservas, componentes y modelos restantes.
+
+## B06-03: primas y reservas (19 de octubre de 2026)
+
+Base 576c9a1, árbol inicialmente limpio. Tres fuentes funcionales,
+tres Rd, NEWS, una prueba nueva y registros/matriz de firmas actualizados.
+Sin dependencias, helpers, nombres públicos, columnas, versión o parámetros
+nuevos. Se conservan C10/C11 y todos los arreglos previos. Matemática,
+reproducciones, decisiones de compatibilidad y límites: B06-03 de
+audit-single-life-contracts.md. No hay decisión C nueva.
+
+239 comprobaciones nuevas definitivas, aprobadas sin fallos/advertencias;
+B06 acumula 417 nuevas. Suite local completa aprobada, salida 0, en
+b06-premiums-reserves-final-tests.log. Los focos iniciales de 212 y la suite
+preliminar anterior a los casos adicionales quedan como evidencia histórica,
+no sustituyen la validación final. Se reutilizan las pruebas v2 y consumidores
+multivida anteriores, sin contarlos como nuevos. Fallos originales en
+b06-premiums-reserves-before.log; revisión del residuo provisional en
+b06-gross-residual-before.log; overflow de n_prem*k en
+b06-premium-periods-before.log. Los residuos se conservan como diagnósticos
+de la ecuación y de los importes redondeados, sin imponerles cero.
+
+b06-premiums-reserves-compatibility.log verifica tres firmas y 42 casos
+ordinarios/salidas: clases, nombres y tipos conservados; valores a tolerancia
+relativa 1e-12. Residuos corregidos se comprueban por escala separadamente.
+Inventario estable: 102 nombres públicos, 973 apariciones de parámetros,
+cero descripciones ausentes; matriz actualizada solo por textos Rd pertinentes.
+
+Artefactos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b06-premiums-reserves/`.
+R CMD build --no-manual aprobado. snapshot-verification.txt acredita 377
+archivos R/tests/Rd/ejemplo/NEWS/NAMESPACE iguales al checkout normalizando
+CRLF; prueba B06 nueva incluida y AGENTS/audit-* excluidos. DESCRIPTION
+conserva 0.1.6.9000. SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`D67DB3D2ADA143558C5E4C9D747FA89D7C1D875C4F9C18C1A93E0B774828733D`.
+
+R CMD check --as-cran --no-manual definitivo: salida 0, **0 ERROR, 0 WARNING,
+1 NOTE**, únicamente por versión de desarrollo 0.1.6.9000. Pruebas instaladas:
+5233 aprobadas, 0 fallos/advertencias (117 s). Pasaron análisis de código
+(69 s), documentación, ejemplos (43 s), cuatro viñetas y reconstrucción (20 s).
+Informe tidyactuarial.Rcheck/00check.log. R 4.6.1/Windows,
+UTF-8, Pandoc de RStudio, bibliotecas instaladas accesibles fuera del
+aislamiento y _R_CHECK_CRAN_INCOMING_REMOTE_=false. Sin push/publicación,
+CI remota nueva o prueba actual de R mínimo. B06 sigue abierto; próximos
+life_contract/add_insurance/add_premium_schedule y valoraciones restantes.

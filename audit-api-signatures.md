@@ -1199,7 +1199,7 @@ Documentación: `man/premium_gross.Rd`. Semántica: revisión por bloque pendien
 | `output` | `c("value", "summary", "audit", "table")` | Output level. "value" returns the annualized gross premium, "summary" returns a compact one-row tibble, and "audit" returns the extended-equivalence components in long format. "table" is accepted as a compatibility alias for "summary" . |
 | `tidy` | `NULL` | Deprecated compatibility argument. TRUE maps to output = "summary" and FALSE to output = "value" . |
 | `check` | `TRUE` | Logical scalar. If TRUE , validates the inputs. |
-| `tol` | `1e-10` | Nonnegative numeric tolerance used for consistency checks. |
+| `tol` | `1e-10` | Nonnegative finite numeric tolerance. Monetary consistency is checked relatively to the compared amounts, without a one-currency-unit floor; frequency and integer checks use absolute tolerance. |
 | `...` | `<argumentos adicionales; sin default>` | Transitional compatibility. The deprecated argument payments_per_year is mapped to k . |
 
 ## B06 — premium_x
@@ -1215,7 +1215,7 @@ Documentación: `man/premium_x.Rd`. Semántica: revisión por bloque pendiente s
 | `m` | `1L` | Positive integer. Conversion frequency for nominal interest-rate inputs. |
 | `type` | `c("whole", "term", "endowment", "variable_k")` | Insurance type. One of "whole" , "term" , "endowment" , or "variable_k" . |
 | `benefit` | `1` | Benefit amount. For standard products, a single nonnegative numeric value. For type = "variable_k" , a numeric vector or a function of time may be supplied. |
-| `n` | `Inf` | Insurance term in years. Use Inf for whole-life insurance. |
+| `n` | `Inf` | Insurance term in years. Use Inf for whole-life insurance. For type = "variable_k" , fractional terms aligned with the benefit frequency are permitted; the default Inf infers a finite term from a numeric benefit schedule. |
 | `h` | `0L` | Nonnegative integer deferment period in years. |
 | `k` | `1L` | Positive integer. Number of premium payments per year. |
 | `frac` | `c("UDD", "CF", "CML", "Balducci")` | Fractional-age assumption. One of "UDD" , "CF" , "CML" , or "Balducci" . |

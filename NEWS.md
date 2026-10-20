@@ -1,5 +1,17 @@
 # tidyactuarial 0.2.0
 
+* Net premiums use the actual term inferred from a variable benefit schedule,
+  reject premiums beyond that coverage and accept aligned fractional variable
+  terms. Invalid controls and integer coercion failures are checked explicitly.
+* Gross premiums validate monetary consistency independently of currency units,
+  retain acquisition shares and small expense loadings, and factor the
+  equivalence residual to avoid overflowing intermediate APV subtraction.
+* Single-life recursive reserves use the equivalent backward identity with a
+  supported prospective boundary condition, preserving original rate growth,
+  rare death/survival probabilities and nonzero whole-life terminal values.
+  Unrequested extinct states are not traversed. Public signatures and output
+  schemas remain unchanged.
+
 * `annuity_x()` and `insurance_x()` now value parallel single-life scenarios
   on a shared mortality table, recycling only length-one arguments. Numeric
   vectors work in `mutate()`; tidy output has one row per scenario. Missing or

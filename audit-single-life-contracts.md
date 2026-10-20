@@ -15,9 +15,9 @@ tests anteriores no equivale a cierre integral del bloque.
 | plot_contingent_cash_flow | Revisión 67c2b70 y 57 comprobaciones reutilizadas; sin cambios gráficos nuevos |
 | annuity_x | B06-02: valoración exacta/fraccionaria, Woolhouse, límites y escenarios; C11 autorizada |
 | insurance_x | B06-02: decrementos anuales, diferimiento, extinción y escenarios; C10 autorizada |
-| premium_x | Tests v2 e identidades previas; pendiente conciliación integral |
-| premium_gross | Tests v2 previos; pendiente conciliación integral de gastos y normalización |
-| reserve_x | Tests v2 previos; pendiente conciliación prospectiva/retrospectiva |
+| premium_x | B06-03: equivalencia, calendario y plazo variable inferido; límites expresos |
+| premium_gross | B06-03: gastos, consistencia monetaria y residuo sin piso de unidad |
+| reserve_x | B06-03: flujos condicionados y recursión estable hacia atrás |
 | life_contract | Especificación conserva tasa original; pendiente revisión integral con consumidores |
 | add_insurance | Pendiente revisión integral del componente contractual |
 | add_premium_schedule | Pendiente revisión integral de calendarios |
@@ -226,3 +226,126 @@ probados y cerrados dentro de sus modelos y límites: check final salida 0,
 aprobadas, ejemplos y viñetas aprobados. C10/C11 cerradas en su alcance
 autorizado. B06 sigue abierto; continuar primas y reservas, luego
 componentes y modelos restantes, conservando estas correcciones.
+
+## B06-03: primas y reservas, 19 de octubre de 2026
+
+Base 576c9a1, árbol limpio al iniciar. Se conservan C10/C11 y la revisión
+anterior de anualidades/seguros. No se han modificado firmas, columnas,
+dependencias, versión ni estados condicionantes de contratos. Se concilian
+las pruebas v2 anteriores con referencias independientes, sin presentarlas
+como nuevas ni interpretar este paso como cierre integral de B06.
+
+### Ecuaciones e identidades
+
+Prima neta anualizada: P=B/a, con a=sum_j S(t_j) exp(-delta t_j)/k.
+El pago de cada fecha es P/k. El libro independiente enumera fechas desde
+emisión o diferimiento, n_prem entero o alineado con k, y probabilidades
+UDD. Se contrastan tasas negativas/cero/positivas y frecuencias 1/4.
+
+Prima comercial: G a=P a+alpha G/k+beta G a+gamma k a. Por tanto
+G=(P+k gamma)/D, D=(1-beta)-alpha/(ka)>0. alpha es adquisición al inicio,
+beta proporción de cada prima y gamma gasto monetario en cada fecha de prima,
+con su contingencia de supervivencia. No se añaden gastos en fechas distintas.
+Los libros independientes enumeran estas cuatro APVs para k=1/4/12 y monedas
+1e-100/1/1e100. No se usa premium_x como único oráculo de gastos.
+
+Reserva antes de la prima: V_t=B_t-P a_t, condicionada a estar vivo en x+t.
+Para primas anuales, (V_t+P_t)(1+i)=p_(x+t)V_(t+1)+q_(x+t)b_(t+1).
+La forma equivalente hacia atrás es
+V_t=exp(-delta)[p_(x+t)V_(t+1)+q_(x+t)b_(t+1)]-P_t.
+El libro independiente cuenta lx sobrevivientes y decrementos desde cada
+fecha; en dotales incluye pago al vencimiento. Se contrastan inicio de primas
+en emisión/diferimiento, pagos trimestrales, términos de prima fraccionarios,
+temporales/dotales y límites de vida entera. No se confunde P anualizada con P/k.
+
+### Hallazgos confirmados e implementación
+
+* premium_x admitía primas posteriores a una cobertura variable inferida de
+  su vector, porque n=Inf ocultaba el plazo finito real. Ahora usa longitud
+  del beneficio/k_benefit para límite de primas y audit insurance_term_years.
+  El default sigue infiriendo ese plazo; no se añade un parámetro. Los plazos
+  variables explícitos fraccionarios delegan su alineación al productor;
+  los seguros estándar conservan n entero. La revisión integral de
+  insurance_variable_k y sus límites numéricos sigue pendiente.
+* Se validan check lógico, edades/diferimientos fuera de rango y overflow
+  de n_prem*k antes del redondeo. m grande válido no se convierte a NA.
+* premium_gross comparaba dinero con tol*max(1,P), aceptando inconsistencia
+  de unidades al expresar primas pequeñas. Ahora compara relativamente
+  al máximo de los dos importes, sin piso monetario; valida el pago almacenado
+  y la frecuencia seleccionada incluso si k se suministra explícitamente.
+  Se conserva la prioridad de nombres preferidos/legados, no se promete
+  conciliación de todas las columnas redundantes que el usuario pueda añadir.
+* alpha/(ka) perdía adquisición al desbordarse ka. Se usa la base log cuando
+  hace falta recuperar ese cociente. Las cargas se calculan desde gastos
+  originales: P beta/D + alpha P/(kaD) + k gamma/D, conservando términos
+  representables aunque la participación intermedia o G-P redondeen a cero.
+* El residuo comercial conserva gastos monetarios realmente calculados.
+  Se netean G-P antes de a; si aparecen Inf-Inf se agrupan los términos con
+  factor a antes de restar adquisición. No se sustituye el residuo por cero
+  ni se pierde beta/alpha solo porque D redondee a uno. Por ejemplo P=1e20,
+  beta=1e-20, a=k=1 da carga aproximada 1 y residuo aproximado -1 cuando
+  el G representable coincide con P. Es un diagnóstico de redondeo, no una
+  promesa falsa de equivalencia exacta de las cifras ya redondeadas.
+* La recursión hacia adelante de reserve_x amplificaba error por 1/p.
+  Con p=.01, i=.1 y prima 90 por beneficio 100, todas las reservas de un
+  temporal son cero por identidad; la anterior acababa con errores de
+  millones tras diez pasos. Ahora se evalúa la misma identidad hacia atrás,
+  con tasas originales y probabilidades/decrementos directos de lx.
+* No se obtiene p como 1-q: p muy pequeño representable ya no se convierte
+  en cero por cancelación. q se obtiene de (l0-l1)/l0, conservando pérdidas
+  pequeñas. Se reutilizan los helpers log/monetarios existentes, sin nuevos.
+* La condición final se obtiene prospectivamente en la última cohorte positiva
+  dentro del horizonte, no se impone cero. Esto conserva la obligación final
+  de vida entera. No se recorren cohortes extinguidas no solicitadas; los
+  pagos formales al vencimiento conservan su convención. Cero de prima con
+  factor diagnóstico infinito produce APV de primas cero, no NaN.
+
+### Evidencia, compatibilidad y límites
+
+b06-premiums-reserves-before.log reproduce 18 fallos/5 advertencias sobre la
+base original con 191 comprobaciones ya aprobadas. La revisión adicional del
+residuo provisional está en b06-gross-residual-before.log: casos de cargo
+monetario no nulo con G-P o una participación redondeados a cero. El log
+b06-premium-periods-before.log reproduce errores internos por n_prem*k infinito.
+Los 212 focos iniciales pasaron; se ampliaron luego calendarios y límites.
+La validación definitiva y el archivo fuente se registran en audit-precran-check.md;
+los logs preliminares no sustituyen b06-premiums-reserves-final-tests.log.
+
+b06-premiums-reserves-compatibility.log compara 42 casos ordinarios/salidas
+con 576c9a1: tres firmas, clases, nombres y tipos conservados; valores con
+tolerancia relativa 1e-12. El residuo comercial cuya aritmética se corrige se
+verifica por escala monetaria separadamente, no por igualdad binaria histórica.
+Los cambios son A numéricos/de validación y B de documentación/extensión de
+plazo variable ya soportado por su productor; no hay decisión C nueva.
+
+Se preserva la interfaz escalar de contratos/primas; t sigue siendo un vector
+de duraciones de una póliza y benefit variable una secuencia de prestaciones,
+no un vector de escenarios. No se fuerza vectorización universal ni se cambia
+output/tidy o el orden de argumentos. La familia permite pipes y tablas de
+auditoría; distintas pólizas requieren llamadas separadas. Las funciones de
+anualidades/seguros ya vectorizadas conservan su ampliación previa.
+
+El horizonte de vida entera en reserve_x sigue siendo la última edad con lx
+positivo; la condición de borde puede incluir el último año implícito del
+seguro. El horizonte finito debe estar soportado por edades registradas.
+Una reserva intermedia pedida sobre una cohorte extinguida sigue siendo
+indefinida; no se introduce una política nueva de NA ni de estado observado.
+Recursión: k=1 y primas due; prospectiva: k-thly due. Se mantienen estos
+contratos locales sin uniformarlos automáticamente con otros consumidores.
+
+premium_x sigue exigiendo factor de prima finito y positivo; no se recupera
+un cociente arbitrario de APVs infinitas. La cobertura variable conserva
+limitaciones de su productor pendiente de revisión. No se prometen cancelación
+general de infinitos, cargas fuera de rango ni precisión absoluta exacta de
+residuos en monedas enormes. Woolhouse conserva sus límites de B06-02.
+No se refactorizan componentes ni se añaden probabilidades/colas inventadas.
+
+Estado de esta unidad: hallazgos confirmados, implementados, probados y
+cerrados dentro de los modelos/límites anteriores. 239 comprobaciones nuevas
+aprobadas, suite local completa aprobada y archivo verificado con 377 archivos
+de código/pruebas/Rd/ejemplo/NEWS/NAMESPACE iguales al checkout. Check final
+salida 0: 0 ERROR, 0 WARNING, 1 NOTE por desarrollo; 5233 comprobaciones
+instaladas aprobadas, ejemplos y viñetas aprobados. B06 acumula 417 nuevas.
+
+B06 continúa abierto: siguen life_contract, add_insurance y
+add_premium_schedule, y luego las valoraciones restantes de este bloque.

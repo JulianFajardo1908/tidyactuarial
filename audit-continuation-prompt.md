@@ -1,5 +1,27 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B06-03: primas y reservas (19 de octubre de 2026)
+
+Base 576c9a1: premium_x, premium_gross y reserve_x conciliadas con pruebas
+previas y libros independientes. Se corrige plazo variable inferido y su
+límite de primas; se aceptan términos variables fraccionarios ya soportados
+por el productor. Prima comercial: consistencia monetaria relativa sin piso,
+cargas representables y residuo honesto cuando G/P redondean iguales.
+Reserva recursiva: misma identidad hacia atrás, condición final prospectiva
+en cohorte soportada, tasa original y probabilidades directas de lx, sin
+forzar reservas cero ni atravesar estados extinguidos no solicitados.
+Ver audit-single-life-contracts.md B06-03 y resultado final/archivo en
+audit-precran-check.md. 239 comprobaciones nuevas; B06 acumula 417 nuevas.
+Tres firmas/esquemas preservados; sin decisión C nueva, dependencias o versión.
+Se mantienen límites de horizonte, primas due, scalar-contract y componentes
+no finitos documentados. Continúan life_contract, add_insurance y
+add_premium_schedule, y después las valoraciones B06 restantes. No reiniciar
+la auditoría ni atribuir estos cambios a un informe externo no proporcionado.
+Validación final B06-03: 0 ERROR, 0 WARNING, 1 NOTE por desarrollo; 5233
+comprobaciones instaladas aprobadas, ejemplos/viñetas aprobados. Archivo
+precran-b06-premiums-reserves verificado (377 archivos); huella y entorno
+en audit-precran-check.md. Sin push/publicación ni cambio de versión.
+
 ## B06-02: anualidades y seguros (18 de octubre)
 
 El usuario pidió especial cuidado con generalidad y vectorización de

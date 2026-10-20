@@ -7,7 +7,8 @@ de parámetros, en orden real y con defaults extraídos de formals(). A_xj
 permanece como alias de insurance_xj. Las descripciones Rd transcriben
 concepto, dominio y unidades cuando existen; no prueban su implementación.
 B03, B04 y B05 quedan cerrados dentro de sus respectivos alcances documentados;
-B06 está en revisión (apv_life_flow, ver audit-single-life-contracts.md);
+B06 está en revisión (flujos, anualidades/seguros y primas/reservas;
+ver audit-single-life-contracts.md);
 B07–B09 conservan pendientes de revisión integral por bloques.
 
 Actualización B03: se abordaron a_angle, s_angle, annuity_arith, annuity_geom
@@ -308,3 +309,35 @@ fraccionarias requieren diseño actuarial/API explícito adicional. La matriz
 de capacidades, ecuaciones y 118 comprobaciones nuevas está en
 audit-single-life-contracts.md; no se declara máxima generalidad ni se
 atribuye esta implementación al informe de Claude que no se proporcionó.
+
+## B06-03: primas y reservas
+
+Se mantienen tres firmas y sus esquemas de output/tidy. Las correcciones
+son A numéricas/de validación y B de documentación/aceptación de términos
+variables fraccionarios que el productor ya soporta; no hay decisión C nueva.
+El plazo inferido de beneficios variables es finito: la auditoría ahora informa
+ese plazo efectivo, y las primas no pueden continuar después de esa cobertura.
+Se preservan inicio en emisión/diferimiento, prima anualizada frente a pago,
+frecuencia propia del beneficio en componentes y prioridades de aliases.
+
+premium_gross compara las columnas monetarias seleccionadas sin piso de unidad;
+no se modifican nombres/aliases. Su loading conserva la carga teórica calculada
+desde gastos originales aunque G y P redondeen iguales; su residuo conserva
+el costo monetario no cubierto por esas cifras redondeadas, sin forzarlo a cero.
+Se evita coerción NA de frecuencias grandes, con tipo ordinario integer
+preservado y almacenamiento double fuera de rango entero, como en B06-02.
+
+reserve_x conserva condicionamiento de póliza viva y posición antes de prima;
+recursive evalúa la misma ecuación hacia atrás para estabilizarla. La condición
+final prospectiva no es necesariamente cero. Se mantiene horizonte de última
+cohorte positiva para vida entera, edades registradas para cobertura finita,
+duraciones t ordenadas/únicas y métodos/limitaciones de primas due actuales.
+No se amplían estados, madurez del contrato o pagos al momento de muerte.
+
+Las tres funciones conservan interfaz de un contrato por llamada; benefit
+variable y t son, respectivamente, calendario de pagos y duraciones, no
+escenarios. No se reinterpretan esos vectores ni se añade vectorización universal.
+42 comparaciones ordinarias con 576c9a1 conservan firmas, clases, columnas,
+tipos y valores a tolerancia relativa 1e-12; residuos se contrastan por escala.
+Ver audit-single-life-contracts.md B06-03 para matemática, 239 comprobaciones
+nuevas y límites de valores no finitos. C02–C04 siguen sin implementar.
