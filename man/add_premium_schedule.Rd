@@ -41,6 +41,13 @@ Adds the premium-payment side of a single-life or two-life insurance
 contract. The schedule defines when premiums are payable while the selected
 life status is in force. This function stores the specification only.
 }
+\details{
+The fractional-age assumption is resolved when this component is added:
+later replacement of the insurance component does not change this stored
+assumption. `n_prem = NULL` remains unresolved until valuation. Finite
+schedules must contain a finite, positive whole number of payments.
+Large integer-valued frequencies are stored as doubles when needed.
+}
 \seealso{
 Other life-contingencies:
 \code{\link[=add_insurance]{add_insurance()}},

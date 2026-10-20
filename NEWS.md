@@ -1,5 +1,11 @@
 # tidyactuarial 0.2.0
 
+* Life-contract specifications preserve large integer-valued inputs without
+  coercing them to missing values and validate the financial domain of stored
+  rates. Premium schedules reject overflowing or empty rounded payment grids;
+  standard positive insurance terms cannot round to zero. Component schemas,
+  ordinary integer types and original rate specifications are retained.
+
 * Net premiums use the actual term inferred from a variable benefit schedule,
   reject premiums beyond that coverage and accept aligned fractional variable
   terms. Invalid controls and integer coercion failures are checked explicitly.

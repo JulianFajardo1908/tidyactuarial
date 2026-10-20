@@ -1,5 +1,26 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B06-04: contratos y componentes (19 de octubre de 2026)
+
+Base acab741: life_contract, add_insurance y add_premium_schedule revisadas
+con consumidores y evidencia previa. Se preservan entradas enteras grandes
+sin coerción NA, se valida el dominio financiero de la tasa original y se
+rechazan calendarios desbordados/vacíos por redondeo. No se convierte la tasa
+almacenada ni se alteran campos/aliases o hipótesis frac capturadas al añadir.
+68 comprobaciones nuevas y 72 objetos ordinarios idénticos al commit base;
+B06 acumula 485 nuevas. Suite local completa aprobada; resultado definitivo
+de check/archivo en audit-precran-check.md. Ver audit-single-life-contracts.md
+B06-04 para matemática y límites: constructor estructural, restricciones de
+cada valoración, términos positivos y componentes ensamblables en cualquier
+orden. No hay decisión C nueva, dependencias o cambio de versión.
+Continúan annuity_multi, insurance_variable_k e insurance_xj/A_xj. B06 sigue
+abierto; no reiniciar unidades cerradas ni confundir almacenamiento fiel con
+validación integral de todos los modelos multivida/simulación. Sin push.
+Validación final B06-04: check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por
+desarrollo; 5301 comprobaciones instaladas aprobadas, ejemplos y viñetas
+aprobados. Archivo verificado precran-b06-contract-storage (378 archivos);
+huella/entorno en audit-precran-check.md. Unidad cerrada en ese alcance.
+
 ## B06-03: primas y reservas (19 de octubre de 2026)
 
 Base 576c9a1: premium_x, premium_gross y reserve_x conciliadas con pruebas

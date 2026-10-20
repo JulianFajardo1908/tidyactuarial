@@ -341,3 +341,17 @@ escenarios. No se reinterpretan esos vectores ni se añade vectorización univer
 tipos y valores a tolerancia relativa 1e-12; residuos se contrastan por escala.
 Ver audit-single-life-contracts.md B06-03 para matemática, 239 comprobaciones
 nuevas y límites de valores no finitos. C02–C04 siguen sin implementar.
+
+## B06-04: contratos y componentes
+
+life_contract/add_insurance/add_premium_schedule mantienen firmas, campos,
+aliases y retorno pipe-friendly. 72 objetos ordinarios son idénticos a acab741.
+Se corrigen coerciones NA conservando double fuera del rango integer, sin
+prometer que todos los consumidores admitan esos horizontes. Se validan las
+bases de tasas originales y se rechazan calendarios finitos desbordados o
+positivos que redondeaban a cero. A de validación, B de documentación; sin C
+nueva. n=0 de componentes sigue rechazado; C10/C11 conservan su propio alcance.
+La hipótesis frac del componente de primas se captura al añadirlo, n_prem=NULL
+se resuelve al valorar y benefit funcional no se evalúa al construir. No se
+añaden parámetros, aliases ni herencia dinámica. Ver modelo, 68 comprobaciones
+nuevas y límites explícitos en audit-single-life-contracts.md B06-04.

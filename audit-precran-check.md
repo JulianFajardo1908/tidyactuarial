@@ -743,3 +743,39 @@ UTF-8, Pandoc de RStudio, bibliotecas instaladas accesibles fuera del
 aislamiento y _R_CHECK_CRAN_INCOMING_REMOTE_=false. Sin push/publicación,
 CI remota nueva o prueba actual de R mínimo. B06 sigue abierto; próximos
 life_contract/add_insurance/add_premium_schedule y valoraciones restantes.
+
+## B06-04: especificaciones de contratos y componentes (19 de octubre)
+
+Base acab741. Se revisan life_contract, add_insurance y add_premium_schedule:
+coerciones NA, dominio de tasas y calendarios que desbordaban o redondeaban a
+cero. Se mantienen esquema, firmas, tipos ordinarios, aliases, tasas originales
+y supuestos capturados. Modelo, causas, compatibilidad y límites en
+audit-single-life-contracts.md B06-04; no hay decisión C nueva.
+
+68 comprobaciones nuevas, sin fallos/advertencias, y suite local completa
+aprobada (salida 0): b06-contract-storage-final-tests.log. B06 acumula 485.
+b06-contract-storage-before.log reproduce defectos originales; el reporter
+muestra un máximo de diez fallos detallados. La comparación con acab741 en
+b06-contract-storage-compatibility.log acredita 72 objetos ordinarios idénticos
+y tres firmas preservadas. Se reutilizan pruebas de contratos/multivida y
+unidades anteriores sin contarlas como nuevas. Inventario estable 102 nombres,
+973 apariciones de parámetros; no se alteran descripciones de parámetros.
+
+Artefactos:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b06-contract-storage/`.
+R CMD build --no-manual aprobado. snapshot-verification.txt acredita 378
+archivos R/tests/Rd/ejemplo/NEWS/NAMESPACE iguales al checkout normalizando
+CRLF; pruebas nuevas incluidas, AGENTS/audit-* excluidos y versión 0.1.6.9000.
+SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+`0F5EFA173D4DC81EB9811BDB9ACB9D72DC1043E5A93101BFC66A9901ED52DED2`.
+
+R CMD check --as-cran --no-manual definitivo: salida 0, **0 ERROR, 0 WARNING,
+1 NOTE**, únicamente por versión de desarrollo 0.1.6.9000. Pruebas instaladas:
+5301 aprobadas, 0 fallos/advertencias/omisiones (104 s). Análisis de código
+aprobado (70 s), documentación, ejemplos (36 s), cuatro viñetas y reconstrucción
+(15 s). Informe tidyactuarial.Rcheck/00check.log. R 4.6.1/Windows, UTF-8,
+Pandoc de RStudio, bibliotecas instaladas accesibles fuera del aislamiento,
+_R_CHECK_CRAN_INCOMING_REMOTE_=false. Sin nueva CI remota ni prueba actual
+de R mínimo. Sin push/publicación ni cambio de versión. Unidad B06-04 cerrada
+dentro de su alcance; siguen annuity_multi, insurance_variable_k y
+insurance_xj/A_xj. B06 continúa abierto.

@@ -18,9 +18,9 @@ tests anteriores no equivale a cierre integral del bloque.
 | premium_x | B06-03: equivalencia, calendario y plazo variable inferido; límites expresos |
 | premium_gross | B06-03: gastos, consistencia monetaria y residuo sin piso de unidad |
 | reserve_x | B06-03: flujos condicionados y recursión estable hacia atrás |
-| life_contract | Especificación conserva tasa original; pendiente revisión integral con consumidores |
-| add_insurance | Pendiente revisión integral del componente contractual |
-| add_premium_schedule | Pendiente revisión integral de calendarios |
+| life_contract | B06-04: almacenamiento fiel, dominio de tasas y consumidores; límites expresos |
+| add_insurance | B06-04: componentes, tipos, conservación y plazos positivos |
+| add_premium_schedule | B06-04: grilla finita positiva y supuestos almacenados |
 | annuity_multi | Tests actuariales previos; pendiente conciliación integral |
 | insurance_variable_k | Tests actuariales previos; pendiente conciliación integral |
 | insurance_xj | Tests actuariales previos; pendiente conciliación integral |
@@ -349,3 +349,84 @@ instaladas aprobadas, ejemplos y viñetas aprobados. B06 acumula 417 nuevas.
 
 B06 continúa abierto: siguen life_contract, add_insurance y
 add_premium_schedule, y luego las valoraciones restantes de este bloque.
+
+## B06-04: especificación de contratos y componentes (19 de octubre)
+
+Base acab741, sin repetir B06-01/02/03. Se revisan life_contract,
+add_insurance y add_premium_schedule con sus consumidores existentes.
+Son constructores escalares de una especificación, no motores de APV ni
+escenarios vectorizados. Un beneficio variable sigue siendo un calendario.
+
+### Modelo y alcance
+
+La tasa almacenada debe admitir acumulación positiva: 1+i>0, 1+i/m>0 o
+1-i/m>0 según sea efectiva, nominal de interés o nominal de descuento.
+La fuerza puede ser cualquier real finito. No se reemplaza la tasa original
+por su equivalente anual: una fuerza extrema válida puede tener equivalente
+redondeado a -1/Inf y aun así producir factores de intervalos representables.
+El calendario finito debe contener N=n_prem*k pagos, con N finito, entero y
+positivo. La tolerancia de alineación no debe convertir un plazo positivo
+en un calendario vacío. Los términos estándar positivos deben redondear a
+por lo menos un año; n=0 continúa fuera del contrato de estos componentes.
+C10/C11 no autorizan extender automáticamente sus propios casos cero aquí.
+
+Libro independiente: lx=1000*.8^(x-40), seguro temporal de tres años,
+h=1, beneficio 500, nominal .06 convertible semestral. Con g=2 log1p(.06/2),
+B=sum(500*.8^j*.2*exp(-g*(j+1)), j=1..3). Para primas semestrales due
+durante dos años, a=(1/2) sum(S(t)*exp(-g*t), t=0,.5,1,1.5), con
+S(t)=.8^floor(t)*(1-.2*(t-floor(t))) bajo UDD. La prima anualizada B/a
+coincide con premium_x del contrato; se contrastan también cambios explícitos
+de beneficio y tasa y anualidades con nominales de frecuencia grande.
+
+### Defectos confirmados y corrección mínima
+
+* Coerciones as.integer convertían edades, frecuencias, plazos y diferimientos
+  finitos fuera del rango integer en NA, con advertencias. Se conserva integer
+  en el rango ordinario y double redondeado fuera de él, como en B06-02/03.
+  Esto almacena fielmente; no promete valorar horizontes imposibles o enormes.
+* life_contract aceptaba bases de acumulación no positivas, pese a anunciar
+  validación de la tasa. Se reutiliza standardize_interest para el dominio,
+  descartando el equivalente y preservando i/i_type/m y aliases originales.
+* n_prem*k infinito y k convertido en NA causaban un if con valor ausente;
+  ahora el número de pagos se comprueba antes de redondear/almacenar.
+* Un plazo positivo minúsculo podía almacenarse como cero en primas y seguros
+  estándar. Se rechaza expresamente, conservando términos fraccionarios
+  alineados de primas y los términos variables previamente soportados.
+
+Las reproducciones sobre acab741 están en b06-contract-storage-before.log:
+12 fallos/errores y nueve advertencias;
+la visualización del reporter limita los fallos detallados a diez. Los tests
+ampliados definitivos añaden tasas nominales grandes y almacenamiento diferido
+de funciones de beneficio, sin invocar dichas funciones al construir.
+
+### Compatibilidad, evidencia y límites
+
+b06-contract-storage-compatibility.log compara 72 objetos ordinarios completos
+con acab741: clases, nombres, tipos, valores, aliases y tres firmas idénticos.
+No se añaden campos o dependencias. Se preservan tibbles/atributos, campos
+del usuario, retorno para pipes y copias sin mutar el contrato original.
+El componente de primas captura frac al añadirse; no se transforma en una
+herencia dinámica al reemplazar el seguro. n_prem=NULL queda sin resolver
+hasta la valoración. El estado joint/last y los tipos permitidos conservan
+su selección anterior; se reutilizan las pruebas multivida previas.
+
+Clasificación A: fallos de coerción, bases inválidas y calendarios vacíos o
+no finitos. B: documentación de almacenamiento, alcance y supuestos capturados.
+No hay propuesta C nueva ni cambio del significado de valores válidos ordinarios.
+La validación del constructor de tablas sigue siendo estructural (data.frame,
+x/lx numéricos). Cada consumidor comprueba su dominio mortal, edades, horizonte,
+grilla, Woolhouse y disponibilidad según su modelo; este cierre no certifica
+todas las valoraciones multivida/simulación ni permite estados manipulados
+arbitrariamente después de construir. No se evalúa anticipadamente benefit
+funcional ni se validan aquí todos los plazos cruzados: se pueden ensamblar
+componentes en cualquier orden y los argumentos explícitos pueden sustituirlos.
+
+68 comprobaciones nuevas aprobadas, B06 acumula 485. Resultado definitivo de
+suite, archivo fuente verificado y check instalado: audit-precran-check.md.
+B06 sigue abierto: continúan annuity_multi, insurance_variable_k e
+insurance_xj/A_xj; no se duplica la revisión del alias.
+
+Estado B06-04: confirmado, implementado, probado y cerrado dentro de ese
+alcance. Check final salida 0: 0 ERROR, 0 WARNING, 1 NOTE por desarrollo;
+5301 comprobaciones instaladas aprobadas, ejemplos y viñetas aprobados.
+Archivo fuente verificado con 378 archivos coincidentes y huella registrada.

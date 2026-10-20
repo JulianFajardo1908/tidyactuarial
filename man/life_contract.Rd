@@ -75,6 +75,15 @@ The object stores actuarial fields using the compact names above. During the
 0.1.4 API transition, it also stores internal compatibility fields so that
 functions not yet migrated can continue to read the contract. These internal
 fields are not part of the preferred user-facing notation.
+
+The original rate and table are retained, without converting the stored
+rate to an annual effective rate or altering the table. Rate domains require
+`i > -1` for effective rates, `1 + i/m > 0` for nominal interest and
+`1 - i/m > 0` for nominal discount; any finite force is allowed.
+Table validation here checks structure and numeric `x`/`lx` columns.
+Valuation functions additionally check mortality consistency, supported ages,
+horizons and payment grids for their particular models. Integer-valued
+specifications outside R's integer range are stored as doubles, never `NA`.
 }
 \examples{
 lt <- data.frame(

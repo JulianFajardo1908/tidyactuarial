@@ -8,6 +8,12 @@
 #' `contract$lives`: `"joint"` becomes joint-life status and
 #' `"last_survivor"` becomes last-survivor status.
 #'
+#' Components may be added in either order and unrelated contract fields are
+#' retained. Standard finite terms must round to at least one year. Large
+#' integer-valued terms, deferments and frequencies are stored as doubles when
+#' outside R's integer range; feasibility of a valuation horizon is checked by
+#' the consumer. Variable-benefit functions are stored without being evaluated.
+#'
 #' @param contract A `tidyact_life_contract` object.
 #' @param type Insurance type. Single-life contracts support `"whole"`,
 #'   `"term"`, `"endowment"`, and `"variable_k"`. Two-life contracts support
@@ -99,7 +105,7 @@ add_insurance <- function(
 
   if (type != "variable_k" &&
       !is.infinite(n) &&
-      abs(n - round(n)) > 1e-10) {
+      (round(n) < 1 || abs(n - round(n)) > 1e-10)) {
     stop(
       "Standard insurance terms must be an integer number of years.",
       call. = FALSE
@@ -169,12 +175,12 @@ add_insurance <- function(
     type = type,
     benefit = benefit,
     n = if (!is.infinite(n) && type != "variable_k") {
-      as.integer(round(n))
+      if (n <= .Machine$integer.max) as.integer(round(n)) else round(n)
     } else {
       n
     },
-    h = as.integer(round(h)),
-    k = as.integer(round(k)),
+    h = if (h <= .Machine$integer.max) as.integer(round(h)) else round(h),
+    k = if (k <= .Machine$integer.max) as.integer(round(k)) else round(k),
     frac = frac,
     status = status
   )
@@ -188,6 +194,12 @@ add_insurance <- function(
 #' Adds the premium-payment side of a single-life or two-life insurance
 #' contract. The schedule defines when premiums are payable while the selected
 #' life status is in force. This function stores the specification only.
+#'
+#' The fractional-age assumption is resolved when this component is added:
+#' later replacement of the insurance component does not change this stored
+#' assumption. `n_prem = NULL` remains unresolved until valuation. Finite
+#' schedules must contain a finite, positive whole number of payments.
+#' Large integer-valued frequencies are stored as doubles when needed.
 #'
 #' @param contract A `tidyact_life_contract` object.
 #' @param k Positive integer. Number of premium payments per year.
@@ -235,7 +247,7 @@ add_premium_schedule <- function(
     stop("`k` must be a single positive integer.", call. = FALSE)
   }
 
-  k <- as.integer(round(k))
+  k <- if (k <= .Machine$integer.max) as.integer(round(k)) else round(k)
 
   if (!is.null(n_prem)) {
     if (!is.numeric(n_prem) ||
@@ -252,9 +264,10 @@ add_premium_schedule <- function(
     if (!is.infinite(n_prem)) {
       n_payments <- n_prem * k
 
-      if (abs(n_payments - round(n_payments)) > 1e-10) {
+      if (!is.finite(n_payments) || round(n_payments) < 1 ||
+          abs(n_payments - round(n_payments)) > 1e-10) {
         stop(
-          "`n_prem * k` must be an integer so that the schedule contains ",
+          "`n_prem * k` must be a finite positive integer so that the schedule contains ",
           "a whole number of premium payments.",
           call. = FALSE
         )

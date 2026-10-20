@@ -47,6 +47,12 @@ only; it does not calculate an actuarial present value.
 For two-life contracts, the insurance status is inferred from
 `contract$lives`: `"joint"` becomes joint-life status and
 `"last_survivor"` becomes last-survivor status.
+
+Components may be added in either order and unrelated contract fields are
+retained. Standard finite terms must round to at least one year. Large
+integer-valued terms, deferments and frequencies are stored as doubles when
+outside R's integer range; feasibility of a valuation horizon is checked by
+the consumer. Variable-benefit functions are stored without being evaluated.
 }
 \seealso{
 Other life-contingencies:
