@@ -779,3 +779,48 @@ _R_CHECK_CRAN_INCOMING_REMOTE_=false. Sin nueva CI remota ni prueba actual
 de R mínimo. Sin push/publicación ni cambio de versión. Unidad B06-04 cerrada
 dentro de su alcance; siguen annuity_multi, insurance_variable_k y
 insurance_xj/A_xj. B06 continúa abierto.
+
+## B06-05: anualidad multivida y seguros restantes (21 de octubre de 2026)
+
+Base d117df3. Se reanuda la unidad guardada tras la interrupción de conexión.
+annuity_multi: C12 autorizada, frac final y extremos temporales de Woolhouse.
+insurance_variable_k: masas fraccionarias directas y productos monetarios log.
+insurance_xj: supervivencia del estado activo, probabilidades competidoras,
+grilla anual y estabilidad log. No se cambian modelos de pago al instante de
+muerte ni el significado histórico joint-and-survivor de reversionary.
+Modelo, reproducciones, referencias y límites en audit-single-life-contracts.md.
+
+153 comprobaciones nuevas (91 anualidad y 62 seguros), todas aprobadas sin
+advertencias; suite fuente completa aprobada en b06-remaining-final-tests.log.
+Se reutiliza esa suite ya terminada y se comprueba además el paquete final
+instalado. B06 acumula 638 comprobaciones nuevas. Reproducciones originales:
+b06-remaining-diagnosis.log, b06-annuity-multi-before.log y
+b06-remaining-insurance-before.log. Evidencia de compatibilidad en
+b06-remaining-compatibility.log: 62 comparaciones ordinarias a 1e-12,
+clases/nombres/esquemas preservados, dos firmas idénticas y annuity_multi
+con todos los formals previos más frac al final. A_xj idéntico a insurance_xj.
+Inventario: 102 nombres públicos, 974 apariciones de parámetros, cero sin
+describir. No hay otra decisión C ni dependencias o versión nuevas.
+
+Artefactos de construcción/check:
+`C:/Users/LENOVO/.codex/visualizations/2026/10/16/01a146a8-108d-79a3-a021-fdc08295e29e/precran-b06-remaining/`.
+
+R CMD build --no-manual aprobado. snapshot-verification.txt acredita 381
+archivos R/tests/Rd/ejemplo/NEWS/NAMESPACE iguales al checkout final normalizando
+CRLF; helper y dos pruebas nuevos incluidos, AGENTS/audit-* excluidos.
+DESCRIPTION mantiene 0.1.6.9000. SHA256 del archivo fuente:
+`EBABC669AE74ECC207B0067566F10C93D6AF639E485240F39AB79A95921D759C`.
+
+R CMD check --as-cran --no-manual definitivo, salida 0: **0 ERROR, 0 WARNING,
+1 NOTE**, exclusivamente por versión de desarrollo 0.1.6.9000. Pruebas
+instaladas: 5454 aprobadas, 0 fallos/advertencias/omisiones (63 s). Análisis
+de código (43 s), documentación, ejemplos (25 s), cuatro viñetas y
+reconstrucción (12 s) aprobados. Ver tidyactuarial.Rcheck/00check.log.
+Entorno: R 4.6.1/Windows, UTF-8, Pandoc de RStudio, bibliotecas instaladas
+accesibles fuera del aislamiento, _R_CHECK_CRAN_INCOMING_REMOTE_=false.
+Sin nueva CI remota ni prueba actual de R mínimo. Sin push/publicación,
+dependencias o cambio de versión. El usuario autorizó el commit local tras
+validación el 21 de octubre. B06-05 queda cerrado dentro del alcance expuesto;
+B06 concilia sus 14 nombres, con 638 comprobaciones nuevas y límites
+documentados. No se declara perfección ni conciliación de un informe externo
+no proporcionado. Sigue B07; preservar la evidencia previa multivida/Monte Carlo.

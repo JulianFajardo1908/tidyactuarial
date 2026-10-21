@@ -40,11 +40,11 @@ the length of \code{benefit} when \code{benefit} is numeric. If
 \item{k}{Positive integer. Number of subperiods per year. Default is
 \code{12}.}
 
-\item{i_type}{Character vector indicating the interest-rate type. Allowed
+\item{i_type}{Character scalar indicating the interest-rate type. Allowed
 values are \code{"effective"}, \code{"nominal_interest"},
 \code{"nominal_discount"}, and \code{"force"}.}
 
-\item{m}{Positive integer vector giving the conversion frequency for nominal
+\item{m}{Positive integer scalar giving the conversion frequency for nominal
 interest-rate inputs. Ignored for \code{"effective"} and \code{"force"}.}
 
 \item{frac}{Fractional-age assumption used in survival probabilities:
@@ -99,8 +99,23 @@ If it is numeric with length greater than 1, its length must equal
 \eqn{n k}. If \code{benefit} is a function, it is evaluated at the end of
 each subperiod, at times \eqn{1/k, 2/k, \ldots, n}.
 
-Fractional survival probabilities are computed via \code{\link{t_px}} under
-the selected fractional-age assumption.
+Fractional mortality is interpolated under the selected assumption. Death
+masses are evaluated directly from annual survivor decrements and stable
+fractional formulas, avoiding subtraction of rounded survival probabilities.
+The table must have consecutive annual ages and nonincreasing finite `lx`,
+with positive exposure at issue and support through `x + h + n`. No extra
+terminal death year is invented. A zero annual survival under CF or Balducci
+uses the limiting mass at the beginning of that annual interval, consistently
+with the package's fractional survival convention.
+
+This values one policy per call. A benefit vector is a sequence of payments,
+not a vector of policy scenarios; signed benefits are supported. Functional
+benefits are evaluated at times relative to the start of coverage, excluding
+`h`; discounting and death probabilities use absolute times including `h`.
+The payment is at the end of the subperiod of death, not at the exact death
+time. Full contractual amounts are used, without division by `k`.
+`i_effective` is diagnostic and may round to -1 or Inf for an extreme valid
+original rate; valuation retains the original log accumulation rate.
 }
 \examples{
 lt <- data.frame(

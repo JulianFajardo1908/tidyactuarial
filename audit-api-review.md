@@ -2,13 +2,13 @@
 
 Objetivo 0.2.0. Clasificación: **A**, defecto matemático/computacional;
 **B**, mejora compatible; **C**, cambio público pendiente de autorización.
-La matriz `audit-api-signatures.md` contiene 102 entradas y 973 apariciones
+La matriz `audit-api-signatures.md` contiene 102 entradas y 974 apariciones
 de parámetros, en orden real y con defaults extraídos de formals(). A_xj
 permanece como alias de insurance_xj. Las descripciones Rd transcriben
 concepto, dominio y unidades cuando existen; no prueban su implementación.
 B03, B04 y B05 quedan cerrados dentro de sus respectivos alcances documentados;
-B06 está en revisión (flujos, anualidades/seguros y primas/reservas;
-ver audit-single-life-contracts.md);
+B06 queda cerrado dentro del alcance y límites documentados en
+audit-single-life-contracts.md, con C12 autorizada y check final aprobado;
 B07–B09 conservan pendientes de revisión integral por bloques.
 
 Actualización B03: se abordaron a_angle, s_angle, annuity_arith, annuity_geom
@@ -355,3 +355,38 @@ La hipótesis frac del componente de primas se captura al añadirlo, n_prem=NULL
 se resuelve al valorar y benefit funcional no se evalúa al construir. No se
 añaden parámetros, aliases ni herencia dinámica. Ver modelo, 68 comprobaciones
 nuevas y límites explícitos en audit-single-life-contracts.md B06-04.
+
+## C12 autorizada e implementada: annuity_multi subanual y Woolhouse temporal
+
+20 de octubre de 2026, base d117df3. Reproducción en
+b06-remaining-diagnosis.log: lx=(100,80,60,40,20), edades 40:44,
+i=0, n=1, k=2, due. none devuelve 1 (ignora k), frente a .95 bajo UDD;
+first devuelve .75, frente a .95 al incluir el extremo final.
+
+Autorizada expresamente por el usuario el 20 de octubre de 2026: añadir al final frac con opciones UDD,
+CF/CML y Balducci (default UDD); none calculará pagos 1/k en la grilla real.
+Woolhouse conservará nombres first/second y la normalización anual, corrigiendo
+los extremos h y h+n y la conversión due/immediate. second usa fuerzas de
+borde estimadas por log del cociente anual del peso esperado del beneficio;
+se rechazan bordes no definidos y se advierten aproximaciones negativas.
+Se conservan firmas posicionales previas, anualidades k=1, independencia,
+1-3 vidas, significado histórico joint-and-survivor de reversionary y horizonte
+conservador documentado. Cambian resultados subanuales antes incorrectos:
+la autorización C requerida por el prompt maestro fue recibida y se implementó.
+
+## B06-05: conciliación final de anualidad multivida y seguros
+
+Ver audit-single-life-contracts.md B06-05 para ecuaciones, reproducciones,
+153 comprobaciones nuevas, 62 comparaciones ordinarias y límites. Se conserva
+el significado joint-and-survivor de reversionary; no es una renta revertida
+pura. El parámetro frac nuevo tiene autorización C12 y queda al final.
+insurance_variable_k preserva beneficio como calendario, no como escenarios;
+su documentación i_type/m ahora indica correctamente escalares. insurance_xj
+preserva escenarios paralelos, esquemas y A_xj. Las masas pequeñas, tasas
+originales, datos inconsistentes y coerciones son correcciones A; aclarar
+momento de pago, estado activo y horizonte truncado es documentación B.
+No se añade otra decisión C ni se cambia versión o dependencia. Inventario
+actualizado: 102 nombres, 974 apariciones de parámetros y ninguna sin describir.
+Validación final B06-05: 5454 comprobaciones instaladas aprobadas y check
+0 ERROR, 0 WARNING, 1 NOTE por desarrollo. Unidad y bloque cerrados dentro
+de sus alcances documentados; C02-C04 siguen sin autorización/implementación.

@@ -1,5 +1,18 @@
 # tidyactuarial 0.2.0
 
+* Approved C12: `annuity_multi()` adds trailing `frac`, values actual payments
+  of 1/k under UDD, CF/CML or Balducci with `woolhouse = "none"`, and includes
+  both deferred and terminal endpoints in temporary Woolhouse corrections.
+  The historical joint-and-survivor meaning of `reversionary` is clarified.
+* Variable subperiod death benefits use direct mortality masses and original
+  log interest, retaining small decrements and representable extreme APVs.
+  Coverage-relative functional benefit times and full payment amounts are
+  documented. Invalid tables, horizons and payment grids fail explicitly.
+* Cause-specific annual insurance validates competing-exit probabilities and
+  consecutive ages, retains cumulative log survival and original interest,
+  and preserves its vectorized output and `A_xj` alias. Available-table whole
+  insurance is explicitly described as truncated when the table is open.
+
 * Life-contract specifications preserve large integer-valued inputs without
   coercing them to missing values and validate the financial domain of stored
   rates. Premium schedules reject overflowing or empty rounded payment grids;

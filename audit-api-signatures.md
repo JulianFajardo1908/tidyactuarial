@@ -68,7 +68,7 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 | B06 | `A_xj (alias de insurance_xj)` | `A_xj(md, x, i, cause, type = c("whole", "term"), benefit = 1, n = NULL, h = 0L, i_type = "effective", m = 1L, tidy = FALSE, check = TRUE, tol = 1e-10)` | md primero; pipe posicional posible, revisar pertinencia | `tidy = FALSE` | Numeric vector of APVs, or a tibble if tidy = TRUE . |
 | B06 | `add_insurance` | `add_insurance(contract, type = c("whole", "term", "endowment", "pure_endowment", "variable_k"), benefit = 1, n = Inf, h = 0L, k = 1L, frac = c("UDD", "CF", "CML", "Balducci"))` | contract primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | The original contract with an `insurance` component. |
 | B06 | `add_premium_schedule` | `add_premium_schedule(contract, k = 1L, timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, woolhouse = c("none", "first", "second"), frac = NULL)` | contract primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | The original contract with a `premium_schedule` component. |
-| B06 | `annuity_multi` | `annuity_multi(lt, ages, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, annuity = c("cohort", "reversionary"), cohort = c("first", "last"), alpha = NULL, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"))` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A single numeric value representing the APV. |
+| B06 | `annuity_multi` | `annuity_multi(lt, ages, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, annuity = c("cohort", "reversionary"), cohort = c("first", "last"), alpha = NULL, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac = c("UDD", "CF", "CML", "Balducci"))` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A single numeric value representing the APV. |
 | B06 | `annuity_x` | `annuity_x(lt, x, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac = NULL, tidy = FALSE)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric vector of actuarial present values, of length one for a single scenario. If tidy = TRUE , a tibble with one row per scenario, the main input values, equivalent interest rate, deferment factor, pure endowment factor, and APV. |
 | B06 | `apv_life_flow` | `apv_life_flow(lt, ages, t = NULL, date = NULL, date0 = NULL, cf, i, i_type = "effective", m = 1L, status = c("single", "first", "last", "reversionary"), alpha = NULL, plot = FALSE)` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A tibble with one row per payment and columns: t , cf , surv_prob , discount , expected_cf , pv , and pv_cum . If date was provided, a date column is included. The total APV is stored as attr(result, "apv") . The contingency attribute identifies "survival" or "weighted" (reversionary benefit fraction) for plot_contingent_cash_flow() . |
 | B06 | `insurance_variable_k` | `insurance_variable_k(lt, x, i, benefit, n = NULL, h = 0, k = 12, i_type = "effective", m = 1L, frac, tidy = FALSE, check = TRUE, tol = 1e-10)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | A numeric actuarial present value, or a one-row tibble if tidy = TRUE . |
@@ -119,7 +119,7 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 ## Cobertura de extracción
 
 - Entradas públicas: 102.
-- Apariciones de parámetros, incluyendo alias y ...: 973.
+- Apariciones de parámetros, incluyendo alias y ...: 974.
 - Apariciones sin descripción Rd: 0.
 - Todas las apariciones tienen descripción; esto no garantiza dominio o unidades completos.
 
@@ -994,7 +994,7 @@ Documentación: `man/insurance_xj.Rd`. Semántica: revisión por bloque pendient
 |---|---|---|
 | `md` | `<obligatorio>` | A multiple decrement table produced by md_table . Must contain columns x , p_total , and the requested cause . |
 | `x` | `<obligatorio>` | Integer age(s) at issue. |
-| `i` | `<obligatorio>` | Annual interest-rate input. Must produce an annual effective rate greater than -1 . |
+| `i` | `<obligatorio>` | Finite annual interest-rate input in the valid domain of its original rate specification. Extreme annual equivalents may round to -1 or overflow, while the original log accumulation remains usable. |
 | `cause` | `<obligatorio>` | Character scalar. Name of the cause column in md , for example "q_death" . |
 | `type` | `c("whole", "term")` | Character scalar. Insurance type: "whole" or "term" . |
 | `benefit` | `1` | Numeric benefit amount payable at the end of the year of decrement by the specified cause. Default is 1 . |
@@ -1053,6 +1053,7 @@ Documentación: `man/annuity_multi.Rd`. Semántica: revisión por bloque pendien
 | `alpha` | `NULL` | Reversionary fraction, typically 0 \le \alpha \le 1 . Used only when annuity = "reversionary" . Note: alpha = 0 matches joint-life; alpha = 1 matches last-survivor. |
 | `timing` | `c("immediate", "due")` | "immediate" or "due" . |
 | `woolhouse` | `c("none", "first", "second")` | "none" , "first" , or "second" . |
+| `frac` | `c("UDD", "CF", "CML", "Balducci")` | Fractional-age assumption for exact payments: "UDD" (default), "CF" , "CML" (alias of CF), or "Balducci" . |
 
 ## B06 — annuity_x
 
@@ -1105,8 +1106,8 @@ Documentación: `man/insurance_variable_k.Rd`. Semántica: revisión por bloque 
 | `n` | `NULL` | Optional term in years. If NULL , the term is inferred from the length of benefit when benefit is numeric. If benefit is a function, n must be supplied. |
 | `h` | `0` | Nonnegative deferment period in years. Default is 0 . |
 | `k` | `12` | Positive integer. Number of subperiods per year. Default is 12 . |
-| `i_type` | `"effective"` | Character vector indicating the interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
-| `m` | `1L` | Positive integer vector giving the conversion frequency for nominal interest-rate inputs. Ignored for "effective" and "force" . |
+| `i_type` | `"effective"` | Character scalar indicating the interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
+| `m` | `1L` | Positive integer scalar giving the conversion frequency for nominal interest-rate inputs. Ignored for "effective" and "force" . |
 | `frac` | `<obligatorio>` | Fractional-age assumption used in survival probabilities: "UDD" , "CF" , "CML" , or "Balducci" . If not specified and lt carries a frac attribute, that value is used. |
 | `tidy` | `FALSE` | Logical. If TRUE , returns a one-row tibble. |
 | `check` | `TRUE` | Logical. If TRUE , performs basic input checks. |
@@ -1138,7 +1139,7 @@ Documentación: `man/insurance_xj.Rd`. Semántica: revisión por bloque pendient
 |---|---|---|
 | `md` | `<obligatorio>` | A multiple decrement table produced by md_table . Must contain columns x , p_total , and the requested cause . |
 | `x` | `<obligatorio>` | Integer age(s) at issue. |
-| `i` | `<obligatorio>` | Annual interest-rate input. Must produce an annual effective rate greater than -1 . |
+| `i` | `<obligatorio>` | Finite annual interest-rate input in the valid domain of its original rate specification. Extreme annual equivalents may round to -1 or overflow, while the original log accumulation remains usable. |
 | `cause` | `<obligatorio>` | Character scalar. Name of the cause column in md , for example "q_death" . |
 | `type` | `c("whole", "term")` | Character scalar. Insurance type: "whole" or "term" . |
 | `benefit` | `1` | Numeric benefit amount payable at the end of the year of decrement by the specified cause. Default is 1 . |

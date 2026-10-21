@@ -1,5 +1,34 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B06-05: anualidad multivida y seguros restantes (21 de octubre de 2026)
+
+Base d117df3. Se retoma el trabajo guardado antes de la interrupción de red;
+no reiniciar. annuity_multi implementa C12 autorizada expresamente el 20 de
+octubre: frac al final, pagos reales 1/k y ambos extremos de Woolhouse temporal.
+Se conserva el significado histórico joint-and-survivor de reversionary y el
+horizonte conservador. insurance_variable_k usa masas directas de fallecimiento
+subanual; insurance_xj conserva estado activo frente a todas las causas y
+usa log supervivencia/descuento. Ver audit-single-life-contracts.md B06-05:
+ecuaciones, referencias, ejemplos reproducidos y límites, sin máxima generalidad.
+Un helper privado compartido; sin nuevas dependencias ni versión. Dos firmas
+idénticas y una ampliada al final por C12; A_xj idéntico a insurance_xj.
+153 comprobaciones nuevas y suite fuente completa aprobadas antes del corte;
+62 comparaciones ordinarias a tolerancia 1e-12. B06 acumula 638 nuevas.
+Inventario 102 nombres y 974 apariciones de parámetros, sin descripciones
+faltantes. El cierre definitivo y check instalado están en audit-precran-check.md.
+Después de validar/cerrar B06, seguir B07 (multivida), preservando los arreglos
+previos y audit-multilife-monte-carlo.md; no confundir esta revisión de
+annuity_multi con el cierre del conjunto multivida. B01/B02 mantienen su
+estado formal de revisión pendiente. No push/publicación ni cambio de versión.
+Validación definitiva 21 de octubre: archivo verificado (381 archivos), check
+salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo; 5454 comprobaciones
+instaladas aprobadas, ejemplos y viñetas aprobados. Huella/entorno en
+audit-precran-check.md. B06-05 y B06 (14 nombres) quedan cerrados dentro de
+sus alcances/límites documentados, 638 comprobaciones nuevas acumuladas.
+El usuario autorizó guardar el commit local tras verificar. Continúa B07;
+no reiniciar B06 ni dar por revisadas todas las valoraciones multivida por
+la sola conciliación de annuity_multi.
+
 ## B06-04: contratos y componentes (19 de octubre de 2026)
 
 Base acab741: life_contract, add_insurance y add_premium_schedule revisadas

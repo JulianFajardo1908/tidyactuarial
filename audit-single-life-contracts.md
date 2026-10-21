@@ -21,10 +21,10 @@ tests anteriores no equivale a cierre integral del bloque.
 | life_contract | B06-04: almacenamiento fiel, dominio de tasas y consumidores; límites expresos |
 | add_insurance | B06-04: componentes, tipos, conservación y plazos positivos |
 | add_premium_schedule | B06-04: grilla finita positiva y supuestos almacenados |
-| annuity_multi | Tests actuariales previos; pendiente conciliación integral |
-| insurance_variable_k | Tests actuariales previos; pendiente conciliación integral |
-| insurance_xj | Tests actuariales previos; pendiente conciliación integral |
-| A_xj | Alias; revisar junto a insurance_xj, sin duplicar función ni evidencia |
+| annuity_multi | B06-05: pagos 1/k, extremos temporales de Woolhouse y C12 autorizada; límites expresos |
+| insurance_variable_k | B06-05: masas de fallecimiento subanuales, calendario y estabilidad monetaria |
+| insurance_xj | B06-05: estado activo, decrementos competidores, grilla anual y log supervivencia |
+| A_xj | Identidad con insurance_xj verificada; no se duplica función ni evidencia |
 
 ## B06-01: flujo de vida, modelo y defectos reproducidos
 
@@ -430,3 +430,141 @@ Estado B06-04: confirmado, implementado, probado y cerrado dentro de ese
 alcance. Check final salida 0: 0 ERROR, 0 WARNING, 1 NOTE por desarrollo;
 5301 comprobaciones instaladas aprobadas, ejemplos y viñetas aprobados.
 Archivo fuente verificado con 378 archivos coincidentes y huella registrada.
+
+## B06-05: anualidad multivida y seguros restantes (21 de octubre de 2026)
+
+Base d117df3. La implementación y las pruebas de esta unidad comenzaron el
+20 de octubre y sobrevivieron a la interrupción de conexión. No se reinicia
+la revisión ni se repiten los arreglos de las unidades anteriores.
+
+### Definiciones actuariales y contraste independiente
+
+annuity_multi valora una póliza con 1-3 vidas inicialmente vivas e independientes.
+Con S_j(t), el peso joint es producto S_j y el peso last es
+1-producto(1-S_j). La etiqueta histórica reversionary representa
+w(t)=(1-alpha)joint(t)+alpha last(t): paga uno mientras todos viven y alpha
+mientras alguno pero no todos viven. No es una renta que empieza únicamente
+al fallecer una vida designada; no se cambia esa definición ni se añade ese
+producto distinto. Para alpha fuera de [0,1] puede ser un peso de beneficio,
+no una probabilidad; se conserva su dominio real finito documentado.
+
+Con F(t)=exp(-g*t)w(t), la renta k-thly anualizada paga 1/k y suma
+F(h+j/k)/k. Due usa j=0..nk-1; immediate j=1..nk. First Woolhouse resta
+(1-1/k)(F(h)-F(h+n))/2 a la renta anual due. Second resta además
+(1-1/k^2)((g+eta_h)F(h)-(g+eta_(h+n))F(h+n))/12.
+eta_t=-log(w(t+1)/w(t)) es una estimación anual hacia adelante de la
+derivada logarítmica del peso, no una fuerza instantánea exacta conocida.
+Immediate resta (F(h)-F(h+n))/k a due. Se requieren pesos positivos y datos
+del año siguiente en ambos bordes para second; exact none evita esa hipótesis
+de suavidad. Se advierten aproximaciones negativas; no se recortan a cero.
+
+insurance_variable_k: cada b_j es el importe completo si la muerte ocurre
+en (h+(j-1)/k,h+j/k], pagadero al final de ese subperíodo. APV=sum b_j
+exp(-g*t_j)(S(t_(j-1))-S(t_j)). No se divide b_j por k y no es un seguro
+pagadero al momento exacto de muerte. Un beneficio funcional se evalúa en
+j/k, relativo al inicio de cobertura; probabilidades/descuento incluyen h.
+Se mantienen beneficios con signo y un solo contrato por llamada; el vector
+benefit es calendario, no un conjunto de pólizas.
+
+Para un año con supervivencia p y q=1-p, desde fracciones u0 a u1:
+UDD tiene masa q*(u1-u0); CF tiene p^u0*(1-p^(u1-u0)); Balducci tiene
+p*q*(u1-u0)/((p+u0*q)(p+u1*q)). Se multiplica por supervivencia desde emisión
+al inicio de ese año. Las diferencias lx-lx_siguiente y log/expm1 conservan
+las masas sin restar supervivencias casi iguales ya redondeadas. CF/Balducci
+con p=0 conservan el límite degenerado al principio del intervalo anual,
+coherente con la convención fraccionaria existente; no es una fuerza finita.
+
+insurance_xj: APV=B sum(exp(-g*(r+1)) producto(p_total desde emisión hasta
+r-1) q_j(x+r), r=h..h+n-1). q_j son probabilidades dependientes de salida
+desde el estado activo en competencia con las demás causas, no probabilidades
+netas si las otras causas no existiesen. El importe se paga al final del año;
+no se vuelve a multiplicar por supervivencia al final de ese año. Se conserva
+la vectorización paralela existente con reciclaje de escalares, las columnas
+tidy y A_xj como alias idéntico.
+
+Referencias contrastadas para el modelo, sin atribuirles nuestras convenciones
+de API: [notas SOA de Hardy/Dickson/Waters, sección 3](https://www.soa.org/globalassets/assets/files/edu/edu-2012-spring-mlc-studynotes.pdf)
+distinguen decrementos dependientes e independientes;
+[implementación del autor de actuarialmath, Woolhouse](https://actuarialmath.readthedocs.io/en/latest/_modules/actuarialmath/woolhouse.html)
+construye la renta temporal por diferencia entre valores en ambos extremos.
+La prueba propia usa identidades analíticas, no importa esos programas ni
+supone que su estimación de fuerza coincida con la nuestra.
+
+### Defectos demostrados, cambios y aprobación
+
+b06-remaining-diagnosis.log reproduce sobre d117df3: para lx=(100,80,60,40,20),
+i=0, n=1, k=2 y due, annuity_multi none daba 1 y first .75 frente a .95
+bajo UDD. none ignoraba k; Woolhouse omitía el borde final de la renta temporal.
+C12 fue autorizada expresamente: se añade frac al final, se calcula la grilla
+real y se corrigen ambos bordes. Las firmas posicionales anteriores permanecen.
+
+El mismo log reproduce insurance_variable_k con lx=1e16 y lx_siguiente=1e16-2,
+beneficio 1e16 e i=0: devolvía 2.220446 en vez de 2. Se reemplaza la resta de
+supervivencias por masas de intervalo directas. Se conserva la tasa log original
+y el producto monetario combinado, incluyendo ceros y supervivencia subdesbordada.
+Se validan grillas finitas, edades, tabla no creciente y horizonte, y se reconoce
+el atributo CML como CF. n/h siguen admitiendo términos fraccionarios alineados.
+
+insurance_xj aceptaba edades 40,42 como dos intervalos consecutivos (APV .44
+en el ejemplo) y columnas de supervivencia como causa. Ahora rechaza esos
+datos incompatibles, verifica probabilidades seleccionadas y totales, controles
+y longitudes vacías; conserva enteros grandes sin coerción NA cuando proceda.
+Supervivencia acumulada y descuento se combinan en log para recuperar APV
+representable, en lugar de multiplicar un cero intermedio por un beneficio.
+
+Se añade un único helper privado compartido, utils-life-payment-basis.R,
+para validar la tabla anual y evaluar supervivencia/muerte fraccionaria en
+annuity_multi e insurance_variable_k. Reutiliza los helpers monetarios y de
+interés existentes; no se refactorizan consumidores ajenos ni se añaden
+dependencias, aliases o columnas públicas.
+
+### Pruebas, compatibilidad y límites
+
+153 comprobaciones nuevas: 91 en test-b06-annuity-multi.R y 62 en
+test-b06-remaining-insurance.R. Pruebas independientes de 1-3 vidas, estados,
+timing, tres interpolaciones, h/n, Woolhouse con fuerza constante, vida inmortal,
+beneficios variables con signo/funcionales, decrementos competidores, suma de
+causas, escenarios, ceros, tasas extremas y subdesbordamiento. Los fallos previos
+están en b06-annuity-multi-before.log y b06-remaining-insurance-before.log.
+La suite fuente completa quedó aprobada antes de la interrupción:
+b06-remaining-final-tests.log. El check instalado definitivo se registra en
+audit-precran-check.md y no se sustituye por esa ejecución preliminar.
+
+b06-remaining-compatibility.log verifica 62 casos ordinarios completos con la
+base: valores a tolerancia 1e-12, clases/nombres/esquemas conservados. Dos
+firmas idénticas; annuity_multi conserva todos sus formals anteriores y añade
+solo frac al final. Identidad de A_xj verificada. Inventario: 102 nombres
+públicos y 974 apariciones de parámetros, cero descripciones ausentes.
+
+Límites preservados: horizonte conservador de annuity_multi basado en menor
+omega y mayor edad (puede truncar tablas distintas más de lo necesario);
+edades enteras y 1-3 vidas independientes; n entero para annuity_multi;
+Woolhouse aproximado y con fronteras soportadas. No se declara dependencia
+estocástica entre vidas, productos continuos, renta revertida pura ni máxima
+generalidad. insurance_variable_k requiere horizonte registrado y no inventa
+un último año; no vectoriza escenarios. insurance_xj whole sobre tabla abierta
+es un APV truncado al horizonte disponible: solo es vida entera completa si
+no quedan activos después de la última fila. p_total y la causa seleccionada
+son la base; no se certifican todas las columnas redundantes de cohortes.
+No se promete cancelación arbitraria de infinitos ni valores fuera del rango
+double. B06 acumula 638 comprobaciones nuevas; se conserva evidencia anterior.
+
+Conciliación adicional de borde en b06-terminal-support-before.log: t_px
+establece supervivencia cero más allá de omega aun con qx terminal suministrada.
+La versión anterior de insurance_variable_k convertía esa truncación en masa
+de muerte al cruzar omega. La validación actual rechaza esa cobertura; no
+extiende automáticamente el horizonte con la probabilidad terminal. Una
+valoración que use un intervalo terminal adicional sería una ampliación de
+modelo a diseñar explícitamente, no una regresión de almacenamiento o de C07.
+
+Estado B06-05: confirmado, implementado, probado y cerrado dentro del alcance
+anterior. Archivo fuente verificado (381 archivos), check final salida 0:
+0 ERROR, 0 WARNING, 1 NOTE por versión de desarrollo; 5454 comprobaciones
+instaladas aprobadas, 0 fallos/advertencias/omisiones. Ejemplos y viñetas
+aprobados. Huella y entorno en audit-precran-check.md.
+
+B06 queda cerrado dentro del alcance y límites documentados de sus 14 nombres
+públicos (incluido el alias A_xj), con 638 comprobaciones nuevas en cinco
+unidades, además de evidencia previa reutilizada. Esto no certifica máxima
+generalidad ni reemplaza B07: siguen las funciones multivida no revisadas
+integralmente, respetando sus correcciones anteriores y sus estados condicionantes.
