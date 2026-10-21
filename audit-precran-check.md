@@ -1,5 +1,37 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B07-01 — 21 de octubre de 2026
+
+Base 11eeb49, rama audit/0.2.0-precran, DESCRIPTION 0.1.6.9000.
+Herencia CML corregida en t_pxy/e_xy; ver audit-multilife-contingencies.md.
+26 comprobaciones nuevas, 15 fallos reproducidos contra la base; 48 objetos
+ordinarios completos y dos firmas idénticos. Roxygen2 regenerado, diff limpio.
+Suite fuente: 5480 aprobadas, 0 fallos/advertencias/omisiones.
+
+Artefactos de esta unidad:
+C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/.
+Build --no-manual y check --as-cran --no-manual: salida 0, **0 ERROR,
+0 WARNING, 1 NOTE**, exclusivamente por versión de desarrollo.
+Suite instalada: 5480 aprobadas, 0 fallos/advertencias/omisiones (80 s).
+Ejemplos (26 s), cuatro viñetas y reconstrucción (20 s) aprobados.
+Informes: build-b07-final.log, check-b07.log,
+tidyactuarial.Rcheck/00check.log y tests/testthat.Rout dentro del check.
+
+snapshot-verification.txt verifica 382 archivos R/tests/Rd/NEWS/NAMESPACE y
+DESCRIPTION contra checkout: normaliza CRLF y permite en DESCRIPTION solo
+reformato de espacios y campos añadidos por build. Regresión nueva incluida,
+AGENTS/audit-* excluidos. SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+F29FCA3547F5F58250E28E11DA60A6A1A1CF3F1E6CE201EB5C9AB441ABFE98C2.
+
+Entorno: Windows, R 4.6.1, bibliotecas existentes R_LIBS_USER 4.6,
+LC_ALL/LC_CTYPE/LANG=C, Pandoc de RStudio y
+_R_CHECK_CRAN_INCOMING_REMOTE_=false. El primer build aislado falló al
+acceder al directorio padre (build-b07.log); la repetición autorizada fuera
+del aislamiento y el check definitivo aprobaron. Sin nuevas dependencias,
+CI remota, prueba actual de R mínimo, manual/PDF, cambio de versión o push.
+B07-01 cerrado solo para herencia CML; B07 y la revisión integral de estas
+dos funciones siguen abiertos. Continúa dominio, bordes y precisión.
+
 Rama `audit/0.2.0-precran`, versión `0.1.6.9000`, Windows 11,
 R 4.6.1. No se cambió la versión ni se publicó el paquete.
 

@@ -1,5 +1,22 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B07-01: herencia CML (21 de octubre de 2026)
+
+Base 11eeb49 verificada, rama audit/0.2.0-precran, Git inicialmente limpio y
+versión 0.1.6.9000. Se inicia B07 sin reabrir B06: t_pxy/e_xy ignoraban el
+atributo CML y usaban UDD. Se normaliza CML a CF, también antes de comparar
+dos tablas. Ver audit-multilife-contingencies.md: 26 comprobaciones analíticas
+nuevas, 15 fallos reproducidos contra la base. Firmas y columnas preservadas,
+sin decisión C nueva. Validación definitiva en audit-precran-check.md.
+B07-01 cerrado en ese alcance: suite fuente/instalada 5480 aprobadas,
+check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo; ejemplos y cuatro
+viñetas aprobados. Archivo de 382 fuentes verificado y huella registrada.
+B07 sigue abierto: continuar dominio, controles, bordes y precisión de
+t_pxy/e_xy, luego anualidades/seguros, primas y reservas. Preservar los
+condicionamientos ya corregidos de e_xy, insurance_xy y reserve_xy. No extender
+esta corrección a otros consumidores ni declarar revisadas estas dos funciones
+en su totalidad. Sin push/publicación ni cambio de versión.
+
 ## B06-05: anualidad multivida y seguros restantes (21 de octubre de 2026)
 
 Base d117df3. Se retoma el trabajo guardado antes de la interrupción de red;

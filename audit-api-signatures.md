@@ -1285,6 +1285,9 @@ Documentación: `man/annuity_xy.Rd`. Semántica: revisión por bloque pendiente 
 
 Documentación: `man/e_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
 
+B07-01: el atributo CML se normaliza a CF; firma y esquema preservados.
+Resto de revisión integral pendiente; ver audit-multilife-contingencies.md.
+
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `lt` | `<obligatorio>` | A life table data frame with columns x and lx . |
@@ -1383,6 +1386,9 @@ Documentación: `man/reserve_xy.Rd`. Semántica: revisión por bloque pendiente 
 ## B07 — t_pxy
 
 Documentación: `man/t_pxy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+
+B07-01: atributos CF/CML equivalentes; se normalizan antes de compararlos.
+Firma y esquema preservados; resto de revisión integral pendiente.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|

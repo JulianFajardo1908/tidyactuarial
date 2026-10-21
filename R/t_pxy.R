@@ -18,6 +18,8 @@
 #'   the supplied life table(s) carry a \code{frac} attribute, that value is
 #'   used. If two tables are supplied and their \code{frac} attributes differ,
 #'   \code{frac} must be supplied explicitly. Passed to \code{\link{t_px}}.
+#'   Inherited \code{"CML"} is normalized to \code{"CF"} before comparing
+#'   the two tables' assumptions.
 #' @param status Two-life status: \code{"joint"} or \code{"last"}.
 #'
 #' @details
@@ -142,6 +144,9 @@ t_pxy <- function(
   if (missing(frac)) {
     frac_x <- attr(lt_x, "frac")
     frac_y <- attr(lt_y, "frac")
+
+    if (identical(frac_x, "CML")) frac_x <- "CF"
+    if (identical(frac_y, "CML")) frac_y <- "CF"
 
     ok_x <- !is.null(frac_x) && frac_x %in% c("UDD", "CF", "Balducci")
     ok_y <- !is.null(frac_y) && frac_y %in% c("UDD", "CF", "Balducci")

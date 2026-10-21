@@ -1,5 +1,12 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+B07-01 (21 de octubre): t_pxy/e_xy normalizan el atributo CML a CF, igual
+que el argumento explícito. Corrección A del modelo heredado, aclaración B
+de documentación; no cambia firmas, columnas ni reciclaje. CF/CML no genera
+conflicto entre tablas; CML/Balducci exige override explícito. 26 comprobaciones
+nuevas; evidencia y límites en audit-multilife-contingencies.md y validación
+final en audit-precran-check.md. B07 continúa abierto y C02-C04 no se amplían.
+
 Objetivo 0.2.0. Clasificación: **A**, defecto matemático/computacional;
 **B**, mejora compatible; **C**, cambio público pendiente de autorización.
 La matriz `audit-api-signatures.md` contiene 102 entradas y 974 apariciones

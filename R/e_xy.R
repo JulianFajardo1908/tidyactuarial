@@ -14,6 +14,7 @@
 #'   passed to \code{\link{t_pxy}}: \code{"UDD"}, \code{"CF"},
 #'   \code{"CML"}, or \code{"Balducci"}. If not specified and \code{lt}
 #'   carries a \code{frac} attribute, that value is used.
+#'   An inherited \code{"CML"} attribute is normalized to \code{"CF"}.
 #' @param cohort Two-life cohort: \code{"first"} (joint-life) or
 #'   \code{"last"} (last survivor).
 #' @param tidy Logical. If \code{TRUE}, returns a tibble.
@@ -99,6 +100,7 @@ e_xy <- function(
   # --- inherit frac from lifetable attribute if not supplied ---
   if (missing(frac)) {
     lt_frac <- attr(lt, "frac")
+    if (identical(lt_frac, "CML")) lt_frac <- "CF"
     if (!is.null(lt_frac) && lt_frac %in% c("UDD", "CF", "Balducci")) {
       frac <- lt_frac
     } else {

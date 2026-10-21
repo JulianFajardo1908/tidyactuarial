@@ -24,7 +24,9 @@ Each life table must contain columns \code{x} and \code{lx}.}
 \code{"CML"} (alias of CF), or \code{"Balducci"}. If not specified and
 the supplied life table(s) carry a \code{frac} attribute, that value is
 used. If two tables are supplied and their \code{frac} attributes differ,
-\code{frac} must be supplied explicitly. Passed to \code{\link{t_px}}.}
+\code{frac} must be supplied explicitly. Passed to \code{\link{t_px}}.
+Inherited \code{"CML"} is normalized to \code{"CF"} before comparing
+the two tables' assumptions.}
 
 \item{status}{Two-life status: \code{"joint"} or \code{"last"}.}
 }

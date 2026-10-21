@@ -32,7 +32,8 @@ the maximum horizon allowed by the table.}
 \item{frac}{Fractional-age assumption for \code{type = "complete"},
 passed to \code{\link{t_pxy}}: \code{"UDD"}, \code{"CF"},
 \code{"CML"}, or \code{"Balducci"}. If not specified and \code{lt}
-carries a \code{frac} attribute, that value is used.}
+carries a \code{frac} attribute, that value is used.
+An inherited \code{"CML"} attribute is normalized to \code{"CF"}.}
 
 \item{cohort}{Two-life cohort: \code{"first"} (joint-life) or
 \code{"last"} (last survivor).}

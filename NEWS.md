@@ -1,5 +1,8 @@
 # tidyactuarial 0.2.0
 
+* Two-life survival and expectancy normalize inherited `CML` attributes to
+  constant force, including equivalent `CF`/`CML` attributes on two tables.
+
 * Approved C12: `annuity_multi()` adds trailing `frac`, values actual payments
   of 1/k under UDD, CF/CML or Balducci with `woolhouse = "none"`, and includes
   both deferred and terminal endpoints in temporary Woolhouse corrections.
