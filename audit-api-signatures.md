@@ -1,5 +1,10 @@
 # Matriz global de firmas públicas
 
+B07-06: seis firmas cotejadas con 4b0948e, sin cambios; 138 resultados
+ordinarios completos concuerdan a 1e-12. Contratos, estados y límites
+conciliados en audit-multilife-contingencies.md. Inventario vivo comprobado:
+102 nombres (101 funciones más el alias A_xj), 974 apariciones de parámetros.
+
 Extracción de las 102 entradas de NAMESPACE sobre la rama audit/0.2.0-precran.
 Se conservan los nombres, orden y defaults reales de formals(). El alias A_xj
 se identifica expresamente. Este inventario no modifica ninguna firma.
@@ -1260,7 +1265,7 @@ Documentación: `man/reserve_x.Rd`. Semántica: revisión por bloque pendiente s
 
 ## B07 — annuity_xy
 
-Documentación: `man/annuity_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/annuity_xy.Rd`. Semántica: conciliada en B07-06 dentro del alcance y límites documentados.
 
 B07-04: firma y esquema preservados, pagos firmados de 11/10/01 con masas
 fraccionarias directas y base log original. C15 autorizada exige bordes
@@ -1288,10 +1293,10 @@ preservada y documentada; ver audit-multilife-contingencies.md.
 
 ## B07 — e_xy
 
-Documentación: `man/e_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/e_xy.Rd`. Semántica: conciliada en B07-06 dentro del alcance y límites documentados.
 
 B07-01: el atributo CML se normaliza a CF; firma y esquema preservados.
-Resto de revisión integral pendiente; ver audit-multilife-contingencies.md.
+La revisión restante se concilió en B07-06; ver audit-multilife-contingencies.md.
 B07-02: coherencia de tabla anual siempre validada (umbral mortal 1e-10),
 controles lógicos y tol finito no negativo; rango integer con check=TRUE.
 
@@ -1302,7 +1307,7 @@ controles lógicos y tol finito no negativo; rango integer con check=TRUE.
 | `y` | `<obligatorio>` | Integer actuarial age for life 2. |
 | `t` | `NULL` | Optional nonnegative numeric duration(s). If NULL , uses the maximum horizon allowed by the table. |
 | `type` | `c("curtate", "complete")` | Character: "curtate" or "complete" . |
-| `frac` | `<obligatorio>` | Fractional-age assumption for type = "complete" , passed to t_pxy : "UDD" , "CF" , "CML" , or "Balducci" . If not specified and lt carries a frac attribute, that value is used. |
+| `frac` | `<obligatorio>` | Fractional-age assumption for type = "complete" , as in t_pxy : "UDD" , "CF" , "CML" , or "Balducci" . If not specified and lt carries a frac attribute, that value is used; inherited CML is normalized to CF. |
 | `cohort` | `c("first", "last")` | Two-life cohort: "first" (joint-life) or "last" (last survivor). |
 | `tidy` | `FALSE` | Logical. If TRUE , returns a tibble. |
 | `check` | `TRUE` | Logical. If TRUE , performs basic input checks. |
@@ -1310,7 +1315,7 @@ controles lógicos y tol finito no negativo; rango integer con check=TRUE.
 
 ## B07 — insurance_xy
 
-Documentación: `man/insurance_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/insurance_xy.Rd`. Semántica: conciliada en B07-06 dentro del alcance y límites documentados.
 
 B07-03: firma/esquema intactos, valoración anual desde estado inicial 11 por
 masas de transición. C13 autorizada exige extinción observada para whole;
@@ -1336,7 +1341,7 @@ pure_endowment ni estado inicial 10/01. Ver audit-multilife-contingencies.md.
 
 ## B07 — premium_xy
 
-Documentación: `man/premium_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/premium_xy.Rd`. Semántica: conciliada en B07-06 dentro del alcance y límites documentados.
 
 B07-05: dotal puro por supervivencia monetaria directa y equivalencia P*a=B;
 P anualizada, cuota P/k, firma y seis columnas summary preservadas. Una póliza
@@ -1369,7 +1374,7 @@ por llamada; denominador positivo/finito/representable todavía requerido.
 
 ## B07 — reserve_xy
 
-Documentación: `man/reserve_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/reserve_xy.Rd`. Semántica: conciliada en B07-06 dentro del alcance y límites documentados.
 
 B07-05: dotal puro directo, ambas recursiones hacia atrás con tasa original,
 last conserva 11/10/01; C16 autorizada incluye prima vencida exactamente en t.
@@ -1406,10 +1411,10 @@ esquemas sin cambios; ver audit-multilife-contingencies.md para alcance/límites
 
 ## B07 — t_pxy
 
-Documentación: `man/t_pxy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/t_pxy.Rd`. Semántica: conciliada en B07-06 dentro del alcance y límites documentados.
 
 B07-01: atributos CF/CML equivalentes; se normalizan antes de compararlos.
-Firma y esquema preservados; resto de revisión integral pendiente.
+Firma y esquema preservados; revisión restante conciliada en B07-06.
 B07-02: tablas anuales coherentes, edades integer representables y duración
 finita requeridas; se preservan convenciones de t=0/NA/horizonte.
 
@@ -1419,7 +1424,7 @@ finita requeridas; se preservan convenciones de t=0/NA/horizonte.
 | `x` | `<obligatorio>` | Integer actuarial age of the first life at time 0. |
 | `y` | `<obligatorio>` | Integer actuarial age of the second life at time 0. |
 | `t` | `<obligatorio>` | Nonnegative time (may be fractional). |
-| `frac` | `<obligatorio>` | Fractional-age assumption: "UDD" , "CF" , "CML" (alias of CF), or "Balducci" . If not specified and the supplied life table(s) carry a frac attribute, that value is used. If two tables are supplied and their frac attributes differ, frac must be supplied explicitly. Passed to t_px . |
+| `frac` | `<obligatorio>` | Fractional-age assumption: "UDD" , "CF" , "CML" (alias of CF), or "Balducci" . If not specified and the supplied life table(s) carry a frac attribute, that value is used. If two tables are supplied and their normalized frac attributes differ, frac must be supplied explicitly. Uses the same assumptions as t_px, with observed lx/log survival. |
 | `status` | `c("joint", "last")` | Two-life status: "joint" or "last" . |
 
 ## B08 — mc_annuity

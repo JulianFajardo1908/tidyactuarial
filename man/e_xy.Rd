@@ -30,7 +30,7 @@ the maximum horizon allowed by the table.}
 \item{type}{Character: \code{"curtate"} or \code{"complete"}.}
 
 \item{frac}{Fractional-age assumption for \code{type = "complete"},
-passed to \code{\link{t_pxy}}: \code{"UDD"}, \code{"CF"},
+as in \code{\link{t_pxy}}: \code{"UDD"}, \code{"CF"},
 \code{"CML"}, or \code{"Balducci"}. If not specified and \code{lt}
 carries a \code{frac} attribute, that value is used.
 An inherited \code{"CML"} attribute is normalized to \code{"CF"}.}
@@ -61,8 +61,10 @@ last-survivor (second death).
 **Complete expectation** (Finan, Section 56.4):
 \deqn{\mathring{e}_{xy} = \int_0^{\infty} {}_tp_{xy} \, dt.}
 
-The integral is decomposed year-by-year and evaluated by adaptive
-quadrature with relative tolerance \code{1e-10}. Survival is always
+The integral is decomposed year-by-year and evaluated analytically under
+UDD, constant force, or Balducci, retaining small survival in log form.
+Observed annual \code{lx} ratios determine the fractional survival.
+Survival is always
 measured from the initial ages, conditional on both lives being alive
 at time zero. In particular, last-survivor survival at later times does
 not imply that both lives remain alive.

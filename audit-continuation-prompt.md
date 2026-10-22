@@ -1,5 +1,39 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B07-06: conciliación de los seis nombres (21 de octubre de 2026)
+
+Base 4b0948e; rama audit/0.2.0-precran y versión 0.1.6.9000 conservadas,
+Git limpio al iniciar. t_pxy y e_xy usan supervivencia observada lx en log;
+e_xy complete integra analíticamente cada intervalo UDD/CF/Balducci. Se
+corrige pérdida de supervivencia anual diminuta y áreas que la cuadratura
+omitía. No cambian firmas, columnas, estados, cero/NA ni truncación; C13-C16
+siguen limitadas a lo autorizado. 189 comprobaciones nuevas, 138 resultados
+ordinarios completos a 1e-12, seis firmas idénticas; inventario 102/974.
+Suite fuente definitiva: 6156 aprobadas, sin fallos/advertencias/omisiones.
+Suite instalada también 6156, sin fallos/advertencias/omisiones. Build/check
+salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo; ejemplos y cuatro
+viñetas aprobados. Archivo de 391 fuentes verificado y huella registrada.
+B07-06 y B07 cerrados dentro del alcance/límites de sus seis nombres;
+702 comprobaciones nuevas acumuladas desde B06. El suplemento B05 siguiente
+sigue pendiente y no se presenta como resuelto por el cierre B07.
+Fórmulas, libros independientes, estados y límites: audit-multilife-contingencies.md.
+Validación de archivo/check final: audit-precran-check.md.
+
+La conciliación detectó un nuevo defecto A en t_px/e_x con lx=(1,1e-200):
+CF a medio año devuelve cero frente a 1e-100, y esperanza de un año cero
+frente a 1/(200*log(10)). Confirmado por single-life-followup.log, todavía
+sin implementar en esas dos funciones. La base B07 ya evita ese complemento.
+Siguiente paso de mayor valor: suplemento B05 para t_px/e_x, incluyendo
+consumidores/identidades y contratos de columnas/NA/horizonte; después B08.
+No tratar este defecto como límite actuarial ni como corregido por analogía.
+Conservar toda la evidencia de B05/B06 y los límites históricos del cierre.
+
+Artefactos nuevos en b07-06 de la sesión del 21 de octubre. El primer libro
+de test omitió timing="due" en annuity_xy; initial-ledger-timing-tests.log
+se conserva como evidencia intermedia, no como suite final. before-final.log
+definitivo reproduce 74 fallos y 115 aprobadas contra 4b0948e. Sin versión,
+push/publicación, nuevas dependencias o ampliación de las decisiones C.
+
 ## B07-05: primas y reservas (21 de octubre de 2026)
 
 Base c126ccb, misma rama audit/0.2.0-precran y versión 0.1.6.9000; Git

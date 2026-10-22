@@ -1,5 +1,47 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B07-06 — 21 de octubre de 2026
+
+Base 4b0948e, rama audit/0.2.0-precran, versión 0.1.6.9000. Supervivencia
+fraccionaria lx/log y esperanza multivida por áreas anuales analíticas.
+Conciliación de seis nombres sin cambiar firmas, columnas, estados ni
+convenciones públicas de horizonte/cero/NA. Fórmulas y límites en
+audit-multilife-contingencies.md B07-06; sin nueva decisión C.
+
+189 comprobaciones nuevas. Regresión definitiva contra base: 74 fallos,
+cero errores/advertencias y 115 aprobadas. 138 resultados ordinarios
+completos a tolerancia 1e-12 y seis firmas idénticas. Inventario verificado:
+102 nombres públicos, 974 apariciones de parámetros, cero descripciones
+Rd ausentes/vacías. Suite fuente definitiva: **6156 aprobadas, 0 fallos,
+0 advertencias, 0 omisiones**. Roxygen2 regenerado y diff --check aprobado.
+Suite instalada: **6156 aprobadas, 0 fallos/advertencias/omisiones** (72 s).
+Build --no-manual y check --as-cran --no-manual finales: salida 0,
+**0 ERROR, 0 WARNING, 1 NOTE**, exclusivamente por versión de desarrollo.
+Ejemplos (24 s), cuatro viñetas y reconstrucción (10 s) aprobados.
+Informes build.log, check.log, tidyactuarial.Rcheck/00check.log y
+tests/testthat.Rout dentro del check. B07-06 y B07 cerrados dentro del
+alcance/límites de los seis nombres documentados; suplemento B05 pendiente.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b07-06/.
+final-tests.log es la suite fuente definitiva; before-final.log contiene
+la regresión final y compatibilidad, inventory.log el inventario. El log
+initial-ledger-timing-tests.log es intermedio: una aserción del nuevo libro
+omitió timing="due" (annuity_xy tiene default immediate). El test definitivo
+explicita due; no se cambió ese default para forzar la identidad.
+
+snapshot-verification.txt acredita 391 archivos R/tests/man/NEWS/NAMESPACE
+y campos originales DESCRIPTION iguales al checkout normalizando CRLF y
+espacios de build en DESCRIPTION. Nueva regresión incluida, AGENTS/audit-*
+excluidos. SHA256 del archivo fuente:
+4D4B2C7904867CE6AF02714D95748F4F68E872702B29DF03E37FBAB6C400C696.
+
+Entorno: Windows/R 4.6.1 y biblioteca de usuario existente; locale C,
+Pandoc de RStudio, build/check fuera del aislamiento y recepción remota
+CRAN desactivada. Sin dependencias nuevas, CI remota, prueba de R mínimo,
+manual/PDF, cambio de versión o push. El defecto específico confirmado en
+t_px/e_x se registra como suplemento B05 pendiente, no como corregido ni
+como límite aceptado; single-life-followup.log verifica ambos fallos.
+
 ## Última validación: B07-05 — 21 de octubre de 2026
 
 Base c126ccb, rama audit/0.2.0-precran, versión 0.1.6.9000. Dotal puro

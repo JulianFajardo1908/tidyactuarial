@@ -490,3 +490,110 @@ B07 sigue abierto: conciliar inventario y límites de las seis funciones,
 extremos de t_pxy/e_xy y los cocientes de equivalencia fuera de rango antes
 de declarar cierre integral. No se presenta este subconjunto como máxima
 generalidad ni como auditoría externa conciliada.
+
+## B07-06: supervivencia extrema y conciliación de los seis nombres (21 de octubre)
+
+Base 4b0948e, Git limpio al iniciar, rama audit/0.2.0-precran y versión
+0.1.6.9000 verificadas. Se conservan B07-01/05, las decisiones C13-C16 y
+las correcciones anteriores; no se introduce una nueva decisión C.
+
+### Defectos reproducidos, matemática y corrección A
+
+Con lx=(1,1e-200), x=y=60, CF y t=.5, t_pxy devolvía cero frente a
+1e-200. El decremento q redondea a uno; reconstruir p=1-q pierde la
+supervivencia anual observada. e_xy complete hasta un año devolvía cero
+frente a 1/(400*log(10))=0.001085736. Bajo Balducci también devolvía cero
+frente a 1e-200 para la esperanza conjunta. La cuadratura adaptativa no
+es una garantía relativa para áreas diminutas o concentradas en el origen.
+quadrature-probe.log aísla este segundo defecto con probabilidades ya
+estables: para p=1e-20, integrar (p/(p+(1-p)u))^2 devuelve 2.754484e-37
+frente al área analítica 1e-20. No se atribuye todo el error a p=1-q.
+diagnosis.log conserva estos valores previos (su primer lanzamiento tuvo
+advertencias regionales de arranque; las validaciones usan locale C).
+
+La base privada usa .life_payment_basis ya existente, con lx observado y
+log supervivencia; no recupera p restando q de uno. Se prepara una vez por
+escenario de e_xy. Last se calcula como max(px,py)+(1-max(px,py))*min(px,py).
+Se conservan t=0, NA inicial, truncación y controles públicos. Las columnas
+px/qx siguen comprobándose con tolerancia 1e-10; las razones lx determinan
+la interpolación, como en las valoraciones por estados revisadas antes.
+
+La integral anual usa b en (0,1], supervivencias desde emisión Ax,Ay y
+probabilidades anuales px,py, qx,qy. Las áreas condicionales conjuntas son:
+
+* UDD: b-(qx+qy)b^2/2+qx*qy*b^3/3.
+* CF: -expm1(b*(log(px)+log(py)))/(-log(px)-log(py)), con límites
+  b si ambas supervivencias son uno y cero si alguna es cero.
+* Balducci: para p1<=p2, b*p2/(p2+q2*b)*log1p(r)/r,
+  r=b*(p2-p1)/(p1*(p2+q2*b)); el límite r=0 es uno.
+
+El área conjunta se multiplica por Ax*Ay en log. Last es la suma de las
+dos áreas marginales menos la conjunta. Para Balducci, la marginal es
+p/q*log1p(q*b/p), y para p=0 tiene área cero. Diferencias y cocientes de
+Balducci se evalúan en log, incluso si r o p2/p1 no caben en double;
+se usa el límite de CF cuando b*log(p) subdesborda. No hay integración
+numérica, extrapolación ni mortalidad terminal inventada.
+
+### Evidencia y compatibilidad
+
+test-b07-survival-precision.R incorpora 189 comprobaciones: 125 sobre
+supervivencia/áreas extremas, tablas con razones anuales que subdesbordan,
+CF/Balducci, vidas desiguales, fuerzas nulas y cero supervivencia;
+60 conexiones de los seis nombres con un libro anual independiente;
+y cuatro comprobaciones de límites de truncación/equivalencia.
+Los oráculos usan fórmulas exponenciales, integrales racionales de vidas
+idénticas y cuadratura independiente solo para casos moderados desiguales.
+Las comparaciones extremas se hacen relativamente; una tolerancia absoluta
+no puede aceptar cero frente a una probabilidad diminuta positiva.
+
+before-final.log contra 4b0948e: 74 fallos, cero errores/advertencias y
+115 aprobadas. 138 resultados ordinarios completos concuerdan a 1e-12,
+incluyendo tablas de salida; las seis firmas son idénticas. El inventario
+mantiene 102 nombres (101 funciones más A_xj), 974 apariciones de parámetros
+y el alias idéntico. No se agregan dependencias, columnas ni parámetros.
+El primer libro de conciliación omitía timing="due" en una aserción de
+annuity_xy (su default es immediate); se corrigió el test explícitamente.
+initial-ledger-timing-tests.log es evidencia intermedia fallida, no la suite
+final. La versión definitiva conserva las convenciones distintas de ambas.
+
+### Conciliación final y límites del bloque
+
+| Nombre | Modelo/estado y resultado conservado | Evidencia y límites |
+|---|---|---|
+| t_pxy | Probabilidad escalar desde ambas vidas vivas, independencia, una/dos tablas | Productos/unión y fracciones estables; t=0 conserva uno; truncación abierta |
+| e_xy | Suma curtata o integral completa desde edades iniciales; escenarios sobre una tabla | Áreas analíticas; NA si inicio falta/extinto; esperanza truncada en tabla abierta |
+| annuity_xy | Sumas 1/k de pesos 11/10/01, incluyendo reversiones designadas | Libros independientes UDD/CF/Balducci y extremos B07-03/04; Woolhouse aproximado/C15; límites de marginal abierta |
+| insurance_xy | Masas anuales del primer/segundo fallecimiento desde emisión, no renovación en h | Enumeración de parejas de muertes y estados; C13/C14; sin seguro continuo ni k público |
+| premium_xy | P anualizada, cuota P/k, equivalencia de una póliza | Libros de primas anuales/fraccionarias B07-03/05; requiere anualidad positiva finita representable |
+| reserve_xy | Beneficios menos primas, estado 11 observado en t entero | Libros prospectivos y recursión 11/10/01; C16; recursión h=0,k=1,due,issue; no estados observados 10/01 públicos |
+
+En los libros independientes se verifica A_term=1-d*a_due-v^n*S(n),
+endowment=term+v^n*S(n), P*a=APV_beneficio y V(0)=0 con prima de
+equivalencia. Se preservan los 46 contrastes B07-03 y las 96 valoraciones
+independientes B07-05. No se usa la concordancia de dos motores del paquete
+como única prueba. Bajo tablas abiertas las identidades con vida entera
+requieren cierre: no extender C13 a rentas/probabilidades por analogía.
+La etiqueta last no informa qué vida está observada viva a una duración.
+No se certifican vidas dependientes, cocientes de APV no representables,
+cancelación general de infinitos ni extrapolación biológica.
+
+La conciliación detectó también el mismo defecto de complemento en t_px
+y e_x, fuera de los seis nombres B07: con lx=(1,1e-200) dan cero frente
+a 1e-100 a medio año CF y 0.002171472 de esperanza de un año, respectivamente.
+single-life-followup.log lo verifica con aserciones. Esto es un defecto A
+confirmado pendiente de suplemento B05, no una limitación actuarial aceptada
+ni una corrección ya realizada. B07 usa su base log y no depende de esos
+valores fallidos. Se preserva el cierre histórico B05, pero se abre este
+pendiente específico antes de iniciar B08. No declarar conciliación extrema
+de t_px/e_x hasta corregir y validar el suplemento.
+
+Artefactos nuevos: b07-06 del directorio de la sesión. La validación final,
+archivo fuente y huella se documentan en audit-precran-check.md.
+Estado B07-06: confirmado, implementado, probado y cerrado en su alcance.
+Suite fuente e instalada: 6156 aprobadas, cero fallos/advertencias/omisiones;
+build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo. Ejemplos
+y cuatro viñetas aprobados; 391 fuentes verificadas. B07 queda cerrado
+dentro del alcance/límites explícitos de sus seis nombres, con 702
+comprobaciones nuevas acumuladas desde B06. No equivale a cierre del
+paquete ni del suplemento B05 recién confirmado. Próximo paso: corregir
+t_px/e_x con regresiones propias antes de iniciar B08. Sin push ni versión.

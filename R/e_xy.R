@@ -11,7 +11,7 @@
 #'   the maximum horizon allowed by the table.
 #' @param type Character: \code{"curtate"} or \code{"complete"}.
 #' @param frac Fractional-age assumption for \code{type = "complete"},
-#'   passed to \code{\link{t_pxy}}: \code{"UDD"}, \code{"CF"},
+#'   as in \code{\link{t_pxy}}: \code{"UDD"}, \code{"CF"},
 #'   \code{"CML"}, or \code{"Balducci"}. If not specified and \code{lt}
 #'   carries a \code{frac} attribute, that value is used.
 #'   An inherited \code{"CML"} attribute is normalized to \code{"CF"}.
@@ -30,8 +30,10 @@
 #' **Complete expectation** (Finan, Section 56.4):
 #' \deqn{\mathring{e}_{xy} = \int_0^{\infty} {}_tp_{xy} \, dt.}
 #'
-#' The integral is decomposed year-by-year and evaluated by adaptive
-#' quadrature with relative tolerance \code{1e-10}. Survival is always
+#' The integral is decomposed year-by-year and evaluated analytically under
+#' UDD, constant force, or Balducci, retaining small survival in log form.
+#' Observed annual \code{lx} ratios determine the fractional survival.
+#' Survival is always
 #' measured from the initial ages, conditional on both lives being alive
 #' at time zero. In particular, last-survivor survival at later times does
 #' not imply that both lives remain alive.
@@ -201,6 +203,7 @@ e_xy <- function(
     }
 
     n_int <- floor(tj_use)
+    basis <- .two_life_survival_basis(lt, lt, xj, yj)
 
     # --- curtate: e = sum_{k=1}^{n} k_p (Finan, Sec. 56.4) ---
     if (type == "curtate") {
@@ -208,26 +211,21 @@ e_xy <- function(
         ex[j] <- 0
       } else {
         pk <- vapply(1:n_int, function(k) {
-          .two_life_survival(lt, lt, xj, yj, t = k, frac = frac, status = status)
+          basis$survival(k, frac, status)
         }, numeric(1))
         ex[j] <- if (anyNA(pk)) NA_real_ else sum(pk)
       }
       next
     }
 
-    # Integrate the status survival from the original ages on each annual
-    # interval. A last-survivor status is not a renewal of two living lives.
+    # Integrate from the original ages, without renewing the two living lives.
     if (tj_use == 0) {
       ex[j] <- 0
       next
     }
     starts <- seq.int(0, ceiling(tj_use) - 1L)
     areas <- vapply(starts, function(k) {
-      stats::integrate(function(u) {
-        vapply(u, function(uu) {
-          .two_life_survival(lt, lt, xj, yj, t = uu, frac = frac, status = status)
-        }, numeric(1))
-      }, k, min(k + 1, tj_use), rel.tol = 1e-10)$value
+      basis$area(k, min(1, tj_use-k), frac, status)
     }, numeric(1))
     ex[j] <- sum(areas)
   }

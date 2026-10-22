@@ -1,5 +1,18 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## B07-06: conciliación de contratos y precisión, sin nueva decisión C
+
+Base 4b0948e. Supervivencia fraccionaria por lx/log y esperanza multivida
+por integrales anuales analíticas son correcciones A del modelo existente;
+aclarar la base numérica y los límites es categoría B. No cambian firmas,
+columnas, calendarios, estados iniciales, cero/NA ni truncación histórica.
+C13-C16 conservan exclusivamente su alcance autorizado. Se verificaron seis
+firmas y 138 resultados ordinarios completos a 1e-12. Inventario conservado:
+102 nombres públicos (101 funciones más A_xj), 974 apariciones de parámetros.
+Ver audit-multilife-contingencies.md B07-06 para identidades y regresiones.
+La precisión extrema de t_px/e_x queda como nuevo defecto A confirmado para
+suplemento B05; no se afirma que esos productores ya estén corregidos.
+
 ## C16 autorizada: prima vencida en la fecha de reserva multivida
 
 Base c126ccb. reserve_xy documenta reserva inmediatamente antes de la prima

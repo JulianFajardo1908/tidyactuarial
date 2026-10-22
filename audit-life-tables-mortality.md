@@ -290,3 +290,16 @@ límites de la primera unidad y los contratos locales de NA/radix/frac.
 
 Siguiente bloque: B06, contingencias de una vida
 y contratos, preservando la función gráfica contingente ya revisada.
+
+### Suplemento pendiente detectado en B07-06 (21 de octubre de 2026)
+
+El cierre histórico anterior se conserva con su evidencia, pero hay un nuevo
+defecto A confirmado en extremos de t_px/e_x. Con tabla x=60:61 y
+lx=(1,1e-200), CF, t_px(60,.5) devuelve cero frente a 1e-100;
+e_x(60,t=1,type="complete") devuelve cero frente a 1/(200*log(10)).
+Reconstruir p como 1-q desde decrementos redondeados elimina supervivencia
+observada positiva. Evidencia con aserciones: b07-06/single-life-followup.log
+en los artefactos del 21 de octubre. Confirmado, pendiente de implementación
+y regresión propia; no se presenta como límite biológico ni como arreglado.
+Resolver este suplemento antes de B08, preservando precedencia/contratos de
+columnas, NA, tablas terminales y las correcciones anteriores de B05.

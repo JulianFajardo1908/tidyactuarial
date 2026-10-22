@@ -1,5 +1,10 @@
 # tidyactuarial 0.2.0
 
+* Two-life fractional survival retains tiny observed annual survival in log
+  form. Complete two-life expectancy uses analytic annual UDD, constant-force
+  and Balducci integrals, avoiding quadrature loss near steep mortality.
+  Existing conditioning, zero-duration and open-table truncation are retained.
+
 * Two-life pure-endowment premiums and reserves use direct discounted status
   survival, retaining small benefits lost by subtracting insurance APVs.
   Joint reserves now use backward conditional recursion; last-survivor reserves

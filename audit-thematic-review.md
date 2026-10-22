@@ -22,9 +22,9 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B02 | Flujos y ecuaciones de valor | 8 | En revisión; ver audit-cash-flow-roots.md y audit-interest-foundations.md |
 | B03 | Anualidades financieras y préstamos | 7 | Revisión cerrada dentro del alcance documentado; ver audit-financial-annuities-loans.md, B03-08/B03-10 y límites expresos |
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
-| B05 | Tablas, mortalidad y probabilidades | 12 | Revisión cerrada: 12/12 dentro del alcance de audit-life-tables-mortality.md; 139 comprobaciones nuevas y check final aprobado |
+| B05 | Tablas, mortalidad y probabilidades | 12 | Cierre histórico preservado: 12/12 y 139 comprobaciones; nuevo suplemento de precisión t_px/e_x confirmado en B07-06, pendiente antes de B08 |
 | B06 | Contingencias de una vida y contratos | 14 | Revisión cerrada: 14/14 dentro del alcance y límites de audit-single-life-contracts.md; 638 comprobaciones nuevas, C12 autorizada y check final aprobado; gráfica previa preservada |
-| B07 | Contingencias multivida | 6 | En revisión: B07-01/05 incluyen probabilidades, seguros, anualidades y primas/reservas; C13-C16 autorizadas. Sigue conciliación integral y límites; ver audit-multilife-contingencies.md |
+| B07 | Contingencias multivida | 6 | Revisión cerrada: seis nombres dentro de los estados/identidades/límites documentados en B07-06; 702 comprobaciones nuevas, C13-C16 autorizadas y check final aprobado. Suplemento B05 pendiente separado |
 | B08 | Simulación de vidas y Monte Carlo | 11 | Pendiente de revisión integral; preservar evidencia previa |
 | B09 | Riesgo colectivo, coberturas y colas | 19 | Pendiente de revisión integral; preservar evidencia previa |
 

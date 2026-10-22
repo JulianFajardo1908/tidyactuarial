@@ -17,7 +17,8 @@
 #'   \code{"CML"} (alias of CF), or \code{"Balducci"}. If not specified and
 #'   the supplied life table(s) carry a \code{frac} attribute, that value is
 #'   used. If two tables are supplied and their \code{frac} attributes differ,
-#'   \code{frac} must be supplied explicitly. Passed to \code{\link{t_px}}.
+#'   \code{frac} must be supplied explicitly. Uses the same assumptions as
+#'   \code{\link{t_px}}.
 #'   Inherited \code{"CML"} is normalized to \code{"CF"} before comparing
 #'   the two tables' assumptions.
 #' @param status Two-life status: \code{"joint"} or \code{"last"}.
@@ -33,9 +34,12 @@
 #' as \emph{at least one} life is alive.
 #' \deqn{{}_tp_{\overline{xy}} = {}_tp_x + {}_tp_y - {}_tp_x \cdot {}_tp_y.}
 #'
-#' Individual survival probabilities \eqn{{}_tp_x} and \eqn{{}_tp_y} are
-#' computed via \code{\link{t_px}}, which supports fractional ages under UDD,
-#' constant force, and Balducci assumptions (Finan, Section 24).
+#' Individual survival probabilities \eqn{{}_tp_x} and \eqn{{}_tp_y} use
+#' observed \code{lx} ratios and fractional survival under UDD, constant
+#' force, or Balducci (Finan, Section 24). Logarithmic calculations retain
+#' small annual survival without subtracting a rounded death probability
+#' from one. Last-survivor survival is evaluated as
+#' \eqn{\max(p_x,p_y)+(1-\max(p_x,p_y))\min(p_x,p_y)}.
 #' Tables must have unique consecutive annual integer ages and finite,
 #' nonnegative, nonincreasing \code{lx}. Supplied \code{px}/\code{qx} must
 #' lie in [0,1] and agree with each other and observed annual \code{lx}
@@ -182,6 +186,6 @@ t_pxy <- function(
     if (frac_use == "CML") frac_use <- "CF"
   }
 
-  # --- compute marginal survival via t_px (Finan, Sec. 24) ---
+  # --- compute marginal survival from observed lx (Finan, Sec. 24) ---
   .two_life_survival(lt_x, lt_y, x, y, t, frac_use, status)
 }
