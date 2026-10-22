@@ -1,5 +1,39 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B08-03 — 22 de octubre de 2026
+
+Base f87706e, rama audit/0.2.0-precran y versión 0.1.6.9000. Motor lx de
+simulate_annuity_x/simulate_insurance_x corregido para supervivencia anual
+subdesbordada; tasas originales y valoración monetaria estable. Censura,
+firmas, columnas y calendario conservados; sin nueva decisión C. Detalles
+y límites numéricos: audit-monte-carlo-review.md.
+
+90 comprobaciones nuevas aprobadas. Contra base, el archivo definitivo
+reproduce 11 fallos, 9 errores y 10 advertencias, con 62 aprobadas; errores
+previos abortan aserciones posteriores. 172 objetos ordinarios completos
+coinciden a 1e-12 y dos firmas idénticas. Roxygen2 y suite fuente definitiva:
+**6398 aprobadas, 0 fallos, 0 advertencias, 0 omisiones**. Inventario:
+102 nombres, 974 apariciones de parámetros, cero descripciones ausentes.
+
+Build --no-manual y check --as-cran --no-manual: salida 0, **0 ERROR,
+0 WARNING, 1 NOTE**, solo por versión de desarrollo. Suite instalada:
+**6398 aprobadas, 0 fallos/advertencias/omisiones** (71 s); ejemplos (23 s),
+cuatro viñetas y reconstrucción (12 s) aprobados. build.log, check.log,
+tidyactuarial.Rcheck/00check.log y tests/testthat.Rout conservados.
+snapshot-verification.txt comprueba 394 archivos R/tests/man/NEWS/NAMESPACE
+y campos originales DESCRIPTION iguales al checkout, normalizando CRLF y
+espacios de build; audit/AGENTS excluidos. SHA256 del archivo final:
+49FB72BC20A0C6CE47DCCF07A193BDB5B55A98A9F0754813D7AA808BD54DDB1B.
+Entorno Windows/R 4.6.1, biblioteca existente, locale C, Pandoc de RStudio,
+recepción remota CRAN desactivada y sin manual/PDF. No se ejecutó nueva CI
+remota ni R mínimo. B08-03 cerrado en su alcance documentado; B08 completo
+y suplemento B05 pendientes. Sin dependencia, cambio de versión ni push.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b08-03/.
+regression-final.log, before-final.log/compatibility.R, final-tests.log e
+inventory.log son la evidencia definitiva. Los after-* anteriores contienen
+iteraciones de las pruebas; no sustituyen los informes definitivos.
+
 ## Última validación: B08-02 — 22 de octubre de 2026
 
 Base 9a7b441, rama audit/0.2.0-precran y versión 0.1.6.9000. C17 autorizada

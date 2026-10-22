@@ -1,5 +1,9 @@
 # Matriz global de firmas públicas
 
+B08-03: simulate_annuity_x/simulate_insurance_x conservan firmas y esquemas;
+172 objetos ordinarios completos coinciden a 1e-12. Motor lx, valoración
+monetaria y límites documentados en audit-monte-carlo-review.md; B08 abierto.
+
 B08-02: mc_multilife_status conserva firma/esquema y 60 resultados válidos
 completos idénticos a 9a7b441. C17 autorizada exige el intervalo exacto de T;
 tol conserva la comprobación entera de K. K_status grande retiene double.
@@ -1566,7 +1570,9 @@ Documentación: `man/mc_reserve.Rd`. Semántica: revisión por bloque pendiente 
 
 ## B08 — simulate_annuity_x
 
-Documentación: `man/simulate_annuity_x.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/simulate_annuity_x.Rd`. B08-03: motor lx, calendario,
+valoración monetaria y RNG probados; firma/esquema conservados. Límites
+numéricos y de censura en audit-monte-carlo-review.md; bloque B08 abierto.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
@@ -1588,7 +1594,9 @@ Documentación: `man/simulate_annuity_x.Rd`. Semántica: revisión por bloque pe
 
 ## B08 — simulate_insurance_x
 
-Documentación: `man/simulate_insurance_x.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/simulate_insurance_x.Rd`. B08-03: masas anuales,
+valoración monetaria y RNG probados; firma/esquema conservados. Censura y
+límites en audit-monte-carlo-review.md; bloque B08 abierto.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|

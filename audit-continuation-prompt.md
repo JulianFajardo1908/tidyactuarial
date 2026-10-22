@@ -1,5 +1,32 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B08-03: motor lx y valoración de wrappers (22 de octubre de 2026)
+
+Base f87706e, Git limpio al iniciar, rama audit/0.2.0-precran y versión
+0.1.6.9000 conservadas. simulate_annuity_x/simulate_insurance_x retienen
+log supervivencia desde lx y tasas originales; valoración monetaria estable,
+sin atajo de tasa pequeña. Validación de rangos/horizonte/tablas antes de
+coerción/muestreo. No cambian firmas, columnas, calendario ni censura.
+90 comprobaciones nuevas pasan; contra base: 11 fallos, 9 errores,
+10 advertencias, 62 aprobadas (errores abortan aserciones posteriores).
+172 objetos ordinarios completos coinciden a 1e-12 y dos firmas idénticas.
+Registro matemático y límites double: audit-monte-carlo-review.md.
+Evidencia final y huella: audit-precran-check.md; artefactos b08-03.
+Suite fuente e instalada: 6398 aprobadas, cero fallos/advertencias/omisiones.
+Build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo; ejemplos y
+cuatro viñetas aprobados, 394 archivos verificados. B08-03 cerrado en su
+alcance documentado y guardado en commit local; B08 completo sigue abierto.
+
+Siguiente unidad B08-04: mc_annuity/mc_insurance, tasas originales y libros
+de flujos por trayectoria, conservando validación K/T y calendarios previos.
+next-valuators-diagnosis.log reproduce rechazo de fuerza 720 aunque los
+flujos independientes sean finitos (seguro 2.032231e-13, renta 4.508027e143).
+Después mc_premium/mc_loss, mc_reserve y summary_mc, incluidos NA, estados
+y error estándar con antitéticos. B08 sigue abierto con 242 comprobaciones
+nuevas acumuladas. El suplemento B05 t_px/e_x continúa pendiente. B01/B02
+mantienen pendientes formales y B09 integral aún no se ha iniciado. No
+reiniciar bloques cerrados, ampliar C13-C17, cambiar versión ni hacer push.
+
 ## B08-02: estados multivida y C17 (22 de octubre de 2026)
 
 Base 9a7b441, misma rama y versión. C17 fue autorizada expresamente por el

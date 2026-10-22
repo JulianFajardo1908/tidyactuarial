@@ -83,6 +83,13 @@ made at times \eqn{t_j}, the simulated present value is
 For \code{k > 1}, the curtate lifetime alone is insufficient because
 payments may occur during the year of death. The function therefore
 simulates a complete lifetime \eqn{T_x=K_x+S} under \code{frac}.
+Fractional survival is retained in log form, including when an annual
+\code{lx} ratio underflows. Cash flows use the original log interest rate
+and combine the monetary amount before exponentiating. The displayed
+annual effective rate may overflow or round to -1 at extreme forces.
+With a finite horizon, surviving paths have \code{Kx = n}, missing
+\code{Tx}, and \code{died_within_horizon = FALSE}; their future lifetime
+is censored, not observed to equal \code{n}.
 }
 \examples{
 lt <- data.frame(

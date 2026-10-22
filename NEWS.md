@@ -1,5 +1,12 @@
 # tidyactuarial 0.2.0
 
+* Single-life simulation wrappers retain finite constant-force lifetimes when
+  annual survivor ratios underflow. Valuation uses the original interest
+  convention and stable monetary annuity sums, including small period rates.
+  Invalid ranges and incompatible survivor counts fail before coercion or
+  sampling. Finite-horizon censoring and existing random-stream conventions
+  are retained and clarified.
+
 * Approved C17: multiple-life simulated statuses require the exact lifetime
   relation K <= T < K+1 before aggregation; tolerance still checks integer K.
   Complete lifetimes are rejected rather than repaired. Large curtate status

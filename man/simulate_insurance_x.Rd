@@ -57,6 +57,10 @@ A tibble with one row per simulation, or a summary. Simulation
 \description{
 Simulates present values of a discrete single-life insurance payable at the
 end of the year of death, or at maturity for an endowment insurance.
+Monetary values retain the original log interest rate, even when the
+displayed annual effective rate loses range. Finite-horizon survivors
+are censored: \code{Kx = n} is a placeholder and
+\code{died_within_horizon = FALSE}, not an observed death at that duration.
 }
 \examples{
 lt <- data.frame(

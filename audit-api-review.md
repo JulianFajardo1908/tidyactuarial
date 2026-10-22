@@ -1,5 +1,15 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## B08-03: wrappers de simulación (22 de octubre de 2026)
+
+Base f87706e. Correcciones A: razón lx en log para CML/Balducci, tasas
+originales y suma monetaria estable; rangos enteros/horizonte comprobados
+antes de coerción y muestreo, tablas incompatibles rechazadas. B: aclarar
+censura finita y metadato efectivo extremo. No cambian firmas, columnas,
+unidades, calendario ni política terminal. 90 comprobaciones y 172 objetos
+ordinarios a 1e-12; ver audit-monte-carlo-review.md. Sin nueva decisión C;
+C13-C17 conservan su alcance específico y B08 permanece abierto.
+
 ## C17 autorizada: coherencia exacta K/T en mc_multilife_status
 
 22 de octubre de 2026, detectada durante B08-01 sobre c7a0d29.

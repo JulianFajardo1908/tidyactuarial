@@ -14,14 +14,72 @@ fracciones CML, vidas faltantes, calendarios y coherencia K/T.
 | simulate_lifetime | PMF anual de K y fracción condicional de muerte; tabla qx | B08-01: precisión y validación puntual corregidas/probadas; revisión integral abierta |
 | simulate_lifetimes | Vidas independientes; una corriente RNG por llamada; precedencia qx/px/lx | B08-01: radix/decrementos y validación puntual corregidos/probados; revisión integral abierta |
 | mc_multilife_status | Min/max de K y T; mismos identificadores de vidas por simulación | B08-02: C17 y conservación de estados/almacenamiento/columnas probadas; límites abajo |
-| simulate_annuity_x | Valor presente de pagos por trayectoria; motor lx propio | Pendiente de revisión integral; no usa automáticamente el generador corregido |
-| simulate_insurance_x | Seguro anual por trayectoria; motor lx propio | Pendiente de revisión integral |
+| simulate_annuity_x | Valor presente de pagos por trayectoria; motor lx propio | B08-03: motor lx, valoración monetaria, calendario y RNG comprobados; límites abajo |
+| simulate_insurance_x | Seguro anual por trayectoria; motor lx propio | B08-03: masas, censura, valoración monetaria y RNG comprobados; límites abajo |
 | mc_annuity | Pagos elegibles por trayectoria, garantías, diferimientos y NA | Pendiente; preservar correcciones previas |
 | mc_insurance | Evento y momento del beneficio por trayectoria | Pendiente; preservar validación K/T previa |
 | mc_premium | Cociente de medias de pares Z,Y; prima anualizada/cuota | Pendiente de revisión integral |
 | mc_loss | Z menos prima en la unidad de Y | Pendiente de revisión integral |
 | mc_reserve | Flujos futuros por trayectoria; antes/después de pago; vigencia | Pendiente; preservar calendarios y NA ya corregidos |
 | summary_mc | Momentos, error estándar, cuantiles y colas empíricas | Pendiente; preservar TVaR empírica ya corregida |
+
+## B08-03 — motor lx y valoración de los dos wrappers (22 de octubre)
+
+Base f87706e, Git limpio al comenzar, rama y versión conservadas. Esta unidad
+es A matemática/computacional y B documental; no amplía C13-C17. Se conservan
+firmas, columnas, importes por pago y convenciones anuales/fraccionarias.
+
+Desde lx, la masa de muerte anual es (l_j-l_(j+1))/l_x; el horizonte finito
+retiene la masa superviviente l_(x+n)/l_x. No normaliza condicionalmente las
+muertes observadas. En esas filas Kx=n es marcador de censura, Tx=NA y
+died_within_horizon=FALSE; no debe tratarse como vida completa observada.
+Con n=Inf sigue exigiéndose cierre observado de la tabla. El nombre histórico
+method="inverse" conserva sample.int y su orden de sorteos; no se sustituye
+por el generador público ni se añade extrapolación.
+
+Defecto reproducido: lx=(1e300,1e-300), horizonte uno. La razón anual
+subdesborda a cero, pero log(p)=-600*log(10) es finito. CML debe producir
+S=-log1p(-U)/(600*log(10)), no cero. Se obtiene log(p) desde los conteos
+cuando hace falta; con q pequeño se usa log1p(-q), q por decremento directo.
+Balducci usa log(U)+log(p)-log1p(-U*q). Solo l_end=0 conserva la degeneración
+terminal previa. No cambia la distribución ni el número de uniformes.
+
+Para fechas elegibles t_j el valor es payment*sum(exp(-g*t_j)); el seguro
+paga benefit*exp(-g*t) cuando corresponde, g de la tasa original. Antes la
+conversión obligatoria a efectiva anual rechazaba fuerzas con flujos finitos.
+Ahora los importes se combinan en log y la efectiva queda como metadato que
+puede ser Inf o -1. Para pagos consecutivos se reutiliza la suma geométrica
+log estable. El atajo abs(i_period)<1e-12 borraba descuentos monetariamente
+materiales: cuatro pagos due de 1e12 a i=1e-12 devolvían 4e12, en vez de
+3999999999998.5. El error actual frente a fechas explícitas es menor de .02;
+no se exige exactitud inferior al redondeo double de la suma log.
+
+Se comprueban rangos antes de coerción/muestreo y horizonte antes de crear
+edades. m grande válido conserva double; n grande se contrasta con soporte.
+Se rechazan incrementos lx antes ocultados por tolerancia absoluta y edades
+duplicadas después del redondeo entero. No se reparan tablas incompatibles.
+
+test-b08-life-mc-precision.R añade 90 comprobaciones: CDF de las tres
+fracciones contra uniformes reconstruidos, masas/censura, libros explícitos
+de pagos/seguros con tasas negativas/cero/positivas, fuerzas extremas con
+importes compensatorios, importe cero, tasa pequeña, límites de entrada,
+invariancia al radix y restauración/avance RNG con semilla presente/ausente.
+Contra f87706e: 11 fallos, 9 errores, 10 advertencias y 62 aprobadas;
+los errores anteriores abortan algunas aserciones. Después pasan las 90.
+172 resultados ordinarios completos coinciden a 1e-12, dos firmas idénticas,
+incluidos contratos, argumentos obsoletos y ambos outputs.
+
+Límites: una fracción Balducci inferior al mínimo double puede seguir siendo
+cero; sumar una fracción diminuta a K puede redondear T a K. No se certifica
+recuperación de fechas que no caben en double ni calendarios arbitrariamente
+grandes. Se preserva la convención terminal CML/Balducci de fracción cero y
+las convenciones locales de pago en ese borde. mc_annuity/mc_insurance y
+otros consumidores aún requieren revisión propia de tasas originales; no
+se propaga esta corrección por analogía. B08 sigue abierto con 242 nuevas
+comprobaciones acumuladas; suplemento B05 pendiente. Validación final y
+huella: audit-precran-check.md. Artefactos b08-03 de la sesión del 21.
+regression-final.log y before-final.log son definitivos; after.log y otros
+after-* conservan iteraciones anteriores de pruebas, no la evidencia final.
 
 ## B08-01 — fundamentos de los dos generadores
 
