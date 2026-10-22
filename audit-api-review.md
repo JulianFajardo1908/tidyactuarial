@@ -1,5 +1,41 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## C17 autorizada: coherencia exacta K/T en mc_multilife_status
+
+22 de octubre de 2026, detectada durante B08-01 sobre c7a0d29.
+mc_multilife_status permite T>=K+1 si la diferencia cae dentro de tol,
+pero sus consumidores mc_insurance/mc_annuity/mc_reserve exigen K<=T<K+1.
+next-status-diagnosis.log reproduce dos vidas K=(0,2),T=(1,2.5): el estado
+conjunto devuelve K_status=0,T_status=1 y mc_insurance rechaza ese resultado.
+
+Propuesta concreta: después de la validación/redondeo entero de K ya
+existentes, exigir exactamente K<=T<K+1 en cada vida. tol conserva su
+papel para comprobar K entero; no relaja las fronteras del intervalo de T.
+Rechazar, sin redondear ni reparar T, los pares fuera del intervalo,
+incluyendo T=K+1 y T<K por una diferencia inferior a tol. Mantener firmas,
+columnas, identificadores y los mínimos/máximos de pares válidos. No cambia
+los calendarios ni la política NA de los consumidores. No se propone
+normalizar un par incompatible ni modificar las trayectorias suministradas.
+
+Categoría C: restringe un dominio que tol permite explícitamente en la
+documentación vigente. El prompt maestro exige autorización específica
+antes de implementar esta modificación. El usuario respondió expresamente
+«Autorizar la coherencia exacta K/T» el 22 de octubre, durante la validación
+de B08-01. Autorizada para la siguiente unidad, todavía sin implementar en
+el snapshot de B08-01. No amplía otros dominios ni permite reparar T.
+
+## B08-01: precisión y dominio de los generadores (22 de octubre de 2026)
+
+Por indicación del usuario se inicia B08 sobre c7a0d29; el suplemento B05
+t_px/e_x permanece pendiente. CML/Balducci conservan p>0 aunque p<=tol;
+lx usa exposición positiva independiente del radix y decrementos directos.
+Se corrigen tol usado antes de validar, edades fuera de rango, n_sim que
+redondea a cero y overflow de death_age. Son correcciones A y aclaraciones
+B, sin nuevos parámetros, columnas ni decisiones C. q=1 conserva fracción
+cero CML/Balducci. Se preservan métodos/sorteos, precedencia de columnas y
+truncación; 78 resultados ordinarios completos a 1e-12 y dos firmas iguales.
+Ver audit-monte-carlo-review.md. B08 sigue abierto; no extender C13-C16 a MC.
+
 ## B07-06: conciliación de contratos y precisión, sin nueva decisión C
 
 Base 4b0948e. Supervivencia fraccionaria por lx/log y esperanza multivida
@@ -207,6 +243,7 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C14 | C | insurance_xy endowment n=0 paga al vencimiento h si el estado sobrevive; term vacío conserva cero | Autorizada expresamente e implementada en B07-03 |
 | C15 | C | annuity_xy second exige pesos positivos y siguiente año en ambos bordes; falta de soporte produce error | Autorizada expresamente e implementada en B07-04; none/first conservan calendario |
 | C16 | C | reserve_xy incluye la cuota vencida programada exactamente en t y en madurez, como reserva antes de prima | Autorizada expresamente e implementada en B07-05; recursión sin ampliación |
+| C17 | C | mc_multilife_status exige exactamente K<=T<K+1 tras la comprobación entera de K; tol deja de relajar las fronteras de T | Autorizada expresamente el 22 de octubre; pendiente de implementación en la unidad siguiente a B08-01 |
 
 ## Mejoras compatibles y categorías A realizadas
 

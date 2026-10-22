@@ -1,5 +1,39 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B08-01: generadores de vidas (22 de octubre de 2026)
+
+El usuario pidió pasar a B08. Base c7a0d29, rama audit/0.2.0-precran,
+Git inicialmente limpio y versión 0.1.6.9000 preservada. El suplemento
+B05 t_px/e_x sigue confirmado y pendiente; no se descarta por cambiar orden.
+Se corrigen fracciones CML/Balducci anuladas por p<=tol, exposición lx
+dependiente del radix y cancelación en q=1-l_next/l. Validación de tol/
+edades/n_sim antes de coerción y death_age sin overflow; q=1 conserva
+fracción cero y los sorteos/semillas conservan sus convenciones previas.
+94 comprobaciones nuevas; 78 resultados ordinarios completos a 1e-12 y
+dos firmas idénticas. Registro principal: audit-monte-carlo-review.md.
+Validación final: audit-precran-check.md. No hay nueva decisión C ni versión.
+Suite fuente/instalada final: 6250 aprobadas, cero fallos/advertencias/
+omisiones; build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo.
+Ejemplos y cuatro viñetas aprobados; 392 fuentes verificadas y huella
+registrada. B08-01 cerrado en su alcance puntual, B08 completo abierto.
+
+B08 sigue abierto en sus once nombres. Seguir mc_multilife_status y el
+motor lx privado de simulate_annuity_x/simulate_insurance_x; este último
+no usa automáticamente los generadores corregidos. next-status-diagnosis.log
+reproduce un par aceptado por el estado y rechazado por mc_insurance en
+T=K+1. Conciliar el contrato tol antes de cambiar ese dominio público;
+no se corrigió por analogía. Después seguir pagos, seguros, primas/pérdidas,
+reservas por trayectoria y resúmenes, incluidos RNG/antitéticos y NA.
+Conservar audit-multilife-monte-carlo.md y sus regresiones anteriores.
+El usuario autorizó expresamente C17 («Autorizar la coherencia exacta K/T»)
+el 22 de octubre durante esta validación: exigir el intervalo exacto de
+T tras la comprobación entera de K, sin reparar trayectorias. Aplicarla en
+la siguiente unidad sin volver a pedir autorización. No implementada en el
+snapshot B08-01. next-lx-engine-diagnosis.log confirma otro defecto A
+pendiente del motor lx: razón anual 1e-600 se pierde y genera T=0 bajo CML.
+Artefactos nuevos: b08-01 en la sesión del 21 de octubre, con trabajo
+fechado el 22. Sin push/publicación ni nuevas dependencias.
+
 ## B07-06: conciliación de los seis nombres (21 de octubre de 2026)
 
 Base 4b0948e; rama audit/0.2.0-precran y versión 0.1.6.9000 conservadas,

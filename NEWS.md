@@ -1,5 +1,12 @@
 # tidyactuarial 0.2.0
 
+* Lifetime simulation retains positive annual survival under CML and Balducci
+  even below the checking tolerance. Simulation from survivor counts uses
+  direct decrements and positive exposure independently of the radix.
+  Invalid tolerances and out-of-range ages fail before integer coercion;
+  valid terminal death ages retain values beyond integer storage. Seeded
+  calls preserve their existing random-stream and restoration conventions.
+
 * Two-life fractional survival retains tiny observed annual survival in log
   form. Complete two-life expectancy uses analytic annual UDD, constant-force
   and Balducci integrals, avoiding quadrature loss near steep mortality.

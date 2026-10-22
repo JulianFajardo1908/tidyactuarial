@@ -1,5 +1,10 @@
 # Matriz global de firmas públicas
 
+B08-01: simulate_lifetime/simulate_lifetimes conservan firmas y esquemas;
+78 resultados completos ordinarios concuerdan con c7a0d29 a 1e-12.
+Precisión/dominio puntual y límites en audit-monte-carlo-review.md;
+la revisión integral de B08 permanece abierta.
+
 B07-06: seis firmas cotejadas con 4b0948e, sin cambios; 138 resultados
 ordinarios completos concuerdan a 1e-12. Contratos, estados y límites
 conciliados en audit-multilife-contingencies.md. Inventario vivo comprobado:
@@ -1598,6 +1603,10 @@ Documentación: `man/simulate_insurance_x.Rd`. Semántica: revisión por bloque 
 
 Documentación: `man/simulate_lifetime.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
 
+B08-01: p positivo no se anula por tol en CML/Balducci; tol y edades se
+validan antes de coerción, n_sim no puede redondear a cero y death_age
+conserva valores fuera de integer. RNG y esquema ordinario preservados.
+
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `lt` | `<obligatorio>` | A data frame or tibble containing the life table. |
@@ -1615,6 +1624,10 @@ Documentación: `man/simulate_lifetime.Rd`. Semántica: revisión por bloque pen
 ## B08 — simulate_lifetimes
 
 Documentación: `man/simulate_lifetimes.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+
+B08-01: exposición lx>0 independiente del radix y decrementos directos;
+tol/edades/n_sim validados antes de coerción. Se conserva una sola corriente
+por llamada, precedencia de columnas, truncación y esquemas.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|

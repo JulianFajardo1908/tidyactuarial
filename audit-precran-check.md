@@ -1,5 +1,45 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B08-01 — 22 de octubre de 2026
+
+Base c7a0d29, rama audit/0.2.0-precran, versión 0.1.6.9000. Por indicación
+del usuario se inicia B08, dejando explícitamente pendiente el suplemento
+B05 t_px/e_x. Se corrigen CML/Balducci con p positivo pequeño, exposición
+lx según radix, decrementos y validación/coerción de ambos generadores.
+Sin cambios de firma/columnas, dependencias ni nueva decisión C.
+
+94 comprobaciones nuevas aprobadas. Contra base: nueve fallos, cinco errores,
+dos advertencias y 35 aprobadas; los errores originales abortan algunos
+bloques y no se cuentan sus aserciones no ejecutadas como aprobadas.
+78 objetos ordinarios completos concuerdan a 1e-12 y dos firmas idénticas.
+Roxygen2 regenerado y diff --check aprobado. Suite fuente definitiva:
+**6250 aprobadas, 0 fallos, 0 advertencias, 0 omisiones**.
+Suite instalada: **6250 aprobadas, 0 fallos/advertencias/omisiones** (75 s).
+Build --no-manual y check --as-cran --no-manual: salida 0, **0 ERROR,
+0 WARNING, 1 NOTE**, exclusivamente por versión de desarrollo. Ejemplos
+(23 s), cuatro viñetas y reconstrucción (12 s) aprobados. Informes build.log,
+check.log, tidyactuarial.Rcheck/00check.log y tests/testthat.Rout.
+snapshot-verification.txt comprueba 392 archivos R/tests/man/NEWS/NAMESPACE
+y campos originales DESCRIPTION iguales al checkout normalizando CRLF y
+el reformato de espacios de build; audit/AGENTS excluidos. SHA256:
+2A1B0AC9A179ED64E5B8387FA3F5A0FD25D4AACAE3FFC75B1205E5551D183570.
+Inventario comprobado: 102 nombres, 974 apariciones de parámetros y cero
+descripciones Rd ausentes/vacías. B08-01 cerrado en su alcance puntual.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b08-01/.
+final-tests.log es la suite fuente; before-final.log/compatibility.R contienen
+la regresión definitiva y compatibilidad. before.log/after.log conservan la
+primera versión de 73 comprobaciones; after-final.log es la regresión final
+de 94. next-status-diagnosis.log confirma la discrepancia pendiente del
+borde T=K+1 entre mc_multilife_status y mc_insurance; no corregida aquí.
+El usuario autorizó C17 durante la validación, para la siguiente unidad;
+el archivo fuente B08-01 aún no contiene esa modificación.
+
+Entorno: Windows/R 4.6.1, biblioteca de usuario existente, locale C y Pandoc
+de RStudio. Build/check fuera del aislamiento con recepción remota CRAN
+desactivada; sin nueva CI, prueba de R mínimo, manual/PDF, versión o push.
+B08 permanece abierto; evidencia y límites en audit-monte-carlo-review.md.
+
 ## Última validación: B07-06 — 21 de octubre de 2026
 
 Base 4b0948e, rama audit/0.2.0-precran, versión 0.1.6.9000. Supervivencia
