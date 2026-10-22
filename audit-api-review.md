@@ -23,6 +23,9 @@ antes de implementar esta modificación. El usuario respondió expresamente
 «Autorizar la coherencia exacta K/T» el 22 de octubre, durante la validación
 de B08-01. Autorizada para la siguiente unidad, todavía sin implementar en
 el snapshot de B08-01. No amplía otros dominios ni permite reparar T.
+Implementada en B08-02 con regresión propia: 58 comprobaciones y 60 objetos
+válidos completos idénticos a 9a7b441. Firma/esquemas intactos. Se conserva
+el redondeo entero de K permitido por tol y T permanece sin modificar.
 
 ## B08-01: precisión y dominio de los generadores (22 de octubre de 2026)
 
@@ -243,7 +246,7 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C14 | C | insurance_xy endowment n=0 paga al vencimiento h si el estado sobrevive; term vacío conserva cero | Autorizada expresamente e implementada en B07-03 |
 | C15 | C | annuity_xy second exige pesos positivos y siguiente año en ambos bordes; falta de soporte produce error | Autorizada expresamente e implementada en B07-04; none/first conservan calendario |
 | C16 | C | reserve_xy incluye la cuota vencida programada exactamente en t y en madurez, como reserva antes de prima | Autorizada expresamente e implementada en B07-05; recursión sin ampliación |
-| C17 | C | mc_multilife_status exige exactamente K<=T<K+1 tras la comprobación entera de K; tol deja de relajar las fronteras de T | Autorizada expresamente el 22 de octubre; pendiente de implementación en la unidad siguiente a B08-01 |
+| C17 | C | mc_multilife_status exige exactamente K<=T<K+1 tras la comprobación entera de K; tol deja de relajar las fronteras de T | Autorizada expresamente el 22 de octubre e implementada en B08-02; firma/esquema conservados |
 
 ## Mejoras compatibles y categorías A realizadas
 

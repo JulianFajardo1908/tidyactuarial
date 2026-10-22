@@ -1,5 +1,11 @@
 # tidyactuarial 0.2.0
 
+* Approved C17: multiple-life simulated statuses require the exact lifetime
+  relation K <= T < K+1 before aggregation; tolerance still checks integer K.
+  Complete lifetimes are rejected rather than repaired. Large curtate status
+  values retain numeric storage, and identifier/output-name collisions give
+  an explicit error. Existing valid min/max results and schemas are retained.
+
 * Lifetime simulation retains positive annual survival under CML and Balducci
   even below the checking tolerance. Simulation from survivor counts uses
   direct decrements and positive exposure independently of the radix.

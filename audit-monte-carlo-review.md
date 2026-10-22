@@ -13,7 +13,7 @@ fracciones CML, vidas faltantes, calendarios y coherencia K/T.
 |---|---|---|
 | simulate_lifetime | PMF anual de K y fracción condicional de muerte; tabla qx | B08-01: precisión y validación puntual corregidas/probadas; revisión integral abierta |
 | simulate_lifetimes | Vidas independientes; una corriente RNG por llamada; precedencia qx/px/lx | B08-01: radix/decrementos y validación puntual corregidos/probados; revisión integral abierta |
-| mc_multilife_status | Min/max de K y T; mismos identificadores de vidas por simulación | Pendiente; incompatibilidad de borde reproducida abajo |
+| mc_multilife_status | Min/max de K y T; mismos identificadores de vidas por simulación | B08-02: C17 y conservación de estados/almacenamiento/columnas probadas; límites abajo |
 | simulate_annuity_x | Valor presente de pagos por trayectoria; motor lx propio | Pendiente de revisión integral; no usa automáticamente el generador corregido |
 | simulate_insurance_x | Seguro anual por trayectoria; motor lx propio | Pendiente de revisión integral |
 | mc_annuity | Pagos elegibles por trayectoria, garantías, diferimientos y NA | Pendiente; preservar correcciones previas |
@@ -65,8 +65,10 @@ No se certifica aún todo su dominio ni se uniforman otras funciones MC.
 
 Con seed se conserva/restaura .Random.seed; sin seed se avanza la corriente
 del llamador. simulate_lifetimes inicializa una sola semilla para toda la
-llamada y no la reinicia por vida. No se cambian cantidad, orden ni tipo
-de sorteos. Los pares antitéticos introducen dependencia entre filas;
+llamada y no la reinicia por vida. Se conservan las llamadas explícitas de
+muestreo, tamaños y orden; no se promete igualdad de muestras afectadas por
+probabilidades corregidas ni detalles internos de sample.int entre versiones
+de R. Los pares antitéticos introducen dependencia entre filas;
 esta unidad no certifica el error estándar genérico bajo esos pares.
 
 test-b08-lifetime-foundations.R añade 94 comprobaciones: CDF condicional
@@ -124,3 +126,69 @@ anual antes de aplicar log. Defecto A confirmado pendiente del motor lx,
 sin corregir en B08-01. No confundirlo con el soporte de p>0 recuperado
 desde qx en el primer generador, ni prometer recuperación de información
 que ya se haya redondeado en una conversión qx/px.
+
+## B08-02 — estados multivida y C17 autorizada
+
+Base 9a7b441, rama y versión preservadas. B08-01 quedó guardado y validado
+antes de editar esta unidad. El usuario autorizó C17 expresamente el 22 de
+octubre; no se pidió otra autorización ni se extendió a otros contratos.
+
+### Modelo y correcciones
+
+Para cada vida K_i=floor(T_i). El estado conjunto usa min(K_i),min(T_i),
+y el último superviviente max(K_i),max(T_i). Como floor es monótona,
+floor(min T_i)=min floor(T_i), y análogamente para max. La igualdad depende
+de que cada par inicial sea compatible. Agregar primero no debe esconder
+una vida inválida que no determine el mínimo o máximo del estado.
+
+C17 exige exactamente K<=T<K+1 después de la comprobación/redondeo entero
+de K ya existentes. Se comprueba floor(T)==K sin sumar uno a un double
+grande; tol conserva la comprobación entera de K. No se redondea ni repara
+T. Se rechazan tanto T=K+1 como T<K aunque la diferencia sea menor que tol.
+La propuesta y la aprobación están en audit-api-review.md. Los pares válidos,
+alias de estado, identidad de las vidas y convenciones de agrupación siguen
+intactos. NA sigue rechazado; no se añade una política nueva de faltantes.
+
+Corrección A: K_status=as.integer(K_status) convertía una vida curtata válida
+de 3e9 en NA, con advertencia. Se mantiene integer ordinario y se conserva
+double cuando el valor no cabe en integer. No se cambia el valor actuarial.
+Los calendarios de pagos de tamaño enorme no se certifican por este arreglo.
+
+Corrección A/aclaración B: col_sim con nombre K_status/T_status/n_lives/status
+provocaba un error interno de columnas duplicadas de tibble. Ahora se rechaza
+explícitamente ese mismo caso ya fallido, indicando que el nombre está
+reservado. No se agrega una columna ni se renombra el identificador; sim_id,
+sim y otros identificadores válidos conservan sus nombres y aliases.
+
+### Evidencia y límites
+
+test-b08-multilife-status.R añade 58 comprobaciones: doce rechazos C17 en
+ambos estados y dos tolerancias; 32 libros de min/max, bordes válidos,
+cinco alias, orden de identificadores y encadenamiento con seguro/anualidad;
+siete de almacenamiento grande/ordinario y siete de nombres/identificadores.
+Las referencias son min/max explícitos y conteos de pagos a tasa cero;
+los consumidores constituyen una comprobación adicional, no el único oráculo.
+Se conserva el redondeo permitido de K cercano al entero y T válido sin reparar.
+
+Contra base: 16 fallos, un error y dos advertencias, con 35 aprobadas.
+El error interno original de tibble aborta el bloque de nombres; las
+aserciones restantes no se cuentan como aprobadas. Con el fix pasan las 58.
+60 objetos válidos COMPLETOS idénticos a 9a7b441, incluyendo agrupaciones
+de 12 simulaciones, alias, col_life=NULL e identificadores personalizados;
+firma idéntica. initial-timing-before.log se conserva como borrador: el
+primer libro omitía timing="due" en mc_annuity, cuyo default es immediate.
+El archivo definitivo explicita due y before-final.log usa ese archivo.
+
+Artefactos b08-02 del directorio de la sesión; suite/build/check/snapshot y
+huella en audit-precran-check.md. B08 sigue abierto. Continúa el otro motor
+lx con el defecto confirmado arriba, después valoración por trayectoria,
+primas/pérdidas/reservas y resúmenes. El suplemento B05 sigue pendiente.
+No se certifican dependencias entre vidas, reparación de trayectorias,
+intervalos de confianza antitéticos ni todos los extremos de los consumidores.
+
+Estado B08-02: autorizado C17, implementado, probado y cerrado dentro del
+alcance anterior. Suite fuente/instalada final: 6308 aprobadas, sin fallos/
+advertencias/omisiones; build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por
+desarrollo. Ejemplos y cuatro viñetas aprobados; 393 fuentes verificadas,
+huella y entorno en audit-precran-check.md. B08 acumula 152 comprobaciones
+nuevas en dos unidades y permanece abierto. No se hizo push ni cambió versión.

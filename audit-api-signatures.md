@@ -1,5 +1,9 @@
 # Matriz global de firmas públicas
 
+B08-02: mc_multilife_status conserva firma/esquema y 60 resultados válidos
+completos idénticos a 9a7b441. C17 autorizada exige el intervalo exacto de T;
+tol conserva la comprobación entera de K. K_status grande retiene double.
+
 B08-01: simulate_lifetime/simulate_lifetimes conservan firmas y esquemas;
 78 resultados completos ordinarios concuerdan con c7a0d29 a 1e-12.
 Precisión/dominio puntual y límites en audit-monte-carlo-review.md;
@@ -1496,6 +1500,9 @@ Documentación: `man/mc_loss.Rd`. Semántica: revisión por bloque pendiente sal
 
 Documentación: `man/mc_multilife_status.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
 
+B08-02: C17 implementada, identidades min/max y almacenamiento cotejados;
+identificadores no pueden colisionar con nombres de salida ya reservados.
+
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `data` | `<obligatorio>` | A data frame or tibble, typically returned by simulate_lifetimes . |
@@ -1504,7 +1511,7 @@ Documentación: `man/mc_multilife_status.Rd`. Semántica: revisión por bloque p
 | `col_life` | `"life_id"` | Character scalar naming the life identifier column. The default is "life_id" . Supply NULL only when no life identifier exists; in that case the function can validate equal row counts across simulations but cannot detect duplicated or substituted lives. |
 | `col_K` | `"Kx"` | Character scalar naming the curtate future lifetime column. |
 | `col_T` | `"Tx"` | Character scalar naming the complete future lifetime column. |
-| `tol` | `1e-10` | Nonnegative numeric tolerance used when checking that each complete future lifetime is compatible with its curtate lifetime. |
+| `tol` | `1e-10` | Nonnegative numeric tolerance for checking whole-number curtate lifetimes. It does not relax the interval K <= T < K+1. |
 
 ## B08 — mc_premium
 

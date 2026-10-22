@@ -1,5 +1,46 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B08-02 — 22 de octubre de 2026
+
+Base 9a7b441, rama audit/0.2.0-precran y versión 0.1.6.9000. C17 autorizada
+expresamente e implementada en mc_multilife_status: coherencia exacta K/T
+sin reparar T. Se conserva K_status grande y se explicita el error de nombres
+de identificador reservados. No cambian firmas, columnas ni aliases.
+
+58 comprobaciones nuevas aprobadas. Contra base: 16 fallos, un error,
+dos advertencias y 35 aprobadas. El error interno original aborta el bloque
+de nombres; sus aserciones no ejecutadas no se cuentan como aprobadas.
+60 objetos válidos completos idénticos y firma idéntica. Roxygen2 y diff
+--check aprobados. Detalle matemático y límites: audit-monte-carlo-review.md.
+Suite fuente definitiva: **6308 aprobadas, 0 fallos, 0 advertencias,
+0 omisiones**. Suite instalada: **6308 aprobadas, 0 fallos/advertencias/
+omisiones** (126 s). El primer lanzamiento de build/check no llegó a ejecutarse:
+la revisión automática de permisos agotó su plazo. Se hizo el único reintento
+permitido y fue admitido; los informes del reintento son la evidencia efectiva.
+snapshot-verification.txt comprueba 393 archivos R/tests/man/NEWS/NAMESPACE
+y los campos originales DESCRIPTION iguales al checkout, normalizando CRLF
+y espacios de build en DESCRIPTION; audit/AGENTS excluidos. SHA256:
+8672B20AC682DE995082FBE502F811F05A4CD2B610700D8FB88E3805BA6F4E3D.
+Inventario comprobado: 102 nombres, 974 apariciones de parámetros, cero
+descripciones Rd ausentes/vacías.
+Build --no-manual y check --as-cran --no-manual finales: salida 0,
+**0 ERROR, 0 WARNING, 1 NOTE**, exclusivamente por versión de desarrollo.
+Ejemplos (36 s), cuatro viñetas y reconstrucción (19 s) aprobados. Informes
+build.log, check.log, tidyactuarial.Rcheck/00check.log y tests/testthat.Rout.
+B08-02 cerrado en su alcance documentado; B08 completo sigue abierto.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b08-02/.
+before-final.log/compatibility.R contienen la regresión definitiva y
+compatibilidad; after.log las 58 comprobaciones. initial-timing-before.log
+es un borrador: omitía timing="due" al contrastar mc_annuity (default
+immediate). Se corrigió ese test antes de implementar y validar; before.log
+y before-final.log usan el archivo definitivo con timing explícito.
+
+Entorno: Windows/R 4.6.1, biblioteca existente, locale C y Pandoc de RStudio;
+recepción remota CRAN desactivada y sin manual/PDF. No se ejecutó nueva CI
+remota ni R mínimo; sin dependencia, versión o push. B08 permanece abierto
+y el suplemento B05 sigue pendiente. Se conserva el archivo validado B08-01.
+
 ## Última validación: B08-01 — 22 de octubre de 2026
 
 Base c7a0d29, rama audit/0.2.0-precran, versión 0.1.6.9000. Por indicación

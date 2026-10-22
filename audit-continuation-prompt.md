@@ -1,5 +1,30 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B08-02: estados multivida y C17 (22 de octubre de 2026)
+
+Base 9a7b441, misma rama y versión. C17 fue autorizada expresamente por el
+usuario y se implementó: mc_multilife_status exige floor(T)==K después de
+la comprobación/redondeo entero de K; tol no relaja el intervalo de T.
+No se repara T. Se evita overflow integer en K_status grande y se aclara
+el error de col_sim que colisiona con campos de salida. No se agregan
+columnas ni cambian firmas, alias, NA o agrupación de vidas válidas.
+58 comprobaciones nuevas y 60 objetos completos válidos idénticos a base;
+regresión previa: 16 fallos, un error, dos advertencias y 35 aprobadas.
+Registro: audit-monte-carlo-review.md; evidencia final: audit-precran-check.md.
+Suite fuente final: 6308 aprobadas, cero fallos/advertencias/omisiones.
+Suite instalada también 6308, sin fallos/advertencias/omisiones; build/check
+salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo. Ejemplos y cuatro
+viñetas aprobados; 393 fuentes verificadas y huella registrada. B08-02
+cerrado en su alcance; C17 implementada y probada, no volver a solicitarla.
+B08 completo sigue abierto, con 152 comprobaciones nuevas acumuladas.
+
+B08 sigue abierto. Seguir simulate_annuity_x/simulate_insurance_x y su
+motor lx privado; next-lx-engine-diagnosis.log de B08-01 confirma pérdida
+de razón 1e-600 y T=0 erróneo bajo CML. Luego valorar pagos/seguros/primas/
+pérdidas/reservas por trayectoria y resúmenes, con estados/NA y antitéticos.
+El suplemento B05 t_px/e_x sigue pendiente, sin confundirlo con B08.
+Artefactos b08-02 de la misma sesión; sin push, versión ni dependencias.
+
 ## B08-01: generadores de vidas (22 de octubre de 2026)
 
 El usuario pidió pasar a B08. Base c7a0d29, rama audit/0.2.0-precran,
