@@ -19,6 +19,7 @@
 #'   \code{"last"} (last survivor).
 #' @param tidy Logical. If \code{TRUE}, returns a tibble.
 #' @param check Logical. If \code{TRUE}, performs basic input checks.
+#'   Table consistency and scalar logical controls are always checked.
 #' @param tol Numeric tolerance for integer checks.
 #'
 #' @details
@@ -40,6 +41,11 @@
 #' Survival beyond that age is taken as zero, as in \code{t_px}; an open
 #' table therefore gives a truncated expectation. Missing initial ages or
 #' zero initial survivors give \code{NA}, including when \code{t = 0}.
+#' Tables must have unique consecutive annual integer ages and finite,
+#' nonnegative, nonincreasing \code{lx}. Observed \code{px}/\code{qx} must
+#' be probabilities consistent with annual \code{lx} ratios within
+#' \code{1e-10}; unknown probabilities may be \code{NA}. The age tolerance
+#' \code{tol} does not relax this mortality consistency threshold.
 #'
 #' **Key identity** (Finan, Example 57.4):
 #' \deqn{\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
@@ -97,6 +103,14 @@ e_xy <- function(
   type   <- match.arg(type)
   cohort <- match.arg(cohort)
 
+  for (name in c("check", "tidy")) {
+    value <- get(name, inherits = FALSE)
+    if (!is.logical(value) || length(value) != 1L || is.na(value))
+      stop("`", name, "` must be TRUE or FALSE.", call. = FALSE)
+  }
+  if (!is.numeric(tol) || length(tol) != 1L || !is.finite(tol) || tol < 0)
+    stop("`tol` must be a single finite nonnegative number.", call. = FALSE)
+
   # --- inherit frac from lifetable attribute if not supplied ---
   if (missing(frac)) {
     lt_frac <- attr(lt, "frac")
@@ -115,11 +129,14 @@ e_xy <- function(
   if (!is.data.frame(lt)) stop("`lt` must be a data.frame.")
   if (!all(c("x", "lx") %in% names(lt))) stop("`lt` must contain columns `x` and `lx`.")
   if (missing(x) || missing(y)) stop("`x` and `y` are required.")
+  .two_life_table(lt)
 
   x <- as.numeric(x); y <- as.numeric(y)
 
   if (check) {
     if (any(!is.finite(x)) || any(!is.finite(y))) stop("`x` and `y` must be finite.")
+    if (any(abs(x) > .Machine$integer.max) || any(abs(y) > .Machine$integer.max))
+      stop("`x` and `y` must be representable as integer ages.", call. = FALSE)
     if (any(abs(x - round(x)) > tol) || any(abs(y - round(y)) > tol)) {
       stop("`x` and `y` must be integer ages.")
     }
@@ -191,7 +208,7 @@ e_xy <- function(
         ex[j] <- 0
       } else {
         pk <- vapply(1:n_int, function(k) {
-          t_pxy(lt, xj, yj, t = k, frac = frac, status = status)
+          .two_life_survival(lt, lt, xj, yj, t = k, frac = frac, status = status)
         }, numeric(1))
         ex[j] <- if (anyNA(pk)) NA_real_ else sum(pk)
       }
@@ -208,7 +225,7 @@ e_xy <- function(
     areas <- vapply(starts, function(k) {
       stats::integrate(function(u) {
         vapply(u, function(uu) {
-          t_pxy(lt, xj, yj, t = uu, frac = frac, status = status)
+          .two_life_survival(lt, lt, xj, yj, t = uu, frac = frac, status = status)
         }, numeric(1))
       }, k, min(k + 1, tj_use), rel.tol = 1e-10)$value
     }, numeric(1))

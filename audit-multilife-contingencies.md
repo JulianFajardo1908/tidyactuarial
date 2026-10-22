@@ -63,3 +63,85 @@ Suite fuente e instalada: 5480 aprobadas, sin fallos/advertencias/omisiones;
 build/check definitivos salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo.
 Ejemplos y cuatro viñetas aprobados; 382 archivos verificados contra checkout.
 Huella y entorno en audit-precran-check.md. B07 permanece abierto.
+
+## B07-02: dominio anual y controles de supervivencia (21 de octubre de 2026)
+
+Base 6969b2d, misma rama y versión, Git limpio antes de editar. Se preservan
+B07-01 y las correcciones de condicionamiento ya registradas. Esta unidad
+revisa t_pxy/e_xy y sus llamadas desde insurance_xy/reserve_xy; no cierra
+todavía las cuatro valoraciones de contratos multivida.
+
+### Matemática, causa y reproducción
+
+Para una cohorte anual válida, lx es finito, no negativo y no creciente por
+edad; para lx>0, px=lx_siguiente/lx y qx=(lx-lx_siguiente)/lx. Las edades
+representan años consecutivos únicos. La supervivencia del estado no puede
+aumentar con el tiempo. t_pxy delegaba en t_px(check=FALSE) sin validar esas
+identidades. e_xy repetía la llamada y tampoco validaba la base anual.
+
+b07-02-diagnosis.log, contra 6969b2d: lx=(100,110,0) daba t_pxy(1)=1 y
+e_xy(t=1)=1 por el recorte del motor marginal. lx=(100,80,0), qx=(.9,1,NA)
+daba S_joint(.5)=.3025 y S_joint(1)=.64: supervivencia creciente al combinar
+dos bases contradictorias. Son defectos de dominio, no mortalidad inferida.
+
+Las edades fuera del rango integer se convertían en NA con advertencia;
+Inf podía provocar un if con valor ausente. e_xy aceptaba tidy=1 como FALSE
+y tolerancias/controles inválidos sin diagnóstico específico.
+
+### Diff acotado y compatibilidad
+
+Corrección A: helper privado utils-two-life-survival.R valida tablas antes
+de valorar: edades anuales únicas/consecutivas, lx finito/no negativo/no
+creciente, px/qx en [0,1] o NA y consistencia absoluta 1e-10 con lx y entre
+sí. La comparación usa el decremento directo, no 1-lx_siguiente/lx para qx.
+Los campos después de extinción no se interpretan como probabilidades
+condicionales observables; no se exige una razón 0/0. No se añade un año
+terminal ni se imputa qx faltante. Las tablas desordenadas válidas funcionan.
+
+El helper marginal compartido conserva exactamente las fórmulas anteriores
+y t_px(check=FALSE); e_xy valida una vez, no en cada nodo de cuadratura.
+No se modifica t_px ni se refactorizan los motores cerrados de B05/B06;
+el helper de pagos requiere una vida inicial válida y no se usa aquí porque
+alteraría la política existente de NA para estados iniciales desconocidos.
+Se validan edades representables y duración finita en t_pxy; e_xy comprueba
+rango de edades cuando check=TRUE y siempre controles lógicos y tol finito
+no negativo. check=FALSE conserva su omisión de comprobaciones de edades y
+duraciones; no autoriza una tabla contradictoria ni controles inválidos.
+tol de edad no relaja consistencia mortal. Clarificaciones B en R/Rd/NEWS.
+
+Sin cambios de firmas, columnas, reciclaje o dependencias; no hay decisión C
+nueva. Se preservan t_pxy(t=0)=1 incluso con edad inicial ausente, su
+truncación más allá de omega y e_xy=NA para edades ausentes/extinguidas,
+incluso t=0. No se uniforman esas convenciones entre funciones. El rechazo
+de datos incompatibles sustituye resultados antes plausibles pero sin modelo.
+
+### Evidencia y límites
+
+test-b07-survival-domain.R añade 62 comprobaciones: 33 rechazos de tablas,
+17 de controles/edades y 12 de identidades UDD independientes, supervivencia,
+esperanza curtata/completa, permutación de filas, NA y bordes preservados.
+La ejecución previa produjo 33 fallos, un error en el bloque de controles
+y cuatro advertencias; sus 12 comprobaciones de casos válidos ya pasaban.
+La ejecución corregida pasa las 62 sin advertencias. Referencias esperadas
+usan productos, sumas y la integral del polinomio UDD (1-.2u)(1-.5u), no
+otro consumidor del mismo motor. Evidencia anterior B07-01/e_xy/seguros
+diferidos/reservas multestado se conserva y se ejecuta con la suite completa.
+
+Artefactos en el directorio de la sesión: b07-02-before.log,
+b07-02-diagnosis.log y b07-02-final-tests.log. En subdirectorio b07-02,
+compatibility.log verifica 48 objetos ordinarios completos idénticos a
+6969b2d y dos firmas idénticas. Build, check y archivo final se registran en
+audit-precran-check.md, sin reutilizar el check de B07-01.
+
+Pendiente: precisión extrema marginal y de la cuadratura, atributos frac
+malformados, evaluación integral de anualidades, seguros, primas y reservas.
+Se preserva la truncación de tablas abiertas: no representa una esperanza
+vitalicia completa ni certifica extrapolación. No se promete soporte de
+edades fuera del rango integer, dependencia entre vidas o muertes continuas.
+Estado B07-02: confirmado, implementado, probado y cerrado para dominio anual
+y controles. Suite fuente/instalada: 5542 aprobadas, sin fallos/advertencias/
+omisiones. Archivo de 384 fuentes verificado, build/check salida 0, 0 ERROR,
+0 WARNING, 1 NOTE por desarrollo; ejemplos y cuatro viñetas aprobados. Huella,
+entorno y pausa del check registrados en audit-precran-check.md. B07 sigue
+abierto; no se declara revisada la precisión extrema ni el conjunto de seis
+funciones por estas dos unidades.

@@ -1,5 +1,13 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+B07-02 (21 de octubre): t_pxy/e_xy rechazan tablas anuales incompatibles,
+probabilidades contradictorias y coerciones/controles inválidos. Categoría A,
+con aclaraciones B de dominio; firmas, columnas y convenciones cero/NA/horizonte
+preservadas. e_xy valida la tabla una vez antes de suma/cuadratura; check=FALSE
+no omite coherencia mortal. 62 comprobaciones nuevas y 48 resultados ordinarios
+idénticos a 6969b2d. Ver audit-multilife-contingencies.md y check final en
+audit-precran-check.md. No se añade decisión C ni se amplían C02-C04.
+
 B07-01 (21 de octubre): t_pxy/e_xy normalizan el atributo CML a CF, igual
 que el argumento explícito. Corrección A del modelo heredado, aclaración B
 de documentación; no cambia firmas, columnas ni reciclaje. CF/CML no genera

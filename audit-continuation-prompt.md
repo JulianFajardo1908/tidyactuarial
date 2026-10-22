@@ -1,5 +1,26 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B07-02: dominio de probabilidades y esperanzas (21 de octubre de 2026)
+
+Base 6969b2d, rama audit/0.2.0-precran y versión 0.1.6.9000 verificadas,
+Git inicialmente limpio. t_pxy/e_xy validan ahora la base anual de edades,
+lx y px/qx antes de llamar al motor marginal. Se corrigen controles inválidos
+y coerción de edades fuera del rango integer; se conservan las convenciones
+propias de t=0, NA inicial y truncación. Ver audit-multilife-contingencies.md:
+62 comprobaciones nuevas, 48 resultados ordinarios completos idénticos y dos
+firmas preservadas. Validación final en audit-precran-check.md. Sin decisión C
+nueva, dependencias o cambio de versión. B07 sigue abierto: quedan precisión
+extrema de supervivencia/cuadratura y revisión integral de annuity_xy,
+insurance_xy, premium_xy y reserve_xy. No confundir el cierre de dominio
+con un cierre integral de esas funciones. Preservar todos los condicionamientos
+previos y B07-01. No push/publicación.
+Validación final B07-02: 5542 comprobaciones fuente/instaladas aprobadas,
+0 fallos/advertencias/omisiones; check salida 0, 0 ERROR, 0 WARNING, 1 NOTE
+por desarrollo. Ejemplos y cuatro viñetas aprobados, 384 fuentes verificadas
+y huella registrada. B07-02 cerrado para dominio anual y controles; B07 sigue
+abierto. Próxima revisión: precisión extrema de t_pxy/e_xy y valoración
+por estados/pagos/Woolhouse de annuity_xy, seguida de insurance_xy.
+
 ## B07-01: herencia CML (21 de octubre de 2026)
 
 Base 11eeb49 verificada, rama audit/0.2.0-precran, Git inicialmente limpio y

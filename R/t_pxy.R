@@ -36,6 +36,13 @@
 #' Individual survival probabilities \eqn{{}_tp_x} and \eqn{{}_tp_y} are
 #' computed via \code{\link{t_px}}, which supports fractional ages under UDD,
 #' constant force, and Balducci assumptions (Finan, Section 24).
+#' Tables must have unique consecutive annual integer ages and finite,
+#' nonnegative, nonincreasing \code{lx}. Supplied \code{px}/\code{qx} must
+#' lie in [0,1] and agree with each other and observed annual \code{lx}
+#' ratios within \code{1e-10}; unknown probabilities may be \code{NA}.
+#' Ages must fit R's integer range and durations must be finite.
+#' The established \code{t_px} horizon and zero-duration conventions apply;
+#' survival beyond the last recorded age is a truncation, not extrapolation.
 #'
 #' @return A single numeric value.
 #'
@@ -125,20 +132,24 @@ t_pxy <- function(
   }
 
   # --- checks ---
-  if (!is.numeric(x) || length(x) != 1L || is.na(x) ||
+  if (!is.numeric(x) || length(x) != 1L || !is.finite(x) ||
+      abs(x) > .Machine$integer.max ||
       abs(x - round(x)) > 1e-10) {
     stop("'x' must be a single integer age.")
   }
-  if (!is.numeric(y) || length(y) != 1L || is.na(y) ||
+  if (!is.numeric(y) || length(y) != 1L || !is.finite(y) ||
+      abs(y) > .Machine$integer.max ||
       abs(y - round(y)) > 1e-10) {
     stop("'y' must be a single integer age.")
   }
-  if (!is.numeric(t) || length(t) != 1L || is.na(t) || t < 0) {
-    stop("'t' must be a single nonnegative number.")
+  if (!is.numeric(t) || length(t) != 1L || !is.finite(t) || t < 0) {
+    stop("'t' must be a single finite nonnegative number.")
   }
 
   x <- as.integer(round(x))
   y <- as.integer(round(y))
+  .two_life_table(lt_x)
+  if (!identical(lt_x, lt_y)) .two_life_table(lt_y)
 
   # --- resolve fractional-age assumption ---
   if (missing(frac)) {
@@ -172,16 +183,5 @@ t_pxy <- function(
   }
 
   # --- compute marginal survival via t_px (Finan, Sec. 24) ---
-  px <- t_px(lt_x, x = x, t = t, frac = frac_use, check = FALSE)
-  py <- t_px(lt_y, x = y, t = t, frac = frac_use, check = FALSE)
-
-  if (is.na(px) || is.na(py)) return(NA_real_)
-
-  # --- joint-life: t_p_xy = t_p_x * t_p_y (Finan, Sec. 56) ---
-  p_joint <- px * py
-
-  if (status == "joint") return(p_joint)
-
-  # --- last survivor: t_p_{xy-bar} = t_p_x + t_p_y - t_p_xy (Finan, Sec. 57) ---
-  px + py - p_joint
+  .two_life_survival(lt_x, lt_y, x, y, t, frac_use, status)
 }

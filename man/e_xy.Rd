@@ -40,7 +40,8 @@ An inherited \code{"CML"} attribute is normalized to \code{"CF"}.}
 
 \item{tidy}{Logical. If \code{TRUE}, returns a tibble.}
 
-\item{check}{Logical. If \code{TRUE}, performs basic input checks.}
+\item{check}{Logical. If \code{TRUE}, performs basic input checks.
+Table consistency and scalar logical controls are always checked.}
 
 \item{tol}{Numeric tolerance for integer checks.}
 }
@@ -71,6 +72,11 @@ expectation and the younger life limits last-survivor expectation.
 Survival beyond that age is taken as zero, as in \code{t_px}; an open
 table therefore gives a truncated expectation. Missing initial ages or
 zero initial survivors give \code{NA}, including when \code{t = 0}.
+Tables must have unique consecutive annual integer ages and finite,
+nonnegative, nonincreasing \code{lx}. Observed \code{px}/\code{qx} must
+be probabilities consistent with annual \code{lx} ratios within
+\code{1e-10}; unknown probabilities may be \code{NA}. The age tolerance
+\code{tol} does not relax this mortality consistency threshold.
 
 **Key identity** (Finan, Example 57.4):
 \deqn{\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y

@@ -1,5 +1,10 @@
 # tidyactuarial 0.2.0
 
+* Two-life survival and expectancy reject incompatible annual ages, increasing
+  or invalid survivor counts and contradictory mortality probabilities.
+  Invalid controls and out-of-range age coercions fail explicitly; existing
+  initial-state, zero-duration and table-horizon conventions are preserved.
+
 * Two-life survival and expectancy normalize inherited `CML` attributes to
   constant force, including equivalent `CF`/`CML` attributes on two tables.
 

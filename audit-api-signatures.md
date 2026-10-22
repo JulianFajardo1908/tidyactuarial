@@ -1287,6 +1287,8 @@ Documentación: `man/e_xy.Rd`. Semántica: revisión por bloque pendiente salvo 
 
 B07-01: el atributo CML se normaliza a CF; firma y esquema preservados.
 Resto de revisión integral pendiente; ver audit-multilife-contingencies.md.
+B07-02: coherencia de tabla anual siempre validada (umbral mortal 1e-10),
+controles lógicos y tol finito no negativo; rango integer con check=TRUE.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
@@ -1389,6 +1391,8 @@ Documentación: `man/t_pxy.Rd`. Semántica: revisión por bloque pendiente salvo
 
 B07-01: atributos CF/CML equivalentes; se normalizan antes de compararlos.
 Firma y esquema preservados; resto de revisión integral pendiente.
+B07-02: tablas anuales coherentes, edades integer representables y duración
+finita requeridas; se preservan convenciones de t=0/NA/horizonte.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|

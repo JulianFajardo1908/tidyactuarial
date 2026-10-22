@@ -24,7 +24,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
 | B05 | Tablas, mortalidad y probabilidades | 12 | Revisión cerrada: 12/12 dentro del alcance de audit-life-tables-mortality.md; 139 comprobaciones nuevas y check final aprobado |
 | B06 | Contingencias de una vida y contratos | 14 | Revisión cerrada: 14/14 dentro del alcance y límites de audit-single-life-contracts.md; 638 comprobaciones nuevas, C12 autorizada y check final aprobado; gráfica previa preservada |
-| B07 | Contingencias multivida | 6 | En revisión: B07-01 herencia CML en t_pxy/e_xy; ver audit-multilife-contingencies.md; preservar evidencia previa |
+| B07 | Contingencias multivida | 6 | En revisión: B07-01 herencia CML y B07-02 dominio anual de t_pxy/e_xy; ver audit-multilife-contingencies.md; preservar evidencia previa |
 | B08 | Simulación de vidas y Monte Carlo | 11 | Pendiente de revisión integral; preservar evidencia previa |
 | B09 | Riesgo colectivo, coberturas y colas | 19 | Pendiente de revisión integral; preservar evidencia previa |
 

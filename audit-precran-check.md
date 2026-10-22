@@ -1,5 +1,42 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B07-02 — 21 de octubre de 2026
+
+Base 6969b2d, rama audit/0.2.0-precran, versión 0.1.6.9000. Dominio anual
+y controles t_pxy/e_xy; ver audit-multilife-contingencies.md. Se preservan
+las correcciones anteriores; no se declara cerrado el bloque B07.
+
+62 comprobaciones nuevas aprobadas; antes 33 fallos, un error en el bloque
+de controles y cuatro advertencias. 48 objetos ordinarios completos y dos
+firmas idénticos a la base. Roxygen2 regenerado y diff --check aprobado.
+Suite fuente e instalada: **5542 aprobadas, 0 fallos, 0 advertencias,
+0 omisiones**. Pruebas instaladas: 71 s. Build --no-manual y
+check --as-cran --no-manual: salida 0, **0 ERROR, 0 WARNING, 1 NOTE**,
+exclusivamente por versión de desarrollo. Ejemplos (25 s), cuatro viñetas
+y reconstrucción (13 s) aprobados. Una pausa prolongada del entorno durante
+la descarga del paquete figura como 41m en el log; esa fase aprobó y no se
+usa ese tiempo como referencia de rendimiento del código.
+
+Artefactos nuevos, preservando B07-01:
+C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b07-02/.
+Informes build.log, check.log, tidyactuarial.Rcheck/00check.log y
+tidyactuarial.Rcheck/tests/testthat.Rout. Evidencia fuente previa/corregida
+en b07-02-before.log, b07-02-diagnosis.log y b07-02-final-tests.log del
+directorio padre. compatibility.log compara los 48 resultados ordinarios.
+
+snapshot-verification.txt acredita 384 archivos R/tests/Rd/NEWS/NAMESPACE y
+campos originales de DESCRIPTION iguales al checkout normalizando CRLF y
+reformato de espacios de build en DESCRIPTION. Helper y regresión incluidos,
+AGENTS/audit-* excluidos. SHA256 de tidyactuarial_0.1.6.9000.tar.gz:
+FEF9866618ACB115C6ED5BA6FB9DAA024BF45971A7E7AB611C422569D2020E4F.
+
+Entorno: R 4.6.1/Windows, R_LIBS_USER 4.6 existente, LC_ALL/LC_CTYPE/LANG=C,
+Pandoc de RStudio, build/check fuera del aislamiento para acceso a biblioteca
+y directorio padre, _R_CHECK_CRAN_INCOMING_REMOTE_=false. Sin instalar
+dependencias, nueva CI remota, prueba actual de R mínimo, manual/PDF, versión
+nueva o push. B07-02 cerrado para dominio/controles; siguen precisión extrema
+y revisión integral de anualidades, seguros, primas y reservas multivida.
+
 ## Última validación: B07-01 — 21 de octubre de 2026
 
 Base 11eeb49, rama audit/0.2.0-precran, DESCRIPTION 0.1.6.9000.

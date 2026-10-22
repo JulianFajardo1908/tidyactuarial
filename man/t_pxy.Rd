@@ -52,6 +52,13 @@ as \emph{at least one} life is alive.
 Individual survival probabilities \eqn{{}_tp_x} and \eqn{{}_tp_y} are
 computed via \code{\link{t_px}}, which supports fractional ages under UDD,
 constant force, and Balducci assumptions (Finan, Section 24).
+Tables must have unique consecutive annual integer ages and finite,
+nonnegative, nonincreasing \code{lx}. Supplied \code{px}/\code{qx} must
+lie in [0,1] and agree with each other and observed annual \code{lx}
+ratios within \code{1e-10}; unknown probabilities may be \code{NA}.
+Ages must fit R's integer range and durations must be finite.
+The established \code{t_px} horizon and zero-duration conventions apply;
+survival beyond the last recorded age is a truncation, not extrapolation.
 }
 \examples{
 lt <- data.frame(
