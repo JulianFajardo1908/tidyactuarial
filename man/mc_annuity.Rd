@@ -157,6 +157,11 @@ payment counts; certain annuities remain independent of lifetime data.
 Fractional due payments use dates strictly before death; fractional
 immediate payments include a date exactly equal to the complete lifetime.
 Guaranteed payments remain payable throughout the guarantee period.
+Discounting retains the log accumulation rate from the original interest
+convention and combines monetary amounts with discount factors before
+losing their numerical range. At extreme rates, the displayed effective
+rate or annual discount factor may be infinite or rounded to a boundary;
+these metadata are not used to value the payments.
 
 For annual whole-life annuity-immediate, the simulated present value is
 \deqn{

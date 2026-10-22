@@ -116,6 +116,13 @@ needed the complete future lifetime \eqn{T_x}, and evaluates the present
 value random variable associated with classical life insurance benefits.
 
 
+Discounting uses the log accumulation rate from the original interest
+convention and combines the benefit amount with the discount factor.
+The displayed annual effective rate and discount factor may lose range
+at extreme rates; they are metadata rather than the valuation basis.
+A zero benefit remains zero for an observed eligible event, while a
+missing required lifetime continues to give a missing present value.
+
 This function follows the compact actuarial notation used throughout
 \code{tidyactuarial}: \code{i} is the interest-rate input, \code{i_type}
 is the interest-rate convention, \code{m} is the nominal conversion
@@ -149,6 +156,11 @@ The following insurance types are supported:
   \item \code{"endowment"}: death benefit is paid if death occurs within
   \code{n} years; otherwise, a survival benefit is paid at time \code{n}.
 }
+With \code{timing = "moment_of_death"}, death at exactly \code{n}
+belongs to the term component. A pure endowment requires \eqn{T_x > n},
+so term and pure-endowment benefits are disjoint and sum to the endowment
+benefit on every observed trajectory. The annual convention continues to
+partition the events using \eqn{K_x < n} and \eqn{K_x \ge n}.
 
 The function returns simulated present values, not only their expected value.
 Therefore the resulting column can be summarized with

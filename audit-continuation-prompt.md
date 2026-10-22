@@ -1,5 +1,42 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B08-04: valoración por trayectoria y C18 (22 de octubre de 2026)
+
+Base 692477d, Git inicialmente limpio, rama audit/0.2.0-precran y versión
+0.1.6.9000 conservadas. mc_annuity/mc_insurance usan tasas originales y
+helpers monetarios, conservando calendarios, NA, firmas y columnas. m grande
+no desborda integer; k/m se comprueban antes de coerción. Se preservan las
+correcciones previas de audit-multilife-monte-carlo.md.
+C18 fue autorizada expresamente: «Autorizar supervivencia estricta T>n».
+Solo pure_endowment con moment_of_death pasa a T>n; temporal T<=n y mixto
+se conservan, y su partición por trayectoria es exacta también en T=n.
+No volver a pedir C18 para ese alcance ni extenderla a mc_reserve.
+448 comprobaciones nuevas, 182 objetos ordinarios a 1e-12 y firmas idénticas.
+Regresión previa: 18 fallos, 6 errores, 3 advertencias, 398 aprobadas;
+errores anteriores abortan aserciones posteriores. Evidencia definitiva
+before-c18-final.log, regression-c18-final.log y final-c18-tests.log en
+b08-04; final-tests.log empezó antes de C18 y no certifica ese cambio.
+Registro y límites: audit-monte-carlo-review.md; validación/huella:
+audit-precran-check.md. B08 sigue abierto con 690 comprobaciones nuevas.
+Suite fuente e instalada finales: 6846 aprobadas, cero fallos/advertencias/
+omisiones. Build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo;
+ejemplos y cuatro viñetas aprobados. 395 archivos cotejados y SHA256 en
+audit-precran-check.md. B08-04 cerrado en su alcance documentado y guardado
+en commit local; B08 completo sigue abierto.
+
+Siguiente unidad B08-05: mc_premium/mc_loss, cociente de medias, unidades
+anualizada/cuota/coeficiente, agrupación, NA y equivalencia Z-qY. Revisar
+next-premium-loss-diagnosis.log: una fila con Z=1e-300,
+Y=annuity_payment=1e300 debería dar cuota 1e-300 y pérdida cero; hoy da
+cuota cero y pérdida 1e-300. Con escalas inversas da Inf/-Inf aunque la
+cuota/flujo monetario final sea finito. Coeficiente q puede no caber en
+double; separar esa limitación del valor representable de los importes.
+Después seguir mc_reserve: tasas originales, libros futuros, antes/después de pago,
+vigencia y su propio borde dotal T>=n (conciliar alcance antes de cambiar).
+Finalmente summary_mc y dependencia antitética. Suplemento B05 t_px/e_x
+pendiente, B01/B02 con pendientes formales y B09 integral sin iniciar.
+No reiniciar auditoría ni cambiar versión, rama o hacer push.
+
 ## B08-03: motor lx y valoración de wrappers (22 de octubre de 2026)
 
 Base f87706e, Git limpio al iniciar, rama audit/0.2.0-precran y versión

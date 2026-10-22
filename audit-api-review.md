@@ -1,5 +1,36 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## B08-04: valoración por trayectoria (22 de octubre de 2026)
+
+Base 692477d. Correcciones A: tasa log original y valoración monetaria
+en mc_annuity/mc_insurance, evitando efectiva anual fuera de rango, cero
+por infinito y coerción de m grande. k/m se validan antes de coerción.
+B: aclarar metadatos financieros extremos. Firmas, columnas, unidades,
+calendarios y NA conservados; 182 objetos ordinarios a 1e-12. C18 debajo
+es la única modificación de significado, autorizada antes de implementarse.
+448 comprobaciones; detalle y límites en audit-monte-carlo-review.md.
+
+## C18 autorizada: muerte exactamente al vencimiento en mc_insurance
+
+22 de octubre de 2026, B08-04, base 692477d. Confirmado sin interés:
+K=2, T=2, n=2, benefit=100 y timing="moment_of_death" devuelven 100
+para term, 100 para pure_endowment y 100 para endowment. Por tanto la
+descomposición por trayectoria endowment=term+pure_endowment falla en
+T=n. Para T<n y T>n los eventos ya son disjuntos. end_of_year conserva
+su partición K<n / K>=n y no presenta este solapamiento.
+
+Propuesta concreta: conservar muerte cubierta T<=n en term/endowment y
+cambiar solo pure_endowment con moment_of_death a supervivencia T>n.
+La muerte en n pagaría por el temporal, no por el componente supervivencia;
+el dotal mixto seguiría pagando una vez. No cambia firma, importe ni fecha
+del dotal mixto, ni el calendario anual, ni la inclusión del temporal.
+Impacto: pure_endowment pasa de benefit*exp(-g*n) a cero solo cuando T=n.
+Cambiar este borde público requiere autorización específica del usuario
+según el prompt maestro, sección 4. El usuario autorizó expresamente
+«Autorizar supervivencia estricta T>n» durante B08-04; implementada con
+pruebas de partición por trayectoria y fronteras antes/en/después de n.
+No extiende por analogía el cambio a mc_reserve u otros consumidores.
+
 ## B08-03: wrappers de simulación (22 de octubre de 2026)
 
 Base f87706e. Correcciones A: razón lx en log para CML/Balducci, tasas
@@ -257,6 +288,7 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C15 | C | annuity_xy second exige pesos positivos y siguiente año en ambos bordes; falta de soporte produce error | Autorizada expresamente e implementada en B07-04; none/first conservan calendario |
 | C16 | C | reserve_xy incluye la cuota vencida programada exactamente en t y en madurez, como reserva antes de prima | Autorizada expresamente e implementada en B07-05; recursión sin ampliación |
 | C17 | C | mc_multilife_status exige exactamente K<=T<K+1 tras la comprobación entera de K; tol deja de relajar las fronteras de T | Autorizada expresamente el 22 de octubre e implementada en B08-02; firma/esquema conservados |
+| C18 | C | mc_insurance pure_endowment al momento de muerte exige T>n, disjunto del temporal T<=n | Autorizada expresamente el 22 de octubre e implementada en B08-04; calendario anual y dotal mixto conservados |
 
 ## Mejoras compatibles y categorías A realizadas
 

@@ -1,5 +1,10 @@
 # Matriz global de firmas públicas
 
+B08-04: mc_annuity/mc_insurance conservan firmas/esquemas y 182 resultados
+ordinarios a 1e-12. Tasas originales y valoración monetaria comprobadas;
+C18 autorizada cambia solo el dotal puro al momento de muerte en T=n.
+448 comprobaciones nuevas; alcance y límites en audit-monte-carlo-review.md.
+
 B08-03: simulate_annuity_x/simulate_insurance_x conservan firmas y esquemas;
 172 objetos ordinarios completos coinciden a 1e-12. Motor lx, valoración
 monetaria y límites documentados en audit-monte-carlo-review.md; B08 abierto.
@@ -1442,7 +1447,9 @@ finita requeridas; se preservan convenciones de t=0/NA/horizonte.
 
 ## B08 — mc_annuity
 
-Documentación: `man/mc_annuity.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/mc_annuity.Rd`. B08-04: seis tipos y calendarios/NA,
+tasas originales y valores monetarios contrastados con flujos explícitos;
+firma/esquema conservados. Límites en audit-monte-carlo-review.md.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
@@ -1464,7 +1471,9 @@ Documentación: `man/mc_annuity.Rd`. Semántica: revisión por bloque pendiente 
 
 ## B08 — mc_insurance
 
-Documentación: `man/mc_insurance.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/mc_insurance.Rd`. B08-04: seis tipos y eventos/NA,
+tasas originales y valores monetarios probados. C18 autorizada exige T>n
+en el dotal puro al momento de muerte; firma/esquema conservados.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|

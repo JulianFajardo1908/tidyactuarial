@@ -16,12 +16,84 @@ fracciones CML, vidas faltantes, calendarios y coherencia K/T.
 | mc_multilife_status | Min/max de K y T; mismos identificadores de vidas por simulación | B08-02: C17 y conservación de estados/almacenamiento/columnas probadas; límites abajo |
 | simulate_annuity_x | Valor presente de pagos por trayectoria; motor lx propio | B08-03: motor lx, valoración monetaria, calendario y RNG comprobados; límites abajo |
 | simulate_insurance_x | Seguro anual por trayectoria; motor lx propio | B08-03: masas, censura, valoración monetaria y RNG comprobados; límites abajo |
-| mc_annuity | Pagos elegibles por trayectoria, garantías, diferimientos y NA | Pendiente; preservar correcciones previas |
-| mc_insurance | Evento y momento del beneficio por trayectoria | Pendiente; preservar validación K/T previa |
-| mc_premium | Cociente de medias de pares Z,Y; prima anualizada/cuota | Pendiente de revisión integral |
-| mc_loss | Z menos prima en la unidad de Y | Pendiente de revisión integral |
+| mc_annuity | Pagos elegibles por trayectoria, garantías, diferimientos y NA | B08-04: calendarios/NA/RNG y valoración monetaria comprobados; límites abajo |
+| mc_insurance | Evento y momento del beneficio por trayectoria | B08-04: seis tipos, tasas originales y C18 autorizada comprobados; límites abajo |
+| mc_premium | Cociente de medias de pares Z,Y; prima anualizada/cuota | Precisión de conversión confirmada y pendiente; revisar integralmente en B08-05 |
+| mc_loss | Z menos prima en la unidad de Y | Precisión de conversión confirmada y pendiente; revisar integralmente en B08-05 |
 | mc_reserve | Flujos futuros por trayectoria; antes/después de pago; vigencia | Pendiente; preservar calendarios y NA ya corregidos |
 | summary_mc | Momentos, error estándar, cuantiles y colas empíricas | Pendiente; preservar TVaR empírica ya corregida |
+
+## B08-04 — valoración por trayectoria y C18 (22 de octubre de 2026)
+
+Base 692477d, Git limpio al comenzar, rama audit/0.2.0-precran y versión
+0.1.6.9000 conservadas. Se concilian primero las correcciones existentes de
+audit-multilife-monte-carlo.md: NA, garantía con T=0, retícula h+j/k,
+fronteras exactas de supervivencia y pares K/T. No se rehacen ni deshacen.
+
+### Matemática y causa raíz
+
+Para una trayectoria observada, Y=c*sum(exp(-g*t_j)) en fechas elegibles;
+Z=b*exp(-g*t) si ocurre el evento, cero si no ocurre, NA si falta la vida
+requerida. g proviene de la tasa original: log1p(i) efectiva, m*log1p(i/m)
+nominal interés, -m*log1p(-i/m) nominal descuento, fuerza directamente.
+Ambos consumidores exigían efectiva anual finita >-1 antes de valorar.
+Fuerza 720 y b=1e300, muerte de fin de año uno: el flujo finito es
+exp(log(1e300)-720)=2.032231e-13, pero se rechazaba. La renta fraccionaria
+con pago en .5 también tenía valor finito 4.508027e143 y era rechazada.
+
+Diff acotado: usar .interest_basis y helpers monetarios existentes, sin
+cambiar .mc_effective_rate compartido ni calendarios. Los factores log de
+fechas cero se fijan en cero antes de multiplicar, incluso si g desborda.
+Importes conocidos cero conservan cero; NA no se convierte en cero. Las
+columnas efectiva/v siguen como metadatos previos y pueden perder rango;
+no se usan para valorar. m grande conserva double y k/m se validan antes
+de redondear a cero o desbordar integer. No se añaden columnas o parámetros.
+
+### C18 autorizada y partición de los seguros
+
+Con K=T=n=2, i=0 y b=100, el temporal y el dotal puro al momento de muerte
+pagaban ambos 100, pero el mixto pagaba 100. El usuario autorizó expresamente
+«Autorizar supervivencia estricta T>n». Solo pure_endowment con ese timing
+cambia de T>=n a T>n; la muerte en n sigue cubierta por term/endowment.
+Ahora Z_endowment=Z_term+Z_pure_endowment en cada trayectoria observada.
+El calendario anual mantiene K<n frente a K>=n. Se documenta la frontera
+y el impacto sobre llamadas anteriores, incluidas beneficio/fecha/indicador.
+
+### Referencias independientes y alcance
+
+test-b08-path-valuators.R añade 448 comprobaciones: enumeración explícita
+de 72 calendarios (seis tipos, anual/trimestral, due/immediate y tres tasas),
+36 libros de eventos de seguro (seis tipos, ambos timings y tres tasas),
+garantías, h fraccionario, fronteras exactas y NA. Valores/conteos/primera y
+última fecha contra retículas independientes, sin helpers de calendario como
+oráculo. Más fuerzas extremas con importes compensatorios, cero, t=0, m/k,
+partición C18 y RNG sin sorteos. Contra base: 18 fallos, 6 errores,
+3 advertencias y 398 aprobadas; errores previos abortan otras aserciones.
+Después pasan las 448. 182 objetos ordinarios completos coinciden a 1e-12,
+incluidas las cinco convenciones/especificaciones financieras de la muestra,
+alias obsoletos y columnas personalizadas; las dos firmas son idénticas.
+La comparación evita T=n en el caso C18, cuyo cambio se verifica aparte.
+
+Límites: se conservan calendarios materializados, sin certificar tamaños
+arbitrarios ni fechas inferiores a la resolución double. .cash_flow_sum
+recupera rango de cada flujo representable; no se promete exactitud relativa
+para sumas subnormales. Las valoraciones siguen condicionadas a los K/T
+recibidos, sin inferir un estado multivida a partir de una etiqueta.
+mc_reserve tiene un motor propio con T>=n en el dotal puro: conciliar ese
+borde y sus convenciones de vigencia en su unidad; C18 no autoriza cambiarlo
+automáticamente. Lo mismo rige para sus tasas originales pendientes.
+
+B08 permanece abierto, ahora con 690 comprobaciones nuevas acumuladas.
+Siguiente unidad: mc_premium/mc_loss, equivalencia y unidades; luego reservas
+y resúmenes/antitéticos. Suplemento B05 sigue pendiente.
+next-premium-loss-diagnosis.log reproduce pérdida de cuota/flujo final
+representable por q que subdesborda/desborda (escalas 1e-300 y 1e300).
+No se ha corregido aún; separar el límite de q del valor monetario final.
+Validación integral, huella y entorno en audit-precran-check.md.
+Artefactos b08-04 de la sesión
+del 21; before-c18-final.log y regression-c18-final.log son definitivos.
+before.log/after.log y before-final.log/regression-final.log conservan etapas
+previas a C18; final-tests.log inició antes de C18 y no certifica el cambio.
 
 ## B08-03 — motor lx y valoración de los dos wrappers (22 de octubre)
 

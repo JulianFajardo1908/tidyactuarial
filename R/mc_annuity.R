@@ -87,6 +87,11 @@
 #' Fractional due payments use dates strictly before death; fractional
 #' immediate payments include a date exactly equal to the complete lifetime.
 #' Guaranteed payments remain payable throughout the guarantee period.
+#' Discounting retains the log accumulation rate from the original interest
+#' convention and combines monetary amounts with discount factors before
+#' losing their numerical range. At extreme rates, the displayed effective
+#' rate or annual discount factor may be infinite or rounded to a boundary;
+#' these metadata are not used to value the payments.
 #'
 #' For annual whole-life annuity-immediate, the simulated present value is
 #' \deqn{
@@ -447,6 +452,10 @@ mc_annuity <- function(
   .mc_assert_numeric_scalar(payment, "payment", min = 0)
   .mc_assert_positive_integer(k, "k")
   .mc_assert_positive_integer(m, "m")
+  if (k > .Machine$integer.max || round(k) < 1)
+    stop("`k` must round to a positive integer within the supported range.", call. = FALSE)
+  if (round(m) < 1)
+    stop("`m` must round to a positive integer.", call. = FALSE)
   .mc_assert_numeric_column(.data, col_K, "col_K")
   .mc_assert_character_scalar(col_T, "col_T")
   .mc_assert_character_scalar(col_pv, "col_pv")
@@ -478,7 +487,7 @@ mc_annuity <- function(
   }
 
   k <- as.integer(round(k))
-  m <- as.integer(round(m))
+  m <- if (m <= .Machine$integer.max) as.integer(round(m)) else round(m)
 
   assert_payment_grid <- function(value, name) {
     if (!is.null(value) &&
@@ -516,20 +525,13 @@ mc_annuity <- function(
     }
   }
 
-  i_effective <- .mc_effective_rate(
+  interest <- .interest_basis(
     i = i,
     i_type = i_type,
     m = m
   )
 
-  if (!is.finite(i_effective) || i_effective <= -1) {
-    stop(
-      "The annual effective interest rate implied by `i`, `i_type`, and `m` ",
-      "must be greater than -1.",
-      call. = FALSE
-    )
-  }
-
+  i_effective <- interest$effective
   v <- 1 / (1 + i_effective)
 
   Kx <- .data[[col_K]]
@@ -585,7 +587,10 @@ mc_annuity <- function(
   pv_annuity <- vapply(
     payment_times,
     function(times) {
-      payment_per_payment * sum(v^times)
+      log_discount <- numeric(length(times))
+      nonzero <- times != 0
+      log_discount[nonzero] <- -interest$growth * times[nonzero]
+      .cash_flow_sum(rep(payment_per_payment, length(times)), log_discount)
     },
     numeric(1)
   )

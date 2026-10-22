@@ -1,5 +1,16 @@
 # tidyactuarial 0.2.0
 
+* Approved C18: moment-of-death pure endowments in `mc_insurance` require
+  survival strictly beyond maturity. A death exactly at maturity belongs
+  to the term component, making term plus pure endowment equal endowment
+  on each trajectory. The annual curtate convention is retained.
+
+* Pathwise Monte Carlo annuities and insurance retain the original log
+  interest rate and representable monetary cash flows at extreme rates.
+  Zero amounts, payments at time zero, unknown lifetimes and existing payment
+  calendars retain their meanings. Large conversion frequencies preserve
+  numeric storage; invalid payment frequencies fail before integer coercion.
+
 * Single-life simulation wrappers retain finite constant-force lifetimes when
   annual survivor ratios underflow. Valuation uses the original interest
   convention and stable monetary annuity sums, including small period rates.

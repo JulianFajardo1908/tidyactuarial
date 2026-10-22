@@ -1,5 +1,40 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B08-04 — 22 de octubre de 2026
+
+Base 692477d, rama audit/0.2.0-precran y versión 0.1.6.9000. Tasas
+originales y valoración monetaria en mc_annuity/mc_insurance, validación
+de k/m antes de coerción y C18 autorizada: dotal puro al momento de muerte
+exige T>n. Firmas, columnas y calendarios previos conservados; detalle,
+regresiones independientes e impacto público en audit-monte-carlo-review.md.
+
+448 comprobaciones nuevas aprobadas. Contra base: 18 fallos, 6 errores,
+3 advertencias y 398 aprobadas; errores previos abortan otras aserciones.
+182 objetos ordinarios completos coinciden a 1e-12; dos firmas idénticas.
+Roxygen2 y suite fuente definitiva: **6846 aprobadas, 0 fallos,
+0 advertencias, 0 omisiones**. Inventario comprobado: 102 nombres,
+974 apariciones de parámetros y cero descripciones ausentes/vacías.
+snapshot-verification.txt comprueba 395 archivos R/tests/man/NEWS/NAMESPACE
+y campos originales DESCRIPTION iguales al checkout, normalizando CRLF y
+espacios de build; audit/AGENTS excluidos. SHA256 del archivo fuente:
+F04F4DA50850DED975C07577D780CF56161A423A4606B6A7FB2E28EE577686E0.
+Build --no-manual y check --as-cran --no-manual finales: salida 0,
+**0 ERROR, 0 WARNING, 1 NOTE**, solo por versión de desarrollo. Suite
+instalada: **6846 aprobadas, 0 fallos/advertencias/omisiones** (74 s).
+Ejemplos (23 s), cuatro viñetas y reconstrucción (11 s) aprobados.
+Informes build.log, check.log, tidyactuarial.Rcheck/00check.log y
+tests/testthat.Rout. Entorno Windows/R 4.6.1, biblioteca existente,
+locale C y Pandoc de RStudio; recepción remota CRAN desactivada, sin
+manual/PDF, nueva CI remota ni prueba de R mínimo. diff --check aprobado.
+B08-04 cerrado en su alcance documentado; B08 completo y suplemento B05
+pendientes. Sin dependencias, cambio de versión ni push.
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b08-04/.
+before-c18-final.log, regression-c18-final.log y final-c18-tests.log son
+definitivos. before/after.log y before-final/regression-final.log son etapas
+anteriores a C18. final-tests.log inició antes de C18 y no lo certifica.
+compatibility.R/log compara casos fuera de la frontera cuyo cambio se
+contrasta por separado; c18-diagnosis.log reproduce el solapamiento previo.
+
 ## Última validación: B08-03 — 22 de octubre de 2026
 
 Base f87706e, rama audit/0.2.0-precran y versión 0.1.6.9000. Motor lx de

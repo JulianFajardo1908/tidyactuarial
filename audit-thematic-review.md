@@ -25,7 +25,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B05 | Tablas, mortalidad y probabilidades | 12 | Cierre histórico preservado: 12/12 y 139 comprobaciones; nuevo suplemento de precisión t_px/e_x confirmado en B07-06, pendiente antes de B08 |
 | B06 | Contingencias de una vida y contratos | 14 | Revisión cerrada: 14/14 dentro del alcance y límites de audit-single-life-contracts.md; 638 comprobaciones nuevas, C12 autorizada y check final aprobado; gráfica previa preservada |
 | B07 | Contingencias multivida | 6 | Revisión cerrada: seis nombres dentro de los estados/identidades/límites documentados en B07-06; 702 comprobaciones nuevas, C13-C16 autorizadas y check final aprobado. Suplemento B05 pendiente separado |
-| B08 | Simulación de vidas y Monte Carlo | 11 | En revisión: B08-01/02/03 cubren generadores, estados multivida y wrappers lx/valoración; C17 autorizada, 242 comprobaciones nuevas acumuladas. Bloque abierto; ver audit-monte-carlo-review.md |
+| B08 | Simulación de vidas y Monte Carlo | 11 | En revisión: B08-01/02/03/04 cubren generadores, estados y valoración de wrappers/por trayectoria; C17/C18 autorizadas, 690 comprobaciones nuevas acumuladas. Bloque abierto; ver audit-monte-carlo-review.md |
 | B09 | Riesgo colectivo, coberturas y colas | 19 | Pendiente de revisión integral; preservar evidencia previa |
 
 102 nombres asignados exactamente una vez: 101 funciones y el alias A_xj.
@@ -135,8 +135,8 @@ Sigue B06; esto no da por aprobados los bloques posteriores.
 | B07 | `premium_xy` | `R/premium_xy.R` | `test-premium_gross-v2.R`, `test-premium_xy-v2.R`, `test-reserve_xy-v2.R`, `test-smoke.R` |
 | B07 | `reserve_xy` | `R/reserve_xy.R` | `test-reserve-xy-state-regressions.R`, `test-reserve_xy-two-tables.R`, `test-reserve_xy-v2.R` |
 | B07 | `t_pxy` | `R/t_pxy.R` | `test-insurance-xy-identities.R`, `test-multilife-survival-expectancy.R` |
-| B08 | `mc_annuity` | `R/mc_annuity.R` | `test-cran-multilife-workflow.R`, `test-mc-lifetime-consistency.R`, `test-mc_annuity-v2.R` |
-| B08 | `mc_insurance` | `R/mc_insurance.R` | `test-mc-lifetime-consistency.R`, `test-mc_insurance-v2.R` |
+| B08 | `mc_annuity` | `R/mc_annuity.R` | `test-cran-multilife-workflow.R`, `test-mc-lifetime-consistency.R`, `test-mc_annuity-v2.R`, `test-b08-path-valuators.R` |
+| B08 | `mc_insurance` | `R/mc_insurance.R` | `test-mc-lifetime-consistency.R`, `test-mc_insurance-v2.R`, `test-b08-path-valuators.R` |
 | B08 | `mc_loss` | `R/mc_loss.R` | `test-mc_loss-v2.R`, `test-mc_premium-v2.R` |
 | B08 | `mc_multilife_status` | `R/mc_multilife_status.R` | `test-cran-multilife-workflow.R`, `test-mc_multilife_status-v2.R` |
 | B08 | `mc_premium` | `R/mc_premium.R` | `test-mc_premium-v2.R` |
