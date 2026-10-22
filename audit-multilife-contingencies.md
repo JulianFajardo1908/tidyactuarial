@@ -368,3 +368,125 @@ reproduce premium_xy pure_endowment joint con lx=(1e16,2,0), i=0,n=1,
 beneficio 1e16 y primas anuales due: devuelve 0 frente a 4e-16. La base de
 primas es uno y la referencia es beneficio*(2/1e16)^2. Confirmado y pendiente
 de implementación/pruebas en B07-05; no se presenta como corregido aquí.
+
+## B07-05: primas y reservas multivida (21 de octubre de 2026)
+
+Base c126ccb, Git limpio, misma rama audit/0.2.0-precran y versión
+0.1.6.9000. Se retoma el dotal puro ya diagnosticado, sin reabrir B07-01/04,
+ni los condicionamientos y recursión multestado previamente corregidos.
+
+### Identidades y condicionamiento
+
+Para T=h+n, dotal puro desde emisión: B exp(-gT)S_status(T). No se paga
+por muerte. La prima anualizada satisface P*a=B_APV, donde a paga 1/k en
+cada fecha elegible; cada cuota monetaria es P/k. El inicio de primas issue
+o deferred determina el origen 0 o h; n_prem puede ser fraccionario alineado.
+Se mantiene el estado contractual de prima joint/last seleccionado.
+
+La reserva prospectiva a t es APV_t(beneficios)-APV_t(primas), condicionada
+a AMBAS vidas vivas en t, como antes. Last no significa un superviviente
+observado desconocido. Dotal puro usa entonces las tablas desde x+t,y+t;
+en cambio, al valorar desde emisión conserva la mezcla de estados tras h.
+
+Para la recursión conjunta antes de prima:
+V11(t)=v[p_x p_y V11(t+1)+(q_x+p_x q_y)B_t]-P_t.
+Para last se conserva:
+V11(t)=v[p_xp_y V11'+p_xq_y V10'+q_xp_y V01'+q_xq_y B_t]-P_t;
+V10(t)=v[p_x V10'+q_x B_t]-P_t y análoga para V01. B_t=0 en dotal puro.
+Las condiciones terminales existentes son B para dotales/dotales puros y
+cero para temporal/whole; el valor prospectivo terminal mantiene su convención.
+No se añade un estado inicial observado 10/01 ni se amplían restricciones:
+recursive sigue h=0,k=1,due,issue. La prima nula hace exactamente cero la
+obligación de primas, aunque su factor unitario no sea representable.
+
+### Defectos demostrados y diff
+
+Con lx=(1e16,2,0), i=0, joint,n=1,B=1e16, el APV dotal puro es 4e-16.
+premium_xy y reserve_xy con P=0 daban cero al restar endowment-term. La
+corrección A añade un helper privado de supervivencia monetaria en
+utils-two-life-insurance.R, compartido por ambos consumidores. Reutiliza
+la base anual por estados, valida horizonte y tasa original y combina
+supervivencia, descuento e importe en log; no añade un tipo público nuevo.
+
+La recursión conjunta hacia adelante cancelaba flujos casi iguales antes de
+dividir por una supervivencia pequeña: con esa tabla, term n=2,B=1e16,P=0,
+V(1) daba cero frente a 1e16. Se aplica la misma identidad hacia atrás, sin
+dividir por probabilidades pequeñas ni forzar la curva desde un saldo de
+emisión redondeado. Last conserva 11/10/01 y su algoritmo hacia atrás.
+Ambas recursiones usan p y q directos de lx, no q=1-p, y log interest
+original, evitando equivalentes anuales desbordados/redondeados a -1.
+Cada transición pondera antes de exponenciar y omite estados imposibles.
+
+Force=720 producía reservas last cero cuando el importe descontado era
+representable; las probabilidades de muerte diminutas también se perdían.
+Con P=0, n=20, force=-40, B=1e-300 y supervivencia uno hasta madurez, se
+rechazaba una reserva 2.726375e47 porque se intentaba valorar una anualidad
+unitaria de primas infinita. Ahora no se evalúa ese componente nulo.
+zero-premium-before.log conserva la reproducción antes de esta corrección
+adicional; se reconstruyó y revalidó el archivo final después de añadirla.
+
+Se preservan enteros ordinarios, usando double redondeado para m/h/k/n
+fuera del rango integer. Se rechazan grillas n_prem*k no finitas, edades y
+t no representables y tablas anuales incompatibles incluso si solo se pide
+el valor terminal. No se uniforman controles check/tol ni políticas n=0.
+
+### C16 autorizada y calendarios
+
+El usuario autorizó expresamente incluir la prima vencida programada en t,
+para cumplir reserva ANTES de prima. Antes, annuity immediate desde t
+omitía esa cuota. Con lx=(100,80,40,0), i=.05,joint,term n=2,B=100,P=10,
+k=1,t=1 daba 69.04762 frente a 59.04762 por libro antes de prima.
+En la vía prospectiva se añade P/k si timing=immediate, t>inicio y t<=fin
+de primas. Como t e inicio son enteros y k entero, esas son precisamente
+las fechas originales elegibles; no se inventa otro calendario. Esto incluye
+la última cuota en madurez si existe. El futuro conserva none/first/second;
+la cuota actual es exacta. No se extiende la recursión ni se cambia P anualizada.
+
+### Evidencia y compatibilidad
+
+test-b07-premium-reserve-precision.R añade 142 comprobaciones: seis de dotal
+puro pequeño/rango, dos de prima cero y factor no representable, siete de
+recursión/rates/decrementos, 25 de C16 incluyendo período de primas fraccionario,
+96 de libros UDD independientes con joint/last, k=1/2/4, h=0/1 e inicios
+issue/deferred, y seis de almacenamiento/tabla/grillas. Las referencias usan
+conteos, interpolación y sumas de fechas; no invocan seguros/anualidades del
+paquete para construir el valor esperado. Se conservan regresiones multestado
+anteriores y las conexiones de B07-03/04.
+
+before-final.log contra c126ccb muestra 33 fallos, tres errores y una
+advertencia; 99 comprobaciones válidas ya pasaban. Los errores detienen
+bloques antes de completar sus aserciones, no se cuentan como aprobados.
+136 resultados completos ordinarios concuerdan a tolerancia 1e-12, incluidas
+primas, reservas prospectivas/recursivas, tablas y formato audit. Dos firmas
+idénticas, columnas/aliases/clases preservados. Cambian C16 y los extremos
+numéricos demostrados; no hay nuevas dependencias ni versión.
+
+Artefactos en b07-05 del directorio de la sesión: before.log, diagnosis.log,
+before-final.log, compatibility.R, zero-premium-before.log, final-tests.log,
+build/check/snapshot. initial-tests.log (5965 comprobaciones) y
+draft-before-zero-premium.tar.gz se conservan como borrador anterior al último
+fix; no son evidencia del código final. domain-before.log comprueba además
+el rechazo de tablas incompatibles que antes se aceptaban al pedir solo
+la reserva terminal. Validación definitiva y huella en audit-precran-check.md.
+B07-05 confirmado, implementado, probado y cerrado en su alcance: suite
+fuente/instalada 5967 aprobadas, sin fallos/advertencias/omisiones; build/check
+salida 0, 0 ERROR, 0 WARNING y 1 NOTE por desarrollo. Ejemplos y cuatro viñetas
+aprobados, 390 fuentes verificadas. B07 completo todavía no está cerrado.
+
+### Límites y continuación
+
+Una póliza por llamada, primas anuales/fraccionarias según API existente y
+reserva en duraciones enteras desde el estado 11. No se amplían estados
+observados, recursión subanual/diferida ni casos cero autorizados en otras
+funciones. Para primas no nulas se sigue requiriendo APV de la anualidad
+positivo, finito y representable: no se promete recuperar cualquier cociente
+de dos APV fuera del rango double. Tampoco se recupera en general una
+reserva condicional intermedia infinita multiplicada por probabilidad diminuta;
+la valoración prospectiva puede ser preferible en esos casos.
+Se conservan restricciones de horizonte, tratamiento de tablas abiertas y
+condiciones terminales anteriores salvo la cuota C16 explícitamente autorizada.
+
+B07 sigue abierto: conciliar inventario y límites de las seis funciones,
+extremos de t_pxy/e_xy y los cocientes de equivalencia fuera de rango antes
+de declarar cierre integral. No se presenta este subconjunto como máxima
+generalidad ni como auditoría externa conciliada.

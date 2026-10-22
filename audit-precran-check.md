@@ -1,5 +1,48 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B07-05 — 21 de octubre de 2026
+
+Base c126ccb, rama audit/0.2.0-precran, versión 0.1.6.9000. Dotal puro
+directo, primas fraccionarias y reservas prospectivas/recursivas; C16
+autorizada e implementada. Fórmulas, condicionamiento, límites y evidencia
+en audit-multilife-contingencies.md. No se declara cerrado todo B07.
+
+142 comprobaciones nuevas aprobadas. Contra base, el archivo final produce
+33 fallos, tres errores y una advertencia, con 99 aprobadas; los errores
+originales abortan algunos bloques antes de completar sus aserciones.
+136 resultados ordinarios completos a tolerancia 1e-12, dos firmas idénticas.
+Los probes domain-before.log comprueban además tablas incompatibles que antes
+devolvían 100 en t terminal y ahora se rechazan. Roxygen2 y diff --check
+aprobados. Suite fuente e instalada: **5967 aprobadas, 0 fallos,
+0 advertencias, 0 omisiones**; instalada 72 s.
+
+Build --no-manual y check --as-cran --no-manual definitivos: salida 0,
+**0 ERROR, 0 WARNING, 1 NOTE**, exclusivamente por versión de desarrollo.
+Ejemplos (24 s), cuatro viñetas y reconstrucción (11 s) aprobados.
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b07-05/.
+Informes build.log, check.log, tidyactuarial.Rcheck/00check.log y
+tidyactuarial.Rcheck/tests/testthat.Rout. final-tests.log es la suite fuente
+definitiva; before-final.log incluye regresión y compatibilidad con c126ccb.
+
+initial-tests.log (5965), initial-build.log y draft-before-zero-premium.tar.gz
+se conservan como evidencia intermedia ANTERIOR al fix adicional P=0; no
+sustituyen la validación final. zero-premium-before.log reproduce ese error.
+Se reconstruyó el archivo y se repitió la suite completa al añadir el fix.
+No se sobrescribieron artefactos de unidades anteriores.
+
+snapshot-verification.txt acredita 390 archivos R/tests/Rd/NEWS/NAMESPACE y
+campos originales DESCRIPTION iguales al checkout normalizando CRLF y el
+reformato de espacios de build en DESCRIPTION. Regresión nueva incluida,
+AGENTS/audit-* excluidos. SHA256 del archivo fuente definitivo:
+28A86B568E19AF2B065E304B26EF00CD87E75610341FA1C0F966EB85294B1B6A.
+
+Entorno: Windows/R 4.6.1, R_LIBS_USER 4.6 existente, LC_ALL/LC_CTYPE/LANG=C,
+Pandoc de RStudio, build/check fuera del aislamiento y
+_R_CHECK_CRAN_INCOMING_REMOTE_=false. Sin dependencias nuevas, CI remota,
+prueba actual de R mínimo, manual/PDF, versión o push. B07-05 cerrado en
+su alcance; siguen conciliación integral B07, precisión propia t_pxy/e_xy y
+límites de equivalencia/estados condicionales fuera del rango double.
+
 ## Última validación: B07-04 — 21 de octubre de 2026
 
 Base 61fa813, rama audit/0.2.0-precran, versión 0.1.6.9000. Anualidades

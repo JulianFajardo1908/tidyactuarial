@@ -1338,6 +1338,10 @@ pure_endowment ni estado inicial 10/01. Ver audit-multilife-contingencies.md.
 
 Documentación: `man/premium_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
 
+B07-05: dotal puro por supervivencia monetaria directa y equivalencia P*a=B;
+P anualizada, cuota P/k, firma y seis columnas summary preservadas. Una póliza
+por llamada; denominador positivo/finito/representable todavía requerido.
+
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `lt` | `<obligatorio>` | A life table, a list of two life tables list(lt_x, lt_y) , or a two-life contract created with life_contract . |
@@ -1366,6 +1370,11 @@ Documentación: `man/premium_xy.Rd`. Semántica: revisión por bloque pendiente 
 ## B07 — reserve_xy
 
 Documentación: `man/reserve_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+
+B07-05: dotal puro directo, ambas recursiones hacia atrás con tasa original,
+last conserva 11/10/01; C16 autorizada incluye prima vencida exactamente en t.
+Estado condicionante 11 y restricciones de recursión preservados. Firma y
+esquemas sin cambios; ver audit-multilife-contingencies.md para alcance/límites.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|

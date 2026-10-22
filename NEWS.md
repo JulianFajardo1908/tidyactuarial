@@ -1,5 +1,12 @@
 # tidyactuarial 0.2.0
 
+* Two-life pure-endowment premiums and reserves use direct discounted status
+  survival, retaining small benefits lost by subtracting insurance APVs.
+  Joint reserves now use backward conditional recursion; last-survivor reserves
+  retain their three-state model. Both use direct annual decrements and original
+  log interest. Approved C16 includes immediate premiums due exactly at the
+  reserve date, including a scheduled last installment at maturity.
+
 * Two-life annuities retain tiny designated-reversion probabilities, original
   log interest and representable signed monetary payments on fractional grids.
   Annual-table and payment-grid consistency are checked explicitly. Approved

@@ -63,3 +63,20 @@
        },
        horizon = if (status == "joint") min(a$horizon, b$horizon) else max(a$horizon, b$horizon))
 }
+
+# A pure endowment is a survival payment, not the subtraction of two APVs.
+.two_life_pure_endowment <- function(lt,x,y,n,h,benefit,i,i_type,m,status) {
+  tables<-if(is.data.frame(lt)) list(lt,lt) else lt
+  if (!is.list(tables) || length(tables)!=2L ||
+      !all(vapply(tables,is.data.frame,logical(1))))
+    stop("`lt` must be one life table or a list of two.",call.=FALSE)
+  state<-.two_life_insurance_basis(tables[[1]],tables[[2]],x,y,status)
+  start<-state$survival(h)
+  if (start == -Inf) return(0)
+  if (!is.finite(h+n) || h+n>state$horizon)
+    stop("Pure-endowment maturity exceeds the supported status horizon.",call.=FALSE)
+  survival<-state$survival(h+n)
+  basis<-.interest_basis(i_type,i,m)
+  if (survival == -Inf) return(0)
+  .cash_flow_value(benefit,survival-basis$growth*(h+n))
+}

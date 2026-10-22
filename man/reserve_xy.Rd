@@ -103,11 +103,21 @@ Because [annuity_xy()] assigns amount `1 / k` to each payment,
 `P` is annualized and the actual installment is `P / k`.
 
 Reserves are measured immediately before a premium payable at duration
-`t`. Pure endowments are valued as endowment APV minus term-insurance APV.
+`t`. With immediate premiums this includes the installment scheduled exactly
+at `t`, including a last installment at maturity. Future installments use
+the selected annuity method; the current installment is an exact `P / k`.
+Pure endowments use direct discounted survival to maturity, avoiding a
+subtraction of nearly equal insurance values.
 Both lives are assumed alive at the valuation duration, under independent
 mortality. In particular, `status = "last"` selects the insured event;
 it does not condition on an unspecified surviving life. Last-survivor
 recursion tracks the both-alive and each single-survivor state separately.
+Both recursive statuses use backward conditional transition identities,
+direct annual `lx` decrements and the original log interest basis. This
+avoids forward cancellation and loss from an effective-rate conversion.
+Unreachable transitions contribute exactly zero. The recursion's existing
+timing and deferment restrictions are retained. Conditional states whose
+reserves themselves overflow double precision are not generally recoverable.
 }
 \seealso{
 [premium_xy()], [annuity_xy()], [insurance_xy()], [reserve_x()]

@@ -1,5 +1,43 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B07-05: primas y reservas (21 de octubre de 2026)
+
+Base c126ccb, misma rama audit/0.2.0-precran y versión 0.1.6.9000; Git
+inicialmente limpio. Se corrigió el dotal puro diagnosticado en B07-04:
+premium_xy/reserve_xy valoran B exp(-g(h+n))S(h+n) directamente mediante
+helper privado compartido, sin restar endowment-term. Se mantiene la mezcla
+desde emisión para beneficios diferidos y el condicionamiento de reserva
+en AMBAS vidas vivas en t. No inferir un estado 10/01 por status=last.
+
+Recursión joint ahora hacia atrás con la misma identidad; last conserva
+11/10/01. Ambas usan decrementos lx directos y log interest original, sin
+ampliar restricciones h=0,k=1,due,issue. P=0 omite exactamente el componente
+de primas, incluso si el factor unitario desbordaría. Validación de tablas,
+grillas y coerciones grandes reforzada, con firmas y columnas preservadas.
+
+C16 autorizada expresamente antes de implementar: la reserva prospectiva
+incluye la cuota vencida programada exactamente en t y la última cuota en
+madurez si corresponde. P sigue anualizada y la cuota es P/k. No se cambia
+la aproximación de los pagos futuros ni se amplía la recursión. Ver propuesta
+y aprobación en audit-api-review.md, pruebas/fórmulas en
+audit-multilife-contingencies.md B07-05.
+
+142 comprobaciones nuevas; suite fuente final 5967 aprobadas, sin fallos/
+advertencias/omisiones. 136 resultados ordinarios completos a 1e-12 y dos
+firmas idénticas. La suite inicial 5965 y su tar se preservan como borrador
+anterior al fix de prima cero; no usarlos como validación del código final.
+Archivo final de 390 fuentes verificado. Resultado definitivo y huella en
+audit-precran-check.md. B07 sigue abierto: conciliar seis funciones, sus
+horizontes/estados/límites, extremos de t_pxy/e_xy y equivalencia con APV fuera
+de rango antes de declarar cierre integral. Sin nuevas dependencias, versión,
+push/publicación ni extensión de autorizaciones anteriores.
+Validación definitiva B07-05: 5967 comprobaciones fuente/instaladas aprobadas,
+0 fallos/advertencias/omisiones; build/check salida 0, 0 ERROR, 0 WARNING,
+1 NOTE por desarrollo. Ejemplos y cuatro viñetas aprobados; 390 fuentes
+verificadas y huella registrada. B07-05 cerrado en su alcance; B07 sigue
+abierto para conciliación integral. No repetir el diagnóstico del dotal puro
+como pendiente: está corregido y probado en ambos consumidores.
+
 ## B07-04: anualidades/reversiones (21 de octubre de 2026)
 
 Base 61fa813, rama y versión 0.1.6.9000 verificadas, Git inicialmente limpio.

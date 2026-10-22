@@ -1,5 +1,25 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## C16 autorizada: prima vencida en la fecha de reserva multivida
+
+Base c126ccb. reserve_xy documenta reserva inmediatamente antes de la prima
+en t, pero para timing=immediate reinicia la anualidad en t y omite el pago
+que vence en esa fecha. Con lx=(100,80,40,0), x=y=60, i=.05, temporal n=2,
+B=100,P=10,k=1,t=1 devuelve 69.04762. El libro antes de prima da 59.04762:
+beneficio 100*.75/1.05 menos prima actual 10 y prima final 10*.25/1.05.
+
+El usuario autorizó expresamente C16 antes de implementar: en la vía prospectiva, filtrar
+las fechas del calendario original por fecha>=t, incluyendo el pago vencido
+en t y, si corresponde, el último pago en la madurez. Mantener estado 11 en t,
+P anualizada/cuota P/k, firmas y esquemas. No ampliar la recursión (sigue h=0,
+k=1,due,issue), ni redefinir Woolhouse fuera del calendario aproximado vigente.
+En madurez immediate la reserva antes de prima es beneficio menos P/k cuando
+esa prima está programada, en vez de beneficio íntegro. No afecta due ordinario.
+Las mejoras numéricas del dotal puro y recursión pueden avanzar por separado.
+La implementación añade la cuota actual exacta al futuro calendario de la
+anualidad; no sustituye la aproximación elegida de pagos futuros ni amplía
+la recursión. Regresiones y límites: audit-multilife-contingencies.md B07-05.
+
 ## C15 autorizada: bordes de Woolhouse second en annuity_xy (B07-04)
 
 Base 61fa813. Con lx=100 exp(-.2j), j=0:2, x=y=60, i=.05, n=2,
@@ -173,6 +193,7 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C13 | C | insurance_xy whole exige extinción observada del estado, sin pago terminal implícito en tabla abierta | Autorizada expresamente tras aclaración e implementada en B07-03 |
 | C14 | C | insurance_xy endowment n=0 paga al vencimiento h si el estado sobrevive; term vacío conserva cero | Autorizada expresamente e implementada en B07-03 |
 | C15 | C | annuity_xy second exige pesos positivos y siguiente año en ambos bordes; falta de soporte produce error | Autorizada expresamente e implementada en B07-04; none/first conservan calendario |
+| C16 | C | reserve_xy incluye la cuota vencida programada exactamente en t y en madurez, como reserva antes de prima | Autorizada expresamente e implementada en B07-05; recursión sin ampliación |
 
 ## Mejoras compatibles y categorías A realizadas
 
