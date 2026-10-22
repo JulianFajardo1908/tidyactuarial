@@ -1,5 +1,37 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B07-03: seguros por estados y conexiones (21 de octubre de 2026)
+
+Base 161cc3b, Git limpio y versión 0.1.6.9000. El usuario reordenó B07:
+insurance_xy por estados, después relaciones con anualidades incluidas las
+reversionarias, primas anuales/fraccionarias y reservas bivariadas. Respetar
+ese orden y todas las correcciones previas. insurance_xy suma ahora masas
+anuales disjuntas de primer/segundo fallecimiento desde emisión, con tasa
+original log y producto monetario estable. Mantiene esquema y una póliza
+por llamada. No invoca annuity_xy como motor: sus identidades son contraste.
+
+C13 y C14 autorizadas expresamente: whole exige mortalidad observada hasta
+extinción del estado, sin convertir saldo de tabla abierta en pago terminal;
+endowment n=0 paga beneficio descontado si el estado sobrevive a h. Term n=0
+sigue cero. No añadir pure_endowment ni estados iniciales 10/01 a la API:
+esas extensiones no forman parte de estas aprobaciones. Ver audit-api-review.md.
+
+188 comprobaciones nuevas: 142 seguros/estados/bordes/extremos y 46 relaciones
+independientes con anualidades, reversiones designadas, primas k=1/2 y reservas
+prospectivas/recursivas según soporte. Suite fuente 5730 aprobadas, sin
+fallos/advertencias/omisiones. 36 resultados ordinarios completos concuerdan
+con base a 1e-12 y firma intacta. Archivo de 387 fuentes verificado; resultado
+definitivo del check en audit-precran-check.md. Detalles matemáticos y límites
+en audit-multilife-contingencies.md B07-03. B07 permanece abierto: continuar
+annuity_xy (beneficios por estados/reversionarias, pagos/Woolhouse/extremos),
+luego premium_xy y reserve_xy, sin confundir comprobaciones cruzadas ordinarias
+con cierre integral. Dotal puro por diferencia sigue pendiente de estabilidad
+propia; también precisión extrema de t_pxy/e_xy. Sin push/publicación ni versión.
+Validación final B07-03: suite fuente/instalada 5730 aprobadas, 0 fallos/
+advertencias/omisiones; build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por
+desarrollo. Ejemplos y cuatro viñetas aprobados, 387 fuentes verificadas y
+huella registrada. B07-03 cerrado en su alcance; B07 sigue abierto.
+
 ## B07-02: dominio de probabilidades y esperanzas (21 de octubre de 2026)
 
 Base 6969b2d, rama audit/0.2.0-precran y versión 0.1.6.9000 verificadas,

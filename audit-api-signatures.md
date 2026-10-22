@@ -1307,6 +1307,11 @@ controles lógicos y tol finito no negativo; rango integer con check=TRUE.
 
 Documentación: `man/insurance_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
 
+B07-03: firma/esquema intactos, valoración anual desde estado inicial 11 por
+masas de transición. C13 autorizada exige extinción observada para whole;
+C14 autorizada paga endowment n=0 en h si sobrevive el estado. No admite k,
+pure_endowment ni estado inicial 10/01. Ver audit-multilife-contingencies.md.
+
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `lt` | `<obligatorio>` | A life table, a list of two life tables list(lt_x, lt_y) , or a tidyact_life_contract object created by life_contract . Each life table must contain columns x and lx . |

@@ -1,5 +1,11 @@
 # tidyactuarial 0.2.0
 
+* Two-life insurance sums disjoint annual first/second-death transition masses
+  from issue, retaining tiny mortality and representable monetary values with
+  extreme interest. State conditioning and existing audit columns are retained.
+  Approved C13 rejects whole insurance without observed status extinction;
+  approved C14 pays a zero-term endowment at its deferred maturity.
+
 * Two-life survival and expectancy reject incompatible annual ages, increasing
   or invalid survivor counts and contradictory mortality probabilities.
   Invalid controls and out-of-range age coercions fail explicitly; existing

@@ -1,5 +1,33 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## C13/C14 autorizadas: bordes de insurance_xy (B07-03)
+
+Base 161cc3b. El usuario pidió comenzar por todos los estados del seguro y
+después relaciones con anualidades (incluidas reversionarias), primas y
+reservas. No se interpreta ese orden como aprobación de cambios de significado.
+
+C13, autorizada expresamente por el usuario tras aclarar la implicación:
+con dos tablas abiertas lx=(100,80,60),
+i=0 y status=last, whole devuelve 1 aunque solo .16 corresponde a segundos
+fallecimientos observados y .84 es supervivencia residual al horizonte. La
+identidad 1-d*a suma implícitamente esa masa como beneficio terminal. Propuesta:
+rechazar whole cuando la supervivencia del estado al horizonte sea positiva,
+sin inferir muerte o extrapolación. Para la parte observada, el usuario puede
+pedir term con horizonte explícito; para el beneficio terminal, endowment.
+No se añaden argumentos ni tipos. Las tablas cerradas siguen funcionando.
+Alternativa no recomendada sin diseño: redefinir whole como temporal truncado.
+
+C14, autorizada expresamente por el usuario: endowment n=0 devuelve 0; matemáticamente
+debería pagar benefit*exp(-g*h)*S(h), al vencer en h si el estado sobrevive.
+Propuesta: aplicar esa regla, conservar term n=0 en cero, conservar esquema
+y survival_to_maturity=1 condicionado en h. No añadir pure_endowment a la
+firma en esta unidad. C10 aprobó este borde solo en insurance_x, no aquí.
+
+Estas dos propuestas no impiden corregir autónomamente cancelación numérica,
+validación y valoración por masas de transición que conservan el modelo.
+Ambas implementadas en B07-03 sin nuevos parámetros ni tipos; pruebas y
+validación final en audit-multilife-contingencies.md/audit-precran-check.md.
+
 B07-02 (21 de octubre): t_pxy/e_xy rechazan tablas anuales incompatibles,
 probabilidades contradictorias y coerciones/controles inválidos. Categoría A,
 con aclaraciones B de dominio; firmas, columnas y convenciones cero/NA/horizonte

@@ -145,3 +145,120 @@ omisiones. Archivo de 384 fuentes verificado, build/check salida 0, 0 ERROR,
 entorno y pausa del check registrados en audit-precran-check.md. B07 sigue
 abierto; no se declara revisada la precisión extrema ni el conjunto de seis
 funciones por estas dos unidades.
+
+## B07-03: seguros por estados y relaciones conectadas (21 de octubre de 2026)
+
+Base 161cc3b, Git limpio, audit/0.2.0-precran y 0.1.6.9000 verificados.
+El usuario cambió expresamente el orden: insurance_xy primero, después
+relaciones con anualidades incluidas reversionarias, primas y reservas.
+Se preservan la corrección del seguro diferido y la recursión multestado.
+
+### Modelo y todos los estados
+
+Insurance_xy recibe ambas vidas vivas (11), independientes. 10 significa
+solo x viva, 01 solo y viva, 00 ninguna. No recibe un estado observado inicial
+10/01; una etiqueta last no lo identifica. Con Sx,Sy y Qx=1-Sx,Qy=1-Sy,
+las masas de ocupación son SxSy, SxQy, QxSy y QxQy. No son beneficios.
+
+Desde 11, las transiciones anuales tienen pesos px*py, px*qy, qx*py y qx*qy.
+Desde 10 continúan px o salen qx; desde 01 continúan py o salen qy; 00 es
+absorbente. Joint paga una vez al salir de 11; last paga al entrar en 00,
+incluida la salida 11->00 por ambas muertes en el mismo intervalo anual.
+No se observa el orden intranual ni se paga al instante exacto de muerte.
+
+Sean Dx(t),Dy(t) masas marginales de muerte en (t,t+1] desde emisión.
+La masa de primer fallecimiento es Dx(t)Sy(t)+Sx(t+1)Dy(t), suma disjunta.
+La de segundo es Dx(t)Qy(t)+Qx(t)Dy(t)+Dx(t)Dy(t), desde 10,01,11.
+APV temporal = B sum(t=h..h+n-1) exp(-g(t+1))*masa(t). Dotal añade
+B exp(-g(h+n))*S_status(h+n). Whole extiende hasta extinción observada.
+El diferimiento excluye muertes desencadenantes anteriores o en h; no
+reinicia ambas vidas en h, particularmente en last. Las columnas existentes
+de anualidad/madurez siguen condicionadas en S_status(h)>0, no en 11 en h.
+
+### Defectos, decisiones y diff
+
+Con lx=(1e16,1e16-2,0) y otra vida que sobrevive el primer año, i=0,
+B=1e16, term n=1 daba 2.220446 en vez de 2. Con ambas tablas iguales,
+last y B=1e32 daba 0 en vez de 4. Con i=1e20 un temporal podía dar APV
+negativo por cancelar 1-d*a-v^n*S(n). Tasas originales muy altas y/o
+supervivencia subdesbordada convertían prestaciones representables en cero.
+
+Corrección A: insurance_xy suma las masas disjuntas directamente. Helper
+privado utils-two-life-insurance.R calcula supervivencia, muerte acumulada
+y decrementos desde lx, y combina en log con la tasa original y el beneficio.
+El beneficio monetario se valora directamente, no multiplicando una APV
+unitaria ya subdesbordada. La columna unitaria puede ser cero aunque el APV
+monetario sea representable; no se inventan dígitos en esa columna. La
+anualidad de auditoría se obtiene por sumas condicionales independientes,
+no invocando annuity_xy como motor del seguro. No cambian firmas/columnas.
+Se conserva el tipo integer ordinario y double redondeado para m/h/n grandes,
+evitando coerción NA; x/y deben caber en integer. CML heredado normaliza a CF.
+
+C13 autorizada expresamente por el usuario tras explicar la implicación:
+whole con supervivencia residual no fuerza un pago terminal al final de
+una tabla abierta. Ahora exige extinción observada del estado. Joint admite
+que una marginal cierre mientras la otra siga abierta si la extinción
+conjunta está soportada; last requiere ambas marginales cerradas. En tablas
+abiertas lx=(100,80,60), last a i=0 devolvía 1 pese a que .84 era saldo
+superviviente. Ahora whole da error, term n=2 da .16 y endowment n=2 da 1.
+No se extrapola un intervalo de una marginal abierta más corta. La muerte
+terminal desconocida no es una prestación dotal.
+
+C14 autorizada expresamente: endowment n=0 paga B exp(-gh)S(h), term n=0
+conserva cero. Se preservan columnas y survival_to_maturity=1 condicionado
+en h. No se extiende C10 por analogía; se obtuvo autorización específica.
+
+### Pruebas independientes y relaciones posteriores
+
+test-b07-insurance-states.R tiene 142 comprobaciones: 108 comparaciones de
+APV/columna unitaria con enumeración de parejas de años de muerte (ambas
+tablas cerradas, edades diferentes, tipos, estados, h=0:2 y tasas positivas,
+cero/negativas); seis extremos numéricos; ocho trayectorias deterministas
+11->01->00, 11->10->00 y 11->00; trece bordes C14 y siete C13/horizontes.
+El archivo final contra 161cc3b reproduce 17 fallos y 125 aprobadas sin errores
+(before-final.log). La reproducción inicial antes de ampliar C13/C14 fue
+cinco fallos numéricos, preservada en before.log. No se cuenta como nuevo
+el condicionamiento corregido el 16 de octubre: su regresión sigue pasando.
+
+test-b07-linked-valuations.R aporta 46 comprobaciones adicionales. Para
+pagos k=1,2,4 y due/immediate, una interpolación lineal UDD propia construye
+los flujos 11,10,01. Se verifica la reversión a y como renta sobre y menos
+conjunta y last como suma de los tres estados. Esto distingue reversión
+designada, superviviente único y joint-and-survivor; no se cambia la etiqueta
+histórica reversionary de annuity_multi. No se añade una renta nueva.
+
+Un libro independiente de muertes y pagos verifica primas anualizadas para
+k=1,2 y reservas desde ambas vidas vivas a t=0:2. Prospectiva y recursiva se
+comparan con el libro para primas anuales; con primas semestrales se comprueba
+prospectiva según soporte vigente. La recursión de last conserva 11/10/01;
+no se sustituye por una continuidad escalar. Ninguna prueba usa el seguro o
+la anualidad del paquete para construir su referencia monetaria esperada.
+36 resultados tidy ordinarios concuerdan con 161cc3b a tolerancia 1e-12,
+incluidas clases, columnas, aliases y condicionamientos; firma idéntica.
+
+Artefactos en el subdirectorio b07-03 de la sesión: before.log,
+before-final.log, compatibility.R, final-tests.log, build/check/snapshot.
+Los artefactos B07-01/02 se conservan. Validación definitiva y huella en
+audit-precran-check.md, sin reutilizar checks anteriores.
+
+### Límites y continuación
+
+Insurance_xy soporta whole/term/endowment anuales, dos vidas independientes,
+edad/h enteros, un beneficio escalar no negativo y una póliza por llamada.
+No tiene k ni type=pure_endowment; premium_xy/reserve_xy construyen el dotal
+puro por diferencia de seguros, pendiente de estabilidad extrema propia.
+No admite un estado observado inicial 10/01, dependencia estocástica ni pago
+al momento de muerte. No se agregan parámetros para suplir esas limitaciones.
+Los campos de auditoría no se prometen finitos si su verdadero valor excede
+double, aunque el APV monetario final sea representable.
+
+Estas relaciones ordinarias no cierran todavía annuity_xy, premium_xy ni
+reserve_xy: siguen Woolhouse, generalidad numérica de pagos/beneficios por
+estado, dotales puros por diferencia, primas fraccionarias extremas y reservas
+fuera del subconjunto contrastado. También sigue la precisión extrema de
+t_pxy/e_xy. Estado B07-03: confirmado, implementado, probado y cerrado dentro
+del alcance documentado. Suite fuente e instalada: 5730 aprobadas, sin fallos,
+advertencias u omisiones; check salida 0, 0 ERROR, 0 WARNING y 1 NOTE por
+versión de desarrollo. Ejemplos y cuatro viñetas aprobados; archivo de 387
+fuentes verificado y huella/entorno en audit-precran-check.md. B07 continúa
+abierto y las comprobaciones conectadas no cierran sus otros consumidores.

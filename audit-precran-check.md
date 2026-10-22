@@ -1,5 +1,43 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B07-03 — 21 de octubre de 2026
+
+Base 161cc3b, rama audit/0.2.0-precran, versión 0.1.6.9000. Seguro por masas
+disjuntas de estados y relaciones con anualidades/reversionarias, primas y
+reservas: audit-multilife-contingencies.md. C13/C14 autorizadas expresamente
+por el usuario e implementadas sin ampliar firmas ni añadir tipos.
+
+188 comprobaciones nuevas, todas aprobadas: 142 en test-b07-insurance-states.R
+y 46 en test-b07-linked-valuations.R. Contra la base, el archivo definitivo
+del seguro reproduce 17 fallos y 125 aprobadas, sin errores. 36 resultados
+tidy ordinarios completos concuerdan a tolerancia 1e-12 y firma idéntica.
+Roxygen2 regenerado, git diff --check aprobado. Suite fuente e instalada:
+**5730 aprobadas, 0 fallos, 0 advertencias, 0 omisiones**; instalada 142 s.
+
+Build --no-manual y check --as-cran --no-manual: salida 0, **0 ERROR,
+0 WARNING, 1 NOTE**, exclusivamente por versión de desarrollo. Ejemplos
+(41 s), cuatro viñetas y reconstrucción (20 s) aprobados. Artefactos nuevos:
+C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b07-03/.
+Informes: build.log, check.log, tidyactuarial.Rcheck/00check.log y
+tidyactuarial.Rcheck/tests/testthat.Rout. before.log conserva la reproducción
+inicial; before-final.log contiene la comparación final con 161cc3b, incluida
+la conciliación de 36 resultados; final-tests.log es la suite fuente.
+
+snapshot-verification.txt acredita 387 archivos R/tests/Rd/NEWS/NAMESPACE y
+campos originales de DESCRIPTION iguales al checkout, normalizando CRLF y
+reformato de espacios de build en DESCRIPTION. Helper y dos regresiones
+nuevos incluidos, AGENTS/audit-* excluidos. SHA256 del archivo fuente:
+6EBCE0FE44F7963C43C843F3C03395E44F145A30CAD433C4A29D85F2D63FF777.
+
+Entorno: Windows/R 4.6.1, R_LIBS_USER 4.6 existente, LC_ALL/LC_CTYPE/LANG=C,
+Pandoc de RStudio y _R_CHECK_CRAN_INCOMING_REMOTE_=false. Build/check fuera
+del aislamiento para acceder al directorio padre y biblioteca existentes.
+Sin instalar dependencias, nueva CI remota, prueba actual de R mínimo,
+manual/PDF, cambio de versión o push. B07-03 cerrado dentro del alcance
+documentado; B07 sigue abierto. Continúa annuity_xy (estados/reversiones,
+pagos, Woolhouse y extremos), después premium_xy y reserve_xy; no confundir
+comprobaciones cruzadas ordinarias con cierre integral de esos consumidores.
+
 ## Última validación: B07-02 — 21 de octubre de 2026
 
 Base 6969b2d, rama audit/0.2.0-precran, versión 0.1.6.9000. Dominio anual
