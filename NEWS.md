@@ -1,5 +1,12 @@
 # tidyactuarial 0.2.0
 
+* Two-life annuities retain tiny designated-reversion probabilities, original
+  log interest and representable signed monetary payments on fractional grids.
+  Annual-table and payment-grid consistency are checked explicitly. Approved
+  C15 requires supported positive Woolhouse second-order borders and following
+  years; negative approximations warn without clipping. State meanings and
+  open-table truncation limits are documented without changing the signature.
+
 * Two-life insurance sums disjoint annual first/second-death transition masses
   from issue, retaining tiny mortality and representable monetary values with
   extreme interest. State conditioning and existing audit columns are retained.

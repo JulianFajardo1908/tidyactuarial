@@ -262,3 +262,109 @@ advertencias u omisiones; check salida 0, 0 ERROR, 0 WARNING y 1 NOTE por
 versión de desarrollo. Ejemplos y cuatro viñetas aprobados; archivo de 387
 fuentes verificado y huella/entorno en audit-precran-check.md. B07 continúa
 abierto y las comprobaciones conectadas no cierran sus otros consumidores.
+
+## B07-04: anualidades y reversiones fraccionarias (21 de octubre de 2026)
+
+Base 61fa813, Git limpio, misma rama audit/0.2.0-precran y versión
+0.1.6.9000. Se sigue el orden solicitado: después de seguros por estados,
+annuity_xy y sus relaciones; no se reabren las correcciones anteriores.
+
+### Modelo e identidades
+
+Ambas vidas están vivas e independientes en emisión. En una fecha t, los
+estados 11/10/01 tienen probabilidades SxSy, SxQy, QxSy, con Q acumulada
+de muerte. El pago esperado es w(t)=b11*SxSy+b10*SxQy+b01*QxSy.
+Los b pueden tener signo; w no es en general una probabilidad. Para una
+reversión designada a y se usa b=(0,0,1), para cualquiera de los supervivientes
+únicos (0,1,1), y para joint-and-survivor b=(1,alpha,alpha). No se cambia
+el significado histórico de reversionary en annuity_multi ni se añade un tipo.
+
+La renta exacta anualizada vale sum(j) exp(-g*(h+j/k))*w(h+j/k)/k,
+j=0..nk-1 due y j=1..nk immediate. h es entero y n puede ser fraccionario
+con nk entero. La identidad de reversión a y = renta y - renta conjunta
+se conserva, pero no se usa esa resta para calcular eventos diminutos.
+
+Con F(t)=exp(-gt)w(t), Woolhouse first resta (1-1/k)(F(h)-F(h+n))/2
+a la renta anual due. Second resta además (1-1/k^2)/12 por
+[(g+eta(h))F(h)-(g+eta(h+n))F(h+n)]. eta(t)=-log(w(t+1)/w(t)) es una
+estimación anual hacia adelante, no la fuerza instantánea exacta. Immediate
+resta (F(h)-F(h+n))/k. Ya existían ambos extremos temporales: no se presenta
+esa fórmula previamente correcta como hallazgo nuevo de esta unidad.
+
+### Defectos reproducidos y cambios
+
+lx=(1e16,1e16-2,0), otra vida con supervivencia uno el primer año, beneficio
+revertido a y de 1e16, i=0,n=1: devolvía 2.220446 frente a 2. A medio año,
+el error se amplificaba por restar 1-S redondeada. Una supervivencia 1e-400
+multiplicada por beneficio 1e300 daba cero en lugar de 1e-100. Force=720
+rechazaba una tasa válida porque su efectivo equivalente desbordaba; force
+negativa grande podía redondear ese equivalente a -1. Con una cohorte
+extinguida desde el primer año, i=-.9999999999999999 y n=100 daba NaN por
+0*Inf, frente a cero. diagnosis.log, before-final.log y zero-discount-probe.log
+conservan reproducciones sobre 61fa813 y el contraste corregido.
+
+Corrección A: helper privado utils-two-life-annuity.R reutiliza la base de
+pagos fraccionarios de B06 y calcula Q(t) como decremento acumulado directo
+de lx más la masa fraccionaria del año actual. No resta supervivencia de uno.
+Conserva logs de los tres estados hasta combinarlos con beneficio firmado,
+descuento y división por k; los estados imposibles son ceros exactos. Se
+reutilizan .interest_basis y los helpers monetarios existentes. Se comprueban
+tablas anuales compatibles, edades, grillas finitas/representables y límites
+integer; m/h/k/n grandes conservan double redondeado cuando procede, sin NA
+por coerción. No se altera el motor de seguros ni otras funciones cerradas.
+
+C15 autorizada expresamente antes de implementar: second exige pesos
+positivos y soporte del año siguiente en ambos bordes. Antes, con tabla
+lx=100 exp(-.2j), j=0:2, joint, i=.05,n=2,k=2,due/CF, suponía fuerza cero
+al final sin datos y daba 1.463482 frente a 1.473671 con el modelo analítico
+extendido. Ahora da un error recomendando none/first si no se aporta soporte.
+No se extiende la aprobación C12 de annuity_multi por analogía. Se advierten
+aproximaciones negativas sin recortarlas, y no se amplía Woolhouse a beneficios
+por estados. Documentación aclara ocupaciones, pagos y estimación de fuerza.
+
+### Evidencia y compatibilidad
+
+95 comprobaciones nuevas en test-b07-annuity-precision.R: seis de reversiones
+diminutas anuales/fraccionarias con UDD/CF/Balducci, cuatro de rango monetario,
+tasa original y signos, 17 de fórmulas Woolhouse/bordes, cinco de tablas/grillas,
+60 sumas de pagos independientes con tres interpolaciones, dos frecuencias,
+dos calendarios y cinco beneficios, y tres de aproximación negativa/exacta.
+Se reutilizan las 46 conexiones independientes de B07-03 y pruebas previas.
+Contra la base, el archivo final da 10 fallos, dos errores y 78 aprobadas;
+los errores detienen los bloques de extremos y grillas antes de completar
+sus aserciones. Son errores originales, no resultados aprobados u omitidos.
+El probe adicional verifica con aserciones el NaN previo y cero corregido.
+
+72 objetos tidy ordinarios completos concuerdan con 61fa813 a tolerancia
+1e-12; firma idéntica, columnas/aliases/clases y herencias preservados.
+Beneficios son pesos por estado, no escenarios. No hay nuevos parámetros,
+dependencias, columnas ni versión. Artefactos en b07-04 del directorio de
+la sesión: compatibility.R, before.log, before-final.log, diagnosis.log,
+zero-discount-probe.log, final-tests.log y build/check/snapshot. Validación
+definitiva y huella se registran en audit-precran-check.md.
+
+### Límites preservados y continuación
+
+Se conserva el horizonte anterior de annuity_xy y la truncación de cada
+marginal abierta a cero más allá de su última edad; no es observación de
+muerte y puede afectar estados last/reversiones después del horizonte más
+corto. La documentación lo explicita; extender o cambiar esa convención
+requiere otra decisión, no se aplica C13 del seguro automáticamente. n=Inf
+es horizonte disponible, no promesa de cobertura hasta extinción. n=0 conserva
+APV y esquema de renta vacía. No se promete vectorización universal, fuerzas
+instantáneas exactas ni cancelación arbitraria de infinitos con factores
+distintos. Las entradas frac malformadas y modelos dependientes no se certifican.
+
+Estado B07-04: confirmado, implementado, probado y cerrado dentro del alcance
+documentado. Suite fuente/instalada: 5825 aprobadas, sin fallos/advertencias/
+omisiones; build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por desarrollo.
+Ejemplos y cuatro viñetas aprobados; 389 fuentes verificadas, huella y entorno
+en audit-precran-check.md. Siguen premium_xy y reserve_xy, en particular dotal puro por diferencia,
+primas fraccionarias extremas, equivalencia y reservas multestado. B07 sigue
+abierto; también continúa pendiente precisión extrema propia de t_pxy/e_xy.
+
+Preparación independiente de B07-05 durante el check: next-premium-diagnosis.log
+reproduce premium_xy pure_endowment joint con lx=(1e16,2,0), i=0,n=1,
+beneficio 1e16 y primas anuales due: devuelve 0 frente a 4e-16. La base de
+primas es uno y la referencia es beneficio*(2/1e16)^2. Confirmado y pendiente
+de implementación/pruebas en B07-05; no se presenta como corregido aquí.

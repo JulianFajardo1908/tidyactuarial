@@ -1262,6 +1262,11 @@ Documentación: `man/reserve_x.Rd`. Semántica: revisión por bloque pendiente s
 
 Documentación: `man/annuity_xy.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
 
+B07-04: firma y esquema preservados, pagos firmados de 11/10/01 con masas
+fraccionarias directas y base log original. C15 autorizada exige bordes
+positivos y año siguiente en second. Truncación de marginales abiertas
+preservada y documentada; ver audit-multilife-contingencies.md.
+
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
 | `lt` | `<obligatorio>` | A life table, a list of two life tables list(lt_x, lt_y) , or a tidyact_life_contract object created by life_contract . Each life table must contain columns x and lx . |

@@ -1,5 +1,45 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B07-04 — 21 de octubre de 2026
+
+Base 61fa813, rama audit/0.2.0-precran, versión 0.1.6.9000. Anualidades
+fraccionarias y reversiones designadas, precisión monetaria, tablas/grillas
+y Woolhouse: audit-multilife-contingencies.md. C15 autorizada expresamente
+antes de implementar; firma/esquema preservados, sin extender C12/C13.
+
+95 comprobaciones nuevas aprobadas, más probe independiente NaN->0 para
+cohorte extinguida y descuento desbordado. Contra base, el archivo final
+produce 10 fallos, dos errores y 78 aprobadas; los dos errores abortan los
+bloques originales antes de agotar sus aserciones. 72 objetos tidy ordinarios
+completos concuerdan a 1e-12 y firma idéntica. Roxygen2 y diff --check aprobados.
+Suite fuente e instalada: **5825 aprobadas, 0 fallos, 0 advertencias,
+0 omisiones**; instalada 145 s. Se reutilizan las conexiones B07-03.
+
+Build --no-manual y check --as-cran --no-manual: salida 0, **0 ERROR,
+0 WARNING, 1 NOTE**, exclusivamente por versión de desarrollo. Ejemplos
+(44 s), cuatro viñetas y reconstrucción (19 s) aprobados. Artefactos nuevos:
+C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b07-04/.
+Informes build.log, check.log, tidyactuarial.Rcheck/00check.log y tests/testthat.Rout
+dentro del check. final-tests.log es la suite fuente; before-final.log contiene
+regresión/compatibilidad con base y probes adicionales. zero-discount-probe.log
+verifica con aserciones NaN original/cero corregido. before.log conserva el
+archivo inicial de reproducción. No se sobrescriben artefactos anteriores.
+
+snapshot-verification.txt acredita 389 archivos R/tests/Rd/NEWS/NAMESPACE y
+campos originales de DESCRIPTION iguales al checkout normalizando CRLF y
+reformato de espacios de build en DESCRIPTION. Helper y regresión incluidos,
+AGENTS/audit-* excluidos. SHA256 del archivo fuente:
+43D3C802D523E5984214BA947C67E9771E36BC82651DFF1A5B54223C741F63B3.
+
+Entorno: Windows/R 4.6.1, R_LIBS_USER 4.6 existente, LC_ALL/LC_CTYPE/LANG=C,
+Pandoc de RStudio, build/check fuera del aislamiento y
+_R_CHECK_CRAN_INCOMING_REMOTE_=false. Sin nuevas dependencias, CI remota,
+prueba actual de R mínimo, manual/PDF, versión o push. B07-04 cerrado dentro
+de los límites documentados: truncación histórica de marginales abiertas
+preservada y explícita, no inferencia de muerte ni máxima generalidad.
+B07 sigue abierto. Next-premium-diagnosis.log confirma un dotal puro perdido
+por diferencia en premium_xy; pendiente de B07-05, no corregido ni cerrado aquí.
+
 ## Última validación: B07-03 — 21 de octubre de 2026
 
 Base 161cc3b, rama audit/0.2.0-precran, versión 0.1.6.9000. Seguro por masas

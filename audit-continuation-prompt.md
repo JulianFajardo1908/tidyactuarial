@@ -1,5 +1,41 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B07-04: anualidades/reversiones (21 de octubre de 2026)
+
+Base 61fa813, rama y versión 0.1.6.9000 verificadas, Git inicialmente limpio.
+annuity_xy combina probabilidades de 11/10/01 con beneficios firmados en log,
+usando decrementos acumulados/fraccionarios directos para las reversiones.
+Se preservan tasas originales y valores monetarios representables; se comprueba
+coherencia anual de tablas y grillas finitas/representables. Firma y columnas
+intactas, sin dependencias nuevas. C15 fue autorizada expresamente antes de
+implementar: second exige pesos positivos y el año siguiente en ambos bordes,
+sin inventar fuerza cero; none/first conservan sus calendarios. Aproximaciones
+negativas advierten sin recorte. No extender la aprobación a estados de pago
+arbitrarios ni a otras funciones. Ver audit-api-review.md.
+
+95 comprobaciones nuevas y 72 resultados tidy ordinarios completos a 1e-12;
+firma idéntica a base. Evidencia y fórmulas en audit-multilife-contingencies.md.
+El probe de cohorte extinguida prueba NaN previo frente a cero corregido.
+Resultado definitivo de suite/build/check y archivo: audit-precran-check.md.
+Se conserva la truncación de cada marginal abierta más allá de su última
+edad, incluyendo su efecto en estados last/reversiones; está documentada como
+límite, no como mortalidad observada. C13 del seguro no la cambia por analogía.
+B07 sigue abierto: continuar premium_xy y reserve_xy (equivalencia, importe
+por cuota frente a prima anualizada, dotal puro por diferencia, fraccionamiento
+extremo y estados condicionantes). Mantener las 46 conexiones de B07-03 y
+la recursión 11/10/01 ya corregida. No push/publicación ni cambio de versión.
+Diagnóstico preparado para B07-05: con lx=(1e16,2,0), i=0, joint, n=1,
+beneficio 1e16 y primas anuales due, premium_xy pure_endowment devuelve cero
+frente a 4e-16 por supervivencia directa. Confirmado, pendiente de corrección;
+no se incluye como cerrado en B07-04. Reproducción next-premium-diagnosis.log
+en b07-04. Empezar por eliminar esa resta para el dotal puro, contrastando
+también reserve_xy y conservando firmas/columnas.
+Validación final B07-04: 5825 comprobaciones fuente/instaladas aprobadas,
+0 fallos/advertencias/omisiones; build/check salida 0, 0 ERROR, 0 WARNING,
+1 NOTE por desarrollo. Ejemplos y cuatro viñetas aprobados; archivo de 389
+fuentes verificado y huella registrada. B07-04 cerrado en ese alcance,
+B07 abierto. La hipótesis confirmada de primas continúa pendiente en B07-05.
+
 ## B07-03: seguros por estados y conexiones (21 de octubre de 2026)
 
 Base 161cc3b, Git limpio y versión 0.1.6.9000. El usuario reordenó B07:

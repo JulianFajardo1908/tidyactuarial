@@ -1,5 +1,23 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## C15 autorizada: bordes de Woolhouse second en annuity_xy (B07-04)
+
+Base 61fa813. Con lx=100 exp(-.2j), j=0:2, x=y=60, i=.05, n=2,
+k=2, due/CF/second, annuity_xy devuelve 1.463482 frente a 1.473671 con
+la fuerza analítica .4 del estado conjunto. En el borde final falta el
+año siguiente; el código interpreta esa falta como fuerza cero. Una tabla
+no extendida no permite inferir esa fuerza, aunque un modelo externo sí.
+
+El usuario autorizó expresamente C15: second exigirá pesos
+positivos y datos del año siguiente en ambos bordes h y h+n, para estimar
+eta(t)=-log(w(t+1)/w(t)). Si falta esa base, dará un error que recomiende
+none o first, sin inventar una fuerza cero. No añade parámetros ni extiende
+Woolhouse a beneficios por estado. First y none conservan sus dominios y
+calendarios; las firmas/columnas no cambian. C12 autorizó este criterio en
+annuity_multi, no lo autoriza automáticamente aquí.
+La autorización específica se recibió antes de implementar. Se mantienen
+firmas y columnas; regresiones y límites en audit-multilife-contingencies.md.
+
 ## C13/C14 autorizadas: bordes de insurance_xy (B07-03)
 
 Base 161cc3b. El usuario pidió comenzar por todos los estados del seguro y
@@ -151,6 +169,10 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C09 | C | KM ax = (Lx-lx_next*width)/dx, tiempo vivido en años, NA si no hay muertes | Autorizada expresamente el 18 de octubre; implementada en el cierre B05 |
 | C10 | C | Seguro dotal de plazo cero paga benefit E_h al vencimiento diferido; temporal vacío conserva cero | Autorizada expresamente e implementada en B06-02 |
 | C11 | C | Anualidad vacía conserva APV cero, factor dotal uno y columna annuity_value_at_start cero en posición ordinaria | Autorizada expresamente e implementada en B06-02 |
+| C12 | C | annuity_multi añade frac al final, pagos reales 1/k y ambos extremos de Woolhouse temporal | Autorizada expresamente e implementada en B06-05; alcance propio |
+| C13 | C | insurance_xy whole exige extinción observada del estado, sin pago terminal implícito en tabla abierta | Autorizada expresamente tras aclaración e implementada en B07-03 |
+| C14 | C | insurance_xy endowment n=0 paga al vencimiento h si el estado sobrevive; term vacío conserva cero | Autorizada expresamente e implementada en B07-03 |
+| C15 | C | annuity_xy second exige pesos positivos y siguiente año en ambos bordes; falta de soporte produce error | Autorizada expresamente e implementada en B07-04; none/first conservan calendario |
 
 ## Mejoras compatibles y categorías A realizadas
 
