@@ -1,5 +1,20 @@
 # Prompt maestro para continuar tidyactuarial
 
+## Preferencia vigente: consumo eficiente (23 de octubre de 2026)
+
+Aplicar audit-efficient-workflow.md: lectura dirigida, regresiones locales
+durante la edición y una validación integral sobre el conjunto estable,
+incluidas ayudas y NEWS. No reducir los controles actuariales ni omitir
+suite fuente, build/check instalado, cotejo, huella y commit de cada unidad.
+Repetir controles solo por cambios, fallos o evidencia pendiente que lo
+justifiquen. Completar documentación antes de construir; no revalidar por
+cambiar únicamente registros excluidos del archivo fuente. No cambiar
+modelo/configuración de la app ni prometer una cantidad de mensajes.
+Este encabezado y el último estado B08 son la entrada rápida; consultar
+historial adicional por función y necesidad, preservándolo íntegro.
+Última base funcional validada: 2f40f1f; Git limpio al comenzar este ajuste
+documental. Siguiente unidad actuarial: B08-06, mc_reserve, descrita abajo.
+
 ## B08-05: mc_premium/mc_loss (22 de octubre de 2026)
 
 Base 0ed6c16, Git inicialmente limpio, rama audit/0.2.0-precran y versión
