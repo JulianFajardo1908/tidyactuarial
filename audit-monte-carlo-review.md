@@ -20,8 +20,98 @@ fracciones CML, vidas faltantes, calendarios y coherencia K/T.
 | mc_insurance | Evento y momento del beneficio por trayectoria | B08-04: seis tipos, tasas originales y C18 autorizada comprobados; límites abajo |
 | mc_premium | Cociente de medias de pares Z,Y; prima anualizada/cuota | B08-05: precisión, medias subnormales, grupos y pares NA probados; límites abajo |
 | mc_loss | Z menos prima en la unidad de Y | B08-05: unidades, flujos monetarios y NA probados; límites abajo |
-| mc_reserve | Flujos futuros por trayectoria; antes/después de pago; vigencia | Pendiente; preservar calendarios y NA ya corregidos |
+| mc_reserve | Flujos futuros por trayectoria; antes/después de pago; vigencia | B08-06: libros, pares, rango monetario y C19/C20 autorizadas probados; límites abajo |
 | summary_mc | Momentos, error estándar, cuantiles y colas empíricas | Pendiente; preservar TVaR empírica ya corregida |
+
+## B08-06 — reservas por trayectoria (23 de octubre de 2026)
+
+Base ee7d7be, Git limpio al iniciar, rama audit/0.2.0-precran y versión
+0.1.6.9000 conservadas. Se concilian los calendarios y validaciones anteriores
+de audit-multilife-monte-carlo.md; se preservan firmas, columnas, aliases,
+tipos de retorno y filtros de vigencia. Se sigue audit-efficient-workflow.md:
+regresiones locales y documentación terminadas antes de la fase integral.
+
+### Modelo y diagnósticos
+
+Por trayectoria, Z_t suma beneficios cubiertos en fechas futuras; Y_t suma
+la base monetaria c de las primas en sus fechas futuras; Pi_t suma la cuota
+real en esas mismas fechas, y L_t=Z_t-Pi_t. Cada descuento es exp(-g*(u-t)),
+con g de la convención financiera original. before_payment incluye u=t,
+after_payment lo excluye. El filtro vigente se aplica después: T>t con
+base completa, K>=t con base curtata; información desconocida sigue NA.
+No se cambia ese condicionamiento ni se equipara una pérdida por escenario
+a una esperanza condicional actuarial. No se extrapolan vidas ni estados.
+
+La conversión previa a efectiva anual rechazaba fuerza 720 aunque un
+beneficio de 1e300 en año uno tuviera valor finito 2.032231e-13. El producto
+q*Y_t también perdía ingreso finito si q o Y_t perdían rango. Se revaloran
+beneficios, base y cuota directamente desde sus fechas; cero y u=t reciben
+tratamiento explícito. .interest_basis y helpers monetarios existentes se
+reutilizan; las columnas efectiva/v quedan como metadatos.
+
+Otros dos defectos A: un beneficio conocido no cubierto tenía fecha NA y
+se devolvía Z_t=NA en lugar de cero; una anualidad de emisión desconocida
+se convertía en calendario vacío/cero y entraba en la estimación de prima.
+Ahora el evento no cubierto conserva cero, y se excluyen conjuntamente
+beneficios/anualidades faltantes. Por ejemplo K=(1,NA,2), T=(1.5,5.5,2.5),
+i=0, beneficio 100, base anual due: q correcto=40, antes 60. La estimación
+reutiliza mc_premium y sus controles de unidades, medias y rango monetario.
+
+Pi_t se obtiene del flujo real y no de una columna intermedia ya redondeada.
+Se admiten metadatos convertidos 0/Inf solo si coinciden con la conversión
+resuelta desde una prima válida; no se amplía la entrada directa a primas
+no finitas. Beneficio y prima finitos exactamente coincidentes pueden
+cancelar mediante .cash_flow_sum cuando sus APV separados desbordan.
+k/m se comprueban antes de coerción; m grande válido conserva double.
+
+### Autorizaciones C19/C20 e impacto público
+
+El usuario autorizó «Autorizar T>n en reservas» y «Autorizar estimación
+coherente» antes de implementar. C19 cambia únicamente el dotal puro al
+momento de muerte de T>=n a T>n: muerte en n pertenece al temporal y al
+mixto. Se prueba la partición por trayectoria en los bordes. C20 conserva
+el significado q de la prima estimada internamente, independientemente del
+selector premium_unit cuando no hay prima de entrada. Con k=2 y c=7,
+el ejemplo registrado daba cuota 25/media(L0)=0 en auto pero cuota
+1.785714/media(L0)=92.85714 en annualized; las cuatro opciones ahora son
+equivalentes. P/columnas suministradas conservan sus unidades seleccionadas.
+Estas autorizaciones no cambian los filtros de vigencia ni el calendario
+anual. El expediente exacto se conserva en audit-api-review.md.
+
+### Evidencia independiente y límites
+
+test-b08-reserve-paths.R añade 171 comprobaciones: libros explícitos de
+beneficios para los seis seguros y ambos timings; pagos antes/después de
+valoración; libros de las seis rentas, garantías y diferimiento fraccionario;
+fuerzas extremas y cantidades compensatorias; cuota real frente a base
+subdesbordada/desbordada; cero, pares NA, máscaras complete/curtate y
+not_in_force na/zero; cancelación de flujos coincidentes; encadenamiento
+extremo mc_premium/mc_reserve; C19/C20 y validación m/k. No se usan helpers
+de calendario como oráculo. Las 99 comprobaciones previas seleccionadas de
+reservas, anualidades y consistencia de vidas también pasan.
+
+Contra ee7d7be: 50 fallos, 6 errores, una advertencia, 95 aprobadas; errores
+previos abortan otras aserciones. Después pasan las 171. 199 objetos
+ordinarios completos a 1e-12 y firma idéntica. La compatibilidad compara
+escenarios cubiertos, fuera de C19/C20 y del par incompleto corregido; esas
+diferencias intencionadas se contrastan con oráculos separados, no se
+ocultan mediante tolerancias. Se conserva el retorno tibble expandido.
+
+Límites: los calendarios siguen materializados; no se certifican tamaños
+arbitrarios ni exactitud relativa de subnormales. La estimación interna
+requiere APV observados de emisión representables; no se inventa una prima
+a partir de infinitos de entrada. Coeficientes/columnas que no caben en
+double pueden seguir siendo 0/Inf. La cancelación general entre flujos
+no representables y factores diferentes no queda garantizada. La reserva
+al morir exactamente en t sigue fuera de vigencia en la base completa,
+incluso en before_payment, conforme al contrato conservado y ahora expreso.
+
+B08 sigue abierto con 1089 comprobaciones nuevas acumuladas. Siguen
+summary_mc y la conciliación final de B08; suplemento B05 pendiente.
+Evidencia integral/huella en audit-precran-check.md. Artefactos b08-06 de
+la sesión del 21: initial-diagnosis.log, before-final.log/compatibility.R y
+regression-final.log definitivos; before.log/after.log son etapas previas
+del archivo de pruebas. No se sustituyen resultados finales por intermedios.
 
 ## B08-05 — primas y pérdidas Monte Carlo (22 de octubre de 2026)
 

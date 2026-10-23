@@ -1,5 +1,9 @@
 # Matriz global de firmas públicas
 
+B08-06: mc_reserve conserva firma/esquema. C19/C20 autorizadas, flujos
+futuros monetarios, pares de estimación y filtros de vigencia comprobados;
+detalle y límites en audit-monte-carlo-review.md.
+
 B08-05: mc_premium/mc_loss conservan firmas y esquemas; 146 objetos
 ordinarios completos a 1e-12, 228 comprobaciones nuevas. Precisión,
 unidades, medias subnormales y grupos en audit-monte-carlo-review.md.
@@ -1552,7 +1556,9 @@ conservados. Límites en audit-monte-carlo-review.md.
 
 ## B08 — mc_reserve
 
-Documentación: `man/mc_reserve.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/mc_reserve.Rd`. B08-06: libros futuros, tasas originales,
+unidades de prima, vigencia/NA y C19/C20 autorizadas probados. Firma/esquema
+conservados; límites en audit-monte-carlo-review.md.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|

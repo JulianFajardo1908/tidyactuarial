@@ -1,5 +1,17 @@
 # tidyactuarial 0.2.0
 
+* Approved C19/C20: `mc_reserve` moment-of-death pure endowments require
+  survival strictly beyond maturity. Internally estimated premiums retain
+  their scale interpretation regardless of the input premium-unit selector;
+  supplied premiums retain their declared units.
+
+* Monte Carlo reserves value future monetary flows with the original log
+  interest rate. Known uncovered benefits remain zero, missing issue
+  annuities are excluded as complete estimation pairs, and actual premium
+  income retains range independently of its displayed annuity basis.
+  Coincident flows can cancel despite separate present-value overflow.
+  Existing in-force and before/after-payment conventions are clarified.
+
 * Monte Carlo premiums and losses retain representable monetary amounts when
   an intermediate annuity-scale coefficient underflows or overflows. Scaled
   means preserve positive subnormal premium exposure, and large valid payment

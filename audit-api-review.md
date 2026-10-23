@@ -1,5 +1,37 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## B08-06: C19 y C20 autorizadas (23 de octubre de 2026)
+
+Base ee7d7be, mc_reserve. El usuario autorizó expresamente ambas:
+«Autorizar T>n en reservas» y «Autorizar estimación coherente».
+Implementadas con regresiones específicas; no volver a solicitar estas
+decisiones dentro de su alcance. Validación final en audit-precran-check.md.
+Las correcciones de tasas originales, cuota monetaria, pares NA, cero
+para eventos no cubiertos y coerciones son A computacionales; aclarar
+vigencia y límites es B documental. Firma y esquema no cambian.
+
+C19: con K=T=n=2, t=0, i=0, P=0 y benefit=100, el dotal puro al momento
+de muerte tiene Z_t=100, mientras mc_insurance corregido por C18 da cero.
+Propuesta: cambiar solo pure_endowment/moment_of_death de T>=n a T>n.
+La muerte en n queda en el temporal y el mixto; partición disjunta también
+en el motor de reservas. Mantener calendario anual y filtros de vigencia.
+Impacto: en ese evento exacto se elimina el componente supervivencia; C18
+no cubría esta función, por eso se solicita autorización propia.
+
+C20: cuando no se suministra prima ni columna, se estima q=media(Z0)/
+media(Y0), pero después premium_unit puede reinterpretar ese q como cuota
+o anualizada. Para K=(1,2), T=(1.5,2.5), i=0, benefit=100, k=2, payment=7,
+auto deja media(L0)=0; annualized y per_payment la hacen positiva.
+Propuesta: la estimación interna siempre produce el coeficiente q y sus
+conversiones correctas. premium_unit solo describe una prima suministrada;
+si no hay entrada de prima, no reinterpreta la estimación. Así las cuatro
+opciones dan la misma prima actuarial y media(L0)=0. No cambia cómo se
+interpreta P/columnas explícitas, ni firmas/columnas. Se necesita autorización
+porque cambia el significado de llamadas sin prima con unidad explícita.
+Reproducción: artefactos b08-06/initial-diagnosis.log. La autorización
+específica requerida por el prompt maestro, sección 4, se obtuvo antes
+de implementar ambas propuestas.
+
 ## B08-05: primas y pérdidas (22 de octubre de 2026)
 
 Base 0ed6c16. A: conservar numerador/denominador/frecuencia hasta combinar
@@ -301,6 +333,8 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C16 | C | reserve_xy incluye la cuota vencida programada exactamente en t y en madurez, como reserva antes de prima | Autorizada expresamente e implementada en B07-05; recursión sin ampliación |
 | C17 | C | mc_multilife_status exige exactamente K<=T<K+1 tras la comprobación entera de K; tol deja de relajar las fronteras de T | Autorizada expresamente el 22 de octubre e implementada en B08-02; firma/esquema conservados |
 | C18 | C | mc_insurance pure_endowment al momento de muerte exige T>n, disjunto del temporal T<=n | Autorizada expresamente el 22 de octubre e implementada en B08-04; calendario anual y dotal mixto conservados |
+| C19 | C | mc_reserve aplica T>n al dotal puro al momento de muerte, conservando vigencia y calendario anual | Autorizada expresamente el 23 de octubre e implementada en B08-06 |
+| C20 | C | mc_reserve no reinterpreta su prima estimada internamente según premium_unit; unidades explícitas solo para primas suministradas | Autorizada expresamente el 23 de octubre e implementada en B08-06 |
 
 ## Mejoras compatibles y categorías A realizadas
 

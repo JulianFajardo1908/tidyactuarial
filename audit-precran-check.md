@@ -1,5 +1,40 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B08-06 — 23 de octubre de 2026
+
+Base ee7d7be, rama audit/0.2.0-precran y versión 0.1.6.9000. mc_reserve:
+tasas originales, libros futuros monetarios, pares NA de emisión, beneficio
+no cubierto cero y cancelación coincidente. C19/C20 autorizadas antes de
+implementar; firma, columnas, vigencia y calendarios preservados. Detalles
+matemáticos e impacto público en audit-monte-carlo-review.md.
+171 comprobaciones nuevas y 99 previas seleccionadas aprobadas. Contra
+base: 50 fallos, 6 errores, una advertencia, 95 aprobadas; errores previos
+abortan otras aserciones. 199 objetos ordinarios a 1e-12 y firma idéntica.
+Roxygen2 y suite fuente definitiva: **7245 aprobadas, 0 fallos,
+0 advertencias, 0 omisiones**. Inventario: 102 nombres y 974 apariciones
+de parámetros, sin descripciones ausentes/vacías. Diff --check aprobado.
+snapshot-verification.txt comprueba 397 archivos R/tests/man/NEWS/NAMESPACE
+y campos originales DESCRIPTION iguales al checkout, normalizando CRLF y
+espacios de build; audit/AGENTS excluidos. SHA256 del archivo final:
+625074EFF6D5C40A1A4AD693E854CE3357AF9DF9D0D5FC85C5012F6E07B23C22.
+Build --no-manual y check --as-cran --no-manual finales: salida 0,
+**0 ERROR, 0 WARNING, 1 NOTE** exclusivamente por versión de desarrollo.
+Suite instalada: **7245 aprobadas, 0 fallos/advertencias/omisiones** (71 s).
+Ejemplos (23 s), cuatro viñetas y reconstrucción aprobados. Informes:
+build.log, check.log, tidyactuarial.Rcheck/00check.log y tests/testthat.Rout.
+Una suite integral fuente y una construcción/check sobre el conjunto final;
+no hubo reconstrucción posterior por documentación. Entorno Windows/R 4.6.1,
+biblioteca existente, locale C, Pandoc de RStudio y recepción remota CRAN
+desactivada. Sin manual/PDF, nueva CI remota ni prueba de R mínimo.
+B08-06 cerrado en su alcance documentado; B08 completo y suplemento B05
+pendientes. Sin dependencia, cambio de versión ni push.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b08-06/.
+initial-diagnosis.log, before-final.log/compatibility.R y regression-final.log
+son definitivos; before.log/after.log contienen etapas anteriores de las
+pruebas. Se aplica audit-efficient-workflow.md: ayuda/NEWS y regresiones
+locales estabilizadas antes de suite fuente y construcción final.
+
 ## Última validación: B08-05 — 22 de octubre de 2026
 
 Base 0ed6c16, rama audit/0.2.0-precran y versión 0.1.6.9000 conservadas.

@@ -12,8 +12,39 @@ cambiar únicamente registros excluidos del archivo fuente. No cambiar
 modelo/configuración de la app ni prometer una cantidad de mensajes.
 Este encabezado y el último estado B08 son la entrada rápida; consultar
 historial adicional por función y necesidad, preservándolo íntegro.
-Última base funcional validada: 2f40f1f; Git limpio al comenzar este ajuste
-documental. Siguiente unidad actuarial: B08-06, mc_reserve, descrita abajo.
+Última base de inicio: ee7d7be; estado actuarial más reciente a continuación.
+
+## B08-06: mc_reserve (23 de octubre de 2026)
+
+Base ee7d7be, Git inicialmente limpio, misma rama y versión. Flujos futuros
+con tasas originales y cuota monetaria independiente de q/Y_t redondeados;
+beneficio no cubierto cero, pares de emisión NA correctos y cancelación
+exacta de flujos monetarios coincidentes. Se preservan calendarios, vigencia,
+not_in_force, firma/columnas, aliases y tibble expandido. m grande válido
+conserva double; k/m se validan antes de coerción.
+C19/C20 fueron autorizadas expresamente e implementadas: T>n para el
+dotal puro al momento de muerte y estimación interna coherente sin
+reinterpretación por premium_unit. No volver a pedirlas dentro de su
+alcance; no cambian el filtro T>t/K>=t ni las primas suministradas.
+171 comprobaciones nuevas y 99 previas seleccionadas pasan; contra base:
+50 fallos, 6 errores, una advertencia, 95 aprobadas (errores abortan otras
+aserciones). 199 objetos ordinarios a 1e-12 y firma idéntica. Detalle/límites:
+audit-monte-carlo-review.md; evidencia final/huella: audit-precran-check.md.
+Artefactos b08-06: before-final.log/compatibility.R y regression-final.log;
+before.log/after.log son etapas previas. B08 abierto con 1089 nuevas.
+Validación final: 7245 aprobadas en fuente e instalado, cero fallos/
+advertencias/omisiones. Build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE
+por desarrollo; ejemplos y cuatro viñetas aprobados. 397 archivos cotejados
+y SHA256 en audit-precran-check.md. Una suite fuente y una construcción/
+check sobre el contenido final. B08-06 cerrado en su alcance y guardado en
+commit local; B08 completo sigue abierto.
+
+Siguiente B08-07: summary_mc, momentos, error estándar, cuantiles y TVaR
+empíricos; comprobar NA, agrupación, precisión y límites del error estándar
+con pares antitéticos, preservando las correcciones de colas anteriores.
+Luego conciliar los once nombres B08 sin declarar cierre por pruebas
+parciales. Suplemento B05 t_px/e_x pendiente; B01/B02 conservan pendientes
+formales y B09 integral aún no iniciado. Sin push, rama o versión nueva.
 
 ## B08-05: mc_premium/mc_loss (22 de octubre de 2026)
 
