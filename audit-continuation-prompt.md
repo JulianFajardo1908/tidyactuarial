@@ -1,5 +1,45 @@
 # Prompt maestro para continuar tidyactuarial
 
+## B08-05: mc_premium/mc_loss (22 de octubre de 2026)
+
+Base 0ed6c16, Git inicialmente limpio, rama audit/0.2.0-precran y versión
+0.1.6.9000 conservadas. Se preservan numerador/denominador/frecuencia hasta
+combinar importes monetarios; helper privado .mc_ratio_product, medias
+subnormales y k grande válido sin overflow integer. Sin nueva decisión C,
+firma, columna ni dependencia. NA por pares, grupos y unidades conservados.
+q puede mostrarse 0/Inf si no cabe, sin anular cuota/flujo finitos. La
+entrada annuity_scale explícita se interpreta como se recibe; para encadenar
+extremos escoger una columna monetaria representable. No ampliar entrada
+no finita ni inventar datos a partir de q redondeado.
+228 comprobaciones nuevas; contra base: 48 fallos, 2 errores, 4 advertencias,
+174 aprobadas; errores abortan otras aserciones. 146 objetos ordinarios
+completos a 1e-12, dos firmas idénticas. Registro matemático y límites:
+audit-monte-carlo-review.md. Evidencia/huella: audit-precran-check.md.
+Artefactos b08-05: before-final.log/compatibility.R, regression-final.log y
+final-definitive-tests.log son definitivos; final-tests.log es una ejecución
+intermedia anterior al último borde subnormal. B08 abierto con 918 nuevas.
+Se aclaran en las ayudas los retornos data.frame/tibble existentes y la
+salida no agrupada de mc_premium. final-artifact/ contiene el archivo/check
+definitivos después de ese ajuste; la primera construcción queda como etapa
+previa. No se cambia el código funcional después de la suite fuente final.
+Validación definitiva completada el 23 de octubre: 7074 aprobadas en fuente
+e instalado, cero fallos/advertencias/omisiones; check 0 ERROR, 0 WARNING,
+1 NOTE por desarrollo, ejemplos y cuatro viñetas aprobados. 396 archivos
+verificados y huella final en audit-precran-check.md. B08-05 cerrado dentro
+de su alcance y guardado en commit local; B08 completo sigue abierto.
+
+Siguiente B08-06: mc_reserve, tasas originales y libros de flujos futuros,
+conservar calendarios, antes/después de pago, vigencia, NA y prima en cada
+unidad. Su motor propio mantiene T>=n en dotal puro; C18 solo autorizó
+mc_insurance y no permite corregir ese borde por analogía. Conciliar el
+caso concreto y solicitar autorización específica si se propone cambiarlo.
+next-reserve-diagnosis.log reproduce ambos pendientes: fuerza 720 rechazada
+con beneficio finito 2.032231e-13, y Z_t=100 a t=0 para T=n frente al cero
+de mc_insurance después de C18. No se ha modificado mc_reserve en B08-05.
+Luego summary_mc, dependencia antitética y conciliación integral B08.
+Suplemento B05 t_px/e_x pendiente; B01/B02 conservan pendientes formales,
+B09 integral no iniciado. Sin push, cambios de rama o versión.
+
 ## B08-04: valoración por trayectoria y C18 (22 de octubre de 2026)
 
 Base 692477d, Git inicialmente limpio, rama audit/0.2.0-precran y versión

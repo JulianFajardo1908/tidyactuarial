@@ -56,7 +56,7 @@ inferred from \code{payment_per_payment}, \code{payment}, or
 \code{benefit_col}, \code{annuity_col}, and \code{premium_col}.}
 }
 \value{
-A tibble containing the original simulations and standardized
+A data frame or tibble containing the original simulations and standardized
 premium columns:
 \describe{
   \item{premium_annualized}{Estimated annualized premium
@@ -73,6 +73,7 @@ The column selected by \code{col_P} stores
 \code{premium_annuity_scale} for backward compatibility. Unless
 \code{col_P = "premium"}, a compatibility column \code{premium} is also
 created with the same scale coefficient.
+Existing grouping is used for estimation and removed from the result.
 }
 \description{
 Estimates net premiums from simulated present values of benefits and premium
@@ -116,6 +117,13 @@ When \code{na_rm = TRUE}, missing values are removed jointly: a simulation
 contributes only if both \code{col_Z} and \code{col_Y} are observed. This
 prevents the numerator and denominator from being estimated from different
 simulated samples.
+Monetary premium amounts retain the ratio before intermediate overflow or
+underflow. A displayed annuity-scale coefficient may still be zero or
+infinite when the coefficient itself is outside double precision, while
+the per-payment and annualized amounts remain representable. The
+equivalence residual uses the ratio before that loss of range.
+Positive subnormal observations are retained using scaled means when an
+ordinary mean rounds to zero. A genuinely zero annuity exposure is rejected.
 }
 \examples{
 simulated <- tibble::tibble(

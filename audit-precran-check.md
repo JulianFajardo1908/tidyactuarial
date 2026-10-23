@@ -1,5 +1,49 @@
 # Verificación local de paquete — 2026-10-16
 
+## Última validación: B08-05 — 22 de octubre de 2026
+
+Base 0ed6c16, rama audit/0.2.0-precran y versión 0.1.6.9000 conservadas.
+mc_premium/mc_loss recuperan importes representables tras pérdida de rango
+del coeficiente, medias subnormales y k grande válido. Firmas, columnas,
+agrupación, pares NA y unidades conservados; sin nueva decisión C.
+228 comprobaciones nuevas aprobadas. Contra base: 48 fallos, 2 errores,
+4 advertencias, 174 aprobadas; errores previos abortan otras aserciones.
+146 objetos ordinarios completos a 1e-12; dos firmas idénticas.
+Detalle matemático/impacto/límites: audit-monte-carlo-review.md.
+Roxygen2 y suite fuente definitiva: **7074 aprobadas, 0 fallos,
+0 advertencias, 0 omisiones**. Inventario comprobado: 102 nombres,
+974 apariciones de parámetros y cero descripciones Rd ausentes/vacías.
+El primer archivo/check en b08-05 conserva la etapa anterior a precisar
+en las ayudas el retorno data.frame/tibble. final-roxygen.log registra
+ese ajuste documental; el archivo/check definitivos están en final-artifact/.
+La suite fuente certifica el mismo código funcional; el check instalado
+final también valida las ayudas definitivas. No se reutiliza como prueba
+final la huella del archivo anterior a ese ajuste.
+final-artifact/snapshot-verification.txt comprueba 396 archivos
+R/tests/man/NEWS/NAMESPACE y campos originales DESCRIPTION iguales al
+checkout, normalizando CRLF y espacios de build; audit/AGENTS excluidos.
+SHA256 definitivo:
+8CE916709D6E21DDA552B574E087321DB40FDCC370F7171FAE7CA9647D9565EA.
+Validación definitiva completada el 23 de octubre: build --no-manual y
+check --as-cran --no-manual, **0 ERROR, 0 WARNING, 1 NOTE** por versión
+de desarrollo. Suite instalada: **7074 aprobadas, 0 fallos/advertencias/
+omisiones** (77 s); ejemplos (24 s), cuatro viñetas y reconstrucción (11 s)
+aprobados. Informes definitivos en final-artifact/build.log, check.log,
+tidyactuarial.Rcheck/00check.log y tests/testthat.Rout. El primer check,
+previo al ajuste de ayudas, también pasó, pero no es la evidencia final.
+Entorno Windows/R 4.6.1, biblioteca existente, locale C y Pandoc de RStudio;
+recepción remota CRAN desactivada, sin manual/PDF, nueva CI remota ni prueba
+de R mínimo. diff --check aprobado. B08-05 cerrado en su alcance documentado;
+B08 completo y suplemento B05 pendientes. Sin dependencia, versión o push.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b08-05/.
+before-final.log/compatibility.R, regression-final.log y
+final-definitive-tests.log son la evidencia definitiva. before.log/after.log
+son etapas previas; after.log incluía una comparación de clases de entrada
+que se corrigió en el test. final-tests.log es una ejecución intermedia que
+no certifica el último borde subnormal; sus fallos se conservan y se corrigen
+antes de la suite definitiva y del archivo fuente final.
+
 ## Última validación: B08-04 — 22 de octubre de 2026
 
 Base 692477d, rama audit/0.2.0-precran y versión 0.1.6.9000. Tasas

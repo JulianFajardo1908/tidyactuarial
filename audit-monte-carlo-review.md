@@ -18,10 +18,94 @@ fracciones CML, vidas faltantes, calendarios y coherencia K/T.
 | simulate_insurance_x | Seguro anual por trayectoria; motor lx propio | B08-03: masas, censura, valoración monetaria y RNG comprobados; límites abajo |
 | mc_annuity | Pagos elegibles por trayectoria, garantías, diferimientos y NA | B08-04: calendarios/NA/RNG y valoración monetaria comprobados; límites abajo |
 | mc_insurance | Evento y momento del beneficio por trayectoria | B08-04: seis tipos, tasas originales y C18 autorizada comprobados; límites abajo |
-| mc_premium | Cociente de medias de pares Z,Y; prima anualizada/cuota | Precisión de conversión confirmada y pendiente; revisar integralmente en B08-05 |
-| mc_loss | Z menos prima en la unidad de Y | Precisión de conversión confirmada y pendiente; revisar integralmente en B08-05 |
+| mc_premium | Cociente de medias de pares Z,Y; prima anualizada/cuota | B08-05: precisión, medias subnormales, grupos y pares NA probados; límites abajo |
+| mc_loss | Z menos prima en la unidad de Y | B08-05: unidades, flujos monetarios y NA probados; límites abajo |
 | mc_reserve | Flujos futuros por trayectoria; antes/después de pago; vigencia | Pendiente; preservar calendarios y NA ya corregidos |
 | summary_mc | Momentos, error estándar, cuantiles y colas empíricas | Pendiente; preservar TVaR empírica ya corregida |
+
+## B08-05 — primas y pérdidas Monte Carlo (22 de octubre de 2026)
+
+Base 0ed6c16, Git inicialmente limpio, misma rama audit/0.2.0-precran y
+versión 0.1.6.9000. Se preservan las correcciones previas de unidades,
+inferencia de metadatos, pares completos, agrupación y aliases. A matemática/
+computacional y B documental; no se amplían C17/C18 ni hay nueva decisión C.
+
+### Modelo, diagnóstico y diff acotado
+
+Y_c=c*sum(v^t_j), q=media(Z)/media(Y_c), cuota=q*c, prima anualizada=k*q*c.
+Con prima anualizada A, el flujo por trayectoria es Pi=A*Y_c/(k*c);
+con cuota p es Pi=p*Y_c/c; con coeficiente explícito q es Pi=q*Y_c.
+L=Z-Pi. La equivalencia usa el cociente de medias sobre los mismos pares
+observados, nunca la media de cocientes individuales.
+
+Una fila Z=1e-300, Y_c=c=1e300 implica cuota 1e-300 y pérdida cero. El
+cociente intermedio daba cero, anulaba la cuota y dejaba pérdida 1e-300.
+Con Z=1e300, Y_c=c=1e-300 daba Inf/-Inf aunque cuota y flujo fueran finitos.
+Anualizar una cuota subnormal también puede recuperar un importe normal:
+redondearla antes de multiplicar por k sesgaba ese resultado. El problema
+incluye intermedios subnormales positivos, no solo ceros e infinitos.
+
+Un helper privado .mc_ratio_product en mc-utils conserva el cálculo
+ordinario cuando su rango es adecuado, prueba la cancelación directa de
+escala y recupera productos restantes en log mediante .cash_flow_value.
+Se retienen numerador, denominador y frecuencia hasta combinar el importe.
+Solo lo usan estas dos funciones. mc_loss conserva la interpretación de
+P/columnas heredadas como coeficiente y no inventa una cuota a partir de
+un coeficiente ya redondeado. El residual de mc_premium usa el cociente
+antes de perder rango, no la representación redondeada de la columna q.
+q puede seguir siendo 0/Inf si no cabe en double; los importes finitos se
+recuperan de los datos originales. No se añaden columnas ocultas o públicas.
+
+Con tiny, el mínimo double positivo, Z=Y=(tiny,0,0) tiene q=1 aunque ambas
+medias redondeen a cero. Con Z=(2*tiny,0,0), Y=(4*tiny,0,0), ambas medias
+redondean al mismo valor y el cociente ordinario da 1 en vez de .5. Se
+usan sumas pareadas cuando caben y medias escaladas/log en caso contrario;
+no se cambia la muestra. Se sigue rechazando Y realmente nulo. k grande
+válido conserva double; integer sigue siendo el almacenamiento ordinario.
+
+### Pruebas independientes, compatibilidad y límites
+
+test-b08-premium-loss-precision.R aporta 228 comprobaciones. Libros de
+fechas explícitas a tasa .04, cuatro frecuencias y tres bases c contrastan
+cuota, anualizada, flujo y pérdida en las tres unidades. Casos extremos
+verifican importes contra identidades exactas/escalas compensatorias,
+incluidos anualización tras subdesbordamiento, intermedios subnormales,
+exposición tiny, ceros, Y firmado previamente admitido, NA y k grande.
+Grupos con identificador NA, agrupación dplyr y pares faltantes asimétricos
+verifican que los dos promedios usan las mismas filas; error con na_rm=FALSE
+y exposición cero preservados. Las funciones no sortean: RNG intacto.
+
+Contra 0ed6c16: 48 fallos, 2 errores, 4 advertencias, 174 aprobadas; los
+errores previos abortan aserciones posteriores. Después pasan las 228.
+146 objetos ordinarios completos coinciden a 1e-12; firmas idénticas,
+incluidos grupos, columnas personalizadas, tres unidades, prima directa/
+en columna y aliases. Inventario público permanece en 102 nombres/974
+apariciones de parámetros; no se cambia ninguna firma o columna pública.
+Las ayudas precisan que se devuelve data.frame o tibble según la entrada;
+mc_premium elimina la agrupación después de estimar. Antes las ayudas
+solo mencionaban tibbles. Es una corrección documental del comportamiento
+previo, no una coerción nueva. Se reconstruye y comprueba el archivo final
+después de regenerar estas ayudas; final-artifact contiene esa evidencia.
+
+Límites: el coeficiente q y cada importe mostrado conservan su rango
+double. Un coeficiente explícito cero ya perdió información; uno infinito
+sigue sin ser prima de entrada válida en mc_loss. Para encadenar casos
+extremos se usa una columna monetaria representable; si annualized no cabe,
+seleccionar per_payment explícitamente si cabe. No se generaliza la entrada
+no finita ni se infiere información adicional. mc_loss conserva su requisito
+de metadatos constantes del contrato; distintos contratos se aplican por
+separado. No se promete exactitud relativa arbitraria en valores subnormales,
+ni retículas materializables para cualquier frecuencia numérica grande.
+
+B08 sigue abierto con 918 comprobaciones nuevas acumuladas. Siguen
+mc_reserve y summary_mc, la conciliación final de B08 y el suplemento B05
+pendiente. Evidencia final y huella en audit-precran-check.md; artefactos
+b08-05 de la sesión del 21. before-final.log/compatibility.R y
+regression-final.log son definitivos. before.log/after.log conservan pruebas
+anteriores (after.log incluía comparación de clases tibble/data.frame que
+se corrigió en la prueba, sin cambiar el contrato). final-tests.log inició
+antes del último borde subnormal; solo final-definitive-tests.log certifica
+la suite final.
 
 ## B08-04 — valoración por trayectoria y C18 (22 de octubre de 2026)
 

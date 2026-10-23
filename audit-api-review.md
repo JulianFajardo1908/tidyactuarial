@@ -1,5 +1,17 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## B08-05: primas y pérdidas (22 de octubre de 2026)
+
+Base 0ed6c16. A: conservar numerador/denominador/frecuencia hasta combinar
+importes representables, recuperar medias subnormales y k grande válido.
+B: documentar límites del coeficiente mostrado y cómo seleccionar una prima
+monetaria representable al encadenar; precisar retorno data.frame/tibble
+según la entrada y salida no agrupada de mc_premium. Firmas, columnas, precedencia de
+unidades, aliases, NA y grupos conservados; no hay nueva decisión C.
+228 comprobaciones y 146 objetos ordinarios a 1e-12. No se amplía entrada
+no finita ni se recupera información de un coeficiente explícito ya perdido.
+Ver audit-monte-carlo-review.md y validación en audit-precran-check.md.
+
 ## B08-04: valoración por trayectoria (22 de octubre de 2026)
 
 Base 692477d. Correcciones A: tasa log original y valoración monetaria

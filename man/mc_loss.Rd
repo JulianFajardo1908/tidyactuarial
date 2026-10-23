@@ -61,7 +61,7 @@ amount used to construct \code{col_Y}. It is normally inferred from
 \code{loss_col}, and \code{premium}.}
 }
 \value{
-A tibble containing the original simulation and standardized columns:
+A data frame or tibble containing the original simulation and standardized columns:
 \describe{
   \item{premium_annualized}{Annualized premium \eqn{P^{(k)}}.}
   \item{premium_per_payment}{Amount collected at each premium date.}
@@ -118,6 +118,15 @@ P_{\mathrm{per\ payment}} = q c,
 \qquad
 P^{(k)} = k q c.
 }
+For annualized or per-payment inputs, monetary income retains the original
+premium amount and frequency until it is combined with the annuity present
+value. This avoids losing a representable income when an intermediate
+annuity-scale coefficient underflows or overflows. Displayed converted
+amounts may still be zero or infinite if they themselves do not fit in
+double precision. An explicitly supplied annuity-scale coefficient is used
+as supplied; a rounded zero or nonfinite coefficient cannot reconstruct
+information that has already been lost. Select a representable monetary
+premium column when passing extreme results from \code{\link{mc_premium}}.
 }
 \examples{
 simulated <- tibble::tibble(

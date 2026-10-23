@@ -1,5 +1,12 @@
 # tidyactuarial 0.2.0
 
+* Monte Carlo premiums and losses retain representable monetary amounts when
+  an intermediate annuity-scale coefficient underflows or overflows. Scaled
+  means preserve positive subnormal premium exposure, and large valid payment
+  frequencies retain numeric storage. Existing paired-NA, grouping and premium
+  unit conventions are retained; displayed unrepresentable coefficients and
+  amounts retain their double-precision limits.
+
 * Approved C18: moment-of-death pure endowments in `mc_insurance` require
   survival strictly beyond maturity. A death exactly at maturity belongs
   to the term component, making term plus pure endowment equal endowment
