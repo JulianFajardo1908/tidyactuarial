@@ -1,5 +1,107 @@
 # Verificación local de paquete — 2026-10-16
 
+## Candidata 0.2.0 — cierre local recuperado el 24 de octubre de 2026
+
+Cambio de versión autorizado expresamente por el usuario. DESCRIPTION
+contiene 0.2.0 y README identifica la candidata sin afirmar publicación.
+Rama audit/0.2.0-precran y base Git 0030cef conservadas; cambios sin commit.
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/24/01a16b38-f8c9-7fa0-8e0f-4849a0242ecc/release-0.2.0/.
+
+La construcción y check terminaron durante la interrupción del chat.
+build.log confirma el archivo tidyactuarial_0.2.0.tar.gz; check.log y
+tidyactuarial.Rcheck/00check.log confirman R CMD check --as-cran con
+**0 ERROR, 0 WARNING, 1 NOTE**: V8 no disponible para comprobar el
+renderizado matemático del manual HTML. No es la NOTE de versión de
+desarrollo de los artefactos anteriores. Manual PDF aprobado, ejemplos
+aprobados y viñetas reconstruidas. Suite instalada: **7454 aprobadas,
+0 fallos, 0 advertencias, 0 omisiones** (64 s). Windows/R 4.6.1, locale C,
+biblioteca existente, Pandoc y TinyTeX; recepción remota CRAN desactivada.
+
+snapshot-verification.log certifica 413 archivos fuente del archivo iguales
+al checkout, normalizando CRLF/espacios de build en DESCRIPTION, y exclusión
+de AGENTS/audit. Se repitió solo ese cotejo al retomar, no la construcción
+ni las pruebas. Los 117 archivos R tienen AST idéntico y los 153 archivos
+de tests/datos son idénticos al snapshot funcional ya validado B05; se
+reutiliza por ello su suite fuente, sin atribuirle las nuevas ayudas o
+metadatos. Diff --check aprobado. SHA256 del archivo definitivo:
+A72296D5A796F313AD36D6976F63382EA0CDB1B62A1F73B0AC9A3FD0A28CB04B.
+
+cran-comments.md en artefactos es un borrador con resultados y límites
+reales. CI de la candidata final y comprobación matemática HTML siguen
+sin certificar. No se instalaron dependencias adicionales para borrar la
+NOTE ni se repitió un check integral por esa limitación de entorno.
+Sin commit, push, ejecución remota, envío a CRAN ni publicación. La
+autorización de versión no implica autorización de esas operaciones.
+
+## Suplemento B05 t_px/e_x — 23 de octubre de 2026
+
+Base 0030cef, rama audit/0.2.0-precran, versión 0.1.6.9000; cambios B08
+conservados sin commit. Correcciones numéricas de supervivencia anual
+derivada y fracciones/integrales CF/Balducci, sin parámetros o columnas
+nuevos. Causa, identidades y límites en audit-life-tables-mortality.md.
+113 comprobaciones nuevas: antes 61 fallos y 52 aprobadas, sin errores ni
+advertencias; después todas aprobadas. Selección relacionada: 594 aprobadas.
+Suite fuente final: **7454 aprobadas, 0 fallos, 0 errores, 0 advertencias,
+0 omisiones**. 192 objetos ordinarios completos coinciden con HEAD a
+1e-12; dos firmas públicas idénticas. Inventario: 102 nombres y 974
+apariciones de parámetros, sin descripciones ausentes/vacías.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/24/01a16b38-f8c9-7fa0-8e0f-4849a0242ecc/b05-supplement/.
+before.log reproduce el defecto; focused.log, final-tests.log,
+compatibility-final.log e inventory.log contienen los resultados fuente.
+Build --no-manual terminado sobre staging de fuentes en directorio
+escribible; snapshot-verification.txt coteja 399 archivos del archivo
+con el checkout, normalizando CRLF y espacios de build en DESCRIPTION.
+SHA256: 85E51A458561730CE1F584D626D171C53CAE01AF7D849AAF86ABF8E062CC6E4B.
+El sandbox permite leer dependencias pero file.access(...,4) devuelve -1;
+los intentos check.log, check-final.log y check-verified.log se detuvieron
+por dependencias declaradas inaccesibles. No son evidencia de check del
+código ni de dependencias ausentes: la biblioteca existente pudo cargar
+el paquete y ejecutar todas las pruebas. Se autorizó mediante revisión
+automática un check con acceso normal, sin cambiar fuentes ni dependencias.
+Resultado definitivo en check-complete.log y unrestricted-check/: check
+--as-cran --no-manual salida 0, **0 ERROR, 0 WARNING, 1 NOTE** únicamente
+por la versión de desarrollo. Suite instalada: **7454 aprobadas, 0 fallos,
+0 advertencias, 0 omisiones** (146 s); ejemplos (36 s) y reconstrucción de
+viñetas (19 s) aprobados. Entorno Windows/R 4.6.1, locale C, biblioteca
+existente y Pandoc de RStudio; recepción remota CRAN desactivada. Sin
+manual PDF, nueva CI remota ni prueba de R mínimo. Diff --check aprobado.
+Suplemento confirmado, implementado, probado y cerrado en este alcance.
+Cambios conservados sin commit, push ni cambio de rama/versión. No se
+repiten suite/build/check por actualizar solo registros excluidos.
+
+## Última validación: B08-07 — 23 de octubre de 2026
+
+Base 0030cef, rama audit/0.2.0-precran y versión 0.1.6.9000. summary_mc:
+momentos escalados, TVaR por masas, selectores vacíos y esquema sin grupos.
+Conciliación de once nombres B08; metadato anual de base Inf solo coherente
+con c*k finitos en los consumidores. Sin nueva C, parámetros o columnas.
+96 comprobaciones nuevas y 471 previas seleccionadas aprobadas. Contra
+base: 17 fallos, 2 errores, cero advertencias, 58 aprobadas; errores previos
+abortan otras aserciones. 79 objetos ordinarios a 1e-12 y once firmas
+iguales a c7a0d29. Modelo y límites en audit-monte-carlo-review.md.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b08-07/.
+initial-diagnosis.log, metadata-diagnosis.log, before-final.log/compatibility.R
+y regression-final.log son definitivos; before.log/after.log son etapas
+anteriores. Ayudas/NEWS y regresiones estabilizadas antes de fase integral,
+según audit-efficient-workflow.md.
+
+Recuperación del cierre tras interrupción (23 de octubre de 2026): los
+logs finales ya existentes confirman **7341 aprobadas, 0 fallos, 0
+advertencias, 0 omisiones**, tanto en fuente como instalado. Build completo;
+check --as-cran --no-manual: **0 ERROR, 0 WARNING, 1 NOTE**, exclusivamente
+por los componentes de la versión de desarrollo. Ejemplos y reconstrucción
+de viñetas aprobados. snapshot-verification.txt registra 398 archivos,
+incluido DESCRIPTION con normalización de espacios de build. En esta
+recuperación se cotejaron de nuevo los otros 397 archivos R/tests/man/NEWS/
+NAMESPACE: cero diferencias tras normalizar CRLF. No se repitió la suite
+ni se reconstruyó el mismo contenido. SHA256 del archivo final:
+7CCB4E7D8845ABFF86909A2144453CCF9CFB8611D7C2EB38F8C21325BC162920.
+Git diff --check aprobado. B08-07 y B08 cerrados dentro del alcance y
+límites documentados; cambios conservados sin commit por la instrucción
+vigente del usuario. Sin nueva CI remota, R mínimo ni manual PDF.
+
 ## Última validación: B08-06 — 23 de octubre de 2026
 
 Base ee7d7be, rama audit/0.2.0-precran y versión 0.1.6.9000. mc_reserve:

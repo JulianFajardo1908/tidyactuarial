@@ -1,5 +1,17 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## B08-07: resúmenes y conciliación (23 de octubre de 2026)
+
+Base 0030cef. A: momentos escalados y TVaR por masas sin desbordamiento
+de excesos, selectores vacíos y esquema de grupos vacíos; metadato anual
+de base Inf solo cuando coincide con c*k de valores finitos conocidos en
+mc_premium/mc_loss/mc_reserve. Siguen rechazadas primas no finitas, metadatos
+incoherentes e inferencia de c desde Inf solo. B: hipótesis iid de se_mean
+y límites antitéticos explícitos, sin inferir pares ni modificar el estimador.
+Sin nueva decisión C, firmas o columnas nuevas. C17-C20 conservan alcance.
+96 comprobaciones nuevas, 79 objetos ordinarios a 1e-12; once firmas B08
+idénticas a c7a0d29. Detalle y límites: audit-monte-carlo-review.md.
+
 ## B08-06: C19 y C20 autorizadas (23 de octubre de 2026)
 
 Base ee7d7be, mc_reserve. El usuario autorizó expresamente ambas:

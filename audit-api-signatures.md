@@ -1,5 +1,10 @@
 # Matriz global de firmas públicas
 
+B08-07: once firmas B08 iguales a c7a0d29; summary_mc y consumidores de
+metadatos conciliados, 96 comprobaciones nuevas y 79 objetos ordinarios a
+1e-12. Se conserva se_mean iid; no se infieren parejas antitéticas. Cierre
+y límites en audit-monte-carlo-review.md, validación en audit-precran-check.md.
+
 B08-06: mc_reserve conserva firma/esquema. C19/C20 autorizadas, flujos
 futuros monetarios, pares de estimación y filtros de vigencia comprobados;
 detalle y límites en audit-monte-carlo-review.md.
@@ -1679,7 +1684,9 @@ por llamada, precedencia de columnas, truncación y esquemas.
 
 ## B08 — summary_mc
 
-Documentación: `man/summary_mc.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/summary_mc.Rd`. B08-07: momentos/tails con rango
+recuperable, NA, grupos, esquemas y límites iid conciliados. Firma y
+columnas ordinarias conservadas; selectores vacíos omiten su categoría.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|

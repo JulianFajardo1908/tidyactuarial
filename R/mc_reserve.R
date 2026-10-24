@@ -127,6 +127,9 @@
 #' requires representable observed issue present values. Nonfinite converted
 #' premium metadata are accepted only when they match a conversion from the
 #' resolved premium; directly supplied premiums must remain finite.
+#' Positive infinite annualized annuity-basis metadata are likewise accepted
+#' only if they agree with the product of a finite payment basis and frequency.
+#' That infinite annualized value alone cannot identify the payment basis.
 #'
 #' @return A tibble with one row per simulation and requested duration. Important
 #'   standardized columns include:
@@ -525,7 +528,7 @@ mc_reserve <- function(
     stop("`tol` must be a single nonnegative finite number.", call. = FALSE)
   }
 
-  constant_column <- function(column) {
+  constant_column <- function(column, allow_inf = FALSE) {
     values <- .data[[column]]
 
     if (!is.numeric(values)) {
@@ -534,7 +537,8 @@ mc_reserve <- function(
 
     observed <- unique(values[!is.na(values)])
 
-    if (length(observed) != 1L || !is.finite(observed[[1L]])) {
+    if (length(observed) != 1L ||
+        (!is.finite(observed[[1L]]) && !(allow_inf && observed[[1L]] == Inf))) {
       stop(
         "`", column, "` must contain one constant finite value for the ",
         "simulated contract.",
@@ -620,10 +624,12 @@ mc_reserve <- function(
   )
 
   if ("payment_annualized" %in% names(.data)) {
-    payment_annualized_data <- constant_column("payment_annualized")
+    payment_annualized_data <- constant_column("payment_annualized", allow_inf = TRUE)
 
-    if (abs(payment_annualized_data - k * payment) >
-        tol * max(1, abs(payment_annualized_data))) {
+    expected_basis <- k * payment
+    if (payment_annualized_data != expected_basis &&
+        (!is.finite(payment_annualized_data) || !is.finite(expected_basis) ||
+         abs(payment_annualized_data - expected_basis) > tol * max(1, abs(payment_annualized_data)))) {
       stop(
         "`payment_annualized` is inconsistent with `k * payment`.",
         call. = FALSE

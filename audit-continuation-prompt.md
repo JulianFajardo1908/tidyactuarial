@@ -1,5 +1,140 @@
 # Prompt maestro para continuar tidyactuarial
 
+## Validación CI de la candidata solicitada — 24 de octubre de 2026
+
+El usuario pidió validar la candidata después de explicar que el siguiente
+paso era guardar/enviar el conjunto para CI. El intento de commit/push fue
+rechazado automáticamente antes de ejecutarse: falta autorización explícita
+del payload y destino exactos. Solicitar confirmación de los 32 archivos
+pendientes (código, tests, documentación y auditorías), commit y push normal
+a https://github.com/JulianFajardo1908/tidyactuarial, rama
+audit/0.2.0-precran. No reintentar ni usar otro método sin esa aprobación.
+Se comprobó que la referencia remota es ancestro del checkout.
+El archivo 0.2.0 conserva su SHA256 y el cotejo de 413 fuentes; no se
+repiten suite/build/check locales. El resultado remoto debe vincularse
+al SHA concreto que reciba GitHub; todavía no se declara aprobado.
+El usuario otorgó después autorización explícita para esos 32 archivos,
+commit y push a ese repositorio y rama. Proceder con el conjunto revisado;
+vincular el resultado de CI al SHA final. CRAN y publicación de la release
+siguen sin autorizar.
+
+## Estado vigente: candidata 0.2.0 validada localmente — 24 de octubre de 2026
+
+El usuario autorizó cambiar la versión y preparar/comprobar la candidata.
+DESCRIPTION=0.2.0; README ajustado. No hay autorización nueva para commit,
+push ni envío a CRAN. Rama audit/0.2.0-precran, HEAD 0030cef, todos los
+cambios anteriores conservados sin commit. Nuevas bases siguen desde 0.2.1.
+
+Build/check completados durante la interrupción: 0 ERROR, 0 WARNING,
+1 NOTE por V8 ausente para verificar fórmulas del manual HTML. Manual PDF,
+ejemplos y viñetas aprobados; 7454 expectativas instaladas pasan sin fallos,
+advertencias ni omisiones. 413 archivos cotejados con el archivo 0.2.0;
+117 AST R y 153 archivos tests/datos iguales al snapshot funcional anterior.
+Se recuperó evidencia y se repitió solo el cotejo, no suite/build/check.
+Artefactos release-0.2.0 de esta sesión, huella y límites completos en
+audit-precran-check.md; borrador de entrega cran-comments.md en artefactos.
+
+Siguiente paso: con autorización expresa de commit/push, guardar el conjunto
+concreto y validar CI sobre ese mismo contenido, incluido R mínimo. No
+atribuir CI histórica a esta candidata ni enviar a CRAN por inferencia.
+La comprobación matemática HTML con V8 no está certificada localmente.
+Los estados de desarrollo y tareas posteriores aquí debajo son históricos;
+este encabezado sustituye sus referencias de versión/validación actuales.
+
+## Sitio y manual locales construidos — 23 de octubre de 2026
+
+pkgdown completado con ejemplos y cuatro artículos desde copia pública
+de fuentes: site-public/ en artefactos de esta sesión. 146 páginas HTML,
+cero destinos de archivos locales faltantes y sin páginas AGENTS/audit.
+No se comprobaron todos los fragmentos de enlace ni destinos externos.
+Se añadieron al índice seis métodos print documentados que la construcción
+detectó omitidos. Alias A_xj redirige a insurance_xj. Log: site-public.log;
+las dos páginas e_x/e_xy se actualizaron después en site-refresh.log.
+
+El build directo inicial mostró que pkgdown convierte Markdown interno
+de la raíz independientemente de .Rbuildignore. La salida de entrega
+usa fuentes sin esos informes. .github/workflows/pkgdown.yaml elimina
+solo audit-*.md y AGENTS.md del checkout efímero antes del build; YAML y
+sintaxis R comprobados, sin ejecutar CI ni publicar nada. Los intentos
+previos incompletos se conservan como artefactos, no son el sitio final.
+
+PDF actual de desarrollo: 246 páginas e índice, sin Overfull; cuatro
+encabezados de e_x/e_xy corregidos solo en comentarios/ayuda. Evidencia,
+muestra visual y huella en audit-manual-index.md. No hubo nuevas pruebas
+actuariales, commit, push ni cambio de versión. El sitio/manual no equivalen
+al build/check final de una candidata 0.2.0. Conservar los límites del PDF.
+
+## Revisión documental de entrega — 23 de octubre de 2026
+
+Se corrigieron omisiones del índice _pkgdown.yml: 19 funciones de riesgo
+colectivo y accrued_interest/bootstrap_spot_curve/forward_curve/par_rate/
+plot_contingent_cash_flow. Validación YAML/Rd: 102 nombres públicos cubiertos
+por temas/alias sin temas duplicados; A_xj pertenece a insurance_xj.
+README distingue desarrollo de CRAN, incluye riesgo colectivo y aclara
+el alcance por commit de CI; siete bloques ejecutables pasan. DESCRIPTION
+incluye riesgo colectivo/coberturas/colas, con versión sin cambios.
+NEWS elimina códigos internos C y sustituye la descripción superada de
+cuadratura de e_xy por integración analítica. Una referencia innecesaria
+a 0.1.6 se retiró de la viñeta de préstamos; su código no cambió.
+Evidencia: documentation-review.R/.log en artefactos de esta sesión.
+Diff --check aprobado. Sin cambios funcionales, nuevas bases, commit o push.
+No se repiten suite actuarial/build/check por esta revisión focalizada;
+el archivo validado en b05-supplement precede a estos cambios documentales
+y de DESCRIPTION/NEWS. La candidata definitiva deberá incluirlos y tener
+su propio build/check. No se reconstruyeron el sitio ni el manual PDF.
+
+## Alcance de versiones acordado: nuevas bases desde 0.2.1
+
+El usuario pospone las nuevas bases de tablas de vida internacionales,
+tasas spot de Colombia/Estados Unidos y siniestralidad de autos para
+0.2.1 y versiones posteriores. No forman parte de la entrega 0.2.0.
+Este acuerdo no modifica DESCRIPTION ni inicia investigación o incorporación
+de datos; tampoco compromete incluir todos los conjuntos en 0.2.1.
+
+## Estado vigente: suplemento B05 cerrado — 23 de octubre de 2026
+
+Se completó t_px/e_x tras B08, conservando todos sus cambios sin commit.
+Base Git 0030cef, rama audit/0.2.0-precran y versión 0.1.6.9000. No hacer
+commit sin autorización expresa, aunque registros históricos lo indicaran.
+Supervivencia derivada directamente desde lx y logaritmos cuando el
+cociente subdesborda; CF/Balducci conservan fracciones e integrales
+representables. Firmas, columnas, NA, extinción y truncación preservados.
+No recuperar px explícito redondeado a cero ni certificar columnas
+incompatibles. Detalles en audit-life-tables-mortality.md.
+
+113 comprobaciones nuevas: contra base 61 fallos/52 aprobadas sin errores
+ni advertencias; después todas aprobadas. 192 objetos ordinarios a 1e-12,
+dos firmas iguales. 7454 aprobadas en fuente e instalado, cero fallos/
+advertencias/omisiones. Build/check completos: 0 ERROR, 0 WARNING, 1 NOTE
+por desarrollo, ejemplos y viñetas aprobados. 399 archivos cotejados y
+SHA256 en audit-precran-check.md. Artefactos b05-supplement de esta sesión.
+El sandbox devolvía file.access=-1 para dependencias legibles; el check
+definitivo usó acceso normal aprobado automáticamente. No confundir sus
+intentos previos fallidos por entorno con resultados del código final.
+
+Actualización posterior del usuario: no repetir B09 sin necesidad técnica
+concreta. Cotejo contra 7575fe4: las 19 funciones y el helper de medidas de
+riesgo no cambiaron; sus pruebas pasaron en la última suite de 7454.
+Evidencia previa conciliada en audit-thematic-review.md; no se identificó
+un defecto nuevo que justifique una revisión adicional. No interpretar
+la etiqueta histórica de B09 pendiente como una orden de reiniciar trabajo.
+No se ejecutaron pruebas ni se cambió código en esta conciliación.
+B01/B02 cerrados formalmente por conciliación documental posterior, sin
+código o pruebas nuevas: pendientes de base logarítmica, m, productos,
+gráfica, cancelación y C01 resueltos por las unidades ya verificadas.
+Matriz de cierre y límites en audit-interest-foundations.md y
+audit-cash-flow-roots.md. Se reutiliza la última suite/check del suplemento
+B05, con 7454 aprobadas en fuente e instalado. C02-C04 siguen como
+propuestas opcionales de API sin implementar, no defectos obligatorios.
+Siguiente etapa: preparación final 0.2.0 a partir del conjunto validado;
+identificar solo documentación o verificaciones finales concretas que
+falten. No repetir barridos ni pruebas ya válidas por rutina. CI histórica
+y conciliación de auditoría externa conservan sus límites documentados.
+Sin cambiar versión, hacer commit/push ni enviar a CRAN sin autorización.
+B05 suplementario y B08 cerrados en sus alcances; no declarar terminada
+toda la auditoría externa ni aprobada una publicación.
+Los párrafos siguientes conservan el historial anterior a este cierre.
+
 ## Preferencia vigente: consumo eficiente (23 de octubre de 2026)
 
 Aplicar audit-efficient-workflow.md: lectura dirigida, regresiones locales
@@ -12,7 +147,47 @@ cambiar únicamente registros excluidos del archivo fuente. No cambiar
 modelo/configuración de la app ni prometer una cantidad de mensajes.
 Este encabezado y el último estado B08 son la entrada rápida; consultar
 historial adicional por función y necesidad, preservándolo íntegro.
-Última base de inicio: ee7d7be; estado actuarial más reciente a continuación.
+Última base de inicio: 0030cef; estado actuarial más reciente a continuación.
+
+## B08-07: summary_mc y conciliación de B08 (23 de octubre de 2026)
+
+Base 0030cef, Git inicialmente limpio, misma rama audit/0.2.0-precran y
+versión 0.1.6.9000. Momentos escalados conservan sd/se cuando var pierde
+rango; TVaR integra masas ordenadas sin restar pérdidas extremas, conserva
+átomos, valores firmados y p=0/1. Selectores vacíos y esquema sin grupos
+corregidos. se_mean sigue siendo sd/sqrt(n) iid; no se infieren parejas de
+method/orden y no se certifica como error antitético. Para pares conocidos,
+resumir medias de pares; tamaños impares/pesos requieren su diseño propio.
+Consumidores mc_premium/mc_loss/mc_reserve aceptan payment_annualized=Inf
+solo si coincide con c*k de c/k finitos. Metadatos incoherentes, primas no
+finitas e inferencia de base desde Inf solo siguen rechazados. Sin nueva C.
+
+96 comprobaciones nuevas y 471 previas seleccionadas pasan. 79 objetos
+ordinarios a 1e-12, once firmas iguales a c7a0d29. Contra base: 17 fallos,
+2 errores, cero advertencias, 58 aprobadas; los errores abortan aserciones.
+Registro consolidado y límites: audit-monte-carlo-review.md. Artefactos
+b08-07: before-final.log/compatibility.R y regression-final.log; before.log/
+after.log son iteraciones anteriores. Validación final/huella en
+audit-precran-check.md. Once nombres conciliados; 1185 comprobaciones nuevas
+en B08. No reabrir unidades por sus pendientes históricos ya resueltos.
+
+Cierre recuperado tras interrupción: 7341 aprobadas tanto en fuente como
+instalado, sin fallos/advertencias/omisiones. Build y check terminados;
+0 ERROR, 0 WARNING, 1 NOTE por versión de desarrollo. Ejemplos y viñetas
+aprobados. Cotejo actual de 397 archivos sin diferencias; evidencia previa
+de 398 incluido DESCRIPTION y SHA256 en audit-precran-check.md. B08-07 y
+B08 cerrados en su alcance. Cambios sin commit, preservados por instrucción
+vigente; no hacer commit sin autorización expresa. No repetir validaciones
+sobre el mismo contenido por haber cambiado solo estos registros excluidos.
+
+Siguiente paso después del cierre validado B08: suplemento B05 t_px/e_x,
+dos defectos confirmados pendientes de precisión, sin reiniciar el cierre
+histórico de B05. Después diagnosticar B09 por familias aprovechando sus
+correcciones previas antes de editar; son 19 nombres pendientes de revisión
+integral, no 19 ediciones ya justificadas. B01/B02 conservan cierres formales
+pendientes. No declarar terminada la auditoría completa. Conservar los
+límites de RNG, censura, double, vigencia y dependencia del cierre B08.
+Sin push, versión nueva, dependencias o cambios de rama.
 
 ## B08-06: mc_reserve (23 de octubre de 2026)
 

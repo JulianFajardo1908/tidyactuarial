@@ -20,14 +20,14 @@
 #' @param tol Numeric tolerance for integer checks.
 #'
 #' @details
-#' **Curtate life expectancy** (Finan, Section 23.7):
+#' \strong{Curtate life expectancy} (Finan, Section 23.7):
 #' \deqn{e_x = \sum_{k=1}^{\omega - x} {}_k p_x = \frac{1}{\ell_x}
 #'   \sum_{k=1}^{\omega - x} \ell_{x+k}.}
 #'
 #' The \eqn{t}-year temporary curtate expectancy is (Finan, Sec. 23.7):
 #' \deqn{e_{x:\overline{t}|} = \sum_{k=1}^{t} {}_k p_x.}
 #'
-#' **Complete life expectancy** (Finan, Section 23.3):
+#' \strong{Complete life expectancy} (Finan, Section 23.3):
 #' \deqn{\breve{e}_x = \int_0^{\omega - x} {}_t p_x \, dt =
 #'   \frac{T_x}{\ell_x}.}
 #'
@@ -46,6 +46,9 @@
 #' conditional probabilities are undefined. The CF/Balducci zero-survival
 #' interval has integral zero; UDD retains its linear decline.
 #' Unknown survivor counts propagate as missing expectations.
+#' When annual probabilities must be derived from survivor counts, survival
+#' uses the direct count ratio rather than \eqn{1-q_y}. Its logarithm retains
+#' the CF integral even when the annual ratio is below floating-point range.
 #'
 #' Under UDD, the complete expectancy satisfies the well-known approximation
 #' (Finan, Example 20.24):
@@ -136,7 +139,7 @@ e_x <- function(
 
   # --- Within-year survival integral: int_0^s {}_u p_y du ---
   # Closed-form under each fractional-age assumption (Finan, Section 24)
-  int_ps <- function(py, qy, s, frac_arg) {
+  int_ps <- function(py, qy, s, frac_arg, log_py = log(py)) {
     if (is.na(s) || s <= 0) return(0)
     if (is.na(py) || is.na(qy)) return(NA_real_)
     if (s >= 1) s <- 1
@@ -149,19 +152,19 @@ e_x <- function(
     if (frac_arg == "CF") {
       # Sec. 24.2: int_0^s p^u du = (1 - p^s) / (-ln p)
       if (py >= 1) return(s)
-      if (py <= 0) return(0)
-      a <- -log(py)
+      if (log_py == -Inf) return(0)
+      a <- -log_py
       if (a * s == 0) return(s)
       return(s * (-expm1(-a * s) / (a * s)))
     }
 
     # Balducci (Sec. 24.3): int_0^s p/(1-(1-u)q) du = (p/q)*ln((p+qs)/p)
     if (qy <= 0) return(s)
-    if (py <= 0) return(0)
-    z <- qy * s / py
-    if (z == 0) return(s)
-    if (is.finite(z)) return(s * (log1p(z) / z))
-    (py / qy) * (log(py + qy * s) - log(py))
+    if (log_py == -Inf) return(0)
+    log_z <- log(qy) + log(s) - log_py
+    if (log_z < -35) return(s)
+    log_increment <- max(0, log_z) + log1p(exp(-abs(log_z)))
+    exp(log_py - log(qy) + log(log_increment))
   }
 
   ex <- rep(NA_real_, n)
@@ -215,14 +218,17 @@ e_x <- function(
       y <- xm
       iy <- match(y, ages)
       qy <- qx_col[iy]; py <- px_col[iy]
+      log_py <- log(py)
       if (is.na(qy) || is.na(py)) {
         iy1 <- match(y + 1L, ages)
         if (!is.na(iy1) && lx[iy] > 0) {
           qy <- (lx[iy] - lx[iy1]) / lx[iy]
-          py <- 1 - qy
+          py <- lx[iy1] / lx[iy]
+          log_py <- if (py == 0 && !is.na(lx[iy1]) && lx[iy1] > 0)
+            log(lx[iy1]) - log(lx[iy]) else log(py)
         }
       }
-      ex[m] <- int_ps(py, qy, s, frac)
+      ex[m] <- int_ps(py, qy, s, frac, log_py)
       next
     }
 
@@ -232,17 +238,21 @@ e_x <- function(
 
     qy <- qx_col[iy]
     py <- px_col[iy]
+    log_py <- log(py)
 
     need <- is.na(qy) | is.na(py)
     if (any(need)) {
       iy1 <- match(ys + 1L, ages)
       okd <- need & !is.na(iy1) & !is.na(lx[iy]) & (lx[iy] > 0)
       qy[okd] <- (lx[iy[okd]] - lx[iy1[okd]]) / lx[iy[okd]]
-      py[okd] <- 1 - qy[okd]
+      py[okd] <- lx[iy1[okd]] / lx[iy[okd]]
+      log_py[okd] <- log(py[okd])
+      under <- okd & !is.na(py) & py == 0 & lx[iy1] > 0
+      log_py[under] <- log(lx[iy1[under]]) - log(lx[iy[under]])
     }
 
     I1 <- vapply(seq_along(py), function(j) {
-      if (is.na(p_k[j])) NA_real_ else if (p_k[j] == 0) 0 else int_ps(py[j], qy[j], 1, frac)
+      if (is.na(p_k[j])) NA_real_ else if (p_k[j] == 0) 0 else int_ps(py[j], qy[j], 1, frac, log_py[j])
     }, numeric(1))
     part1 <- sum(p_k[seq_along(I1)] * I1)
 
@@ -253,15 +263,18 @@ e_x <- function(
       yN <- xm + n_int
       iN <- match(yN, ages)
       qN <- qx_col[iN]; pN <- px_col[iN]
+      log_pN <- log(pN)
       if (is.na(qN) || is.na(pN)) {
         iN1 <- match(yN + 1L, ages)
         if (!is.na(iN1) && !is.na(lx[iN]) && lx[iN] > 0) {
           qN <- (lx[iN] - lx[iN1]) / lx[iN]
-          pN <- 1 - qN
+          pN <- lx[iN1] / lx[iN]
+          log_pN <- if (pN == 0 && !is.na(lx[iN1]) && lx[iN1] > 0)
+            log(lx[iN1]) - log(lx[iN]) else log(pN)
         }
       }
       part2 <- if (is.na(p_k[length(p_k)])) NA_real_ else if (p_k[length(p_k)] == 0) 0 else
-        p_k[length(p_k)] * int_ps(pN, qN, s, frac)
+        p_k[length(p_k)] * int_ps(pN, qN, s, frac, log_pN)
     }
 
     ex[m] <- part1 + part2

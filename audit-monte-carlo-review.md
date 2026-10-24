@@ -11,8 +11,8 @@ fracciones CML, vidas faltantes, calendarios y coherencia K/T.
 
 | Nombre | Modelo/contrato a conciliar | Estado actual |
 |---|---|---|
-| simulate_lifetime | PMF anual de K y fracción condicional de muerte; tabla qx | B08-01: precisión y validación puntual corregidas/probadas; revisión integral abierta |
-| simulate_lifetimes | Vidas independientes; una corriente RNG por llamada; precedencia qx/px/lx | B08-01: radix/decrementos y validación puntual corregidos/probados; revisión integral abierta |
+| simulate_lifetime | PMF anual de K y fracción condicional de muerte; tabla qx | B08-01/07: conciliado dentro del alcance y límites de cierre |
+| simulate_lifetimes | Vidas independientes; una corriente RNG por llamada; precedencia qx/px/lx | B08-01/07: conciliado dentro del alcance y límites de cierre |
 | mc_multilife_status | Min/max de K y T; mismos identificadores de vidas por simulación | B08-02: C17 y conservación de estados/almacenamiento/columnas probadas; límites abajo |
 | simulate_annuity_x | Valor presente de pagos por trayectoria; motor lx propio | B08-03: motor lx, valoración monetaria, calendario y RNG comprobados; límites abajo |
 | simulate_insurance_x | Seguro anual por trayectoria; motor lx propio | B08-03: masas, censura, valoración monetaria y RNG comprobados; límites abajo |
@@ -21,7 +21,107 @@ fracciones CML, vidas faltantes, calendarios y coherencia K/T.
 | mc_premium | Cociente de medias de pares Z,Y; prima anualizada/cuota | B08-05: precisión, medias subnormales, grupos y pares NA probados; límites abajo |
 | mc_loss | Z menos prima en la unidad de Y | B08-05: unidades, flujos monetarios y NA probados; límites abajo |
 | mc_reserve | Flujos futuros por trayectoria; antes/después de pago; vigencia | B08-06: libros, pares, rango monetario y C19/C20 autorizadas probados; límites abajo |
-| summary_mc | Momentos, error estándar, cuantiles y colas empíricas | Pendiente; preservar TVaR empírica ya corregida |
+| summary_mc | Momentos, error estándar, cuantiles y colas empíricas | B08-07: momentos/tails/extremos, NA/grupos y límites iid conciliados |
+
+## B08-07 — resúmenes y conciliación de los once nombres (23 de octubre de 2026)
+
+Base 0030cef, Git limpio, rama audit/0.2.0-precran y versión 0.1.6.9000
+conservadas. Este apartado consolida las unidades B08-01 a B08-06; los
+pendientes históricos de sus snapshots se resuelven en las unidades que
+los suceden, sin borrar evidencia. No se reinicia el bloque ni se amplían
+las autorizaciones C17-C20. Las correcciones actuales son A numéricas y
+B documentales, sin nuevos parámetros, aliases o columnas públicas.
+
+### Diagnóstico e identidades
+
+La varianza muestral es sum((x-mean(x))^2)/(n-1), sd su raíz y se=sd/sqrt(n)
+bajo independencia. Con x=(-1e308,1e308), varianza no cabe pero sd=sqrt(2)*
+1e308 y se=1e308 sí. Con x=(-1e-300,1e-300), varianza redondea a cero pero
+sd y se siguen siendo positivos representables. Se recuperan en escala
+normalizada, centrando antes de escalar cuando cabe. Se evalúan por separado
+varianza, desviación y error; no se fuerza finitud de una varianza imposible.
+
+TVaR_p es la integral de cuantiles empíricos superiores dividida por 1-p.
+La resta x-VaR desbordaba para x=(-1e308,1e308) y daba TVaR_0=Inf, en vez
+de cero, y TVaR_.5=Inf en vez de 1e308. Se integran masas ordenadas, incluida
+la fracción del átomo fronterizo, sin restar extremos. p=0 usa la media,
+p=1 el máximo. Para una fracción muy pequeña del átomo inferior se resta
+su masa monetaria de la media antes de dividir por 1-p; así no se pierde
+p diminuto por redondear prematuramente 1-p a uno. Una elevación binaria
+exacta mantiene muestras subnormales durante el promedio. Los valores
+firmados y colas extendidas siguen admitidos; momentos indefinidos son NA.
+VaR sigue siendo cuantil tipo 1 y los q descriptivos tipo 7.
+
+numeric() ya pasaba la validación de probabilidades pero fallaba al nombrar
+un vector vacío; ahora omite la categoría. Los grupos vacíos conservan
+columnas estadísticas con cero filas; la muestra vacía no agrupada conserva
+una fila de conteos y estadísticas NA. Se preserva la política na_rm.
+
+La conciliación encontró otro defecto de encadenamiento: mc_annuity con
+c=1e308, k=2 y fuerza 1000 da Y=7.124576e90 finito pero payment_annualized=Inf.
+mc_premium/mc_loss/mc_reserve rechazaban el metadato antes de valorar flujos
+finitos. Sus verificaciones locales ahora admiten únicamente Inf positivo
+si coincide con c*k de c y k finitos conocidos. Se sigue rechazando un Inf
+incoherente o usado como única base para inferir c. No se amplía la prima
+directa a valores no finitos ni se infiere un importe desde un infinito.
+
+### Dependencia, oráculos y compatibilidad
+
+se_mean conserva sd/sqrt(n). Se documenta expresamente su hipótesis iid:
+no es un error Monte Carlo válido en general para muestras antitéticas,
+ponderadas o agrupadas. No se inventan pares desde method, orden o etiquetas.
+Para pares independientes conocidos se pueden resumir sus medias; un n impar
+o pesos desiguales requiere un cálculo acorde al diseño. La prueba usa pares
+(1,9),(2,8),(4,6): la media de cada par es 5 y su error es cero, mientras el
+resumen de filas tiene el error descriptivo iid positivo. No se certifica
+ese error de filas como estimador de la simulación antitética.
+
+test-b08-summary-precision.R añade 96 comprobaciones: momentos analíticos
+escalados, TVaR como integración independiente de masas, átomos/valores
+firmados/subnormales/infinidades, p=0/1 y p diminuto, NA/grupos/esquemas,
+RNG intacto, dependencia y libros explícitos de productos encadenados.
+Reconcilia joint/last_survivor hasta reservas a t=0 y resúmenes; los wrappers
+retienen un libro común observado con censura finita, sin tratar K=n como
+muerte completa. La metadata anual desbordada se prueba en los tres
+consumidores, también con rechazos de datos incoherentes y falta de base.
+Las 471 comprobaciones previas seleccionadas de resúmenes, primas/pérdidas
+y reservas siguen aprobadas. La suite integral incluye las restantes de B08.
+
+79 objetos ordinarios completos coinciden con 0030cef a 1e-12; 37 son
+resúmenes y 42 consumidores financieros. Los once formals públicos son
+idénticos a c7a0d29, base anterior a B08. La regresión definitiva sobre
+0030cef y resultados finales se conservan en before-final.log y
+regression-final.log; errores previos abortan algunas aserciones. before.log
+y after.log son etapas anteriores, no sustituyen la evidencia final.
+
+### Cierre de alcance y límites conservados
+
+Los once nombres se concilian dentro de sus modelos documentados: PMF de
+vidas y fracciones; truncación condicional/error de los generadores frente
+a censura de los wrappers; min/max multivida; calendarios/eventos; primas,
+pérdidas, reservas por trayectoria y resúmenes. B08 acumula 1185 comprobaciones
+nuevas. Cierre validado: 7341 comprobaciones aprobadas en fuente e instalado,
+sin fallos, advertencias ni omisiones; check con 0 ERROR, 0 WARNING y una
+NOTE por versión de desarrollo. Evidencia y cotejo recuperados tras la
+interrupción en audit-precran-check.md. B08 cerrado en este alcance;
+cambios preservados sin commit por instrucción vigente del usuario.
+
+Se conservan independencia entre vidas cuando corresponde, control de RNG
+según cada contrato y la convención terminal CML/Balducci con q=1. No se
+promete reconstrucción de información perdida en qx/px, fracciones menores
+que double, fechas/materializaciones arbitrarias o cancelación general de
+flujos no representables. Los calendarios/fronteras y filtros de vigencia
+siguen los contratos locales. No se infieren estados observados multivida
+desde una etiqueta; una pérdida por trayectoria no es una reserva esperada
+condicional. Las columnas que no caben pueden ser 0/Inf y no sirven por sí
+solas para recuperar entradas. Las etiquetas de cuantiles mantienen su
+precisión histórica y las claves de agrupación deben evitar colisiones con
+los nombres estadísticos si se desean nombres sin reparación automática.
+
+No se certifican CI remota nueva, R mínimo ni el manual PDF. B05 t_px/e_x,
+B09 y los cierres formales B01/B02 siguen separados; no se les atribuye este
+cierre ni se dan por corregidos por analogía. Artefactos b08-07 de la sesión
+del 21; trabajo fechado el 23. Sin dependencia, versión o push.
 
 ## B08-06 — reservas por trayectoria (23 de octubre de 2026)
 

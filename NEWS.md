@@ -1,6 +1,27 @@
 # tidyactuarial 0.2.0
 
-* Approved C19/C20: `mc_reserve` moment-of-death pure endowments require
+## Life contingencies and Monte Carlo
+
+* Single-life fractional survival and complete life expectancy retain small
+  annual survival derived from survivor counts. CF and Balducci avoid
+  cancellation through mortality complements and use logarithmic ratios
+  when annual survival underflows; integer horizons and table truncation
+  conventions are preserved.
+
+* Monte Carlo summaries retain representable standard deviations and standard
+  errors when variance loses range. Empirical TVaR integrates ordered tail
+  masses without overflowing excess-loss differences, preserving fractional
+  atoms, signed values and endpoint conventions. Empty probability selectors
+  omit their columns and empty grouped summaries retain their schema.
+  The independence assumption behind `se_mean` and antithetic limits are
+  documented explicitly; no pairing is inferred from a method label.
+
+* Monte Carlo premium, loss and reserve consumers accept overflowing annualized
+  annuity-basis metadata only when they match a finite per-payment basis and
+  frequency. Inconsistent metadata and inference from an infinite annualized
+  value alone remain errors, preserving valid chained monetary calculations.
+
+* `mc_reserve` moment-of-death pure endowments require
   survival strictly beyond maturity. Internally estimated premiums retain
   their scale interpretation regardless of the input premium-unit selector;
   supplied premiums retain their declared units.
@@ -19,7 +40,7 @@
   unit conventions are retained; displayed unrepresentable coefficients and
   amounts retain their double-precision limits.
 
-* Approved C18: moment-of-death pure endowments in `mc_insurance` require
+* Moment-of-death pure endowments in `mc_insurance` require
   survival strictly beyond maturity. A death exactly at maturity belongs
   to the term component, making term plus pure endowment equal endowment
   on each trajectory. The annual curtate convention is retained.
@@ -37,7 +58,7 @@
   sampling. Finite-horizon censoring and existing random-stream conventions
   are retained and clarified.
 
-* Approved C17: multiple-life simulated statuses require the exact lifetime
+* Multiple-life simulated statuses require the exact lifetime
   relation K <= T < K+1 before aggregation; tolerance still checks integer K.
   Complete lifetimes are rejected rather than repaired. Large curtate status
   values retain numeric storage, and identifier/output-name collisions give
@@ -59,21 +80,21 @@
   survival, retaining small benefits lost by subtracting insurance APVs.
   Joint reserves now use backward conditional recursion; last-survivor reserves
   retain their three-state model. Both use direct annual decrements and original
-  log interest. Approved C16 includes immediate premiums due exactly at the
+  log interest. Immediate premiums include those due exactly at the
   reserve date, including a scheduled last installment at maturity.
 
 * Two-life annuities retain tiny designated-reversion probabilities, original
   log interest and representable signed monetary payments on fractional grids.
-  Annual-table and payment-grid consistency are checked explicitly. Approved
-  C15 requires supported positive Woolhouse second-order borders and following
+  Annual-table and payment-grid consistency are checked explicitly.
+  Second-order Woolhouse corrections require supported positive borders and following
   years; negative approximations warn without clipping. State meanings and
   open-table truncation limits are documented without changing the signature.
 
 * Two-life insurance sums disjoint annual first/second-death transition masses
   from issue, retaining tiny mortality and representable monetary values with
   extreme interest. State conditioning and existing audit columns are retained.
-  Approved C13 rejects whole insurance without observed status extinction;
-  approved C14 pays a zero-term endowment at its deferred maturity.
+  Whole insurance without observed status extinction is rejected;
+  a zero-term endowment pays at its deferred maturity.
 
 * Two-life survival and expectancy reject incompatible annual ages, increasing
   or invalid survivor counts and contradictory mortality probabilities.
@@ -83,7 +104,7 @@
 * Two-life survival and expectancy normalize inherited `CML` attributes to
   constant force, including equivalent `CF`/`CML` attributes on two tables.
 
-* Approved C12: `annuity_multi()` adds trailing `frac`, values actual payments
+* `annuity_multi()` adds trailing `frac`, values actual payments
   of 1/k under UDD, CF/CML or Balducci with `woolhouse = "none"`, and includes
   both deferred and terminal endpoints in temporary Woolhouse corrections.
   The historical joint-and-survivor meaning of `reversionary` is clarified.
@@ -123,8 +144,8 @@
   probabilities use survivor decrements before division. Explicit interest
   overrides on insurance contracts are respected. Woolhouse reports negative
   approximations and rejects undefined positive-survival boundary forces.
-* Approved C10: zero-term endowments pay on survival at deferred maturity.
-  Approved C11: empty annuities retain zero APV, with a pure endowment factor
+* Zero-term endowments pay on survival at deferred maturity.
+  Empty annuities retain zero APV, with a pure endowment factor
   of one and the ordinary `annuity_value_at_start` diagnostic column.
 
 * Life cash-flow APVs retain original log interest rates and combine monetary,
@@ -145,13 +166,13 @@
 
 ## Bug fixes
 
-* Approved C08: `t_Ex()` returns discounted survival without an upper cap of
+* `t_Ex()` returns discounted survival without an upper cap of
   one, allowing actuarial values above one under negative interest rates.
   Pure endowments and commutation values retain original log discount rates.
 * Survival/death probabilities preserve small fractional decrement losses;
   complete expectancy integrals retain small horizons and treat extinct
   cohorts and unknown survivor counts without spurious NaN/index errors.
-* Approved C09: Kaplan-Meier `ax` measures time lived by interval decedents
+* Kaplan-Meier `ax` measures time lived by interval decedents
   in years. Empirical exposures are stable across radix scales and use the
   CF/Balducci zero-survival limits; positive deaths at zero exposure yield Inf.
   Standard errors and confidence limits retain very small survival estimates.
@@ -160,7 +181,7 @@
   validate annual age grids, and KM plots sort and validate step/band data.
 
 
-* Approved API decision C07: open life tables built only from `lx` now leave
+* Open life tables built only from `lx` now leave
   terminal deaths/probabilities/central rates missing instead of implying certain
   death. Supplied terminal probabilities and closed-table conventions remain.
 * Annual life tables reject contradictory `qx`/`px`, forbidden NaN values,
@@ -197,7 +218,7 @@
 * Portfolio duration and convexity avoid monetary products that overflow or
   underflow before taking a finite weighted average. Yield-coordinate and
   time-unit requirements for aggregation are now explicit in documentation.
-* Approved API decision C06: with `.na = "propagate"`, portfolio positions
+* With `.na = "propagate"`, portfolio positions
   with missing identifiers now produce a final row with an NA identifier and
   missing sensitivity, value and position count, instead of silently vanishing.
   Missing-value `drop` and `error` policies are preserved.
@@ -217,7 +238,7 @@
 * Callable dates must identify distinct coupon periods strictly inside
   maturity after alignment; nonrepresentable period counts are rejected before
   integer conversion in book-value and callable schedules.
-* Approved API decision C05: callable `is_worst_case` now marks exactly the
+* Callable `is_worst_case` now marks exactly the
   computed minimum price and all exact computed ties. Calendar tolerance no
   longer determines monetary near ties. Arguments and columns are unchanged.
 
@@ -255,7 +276,7 @@
 * s_angle documentation now identifies the existing horizon as the end of
   the term, one payment interval after the final due payment.
 
-* solve_value now has an approved trailing argument `residual_tol = tol`,
+* `solve_value()` now has a trailing argument `residual_tol = tol`,
   separating result-unit residual accuracy from unknown-coordinate accuracy.
   Audit convergence uses this explicit threshold without a hidden floor.
   Exhausting uniroot iterations is now an error. Existing positional arguments
@@ -376,7 +397,8 @@
   conditioning on both lives being alive at the initial ages. Annual
   integration now uses survival from those original ages, including paths
   with only one survivor, instead of restarting both lives each year.
-  Adaptive quadrature replaces the fixed trapezoid grid for both cohorts.
+  Annual integrals use analytic UDD, constant-force, or Balducci formulas
+  for both cohorts, replacing numerical quadrature.
   Missing initial ages and zero initial survivors return `NA` consistently.
 * `t_px()` now obtains integer survival directly from `lx`, including at
   the last recorded age, without requiring a next-year probability.

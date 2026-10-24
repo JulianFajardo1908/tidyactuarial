@@ -1,7 +1,35 @@
 # B02 — Flujos y búsqueda de raíces
 
 Continuación del barrido ampliado, 16 de octubre de 2026. Objetivo 0.2.0.
-Estado del bloque: en revisión; no cerrado.
+Estado vigente: **cerrado dentro del alcance documentado**, conciliado el
+23 de octubre de 2026.
+
+## Cierre formal por conciliación de evidencia existente
+
+| Pendiente histórico | Evidencia que lo resuelve |
+|---|---|
+| Productos capital-factor representables pese a pérdida de rango intermedia | B02-04 y test-capital-factor-products.R: 23 comprobaciones con referencias binarias/Decimal |
+| Newton dependiente de escala y unidades de tolerancia | B02-05: 13 comprobaciones; B02-08/C01 autorizada: residual_tol separado y 56 comprobaciones |
+| Gráfica de flujos sin revisión propia | B02-06: 11 comprobaciones adicionales, API ggplot/pipes y dos PNG revisados |
+| Cancelación de importes individualmente desbordados | B02-07: 17 comprobaciones bajo igualdad exacta del log factor |
+
+Se conservan los ocho contratos públicos y el parámetro final residual_tol
+autorizado por C01. irr_flow_multi sigue siendo un catálogo de raíces
+detectables: tangencias y raíces próximas conservan los límites heurísticos
+documentados. No se garantiza cancelación general entre factores distintos
+ni representar resultados fuera de double. La precisión de coordenada y
+el criterio residual permanecen distintos; el resultado audit informa
+converged conforme al umbral documentado. No se amplían C02-C04.
+
+Los fallos previos y oráculos independientes están registrados en las
+unidades correspondientes. La revalidación de cancelación y C01 figura
+en audit-precran-check.md; la última validación del suplemento B05 incluye
+todas estas regresiones: 7454 aprobadas en fuente e instalado, check
+0 ERROR, 0 WARNING, una NOTE por desarrollo, ejemplos/viñetas aprobados
+y 399 archivos cotejados. Se reutiliza esa evidencia, sin ejecutar pruebas
+nuevas ni modificar código. Sin commit, push ni cambio de versión.
+Los apartados siguientes conservan la historia y sus límites; no deben
+interpretarse como pendientes nuevos cuando esta conciliación los resuelve.
 
 ## B02-02: TIR dependiente de la unidad monetaria
 

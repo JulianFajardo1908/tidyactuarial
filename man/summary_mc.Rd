@@ -25,9 +25,11 @@ summary is computed separately within each group. If \code{by = NULL} and
 \code{.data} is already grouped with \code{dplyr::group_by()}, the current
 grouping structure is used.}
 
-\item{probs}{Numeric vector of probabilities for quantiles.}
+\item{probs}{Numeric vector of probabilities for quantiles. Use
+\code{numeric()} to omit these columns.}
 
-\item{var_probs}{Numeric vector of probabilities for VaR and TVaR.}
+\item{var_probs}{Numeric vector of probabilities for VaR and TVaR. Use
+\code{numeric()} to omit these columns.}
 
 \item{na_rm}{Logical scalar. If \code{TRUE}, missing values are removed
 before computing statistics.}
@@ -70,6 +72,27 @@ Equivalently, for `0 <= p < 1` and `v = VaR_p(X)`,
 For `p = 1`, the finite empirical upper-endpoint limit (`max(x)`) is
 reported. At `p = 0`, TVaR is the empirical mean. Negative simulated
 values are permitted because `summary_mc()` is a generic numeric summary.
+TVaR is evaluated from ordered empirical probability masses, avoiding
+subtraction of extreme losses. A fractional boundary atom is retained.
+Variance, standard deviation and error are evaluated independently in
+scaled form when squaring loses range: variance may be zero or infinite
+while the deviation or error remains representable. Undefined moments
+for nonfinite observations remain missing; extended upper tails can be
+infinite. A sample smaller than two has missing variance, deviation and error.
+
+The column \code{se_mean} is the usual \eqn{s/\sqrt{n}} estimate under
+independent, identically distributed observations. It is not a general
+Monte Carlo error estimate for antithetic, clustered, weighted or otherwise
+dependent samples. A method label alone does not identify independent
+sampling units after filtering, grouping or reordering, so pairs are not
+inferred automatically. For known independent antithetic pairs, summarise
+their pair means instead. An odd unpaired observation or unequal weights
+requires an error calculation appropriate to that sampling design.
+
+Quantile labels retain the existing rounding to thousandths of probability;
+probabilities within a selector must yield distinct labels. Empty grouped
+inputs retain the statistical columns with zero output rows. An ungrouped
+empty effective sample retains one row of counts and missing statistics.
 
 If \code{na_rm = TRUE}, missing values in \code{col_value} are removed before
 computing statistics. If \code{na_rm = FALSE} and missing values are present,

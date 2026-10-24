@@ -127,6 +127,9 @@ double precision. An explicitly supplied annuity-scale coefficient is used
 as supplied; a rounded zero or nonfinite coefficient cannot reconstruct
 information that has already been lost. Select a representable monetary
 premium column when passing extreme results from \code{\link{mc_premium}}.
+Positive infinite annualized annuity-basis metadata are accepted only when
+they agree with the product of the finite per-payment basis and frequency;
+they cannot be used alone to infer the payment basis.
 }
 \examples{
 simulated <- tibble::tibble(

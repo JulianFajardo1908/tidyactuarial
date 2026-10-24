@@ -1,5 +1,23 @@
 # Manual PDF con índice — 2026-10-16
 
+## Actualización documental local — 23 de octubre de 2026
+
+Manual reconstruido con las ayudas actuales y versión 0.1.6.9000: salida 0,
+246 páginas; makeindex acepta 1214 entradas y rechaza cero. Sin Overfull
+en manual-final.log. Se reutiliza Rd.cfg de presentación anterior. Se
+corrigieron únicamente cuatro encabezados roxygen/Rd de e_x/e_xy para
+usar strong en vez de asteriscos Markdown literales; sin cambio funcional.
+Renderizadas portada, uso de e_xy (92), summary_mc (223) y última página
+del índice (246); muestra revisada visualmente y encabezado e_xy corregido.
+No es una revisión visual de todas las páginas. Persisten avisos de
+sustitución de fuentes/enlaces externos del PDF autónomo, como antes.
+
+PDF y log: C:/Users/LENOVO/.codex/visualizations/2026/10/24/01a16b38-f8c9-7fa0-8e0f-4849a0242ecc/manual/.
+Archivo: tidyactuarial-manual-0.1.6.9000.pdf. SHA256:
+9F7048474E21650F535CEF8086B725DD7F904750C1CEF10DA5B11EFF922C3351.
+Esta compilación no sustituye el build/check de la futura candidata 0.2.0.
+Los párrafos siguientes conservan la validación histórica anterior.
+
 Estado: compilación con índice implementada y comprobada.
 Fuentes del paquete en `d296d70`, versión `0.1.6.9000`.
 

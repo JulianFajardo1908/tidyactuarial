@@ -1,5 +1,42 @@
 # B05 — tablas de vida, mortalidad y probabilidades
 
+## Suplemento de precisión t_px/e_x — 23 de octubre de 2026
+
+Se retoman exclusivamente los dos defectos confirmados al cerrar B07.
+Base Git 0030cef, rama audit/0.2.0-precran, versión 0.1.6.9000; se preservan
+los cambios B08 sin commit. No se reabre el cierre histórico de B05.
+
+Modelo: S(n+s)=l_(x+n)/l_x por S_(x+n)(s); CF usa p^s y área
+-expm1(s*log(p))/(-log(p)); Balducci usa p/(p+s*q) y área
+(p/q)*log1p(q*s/p). El complemento 1-q redondeaba p a cero cuando
+l_(x+1)/l_x era pequeño: con lx=(1,1e-200), S(.5) CF era cero en vez
+de 1e-100 y el área anual era cero en vez de 1/(200*log(10)).
+
+Corrección acotada a R/t_px.R y R/e_x.R: supervivencia derivada como
+cociente directo, logaritmo del cociente desde los conteos si aquel
+subdesborda, denominador Balducci sin resta cancelatoria e integral
+Balducci con incrementos logarítmicos estables. Se conservan firmas,
+columnas, reciclado, NA, extinción, horizontes enteros y truncación de
+tablas abiertas. t_px conserva px suministrado; e_x conserva su regla
+previa de derivar ambos valores desde lx cuando falta alguno del par.
+No se recupera información perdida en columnas px explícitas redondeadas
+a cero, ni se certifican tablas con columnas actuariales incompatibles.
+
+test-b05-single-life-precision.R: 113 comprobaciones de CF/CML/Balducci,
+áreas cerradas independientes, cociente 1e-600, duraciones diminutas,
+intervalos completos/parciales, columnas presentes/ausentes, UDD, NA,
+extinción, retorno tidy y consumidor t_qx. Contra código previo: 61 fallos,
+0 errores/advertencias y 52 aprobadas. Tras corrección: 113 aprobadas;
+594 en selección relacionada. Compatibilidad: 192 objetos completos a
+1e-12 y dos firmas idénticas contra HEAD. Ayudas y NEWS actualizados.
+Validación integral: 7454 aprobadas tanto en fuente como instalado, sin
+fallos, advertencias ni omisiones. Check 0 ERROR, 0 WARNING, una NOTE por
+desarrollo; ejemplos/viñetas aprobados y 399 archivos cotejados. Suplemento
+confirmado, implementado, probado y cerrado dentro de este alcance.
+Evidencia definitiva y límites de entorno en audit-precran-check.md.
+Artefactos en la carpeta b05-supplement de esta sesión; before.log conserva
+la reproducción anterior a editar. Sin commit, push ni cambio de versión.
+
 Primera unidad, 18 de octubre de 2026, sobre 67c2b70.
 Rama audit/0.2.0-precran, DESCRIPTION 0.1.6.9000; árbol limpio al comenzar.
 Se retoma el orden tras el paréntesis de visualizaciones. Se preservan

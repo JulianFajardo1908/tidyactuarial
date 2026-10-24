@@ -204,6 +204,9 @@ unrepresentable flows is not guaranteed. Internal premium estimation
 requires representable observed issue present values. Nonfinite converted
 premium metadata are accepted only when they match a conversion from the
 resolved premium; directly supplied premiums must remain finite.
+Positive infinite annualized annuity-basis metadata are likewise accepted
+only if they agree with the product of a finite payment basis and frequency.
+That infinite annualized value alone cannot identify the payment basis.
 }
 \examples{
 simulated <- tibble::tibble(

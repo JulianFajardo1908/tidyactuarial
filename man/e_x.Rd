@@ -49,14 +49,14 @@ Computes the curtate or complete expected future lifetime at integer age
 \eqn{x}, optionally restricted to a temporary horizon of \eqn{t} years.
 }
 \details{
-**Curtate life expectancy** (Finan, Section 23.7):
+\strong{Curtate life expectancy} (Finan, Section 23.7):
 \deqn{e_x = \sum_{k=1}^{\omega - x} {}_k p_x = \frac{1}{\ell_x}
   \sum_{k=1}^{\omega - x} \ell_{x+k}.}
 
 The \eqn{t}-year temporary curtate expectancy is (Finan, Sec. 23.7):
 \deqn{e_{x:\overline{t}|} = \sum_{k=1}^{t} {}_k p_x.}
 
-**Complete life expectancy** (Finan, Section 23.3):
+\strong{Complete life expectancy} (Finan, Section 23.3):
 \deqn{\breve{e}_x = \int_0^{\omega - x} {}_t p_x \, dt =
   \frac{T_x}{\ell_x}.}
 
@@ -75,6 +75,9 @@ Extinct cohorts contribute zero to later intervals, even if their
 conditional probabilities are undefined. The CF/Balducci zero-survival
 interval has integral zero; UDD retains its linear decline.
 Unknown survivor counts propagate as missing expectations.
+When annual probabilities must be derived from survivor counts, survival
+uses the direct count ratio rather than \eqn{1-q_y}. Its logarithm retains
+the CF integral even when the annual ratio is below floating-point range.
 
 Under UDD, the complete expectancy satisfies the well-known approximation
 (Finan, Example 20.24):

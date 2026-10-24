@@ -2,9 +2,12 @@
 
 **Actuarial mathematics in R with transparent formulas, reproducible workflows, and tidy outputs where they add value.**
 
-`tidyactuarial` provides tools for financial mathematics and life contingencies in R. The package is designed so that the actuarial model remains visible: formulas, timing conventions, mortality assumptions, and valuation dates come first; computation is then used to reproduce, audit, and scale the calculation.
+`tidyactuarial` provides tools for financial mathematics, life contingencies, and collective risk in R. The package is designed so that the actuarial model remains visible: formulas, timing conventions, mortality assumptions, and valuation dates come first; computation is then used to reproduce, audit, and scale the calculation.
 
-The stable release is **0.1.6** on CRAN. The development version is **0.1.6.9000**.
+This repository contains the **0.2.0 release candidate**. This README describes
+that candidate; it does not imply that CRAN has accepted or published it.
+Until then, installation from CRAN may provide an earlier release without
+some of the features and corrections described here.
 
 ## Installation
 
@@ -32,6 +35,7 @@ The package currently includes tools for:
 - **Life contingencies:** life annuities, life insurance, premiums, reserves, and contract-based workflows.
 - **Multiple-life and multiple-decrement models:** joint-life and last-survivor quantities, premiums, reserves, and cause-specific decrement calculations.
 - **Simulation and actuarial risk:** lifetime simulation and Monte Carlo tools for annuities, insurance, premiums, reserves, losses, and multiple-life status models.
+- **Collective risk and coverage:** frequency and severity models, deductibles and limits, aggregate loss distributions and simulation, VaR, TVaR, and stop-loss premiums.
 
 The full API is organized by actuarial area in the **Reference** section of the package website.
 
@@ -270,7 +274,10 @@ This keeps simple calculations simple while allowing larger analyses to remain i
 
 ## Reliability
 
-The package is developed with automated unit and regression tests. The development branch is also checked through continuous integration on Linux, Windows, and macOS.
+The package is developed with automated unit and regression tests. Continuous
+integration is configured for Linux, Windows, and macOS, including the declared
+minimum R version on Ubuntu. A successful run applies to the commit it checks;
+it does not certify later development changes.
 
 For released work where stability is the priority, use the CRAN version.
 

@@ -23,11 +23,11 @@
 #' @param tol Numeric tolerance for integer checks.
 #'
 #' @details
-#' **Curtate expectation** (Finan, Section 56.4 / Section 57):
+#' \strong{Curtate expectation} (Finan, Section 56.4 / Section 57):
 #' \deqn{e_{xy} = \sum_{k=1}^{\infty} {}_kp_{xy}, \quad
 #'   e_{\overline{xy}} = \sum_{k=1}^{\infty} {}_kp_{\overline{xy}}.}
 #'
-#' **Complete expectation** (Finan, Section 56.4):
+#' \strong{Complete expectation} (Finan, Section 56.4):
 #' \deqn{\mathring{e}_{xy} = \int_0^{\infty} {}_tp_{xy} \, dt.}
 #'
 #' The integral is decomposed year-by-year and evaluated analytically under

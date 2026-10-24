@@ -76,6 +76,10 @@
 #' equivalence residual uses the ratio before that loss of range.
 #' Positive subnormal observations are retained using scaled means when an
 #' ordinary mean rounds to zero. A genuinely zero annuity exposure is rejected.
+#' A positive infinite \code{payment_annualized} metadata value is accepted
+#' only when it agrees with the product of a finite payment basis and finite
+#' frequency. The payment basis cannot be inferred from that infinite value
+#' alone; retain \code{payment_per_payment} or supply \code{annuity_payment}.
 #'
 #' @return A data frame or tibble containing the original simulations and standardized
 #' premium columns:
@@ -315,14 +319,14 @@ mc_premium <- function(
   payments_per_year <- rep(NA_integer_, n_rows)
   mc_equivalence_residual <- rep(NA_real_, n_rows)
 
-  constant_in_group <- function(data, column) {
+  constant_in_group <- function(data, column, allow_inf = FALSE) {
     values <- data[[column]]
 
     if (!is.numeric(values)) {
       stop("`", column, "` must be numeric.", call. = FALSE)
     }
 
-    if (anyNA(values) || any(!is.finite(values))) {
+    if (anyNA(values) || any(!is.finite(values) & !(allow_inf & values == Inf))) {
       stop(
         "`", column, "` must contain finite nonmissing metadata within ",
         "each premium group.",
@@ -478,11 +482,13 @@ mc_premium <- function(
     if ("payment_annualized" %in% names(data_group)) {
       annualized_basis <- constant_in_group(
         data_group,
-        "payment_annualized"
+        "payment_annualized", allow_inf = TRUE
       )
 
-      if (abs(annualized_basis - k_group * payment_group) >
-          tol * max(1, abs(annualized_basis))) {
+      expected_basis <- k_group * payment_group
+      if (annualized_basis != expected_basis &&
+          (!is.finite(annualized_basis) || !is.finite(expected_basis) ||
+           abs(annualized_basis - expected_basis) > tol * max(1, abs(annualized_basis)))) {
         stop(
           "`payment_annualized` is inconsistent with the payment ",
           "frequency and per-payment amount.",

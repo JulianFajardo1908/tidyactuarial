@@ -124,6 +124,10 @@ the per-payment and annualized amounts remain representable. The
 equivalence residual uses the ratio before that loss of range.
 Positive subnormal observations are retained using scaled means when an
 ordinary mean rounds to zero. A genuinely zero annuity exposure is rejected.
+A positive infinite \code{payment_annualized} metadata value is accepted
+only when it agrees with the product of a finite payment basis and finite
+frequency. The payment basis cannot be inferred from that infinite value
+alone; retain \code{payment_per_payment} or supply \code{annuity_payment}.
 }
 \examples{
 simulated <- tibble::tibble(

@@ -1,7 +1,34 @@
 # B01 — Tasas y factores financieros
 
 Barrido ampliado iniciado el 16 de octubre de 2026. Objetivo acordado: 0.2.0.
-Estado del bloque: **en revisión**, no cerrado. No reemplaza otros registros.
+Estado vigente: **cerrado dentro del alcance documentado**, conciliado el
+23 de octubre de 2026. No reemplaza otros registros.
+
+## Cierre formal por conciliación de evidencia existente
+
+| Pendiente histórico | Evidencia que lo resuelve |
+|---|---|
+| Fuerza -40 y separación entre conversión y valoración | B01-04/B01-05: base logarítmica original, descuento directo y pruebas de factores representables |
+| Coherencia de m entre familias | Matriz de audit-api-review.md: conversión, frecuencia de salida y validación local diferenciadas; aclaraciones Rd existentes |
+| Productos extremos en consumidores | B02-04: 23 comprobaciones capital-factor; B02-07: cancelación bajo factor común, con 17 comprobaciones |
+| Ejemplo docente integrado | Ejemplo de accumulation_factor registrado en la verificación de B01-04 |
+
+Las cinco funciones conservan sus contratos locales. Una conversión
+efectiva que redondea a -1 o desborda no se presenta como exacta: las
+valoraciones usan la especificación original cuando existe. No se promete
+representar resultados fuera de double ni recuperar una tasa original
+desde una conversión que ya perdió información. Uniformar m (C02) o
+reordenar/renombrar interfaces (C03/C04) permanece separado del cierre;
+no es una corrección matemática pendiente.
+
+Se reutiliza la validación final del suplemento B05: 7454 comprobaciones
+aprobadas en fuente e instalado, check 0 ERROR, 0 WARNING, una NOTE por
+desarrollo, ejemplos/viñetas aprobados y 399 archivos cotejados. Incluye
+las regresiones de tasas, factores y consumidores enumeradas aquí.
+Evidencia y huella en audit-precran-check.md; no se ejecutaron pruebas
+nuevas ni se modificó código para este cierre documental. Sin commit,
+push o cambio de versión. Los apartados siguientes conservan la historia;
+sus pendientes quedan resueltos únicamente como indica esta conciliación.
 
 ## Alcance revisado
 

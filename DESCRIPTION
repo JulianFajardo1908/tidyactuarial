@@ -1,13 +1,14 @@
 Package: tidyactuarial
 Type: Package
 Title: Tidy Tools for Actuarial Mathematics and Life Contingencies
-Version: 0.1.6.9000
+Version: 0.2.0
 Authors@R: person(given = "Julian", family = "Fajardo", email = "julian.fajardo1908@gmail.com", role = c("aut", "cre"))
 Description: Provides tidyverse-aligned tools for actuarial mathematics
     and life contingencies, including life tables, survival probabilities,
     actuarial present values of cash flows, life annuities, life insurance,
     premiums, reserves, multiple-life calculations, Monte Carlo simulation,
-    and deterministic cash-flow diagrams. The package emphasizes clear
+    collective risk models, insurance coverage, tail risk measures, and
+    deterministic cash-flow diagrams. The package emphasizes clear
     actuarial notation, reproducible workflows, and pipe-friendly tools for
     actuarial education and applied actuarial analysis.
 License: MIT + file LICENSE

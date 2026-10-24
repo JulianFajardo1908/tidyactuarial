@@ -18,15 +18,25 @@ Las decisiones materiales de API se consultan antes de implementarse.
 
 | Bloque | Tema | Nombres públicos | Estado |
 |---|---|---:|---|
-| B01 | Tasas y factores financieros | 5 | En revisión; ver audit-interest-foundations.md |
-| B02 | Flujos y ecuaciones de valor | 8 | En revisión; ver audit-cash-flow-roots.md y audit-interest-foundations.md |
+| B01 | Tasas y factores financieros | 5 | Cierre formal conciliado con evidencia existente: base logarítmica, factores, m y consumidores resueltos en su alcance; C02-C04 opcionales separadas. Ver audit-interest-foundations.md |
+| B02 | Flujos y ecuaciones de valor | 8 | Cierre formal conciliado: productos, gráfica, cancelación bajo factor común y C01 resueltos/probados; límites de raíces y double preservados. Ver audit-cash-flow-roots.md |
 | B03 | Anualidades financieras y préstamos | 7 | Revisión cerrada dentro del alcance documentado; ver audit-financial-annuities-loans.md, B03-08/B03-10 y límites expresos |
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
-| B05 | Tablas, mortalidad y probabilidades | 12 | Cierre histórico preservado: 12/12 y 139 comprobaciones; nuevo suplemento de precisión t_px/e_x confirmado en B07-06, pendiente antes de B08 |
+| B05 | Tablas, mortalidad y probabilidades | 12 | Cierre histórico preservado y suplemento t_px/e_x cerrado: 113 comprobaciones nuevas; suite/check definitivos en audit-precran-check.md |
 | B06 | Contingencias de una vida y contratos | 14 | Revisión cerrada: 14/14 dentro del alcance y límites de audit-single-life-contracts.md; 638 comprobaciones nuevas, C12 autorizada y check final aprobado; gráfica previa preservada |
-| B07 | Contingencias multivida | 6 | Revisión cerrada: seis nombres dentro de los estados/identidades/límites documentados en B07-06; 702 comprobaciones nuevas, C13-C16 autorizadas y check final aprobado. Suplemento B05 pendiente separado |
-| B08 | Simulación de vidas y Monte Carlo | 11 | En revisión: B08-01 a 06 cubren generadores, estados, valoración, primas/pérdidas y reservas; C17-C20 autorizadas, 1089 comprobaciones nuevas acumuladas. Bloque abierto; ver audit-monte-carlo-review.md |
-| B09 | Riesgo colectivo, coberturas y colas | 19 | Pendiente de revisión integral; preservar evidencia previa |
+| B07 | Contingencias multivida | 6 | Revisión cerrada: seis nombres dentro de los estados/identidades/límites documentados en B07-06; 702 comprobaciones nuevas, C13-C16 autorizadas y check final aprobado. Suplemento B05 posteriormente cerrado |
+| B08 | Simulación de vidas y Monte Carlo | 11 | Cerrado dentro de los modelos y límites de B08-07: once nombres conciliados, 1185 comprobaciones nuevas, firmas conservadas y C17-C20 autorizadas; validación final recuperada en audit-precran-check.md |
+| B09 | Riesgo colectivo, coberturas y colas | 19 | Evidencia previa conciliada: código sin cambios desde 7575fe4 y pruebas aprobadas en la última suite; sin defecto nuevo demostrado que justifique repetir la revisión. Alcance previo en audit-risk-coverage.md |
+
+Conciliación documental del 23 de octubre de 2026: se compararon las 19
+funciones B09 y R/risk-measures-internal.R contra 7575fe4; cero diferencias.
+Las pruebas de esas familias y las regresiones de riesgo figuran aprobadas
+en b05-supplement/final-tests.log (7454 aprobadas en total), con suite
+instalada y check final también aprobados. No se ejecutaron nuevas pruebas
+para esta conciliación. La etiqueta anterior de revisión integral pendiente
+no constituye evidencia de defecto ni justifica repetir el análisis.
+Se conserva el alcance limitado de audit-risk-coverage.md: este cotejo no
+declara cerrada toda la auditoría externa ni una revisión exhaustiva nueva.
 
 102 nombres asignados exactamente una vez: 101 funciones y el alias A_xj.
 El paréntesis de visualizaciones añade plot_contingent_cash_flow a B06;
@@ -145,7 +155,7 @@ Sigue B06; esto no da por aprobados los bloques posteriores.
 | B08 | `simulate_insurance_x` | `R/simulate_life_mc.R` | `test-final-public-integration.R`, `test-simulate_life_mc-v2.R`, `test-b08-life-mc-precision.R` |
 | B08 | `simulate_lifetime` | `R/simulate_lifetime.R` | `test-cran-multilife-workflow.R`, `test-simulate_lifetime-v2.R` |
 | B08 | `simulate_lifetimes` | `R/simulate_lifetimes.R` | `test-cran-multilife-workflow.R`, `test-simulate_lifetimes-v2.R` |
-| B08 | `summary_mc` | `R/summary_mc.R` | `test-final-public-integration.R`, `test-summary-mc-final.R`, `test-summary-mc-tvar-regression.R` |
+| B08 | `summary_mc` | `R/summary_mc.R` | `test-final-public-integration.R`, `test-summary-mc-final.R`, `test-summary-mc-tvar-regression.R`, `test-b08-summary-precision.R` |
 | B09 | `aggregate_distribution` | `R/aggregate-distribution.R` | `test-aggregate-distribution.R`, `test-risk-audit-regressions.R`, `test-to-payment-basis.R`, `test-value-at-risk.R` |
 | B09 | `aggregate_moments` | `R/aggregate-moments.R` | `test-aggregate-distribution.R`, `test-aggregate-moments.R`, `test-simulate-aggregate.R`, `test-to-payment-basis.R` |
 | B09 | `apply_coverage` | `R/apply_coverage.R` | `test-apply-coverage.R`, `test-risk-audit-regressions.R`, `test-simulate-aggregate.R`, `test-simulate-severity.R`, `test-stop-loss-premium.R`, `test-tail-value-at-risk.R`, `test-to-payment-basis.R` |
