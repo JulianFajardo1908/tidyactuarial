@@ -173,8 +173,4 @@ articles:
 - title: Life Contingencies
   navbar: ~
   contents: life-contingencies
-- title: Collective Risk
-  navbar: ~
-  contents:
-  - collective-risk
 
