@@ -36,6 +36,7 @@ reference:
     Bond valuation, yield, book value, callable bonds, duration, convexity, portfolio measures, and immunization.
   contents:
   - bond_cash_flows
+  - accrued_interest
   - bond_price
   - bond_ytm
   - bond_book_value
@@ -56,6 +57,9 @@ reference:
   - discount_factor_spot
   - yield_curve
   - forward_rate
+  - bootstrap_spot_curve
+  - forward_curve
+  - par_rate
 - title: Life Tables and Survival
   desc: |
     Life-table construction, mortality laws, Kaplan-Meier estimation, survival probabilities, life expectancy, and commutation functions.
@@ -80,6 +84,7 @@ reference:
   - insurance_x
   - insurance_variable_k
   - apv_life_flow
+  - plot_contingent_cash_flow
   - premium_x
   - premium_gross
   - reserve_x
@@ -117,6 +122,35 @@ reference:
   - mc_loss
   - mc_multilife_status
   - summary_mc
+- title: Collective Risk, Coverage, and Tail Measures
+  desc: |
+    Frequency and severity models, insurance payments, aggregate losses, simulation, and risk measures.
+  contents:
+  - frequency_spec
+  - severity_spec
+  - empirical_frequency
+  - empirical_severity
+  - distribution_moments
+  - collective_risk_spec
+  - coverage_spec
+  - apply_coverage
+  - to_payment_basis
+  - discretize_severity
+  - distribution_convolution
+  - aggregate_moments
+  - aggregate_distribution
+  - simulate_frequency
+  - simulate_severity
+  - simulate_aggregate
+  - value_at_risk
+  - tail_value_at_risk
+  - stop_loss_premium
+  - print.tidyact_aggregate_distribution
+  - print.tidyact_collective_risk_spec
+  - print.tidyact_convolution_spec
+  - print.tidyact_frequency_spec
+  - print.tidyact_payment_spec
+  - print.tidyact_severity_spec
 - title: Datasets
   desc: |
     Reproducible datasets for financial and actuarial examples.

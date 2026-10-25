@@ -437,7 +437,7 @@ $$
 What changes is the rule used to define $i_t$, $R_t$, and $E_t$.
 
 `amort_schedule_general()` represents this broader problem directly. In
-`tidyactuarial 0.1.6`, the interest-rate input may be a scalar or a vector with
+`tidyactuarial`, the interest-rate input may be a scalar or a vector with
 one rate specification per period, while `payment` may be calculated
 automatically, supplied as a scalar or vector, or defined as a function of the
 current loan state.

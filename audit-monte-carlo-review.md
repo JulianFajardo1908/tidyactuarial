@@ -1,0 +1,598 @@
+# B08 — simulación de vidas y Monte Carlo
+
+## Inicio y alcance (22 de octubre de 2026)
+
+El usuario pidió pasar a B08. Base c7a0d29, Git inicialmente limpio,
+rama audit/0.2.0-precran y versión 0.1.6.9000 verificadas. B07 conserva su
+cierre documentado. El suplemento B05 t_px/e_x sigue confirmado y pendiente;
+cambiar el orden de trabajo no lo corrige ni lo elimina. Se preserva el
+registro anterior audit-multilife-monte-carlo.md y sus regresiones de RNG,
+fracciones CML, vidas faltantes, calendarios y coherencia K/T.
+
+| Nombre | Modelo/contrato a conciliar | Estado actual |
+|---|---|---|
+| simulate_lifetime | PMF anual de K y fracción condicional de muerte; tabla qx | B08-01/07: conciliado dentro del alcance y límites de cierre |
+| simulate_lifetimes | Vidas independientes; una corriente RNG por llamada; precedencia qx/px/lx | B08-01/07: conciliado dentro del alcance y límites de cierre |
+| mc_multilife_status | Min/max de K y T; mismos identificadores de vidas por simulación | B08-02: C17 y conservación de estados/almacenamiento/columnas probadas; límites abajo |
+| simulate_annuity_x | Valor presente de pagos por trayectoria; motor lx propio | B08-03: motor lx, valoración monetaria, calendario y RNG comprobados; límites abajo |
+| simulate_insurance_x | Seguro anual por trayectoria; motor lx propio | B08-03: masas, censura, valoración monetaria y RNG comprobados; límites abajo |
+| mc_annuity | Pagos elegibles por trayectoria, garantías, diferimientos y NA | B08-04: calendarios/NA/RNG y valoración monetaria comprobados; límites abajo |
+| mc_insurance | Evento y momento del beneficio por trayectoria | B08-04: seis tipos, tasas originales y C18 autorizada comprobados; límites abajo |
+| mc_premium | Cociente de medias de pares Z,Y; prima anualizada/cuota | B08-05: precisión, medias subnormales, grupos y pares NA probados; límites abajo |
+| mc_loss | Z menos prima en la unidad de Y | B08-05: unidades, flujos monetarios y NA probados; límites abajo |
+| mc_reserve | Flujos futuros por trayectoria; antes/después de pago; vigencia | B08-06: libros, pares, rango monetario y C19/C20 autorizadas probados; límites abajo |
+| summary_mc | Momentos, error estándar, cuantiles y colas empíricas | B08-07: momentos/tails/extremos, NA/grupos y límites iid conciliados |
+
+## B08-07 — resúmenes y conciliación de los once nombres (23 de octubre de 2026)
+
+Base 0030cef, Git limpio, rama audit/0.2.0-precran y versión 0.1.6.9000
+conservadas. Este apartado consolida las unidades B08-01 a B08-06; los
+pendientes históricos de sus snapshots se resuelven en las unidades que
+los suceden, sin borrar evidencia. No se reinicia el bloque ni se amplían
+las autorizaciones C17-C20. Las correcciones actuales son A numéricas y
+B documentales, sin nuevos parámetros, aliases o columnas públicas.
+
+### Diagnóstico e identidades
+
+La varianza muestral es sum((x-mean(x))^2)/(n-1), sd su raíz y se=sd/sqrt(n)
+bajo independencia. Con x=(-1e308,1e308), varianza no cabe pero sd=sqrt(2)*
+1e308 y se=1e308 sí. Con x=(-1e-300,1e-300), varianza redondea a cero pero
+sd y se siguen siendo positivos representables. Se recuperan en escala
+normalizada, centrando antes de escalar cuando cabe. Se evalúan por separado
+varianza, desviación y error; no se fuerza finitud de una varianza imposible.
+
+TVaR_p es la integral de cuantiles empíricos superiores dividida por 1-p.
+La resta x-VaR desbordaba para x=(-1e308,1e308) y daba TVaR_0=Inf, en vez
+de cero, y TVaR_.5=Inf en vez de 1e308. Se integran masas ordenadas, incluida
+la fracción del átomo fronterizo, sin restar extremos. p=0 usa la media,
+p=1 el máximo. Para una fracción muy pequeña del átomo inferior se resta
+su masa monetaria de la media antes de dividir por 1-p; así no se pierde
+p diminuto por redondear prematuramente 1-p a uno. Una elevación binaria
+exacta mantiene muestras subnormales durante el promedio. Los valores
+firmados y colas extendidas siguen admitidos; momentos indefinidos son NA.
+VaR sigue siendo cuantil tipo 1 y los q descriptivos tipo 7.
+
+numeric() ya pasaba la validación de probabilidades pero fallaba al nombrar
+un vector vacío; ahora omite la categoría. Los grupos vacíos conservan
+columnas estadísticas con cero filas; la muestra vacía no agrupada conserva
+una fila de conteos y estadísticas NA. Se preserva la política na_rm.
+
+La conciliación encontró otro defecto de encadenamiento: mc_annuity con
+c=1e308, k=2 y fuerza 1000 da Y=7.124576e90 finito pero payment_annualized=Inf.
+mc_premium/mc_loss/mc_reserve rechazaban el metadato antes de valorar flujos
+finitos. Sus verificaciones locales ahora admiten únicamente Inf positivo
+si coincide con c*k de c y k finitos conocidos. Se sigue rechazando un Inf
+incoherente o usado como única base para inferir c. No se amplía la prima
+directa a valores no finitos ni se infiere un importe desde un infinito.
+
+### Dependencia, oráculos y compatibilidad
+
+se_mean conserva sd/sqrt(n). Se documenta expresamente su hipótesis iid:
+no es un error Monte Carlo válido en general para muestras antitéticas,
+ponderadas o agrupadas. No se inventan pares desde method, orden o etiquetas.
+Para pares independientes conocidos se pueden resumir sus medias; un n impar
+o pesos desiguales requiere un cálculo acorde al diseño. La prueba usa pares
+(1,9),(2,8),(4,6): la media de cada par es 5 y su error es cero, mientras el
+resumen de filas tiene el error descriptivo iid positivo. No se certifica
+ese error de filas como estimador de la simulación antitética.
+
+test-b08-summary-precision.R añade 96 comprobaciones: momentos analíticos
+escalados, TVaR como integración independiente de masas, átomos/valores
+firmados/subnormales/infinidades, p=0/1 y p diminuto, NA/grupos/esquemas,
+RNG intacto, dependencia y libros explícitos de productos encadenados.
+Reconcilia joint/last_survivor hasta reservas a t=0 y resúmenes; los wrappers
+retienen un libro común observado con censura finita, sin tratar K=n como
+muerte completa. La metadata anual desbordada se prueba en los tres
+consumidores, también con rechazos de datos incoherentes y falta de base.
+Las 471 comprobaciones previas seleccionadas de resúmenes, primas/pérdidas
+y reservas siguen aprobadas. La suite integral incluye las restantes de B08.
+
+79 objetos ordinarios completos coinciden con 0030cef a 1e-12; 37 son
+resúmenes y 42 consumidores financieros. Los once formals públicos son
+idénticos a c7a0d29, base anterior a B08. La regresión definitiva sobre
+0030cef y resultados finales se conservan en before-final.log y
+regression-final.log; errores previos abortan algunas aserciones. before.log
+y after.log son etapas anteriores, no sustituyen la evidencia final.
+
+### Cierre de alcance y límites conservados
+
+Los once nombres se concilian dentro de sus modelos documentados: PMF de
+vidas y fracciones; truncación condicional/error de los generadores frente
+a censura de los wrappers; min/max multivida; calendarios/eventos; primas,
+pérdidas, reservas por trayectoria y resúmenes. B08 acumula 1185 comprobaciones
+nuevas. Cierre validado: 7341 comprobaciones aprobadas en fuente e instalado,
+sin fallos, advertencias ni omisiones; check con 0 ERROR, 0 WARNING y una
+NOTE por versión de desarrollo. Evidencia y cotejo recuperados tras la
+interrupción en audit-precran-check.md. B08 cerrado en este alcance;
+cambios preservados sin commit por instrucción vigente del usuario.
+
+Se conservan independencia entre vidas cuando corresponde, control de RNG
+según cada contrato y la convención terminal CML/Balducci con q=1. No se
+promete reconstrucción de información perdida en qx/px, fracciones menores
+que double, fechas/materializaciones arbitrarias o cancelación general de
+flujos no representables. Los calendarios/fronteras y filtros de vigencia
+siguen los contratos locales. No se infieren estados observados multivida
+desde una etiqueta; una pérdida por trayectoria no es una reserva esperada
+condicional. Las columnas que no caben pueden ser 0/Inf y no sirven por sí
+solas para recuperar entradas. Las etiquetas de cuantiles mantienen su
+precisión histórica y las claves de agrupación deben evitar colisiones con
+los nombres estadísticos si se desean nombres sin reparación automática.
+
+No se certifican CI remota nueva, R mínimo ni el manual PDF. B05 t_px/e_x,
+B09 y los cierres formales B01/B02 siguen separados; no se les atribuye este
+cierre ni se dan por corregidos por analogía. Artefactos b08-07 de la sesión
+del 21; trabajo fechado el 23. Sin dependencia, versión o push.
+
+## B08-06 — reservas por trayectoria (23 de octubre de 2026)
+
+Base ee7d7be, Git limpio al iniciar, rama audit/0.2.0-precran y versión
+0.1.6.9000 conservadas. Se concilian los calendarios y validaciones anteriores
+de audit-multilife-monte-carlo.md; se preservan firmas, columnas, aliases,
+tipos de retorno y filtros de vigencia. Se sigue audit-efficient-workflow.md:
+regresiones locales y documentación terminadas antes de la fase integral.
+
+### Modelo y diagnósticos
+
+Por trayectoria, Z_t suma beneficios cubiertos en fechas futuras; Y_t suma
+la base monetaria c de las primas en sus fechas futuras; Pi_t suma la cuota
+real en esas mismas fechas, y L_t=Z_t-Pi_t. Cada descuento es exp(-g*(u-t)),
+con g de la convención financiera original. before_payment incluye u=t,
+after_payment lo excluye. El filtro vigente se aplica después: T>t con
+base completa, K>=t con base curtata; información desconocida sigue NA.
+No se cambia ese condicionamiento ni se equipara una pérdida por escenario
+a una esperanza condicional actuarial. No se extrapolan vidas ni estados.
+
+La conversión previa a efectiva anual rechazaba fuerza 720 aunque un
+beneficio de 1e300 en año uno tuviera valor finito 2.032231e-13. El producto
+q*Y_t también perdía ingreso finito si q o Y_t perdían rango. Se revaloran
+beneficios, base y cuota directamente desde sus fechas; cero y u=t reciben
+tratamiento explícito. .interest_basis y helpers monetarios existentes se
+reutilizan; las columnas efectiva/v quedan como metadatos.
+
+Otros dos defectos A: un beneficio conocido no cubierto tenía fecha NA y
+se devolvía Z_t=NA en lugar de cero; una anualidad de emisión desconocida
+se convertía en calendario vacío/cero y entraba en la estimación de prima.
+Ahora el evento no cubierto conserva cero, y se excluyen conjuntamente
+beneficios/anualidades faltantes. Por ejemplo K=(1,NA,2), T=(1.5,5.5,2.5),
+i=0, beneficio 100, base anual due: q correcto=40, antes 60. La estimación
+reutiliza mc_premium y sus controles de unidades, medias y rango monetario.
+
+Pi_t se obtiene del flujo real y no de una columna intermedia ya redondeada.
+Se admiten metadatos convertidos 0/Inf solo si coinciden con la conversión
+resuelta desde una prima válida; no se amplía la entrada directa a primas
+no finitas. Beneficio y prima finitos exactamente coincidentes pueden
+cancelar mediante .cash_flow_sum cuando sus APV separados desbordan.
+k/m se comprueban antes de coerción; m grande válido conserva double.
+
+### Autorizaciones C19/C20 e impacto público
+
+El usuario autorizó «Autorizar T>n en reservas» y «Autorizar estimación
+coherente» antes de implementar. C19 cambia únicamente el dotal puro al
+momento de muerte de T>=n a T>n: muerte en n pertenece al temporal y al
+mixto. Se prueba la partición por trayectoria en los bordes. C20 conserva
+el significado q de la prima estimada internamente, independientemente del
+selector premium_unit cuando no hay prima de entrada. Con k=2 y c=7,
+el ejemplo registrado daba cuota 25/media(L0)=0 en auto pero cuota
+1.785714/media(L0)=92.85714 en annualized; las cuatro opciones ahora son
+equivalentes. P/columnas suministradas conservan sus unidades seleccionadas.
+Estas autorizaciones no cambian los filtros de vigencia ni el calendario
+anual. El expediente exacto se conserva en audit-api-review.md.
+
+### Evidencia independiente y límites
+
+test-b08-reserve-paths.R añade 171 comprobaciones: libros explícitos de
+beneficios para los seis seguros y ambos timings; pagos antes/después de
+valoración; libros de las seis rentas, garantías y diferimiento fraccionario;
+fuerzas extremas y cantidades compensatorias; cuota real frente a base
+subdesbordada/desbordada; cero, pares NA, máscaras complete/curtate y
+not_in_force na/zero; cancelación de flujos coincidentes; encadenamiento
+extremo mc_premium/mc_reserve; C19/C20 y validación m/k. No se usan helpers
+de calendario como oráculo. Las 99 comprobaciones previas seleccionadas de
+reservas, anualidades y consistencia de vidas también pasan.
+
+Contra ee7d7be: 50 fallos, 6 errores, una advertencia, 95 aprobadas; errores
+previos abortan otras aserciones. Después pasan las 171. 199 objetos
+ordinarios completos a 1e-12 y firma idéntica. La compatibilidad compara
+escenarios cubiertos, fuera de C19/C20 y del par incompleto corregido; esas
+diferencias intencionadas se contrastan con oráculos separados, no se
+ocultan mediante tolerancias. Se conserva el retorno tibble expandido.
+
+Límites: los calendarios siguen materializados; no se certifican tamaños
+arbitrarios ni exactitud relativa de subnormales. La estimación interna
+requiere APV observados de emisión representables; no se inventa una prima
+a partir de infinitos de entrada. Coeficientes/columnas que no caben en
+double pueden seguir siendo 0/Inf. La cancelación general entre flujos
+no representables y factores diferentes no queda garantizada. La reserva
+al morir exactamente en t sigue fuera de vigencia en la base completa,
+incluso en before_payment, conforme al contrato conservado y ahora expreso.
+
+B08 sigue abierto con 1089 comprobaciones nuevas acumuladas. Siguen
+summary_mc y la conciliación final de B08; suplemento B05 pendiente.
+Evidencia integral/huella en audit-precran-check.md. Artefactos b08-06 de
+la sesión del 21: initial-diagnosis.log, before-final.log/compatibility.R y
+regression-final.log definitivos; before.log/after.log son etapas previas
+del archivo de pruebas. No se sustituyen resultados finales por intermedios.
+
+## B08-05 — primas y pérdidas Monte Carlo (22 de octubre de 2026)
+
+Base 0ed6c16, Git inicialmente limpio, misma rama audit/0.2.0-precran y
+versión 0.1.6.9000. Se preservan las correcciones previas de unidades,
+inferencia de metadatos, pares completos, agrupación y aliases. A matemática/
+computacional y B documental; no se amplían C17/C18 ni hay nueva decisión C.
+
+### Modelo, diagnóstico y diff acotado
+
+Y_c=c*sum(v^t_j), q=media(Z)/media(Y_c), cuota=q*c, prima anualizada=k*q*c.
+Con prima anualizada A, el flujo por trayectoria es Pi=A*Y_c/(k*c);
+con cuota p es Pi=p*Y_c/c; con coeficiente explícito q es Pi=q*Y_c.
+L=Z-Pi. La equivalencia usa el cociente de medias sobre los mismos pares
+observados, nunca la media de cocientes individuales.
+
+Una fila Z=1e-300, Y_c=c=1e300 implica cuota 1e-300 y pérdida cero. El
+cociente intermedio daba cero, anulaba la cuota y dejaba pérdida 1e-300.
+Con Z=1e300, Y_c=c=1e-300 daba Inf/-Inf aunque cuota y flujo fueran finitos.
+Anualizar una cuota subnormal también puede recuperar un importe normal:
+redondearla antes de multiplicar por k sesgaba ese resultado. El problema
+incluye intermedios subnormales positivos, no solo ceros e infinitos.
+
+Un helper privado .mc_ratio_product en mc-utils conserva el cálculo
+ordinario cuando su rango es adecuado, prueba la cancelación directa de
+escala y recupera productos restantes en log mediante .cash_flow_value.
+Se retienen numerador, denominador y frecuencia hasta combinar el importe.
+Solo lo usan estas dos funciones. mc_loss conserva la interpretación de
+P/columnas heredadas como coeficiente y no inventa una cuota a partir de
+un coeficiente ya redondeado. El residual de mc_premium usa el cociente
+antes de perder rango, no la representación redondeada de la columna q.
+q puede seguir siendo 0/Inf si no cabe en double; los importes finitos se
+recuperan de los datos originales. No se añaden columnas ocultas o públicas.
+
+Con tiny, el mínimo double positivo, Z=Y=(tiny,0,0) tiene q=1 aunque ambas
+medias redondeen a cero. Con Z=(2*tiny,0,0), Y=(4*tiny,0,0), ambas medias
+redondean al mismo valor y el cociente ordinario da 1 en vez de .5. Se
+usan sumas pareadas cuando caben y medias escaladas/log en caso contrario;
+no se cambia la muestra. Se sigue rechazando Y realmente nulo. k grande
+válido conserva double; integer sigue siendo el almacenamiento ordinario.
+
+### Pruebas independientes, compatibilidad y límites
+
+test-b08-premium-loss-precision.R aporta 228 comprobaciones. Libros de
+fechas explícitas a tasa .04, cuatro frecuencias y tres bases c contrastan
+cuota, anualizada, flujo y pérdida en las tres unidades. Casos extremos
+verifican importes contra identidades exactas/escalas compensatorias,
+incluidos anualización tras subdesbordamiento, intermedios subnormales,
+exposición tiny, ceros, Y firmado previamente admitido, NA y k grande.
+Grupos con identificador NA, agrupación dplyr y pares faltantes asimétricos
+verifican que los dos promedios usan las mismas filas; error con na_rm=FALSE
+y exposición cero preservados. Las funciones no sortean: RNG intacto.
+
+Contra 0ed6c16: 48 fallos, 2 errores, 4 advertencias, 174 aprobadas; los
+errores previos abortan aserciones posteriores. Después pasan las 228.
+146 objetos ordinarios completos coinciden a 1e-12; firmas idénticas,
+incluidos grupos, columnas personalizadas, tres unidades, prima directa/
+en columna y aliases. Inventario público permanece en 102 nombres/974
+apariciones de parámetros; no se cambia ninguna firma o columna pública.
+Las ayudas precisan que se devuelve data.frame o tibble según la entrada;
+mc_premium elimina la agrupación después de estimar. Antes las ayudas
+solo mencionaban tibbles. Es una corrección documental del comportamiento
+previo, no una coerción nueva. Se reconstruye y comprueba el archivo final
+después de regenerar estas ayudas; final-artifact contiene esa evidencia.
+
+Límites: el coeficiente q y cada importe mostrado conservan su rango
+double. Un coeficiente explícito cero ya perdió información; uno infinito
+sigue sin ser prima de entrada válida en mc_loss. Para encadenar casos
+extremos se usa una columna monetaria representable; si annualized no cabe,
+seleccionar per_payment explícitamente si cabe. No se generaliza la entrada
+no finita ni se infiere información adicional. mc_loss conserva su requisito
+de metadatos constantes del contrato; distintos contratos se aplican por
+separado. No se promete exactitud relativa arbitraria en valores subnormales,
+ni retículas materializables para cualquier frecuencia numérica grande.
+
+B08 sigue abierto con 918 comprobaciones nuevas acumuladas. Siguen
+mc_reserve y summary_mc, la conciliación final de B08 y el suplemento B05
+pendiente. Evidencia final y huella en audit-precran-check.md; artefactos
+b08-05 de la sesión del 21. before-final.log/compatibility.R y
+regression-final.log son definitivos. before.log/after.log conservan pruebas
+anteriores (after.log incluía comparación de clases tibble/data.frame que
+se corrigió en la prueba, sin cambiar el contrato). final-tests.log inició
+antes del último borde subnormal; solo final-definitive-tests.log certifica
+la suite final.
+
+## B08-04 — valoración por trayectoria y C18 (22 de octubre de 2026)
+
+Base 692477d, Git limpio al comenzar, rama audit/0.2.0-precran y versión
+0.1.6.9000 conservadas. Se concilian primero las correcciones existentes de
+audit-multilife-monte-carlo.md: NA, garantía con T=0, retícula h+j/k,
+fronteras exactas de supervivencia y pares K/T. No se rehacen ni deshacen.
+
+### Matemática y causa raíz
+
+Para una trayectoria observada, Y=c*sum(exp(-g*t_j)) en fechas elegibles;
+Z=b*exp(-g*t) si ocurre el evento, cero si no ocurre, NA si falta la vida
+requerida. g proviene de la tasa original: log1p(i) efectiva, m*log1p(i/m)
+nominal interés, -m*log1p(-i/m) nominal descuento, fuerza directamente.
+Ambos consumidores exigían efectiva anual finita >-1 antes de valorar.
+Fuerza 720 y b=1e300, muerte de fin de año uno: el flujo finito es
+exp(log(1e300)-720)=2.032231e-13, pero se rechazaba. La renta fraccionaria
+con pago en .5 también tenía valor finito 4.508027e143 y era rechazada.
+
+Diff acotado: usar .interest_basis y helpers monetarios existentes, sin
+cambiar .mc_effective_rate compartido ni calendarios. Los factores log de
+fechas cero se fijan en cero antes de multiplicar, incluso si g desborda.
+Importes conocidos cero conservan cero; NA no se convierte en cero. Las
+columnas efectiva/v siguen como metadatos previos y pueden perder rango;
+no se usan para valorar. m grande conserva double y k/m se validan antes
+de redondear a cero o desbordar integer. No se añaden columnas o parámetros.
+
+### C18 autorizada y partición de los seguros
+
+Con K=T=n=2, i=0 y b=100, el temporal y el dotal puro al momento de muerte
+pagaban ambos 100, pero el mixto pagaba 100. El usuario autorizó expresamente
+«Autorizar supervivencia estricta T>n». Solo pure_endowment con ese timing
+cambia de T>=n a T>n; la muerte en n sigue cubierta por term/endowment.
+Ahora Z_endowment=Z_term+Z_pure_endowment en cada trayectoria observada.
+El calendario anual mantiene K<n frente a K>=n. Se documenta la frontera
+y el impacto sobre llamadas anteriores, incluidas beneficio/fecha/indicador.
+
+### Referencias independientes y alcance
+
+test-b08-path-valuators.R añade 448 comprobaciones: enumeración explícita
+de 72 calendarios (seis tipos, anual/trimestral, due/immediate y tres tasas),
+36 libros de eventos de seguro (seis tipos, ambos timings y tres tasas),
+garantías, h fraccionario, fronteras exactas y NA. Valores/conteos/primera y
+última fecha contra retículas independientes, sin helpers de calendario como
+oráculo. Más fuerzas extremas con importes compensatorios, cero, t=0, m/k,
+partición C18 y RNG sin sorteos. Contra base: 18 fallos, 6 errores,
+3 advertencias y 398 aprobadas; errores previos abortan otras aserciones.
+Después pasan las 448. 182 objetos ordinarios completos coinciden a 1e-12,
+incluidas las cinco convenciones/especificaciones financieras de la muestra,
+alias obsoletos y columnas personalizadas; las dos firmas son idénticas.
+La comparación evita T=n en el caso C18, cuyo cambio se verifica aparte.
+
+Límites: se conservan calendarios materializados, sin certificar tamaños
+arbitrarios ni fechas inferiores a la resolución double. .cash_flow_sum
+recupera rango de cada flujo representable; no se promete exactitud relativa
+para sumas subnormales. Las valoraciones siguen condicionadas a los K/T
+recibidos, sin inferir un estado multivida a partir de una etiqueta.
+mc_reserve tiene un motor propio con T>=n en el dotal puro: conciliar ese
+borde y sus convenciones de vigencia en su unidad; C18 no autoriza cambiarlo
+automáticamente. Lo mismo rige para sus tasas originales pendientes.
+
+B08 permanece abierto, ahora con 690 comprobaciones nuevas acumuladas.
+Siguiente unidad: mc_premium/mc_loss, equivalencia y unidades; luego reservas
+y resúmenes/antitéticos. Suplemento B05 sigue pendiente.
+next-premium-loss-diagnosis.log reproduce pérdida de cuota/flujo final
+representable por q que subdesborda/desborda (escalas 1e-300 y 1e300).
+No se ha corregido aún; separar el límite de q del valor monetario final.
+Validación integral, huella y entorno en audit-precran-check.md.
+Artefactos b08-04 de la sesión
+del 21; before-c18-final.log y regression-c18-final.log son definitivos.
+before.log/after.log y before-final.log/regression-final.log conservan etapas
+previas a C18; final-tests.log inició antes de C18 y no certifica el cambio.
+
+## B08-03 — motor lx y valoración de los dos wrappers (22 de octubre)
+
+Base f87706e, Git limpio al comenzar, rama y versión conservadas. Esta unidad
+es A matemática/computacional y B documental; no amplía C13-C17. Se conservan
+firmas, columnas, importes por pago y convenciones anuales/fraccionarias.
+
+Desde lx, la masa de muerte anual es (l_j-l_(j+1))/l_x; el horizonte finito
+retiene la masa superviviente l_(x+n)/l_x. No normaliza condicionalmente las
+muertes observadas. En esas filas Kx=n es marcador de censura, Tx=NA y
+died_within_horizon=FALSE; no debe tratarse como vida completa observada.
+Con n=Inf sigue exigiéndose cierre observado de la tabla. El nombre histórico
+method="inverse" conserva sample.int y su orden de sorteos; no se sustituye
+por el generador público ni se añade extrapolación.
+
+Defecto reproducido: lx=(1e300,1e-300), horizonte uno. La razón anual
+subdesborda a cero, pero log(p)=-600*log(10) es finito. CML debe producir
+S=-log1p(-U)/(600*log(10)), no cero. Se obtiene log(p) desde los conteos
+cuando hace falta; con q pequeño se usa log1p(-q), q por decremento directo.
+Balducci usa log(U)+log(p)-log1p(-U*q). Solo l_end=0 conserva la degeneración
+terminal previa. No cambia la distribución ni el número de uniformes.
+
+Para fechas elegibles t_j el valor es payment*sum(exp(-g*t_j)); el seguro
+paga benefit*exp(-g*t) cuando corresponde, g de la tasa original. Antes la
+conversión obligatoria a efectiva anual rechazaba fuerzas con flujos finitos.
+Ahora los importes se combinan en log y la efectiva queda como metadato que
+puede ser Inf o -1. Para pagos consecutivos se reutiliza la suma geométrica
+log estable. El atajo abs(i_period)<1e-12 borraba descuentos monetariamente
+materiales: cuatro pagos due de 1e12 a i=1e-12 devolvían 4e12, en vez de
+3999999999998.5. El error actual frente a fechas explícitas es menor de .02;
+no se exige exactitud inferior al redondeo double de la suma log.
+
+Se comprueban rangos antes de coerción/muestreo y horizonte antes de crear
+edades. m grande válido conserva double; n grande se contrasta con soporte.
+Se rechazan incrementos lx antes ocultados por tolerancia absoluta y edades
+duplicadas después del redondeo entero. No se reparan tablas incompatibles.
+
+test-b08-life-mc-precision.R añade 90 comprobaciones: CDF de las tres
+fracciones contra uniformes reconstruidos, masas/censura, libros explícitos
+de pagos/seguros con tasas negativas/cero/positivas, fuerzas extremas con
+importes compensatorios, importe cero, tasa pequeña, límites de entrada,
+invariancia al radix y restauración/avance RNG con semilla presente/ausente.
+Contra f87706e: 11 fallos, 9 errores, 10 advertencias y 62 aprobadas;
+los errores anteriores abortan algunas aserciones. Después pasan las 90.
+172 resultados ordinarios completos coinciden a 1e-12, dos firmas idénticas,
+incluidos contratos, argumentos obsoletos y ambos outputs.
+
+Límites: una fracción Balducci inferior al mínimo double puede seguir siendo
+cero; sumar una fracción diminuta a K puede redondear T a K. No se certifica
+recuperación de fechas que no caben en double ni calendarios arbitrariamente
+grandes. Se preserva la convención terminal CML/Balducci de fracción cero y
+las convenciones locales de pago en ese borde. mc_annuity/mc_insurance y
+otros consumidores aún requieren revisión propia de tasas originales; no
+se propaga esta corrección por analogía. B08 sigue abierto con 242 nuevas
+comprobaciones acumuladas; suplemento B05 pendiente. Validación final y
+huella: audit-precran-check.md. Artefactos b08-03 de la sesión del 21.
+regression-final.log y before-final.log son definitivos; after.log y otros
+after-* conservan iteraciones anteriores de pruebas, no la evidencia final.
+
+## B08-01 — fundamentos de los dos generadores
+
+### Identidades y diagnóstico independiente
+
+Desde la edad inicial x: P(K=k)=[producto de j<k de (1-q_j)]q_k.
+Si la tabla no agota la distribución, conditional normaliza estas masas
+por la probabilidad de muerte observada y advierte; error rechaza. Se
+preservan ambos modos y el umbral existente de reconocimiento de truncación.
+
+Condicionalmente al año de muerte, S=T-K tiene las distribuciones:
+
+* UDD: F(s)=s.
+* CML, p=1-q>0: F(s)=(1-p^s)/q; S=log1p(-U*q)/log1p(-q).
+* Balducci, p>0: F(s)=s/(p+q*s); S=U*p/(1-U*q).
+
+Antes se reemplazaba S por cero en CML/Balducci cuando p<=tol, incluso
+si p era positivo. Con q=1-1e-11 y tol=1e-10, todas las fracciones eran
+cero, pero sus CDF no devolvían los uniformes de la semilla 42. Es un
+defecto A del modelo, no una propuesta de nueva distribución. Se cambia
+la condición de degeneración a p==0 y se conserva exactamente la
+convención de fracción cero para q==1 en CML/Balducci. La corrección CML
+previa con q diminuto, basada en log1p(-q), permanece intacta.
+
+La exposición positiva en lx es lx>0, independiente del radix. Antes
+positive_rows usaba lx>tol: multiplicar (100,80,40,0) por 1e-100 podía
+rechazar la tabla. Se elimina ese umbral absoluto. Se deriva q como
+(l_y-l_(y+1))/l_y, evitando cancelación en 1-l_(y+1)/l_y. Por ejemplo,
+lx=(1e16,1e16-2) implica q=2e-16; la resta de la razón redondeada daba
+otro decremento. No se añade cierre, extrapolación ni una fila terminal.
+
+Se valida tol antes de usarlo y edades iniciales/de tabla antes de
+as.integer, evitando advertencias y NA por coerción. Un n_sim positivo
+que redondearía a cero se rechaza. death_age=x+K+1 se calcula sin overflow
+entero, conservando integer ordinario y double solo cuando hace falta.
+Se preservan las firmas, nombres/orden de columnas, aliases, métodos,
+precedencia qx/px/lx y la política de tolerancia ya existente para qx/px.
+No se certifica aún todo su dominio ni se uniforman otras funciones MC.
+
+### RNG y comprobaciones
+
+Con seed se conserva/restaura .Random.seed; sin seed se avanza la corriente
+del llamador. simulate_lifetimes inicializa una sola semilla para toda la
+llamada y no la reinicia por vida. Se conservan las llamadas explícitas de
+muestreo, tamaños y orden; no se promete igualdad de muestras afectadas por
+probabilidades corregidas ni detalles internos de sample.int entre versiones
+de R. Los pares antitéticos introducen dependencia entre filas;
+esta unidad no certifica el error estándar genérico bajo esos pares.
+
+test-b08-lifetime-foundations.R añade 94 comprobaciones: CDF condicional
+contra uniformes reconstruidos independientemente, métodos inverse/
+multinomial/antithetic y tamaño impar; invariancia al radix para tres
+escalas y tres fracciones; decremento pequeño; validación/coerción; masas
+anuales explícitas; coherencia K=floor(T); restauración con semilla
+presente/ausente, después de error en una vida posterior y consumo sin
+semilla. No se usa aproximación estadística para decidir los regresores.
+
+Contra c7a0d29, el archivo definitivo reproduce nueve fallos, cinco errores
+y dos advertencias, con 35 comprobaciones ya aprobadas. Algunos errores
+originales abortan bloques antes de completar sus aserciones; no se cuentan
+las no ejecutadas como aprobadas. Tras el fix pasan las 94. 78 resultados
+ordinarios COMPLETOS concuerdan a 1e-12 y las dos firmas son idénticas.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/b08-01/.
+before.log y after.log son la regresión inicial de 73 comprobaciones;
+after-final.log/before-final.log contienen el archivo definitivo de 94 y
+la compatibilidad. final-tests.log y build/check/snapshot son la evidencia
+de paquete final, registrada en audit-precran-check.md. Sin nueva dependencia,
+versión, push/publicación ni extensión de decisiones C previas.
+
+B08-01 confirmado, implementado, probado y cerrado dentro del alcance
+puntual anterior. Suite fuente/instalada: 6250 aprobadas, cero fallos/
+advertencias/omisiones. Build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE
+por desarrollo. Ejemplos y cuatro viñetas aprobados; 392 fuentes verificadas.
+Entorno, archivo y huella en audit-precran-check.md. B08 completo sigue abierto.
+
+### Continuación y límites
+
+B08 permanece abierto; este subconjunto no cierra sus once nombres. Sigue
+mc_multilife_status y el motor .simulate_lifetime_inverse_lx de los dos
+wrappers simulate_*_x, luego valoración por trayectoria y resúmenes. No
+asumir que corregir simulate_lifetime cambia el otro motor lx.
+
+next-status-diagnosis.log confirma un borde pendiente: dos vidas con
+K=(0,2),T=(1,2.5) pasan la tolerancia de mc_multilife_status y generan
+K_status=0,T_status=1; mc_insurance rechaza después ese par por incumplir
+K<=T<K+1. No está corregido aquí. Se debe conciliar el significado público
+de tol antes de cambiar su dominio, además de revisar almacenamiento y
+columnas de identificadores. No trasladar automáticamente la aprobación
+de otros bordes. El defecto B05 t_px/e_x sigue separado y pendiente.
+
+Actualización de decisión: C17 fue propuesta concretamente en
+audit-api-review.md y el usuario autorizó «la coherencia exacta K/T» el
+22 de octubre. Aplicar en la siguiente unidad, sin pedir de nuevo; el
+snapshot B08-01 todavía no modifica mc_multilife_status.
+
+next-lx-engine-diagnosis.log reproduce además simulate_annuity_x con
+lx=(1e300,1e-300), CML, n=1,k=1000: devuelve T=0 y cero pagos en todas
+las cinco trayectorias de semilla 42. La fuerza es 600*log(10), finita;
+su fracción de vida no es cero casi seguramente. Se pierde la razón
+anual antes de aplicar log. Defecto A confirmado pendiente del motor lx,
+sin corregir en B08-01. No confundirlo con el soporte de p>0 recuperado
+desde qx en el primer generador, ni prometer recuperación de información
+que ya se haya redondeado en una conversión qx/px.
+
+## B08-02 — estados multivida y C17 autorizada
+
+Base 9a7b441, rama y versión preservadas. B08-01 quedó guardado y validado
+antes de editar esta unidad. El usuario autorizó C17 expresamente el 22 de
+octubre; no se pidió otra autorización ni se extendió a otros contratos.
+
+### Modelo y correcciones
+
+Para cada vida K_i=floor(T_i). El estado conjunto usa min(K_i),min(T_i),
+y el último superviviente max(K_i),max(T_i). Como floor es monótona,
+floor(min T_i)=min floor(T_i), y análogamente para max. La igualdad depende
+de que cada par inicial sea compatible. Agregar primero no debe esconder
+una vida inválida que no determine el mínimo o máximo del estado.
+
+C17 exige exactamente K<=T<K+1 después de la comprobación/redondeo entero
+de K ya existentes. Se comprueba floor(T)==K sin sumar uno a un double
+grande; tol conserva la comprobación entera de K. No se redondea ni repara
+T. Se rechazan tanto T=K+1 como T<K aunque la diferencia sea menor que tol.
+La propuesta y la aprobación están en audit-api-review.md. Los pares válidos,
+alias de estado, identidad de las vidas y convenciones de agrupación siguen
+intactos. NA sigue rechazado; no se añade una política nueva de faltantes.
+
+Corrección A: K_status=as.integer(K_status) convertía una vida curtata válida
+de 3e9 en NA, con advertencia. Se mantiene integer ordinario y se conserva
+double cuando el valor no cabe en integer. No se cambia el valor actuarial.
+Los calendarios de pagos de tamaño enorme no se certifican por este arreglo.
+
+Corrección A/aclaración B: col_sim con nombre K_status/T_status/n_lives/status
+provocaba un error interno de columnas duplicadas de tibble. Ahora se rechaza
+explícitamente ese mismo caso ya fallido, indicando que el nombre está
+reservado. No se agrega una columna ni se renombra el identificador; sim_id,
+sim y otros identificadores válidos conservan sus nombres y aliases.
+
+### Evidencia y límites
+
+test-b08-multilife-status.R añade 58 comprobaciones: doce rechazos C17 en
+ambos estados y dos tolerancias; 32 libros de min/max, bordes válidos,
+cinco alias, orden de identificadores y encadenamiento con seguro/anualidad;
+siete de almacenamiento grande/ordinario y siete de nombres/identificadores.
+Las referencias son min/max explícitos y conteos de pagos a tasa cero;
+los consumidores constituyen una comprobación adicional, no el único oráculo.
+Se conserva el redondeo permitido de K cercano al entero y T válido sin reparar.
+
+Contra base: 16 fallos, un error y dos advertencias, con 35 aprobadas.
+El error interno original de tibble aborta el bloque de nombres; las
+aserciones restantes no se cuentan como aprobadas. Con el fix pasan las 58.
+60 objetos válidos COMPLETOS idénticos a 9a7b441, incluyendo agrupaciones
+de 12 simulaciones, alias, col_life=NULL e identificadores personalizados;
+firma idéntica. initial-timing-before.log se conserva como borrador: el
+primer libro omitía timing="due" en mc_annuity, cuyo default es immediate.
+El archivo definitivo explicita due y before-final.log usa ese archivo.
+
+Artefactos b08-02 del directorio de la sesión; suite/build/check/snapshot y
+huella en audit-precran-check.md. B08 sigue abierto. Continúa el otro motor
+lx con el defecto confirmado arriba, después valoración por trayectoria,
+primas/pérdidas/reservas y resúmenes. El suplemento B05 sigue pendiente.
+No se certifican dependencias entre vidas, reparación de trayectorias,
+intervalos de confianza antitéticos ni todos los extremos de los consumidores.
+
+Estado B08-02: autorizado C17, implementado, probado y cerrado dentro del
+alcance anterior. Suite fuente/instalada final: 6308 aprobadas, sin fallos/
+advertencias/omisiones; build/check salida 0, 0 ERROR, 0 WARNING, 1 NOTE por
+desarrollo. Ejemplos y cuatro viñetas aprobados; 393 fuentes verificadas,
+huella y entorno en audit-precran-check.md. B08 acumula 152 comprobaciones
+nuevas en dos unidades y permanece abierto. No se hizo push ni cambió versión.
