@@ -61,59 +61,50 @@ The package currently includes tools for:
 The full API is organized by actuarial area in the **Reference** section
 of the package website.
 
-## Collective risk in tidyactuarial 0.2.0
+## Collective risk: from a model to an annual loss
 
-A compact compound Poisson example links claim frequency, severity,
-insurance coverage, and simulated tail risk. The deductible applies per
-loss, while the stop-loss retention applies to the annual aggregate.
+In the collective risk model, the annual aggregate loss is the sum of
+individual claim amounts:
+
+S = \sum\_{j=1}^{N} X_j.
+
+For this example, suppose the number of annual claims follows a Poisson
+distribution with mean 3, while individual claim amounts follow a Gamma
+distribution with shape 2 and rate 0.005. We can calculate aggregate
+moments from the model and then use simulation to examine its tail.
 
 ``` r
 
-library(tidyactuarial)
-
 frequency <- frequency_spec("poisson", lambda = 3)
 
-model <- frequency |>
+risk_model <- frequency |>
   collective_risk_spec(
     severity = severity_spec(
-      "discrete",
-      values = c(200, 800, 2000),
-      probs = c(0.30, 0.50, 0.20)
-    ) |>
-      apply_coverage(
-        coverage_spec(
-          deductible = 200,
-          limit = 1200,
-          coinsurance = 0.80
-        )
-      )
-  ) |>
-  to_payment_basis()
+      "gamma", shape = 2, rate = 0.005
+    )
+  )
 
-# Analytical aggregate moments
-model |>
+# Expected aggregate loss and second moment
+risk_model |>
   aggregate_moments(order = 1:2)
 
-# Reproducible simulations and empirical tail measures
-simulations <- model |>
+# Simulate annual aggregate losses
+losses <- risk_model |>
   simulate_aggregate(n_sim = 5000, seed = 2026)
 
-simulations |>
+# Empirical tail risk at 95% and 99%
+losses |>
   value_at_risk(level = c(0.95, 0.99))
 
-simulations |>
+losses |>
   tail_value_at_risk(level = c(0.95, 0.99))
-
-simulations |>
-  stop_loss_premium(retention = c(1000, 2000))
 ```
 
-The expected annual insurer payment is **1,296 monetary units**, from
-`E[N] E[Y] = 3 × (0 × 0.30 + 480 × 0.50 + 960 × 0.20)`. VaR, TVaR, and
-stop-loss outputs above are Monte Carlo estimates. For a complete worked
-example, including Poisson thinning, an aggregate-payment histogram, and
-optional Panjer recursion, see **Collective Risk, Insurance Coverage,
-and Tail Measures** under Articles.
+The theoretical expected annual loss is E\[S\] = 3(2/0.005) = 1,200. The
+simulated VaR and TVaR are estimates, and will not necessarily match
+their theoretical values exactly. The distinction between analytical
+calculations and simulation is important when interpreting actuarial
+results.
 
 ## A simple design principle
 
@@ -325,14 +316,13 @@ replace the underlying equation of equivalence.
 
 ## Articles
 
-Five introductory articles develop complete workflows rather than
+Four introductory articles develop complete workflows rather than
 isolated function calls:
 
 - **Financial Mathematics with tidyactuarial**
 - **Loans, Amortization, and General Payment Schedules**
 - **Bonds, Duration, Convexity, and Immunization**
 - **Life Contingencies with tidyactuarial**
-- **Collective Risk, Insurance Coverage, and Tail Measures**
 
 They are available from the **Articles** menu of the package website.
 
@@ -407,8 +397,8 @@ background references include:
 - Bowers, N. L., Gerber, H. U., Hickman, J. C., Jones, D. A., &
   Nesbitt, C. J. *Actuarial Mathematics*.
 - Klugman, S. A., Panjer, H. H., & Willmot, G. E. (2019). *Loss Models:
-  From Data to Decisions* (5th ed.). Wiley. **Core reference for
-  collective risk theory.**
+  From Data to Decisions* (5th ed.). Wiley. A primary reference for the
+  collective risk module.
 
 ## License
 
@@ -729,8 +719,3 @@ Reproducible datasets for financial and actuarial examples.
 
 - [Life Contingencies with
   tidyactuarial](https://julianfajardo1908.github.io/tidyactuarial/articles/life-contingencies.md):
-
-### Collective Risk
-
-- [Collective Risk, Insurance Coverage, and Tail
-  Measures](https://julianfajardo1908.github.io/tidyactuarial/articles/collective-risk.md):

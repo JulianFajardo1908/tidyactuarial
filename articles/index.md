@@ -13,8 +13,3 @@
 
 - [Life Contingencies with
   tidyactuarial](https://julianfajardo1908.github.io/tidyactuarial/articles/life-contingencies.md):
-
-### Collective Risk
-
-- [Collective Risk, Insurance Coverage, and Tail
-  Measures](https://julianfajardo1908.github.io/tidyactuarial/articles/collective-risk.md):
