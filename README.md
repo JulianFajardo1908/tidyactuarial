@@ -50,19 +50,21 @@ library(tidyactuarial)
 
 frequency <- frequency_spec("poisson", lambda = 3)
 
-model <- severity_spec(
-  "discrete",
-  values = c(200, 800, 2000),
-  probs = c(0.30, 0.50, 0.20)
-) |>
-  apply_coverage(
-    coverage_spec(
-      deductible = 200,
-      limit = 1200,
-      coinsurance = 0.80
-    )
+model <- frequency |>
+  collective_risk_spec(
+    severity = severity_spec(
+      "discrete",
+      values = c(200, 800, 2000),
+      probs = c(0.30, 0.50, 0.20)
+    ) |>
+      apply_coverage(
+        coverage_spec(
+          deductible = 200,
+          limit = 1200,
+          coinsurance = 0.80
+        )
+      )
   ) |>
-  collective_risk_spec(frequency = frequency) |>
   to_payment_basis()
 
 # Analytical aggregate moments
