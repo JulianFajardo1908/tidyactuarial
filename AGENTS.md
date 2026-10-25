@@ -2,8 +2,8 @@
 
 ## Identidad y estado
 - Paquete R de matemática financiera, contingencias de vida y teoría actuarial del riesgo, orientado a docencia y aplicación profesional.
-- Referencia estable: CRAN 0.1.6. Rama de desarrollo prevista para 0.2.0: 0.1.6.9000; verificar siempre el `DESCRIPTION` real.
-- Objetivo inmediato: estabilizar 0.2.0 antes de CRAN. Existe una auditoría externa con al menos 16 hallazgos; cada hallazgo es una hipótesis de trabajo hasta su reproducción sobre la rama actual.
+- Referencia estable: CRAN 0.2.0 (publicada el 25 de octubre de 2026). Tras sincronizar las ramas, `master` representa la versión 0.2.0 y `develop` continuará como 0.2.0.9000; verificar siempre el `DESCRIPTION` real.
+- Objetivo inmediato: mantener coherentes CRAN, GitHub, la documentación y pkgdown para 0.2.0. Las auditorías previas se consideran registros históricos; cualquier hallazgo nuevo debe reproducirse antes de corregirlo.
 - El núcleo del paquete usa herramientas tidyverse, resultados claros y convenciones actuariales expresas. No es un wrapper genérico de `actuar`.
 
 ## Diseño de API
@@ -23,7 +23,7 @@
 - Multivida: explicitar supuestos de independencia y estado condicionante de cada valoración; no inferir el estado a partir de una única etiqueta sin comprobarlo.
 - Simulación: controlar semillas y consistencia de outputs encadenados; preservar el estado RNG cuando el contrato lo exija.
 
-## Auditoría pre-CRAN
+## Validación y mantenimiento
 - Orden sugerido: 1) `lifetable`, `mortality_law_table`, `e_xy` y tablas; 2) inmunización; 3) riesgo colectivo y coberturas; 4) reservas multivida y Monte Carlo; 5) documentación/CI/release.
 - No dar por corregido un hallazgo solo por escribir código. Estados: confirmado, propuesto, implementado, probado, cerrado.
 - Cada corrección requiere un test que falle antes y pase después cuando sea reproducible.
