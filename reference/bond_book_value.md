@@ -71,7 +71,8 @@ bond_book_value(
 
 - tol:
 
-  Numeric scalar. Tolerance used in alignment checks.
+  Finite positive numeric scalar. Absolute tolerance for alignment of
+  `n * k` and `t * k` with integer periods, not a monetary tolerance.
 
 - check:
 
@@ -123,8 +124,8 @@ Yield input conventions:
   coupon period.
 
 - Otherwise, `y`, `y_type`, and `y_m` define an annual yield
-  specification, which is converted first to annual effective yield and
-  then to effective yield per coupon period.
+  specification. Valuation retains its original log accumulation rate
+  even if an equivalent reported rate loses numeric range.
 
 This function follows the compact bond notation used in `tidyactuarial`:
 `P` is price, `face` is the face value, `c` is the annual coupon rate,
@@ -137,7 +138,11 @@ maturity period count \\N\\. If the remaining future cash flows are
 period, then the book value at time \\s\\ is \$\$BV_s =
 \sum\_{r=s+1}^{N} C_r (1+i_p)^{-(r-s)}.\$\$
 
-This is the prospective book value on the bond's yield basis.
+This is the prospective book value on the bond's yield basis. Valuation
+times retain their supplied order and duplicates. At maturity the final
+coupon and redemption have both been paid, so the value is zero; the
+same convention gives zero for `n = t = 0`. Integer period counts must
+fit the cash-flow schedule, with sufficient memory for its rows.
 
 ## See also
 
@@ -147,6 +152,7 @@ This is the prospective book value on the bond's yield basis.
 [`bond_convexity`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md)
 
 Other bonds:
+[`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md),
 [`bond_callable_price()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md),
 [`bond_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md),
 [`bond_duration()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_duration.md),
@@ -196,12 +202,12 @@ bond_book_value(
 #> # A tibble: 6 × 10
 #>       t valuation_period book_value yield_per_period yield_effective_annual
 #>   <dbl>            <int>      <dbl>            <dbl>                  <dbl>
-#> 1     0                0       108.           0.0600                   0.06
-#> 2     1                1       107.           0.0600                   0.06
-#> 3     2                2       105.           0.0600                   0.06
-#> 4     3                3       104.           0.0600                   0.06
-#> 5     4                4       102.           0.0600                   0.06
-#> 6     5                5         0            0.0600                   0.06
+#> 1     0                0       108.             0.06                   0.06
+#> 2     1                1       107.             0.06                   0.06
+#> 3     2                2       105.             0.06                   0.06
+#> 4     3                3       104.             0.06                   0.06
+#> 5     4                4       102.             0.06                   0.06
+#> 6     5                5         0              0.06                   0.06
 #> # ℹ 5 more variables: k <int>, face <dbl>, c <dbl>, n <dbl>, R <dbl>
 
 # Yield given directly per coupon period

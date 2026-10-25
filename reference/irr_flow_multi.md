@@ -121,7 +121,7 @@ If no roots are detected, the function returns a tibble with zero rows.
 This function is intended for cash flows with multiple sign changes,
 where more than one IRR may exist. It evaluates the NPV on a fine grid
 over the search interval, identifies subintervals with sign changes (and
-grid points where the NPV is approximately zero), and applies
+grid points where the scaled NPV evaluates to zero), and applies
 [`uniroot`](https://rdrr.io/r/stats/uniroot.html) to each candidate
 interval.
 
@@ -129,6 +129,14 @@ The IRRs returned are interpreted as annual effective rates.
 
 Timing can be supplied either through `t` (in years) or `date` (calendar
 dates). If `date` is supplied, the earliest date is treated as time 0.
+
+Cash flows are divided by their largest absolute amount during the
+search; reported NPVs remain in the original currency. Scaling that
+would erase a nonzero amount through underflow is rejected. Only exact
+computed grid zeros and sign-changing brackets generate candidates: an
+absolutely small monetary NPV is not by itself evidence of a root. Grid
+detection remains heuristic, including for tangential or very close
+roots.
 
 This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `cf` denotes cash flows, `t` denotes time, and `m`
@@ -176,7 +184,7 @@ irr_flow_multi(
 #> # A tibble: 1 × 11
 #>   root_id    irr i_effective_annual j_nominal_interest  delta      npv
 #>     <int>  <dbl>              <dbl>              <dbl>  <dbl>    <dbl>
-#> 1       1 0.0890             0.0890             0.0890 0.0852 1.36e-12
+#> 1       1 0.0890             0.0890             0.0890 0.0852 1.31e-12
 #> # ℹ 5 more variables: interval_left <dbl>, interval_right <dbl>,
 #> #   n_cashflows <int>, has_both_signs <lgl>, n_sign_changes_cashflow <int>
 

@@ -1,6 +1,6 @@
 # Total-decrement lifetable from a multiple decrement table: lt_tau
 
-Builds a single-decrement lifetable for the *total* decrement (any
+Builds a single-decrement lifetable for the \*total\* decrement (any
 cause), using \\q_x^{(\tau)}\\ from a multiple decrement table produced
 by
 [`md_table`](https://julianfajardo1908.github.io/tidyactuarial/reference/md_table.md).

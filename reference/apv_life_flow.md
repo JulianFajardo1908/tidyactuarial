@@ -90,7 +90,9 @@ apv_life_flow(
 A tibble with one row per payment and columns: `t`, `cf`, `surv_prob`,
 `discount`, `expected_cf`, `pv`, and `pv_cum`. If `date` was provided, a
 `date` column is included. The total APV is stored as
-`attr(result, "apv")`.
+`attr(result, "apv")`. The `contingency` attribute identifies
+`"survival"` or `"weighted"` (reversionary benefit fraction) for
+[`plot_contingent_cash_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/plot_contingent_cash_flow.md).
 
 ## Details
 
@@ -121,6 +123,19 @@ The survival probability depends on the `status`:
   \\\alpha\\ while at least one but not all lives are alive.
 
 Fractional-year survival is computed under UDD within each year.
+Discounting uses the log accumulation rate from the original interest
+specification. A displayed discount factor may be zero or infinite even
+when its monetary APV contribution is representable.
+
+Unknown mortality intervals produce missing contributions, unless
+survival has already reached zero. Missing numeric payment times and
+cash flows are retained as missing rows. Cumulative APV follows input
+row order and remains missing after a missing contribution. For
+compatibility, the `apv` attribute is the sum of nonmissing
+contributions (zero if none are known), so it is a subtotal when any
+contribution is missing, not a complete contract valuation. Calendar
+times use actual elapsed days divided by 365.25; all dates must be
+finite and nonmissing. Payments at the same time remain separate rows.
 
 ## Examples
 

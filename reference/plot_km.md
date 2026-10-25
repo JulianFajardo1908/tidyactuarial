@@ -94,14 +94,10 @@ out <- km_lifetable(time, status, breaks = 0:30)
 
 # Pass the full list - $km is extracted automatically
 plot_km(out)
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_ribbon()`).
 
 
 # Or pass just the km tibble
 plot_km(out$km)
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_ribbon()`).
 
 
 # Without confidence band
@@ -114,7 +110,5 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed") +
     ggplot2::labs(subtitle = "Dashed line = median survival")
 }
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_ribbon()`).
 
 ```

@@ -9,7 +9,7 @@ observed dirty price at time 0, using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,12 +94,13 @@ defaults to <code>face</code>.</p></dd>
 
 
 <dt id="arg-interval">interval<a class="anchor" aria-label="anchor" href="#arg-interval"></a></dt>
-<dd><p>Optional numeric vector of length 2 giving a bracket for the
-effective yield per coupon period.</p></dd>
+<dd><p>Optional finite numeric vector of length 2 giving an increasing
+bracket for the effective yield per coupon period, with both bounds above -1.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Numeric scalar. Tolerance passed to <code><a href="https://rdrr.io/r/stats/uniroot.html" class="external-link">uniroot</a></code>.</p></dd>
+<dd><p>Finite positive numeric scalar. Yield-coordinate tolerance passed
+to <code><a href="https://rdrr.io/r/stats/uniroot.html" class="external-link">uniroot</a></code>, not a monetary price tolerance.</p></dd>
 
 
 <dt id="arg-maxiter">maxiter<a class="anchor" aria-label="anchor" href="#arg-maxiter"></a></dt>
@@ -116,18 +117,18 @@ effective yield per coupon period.</p></dd>
     <p>A one-row tibble with columns:</p><dl><dt>price</dt>
 <dd><p>Input dirty price.</p></dd>
 
-<dt>i_period</dt>
+  <dt>i_period</dt>
 <dd><p>Effective yield per coupon period.</p></dd>
 
-<dt>j_nominal</dt>
+  <dt>j_nominal</dt>
 <dd><p>Nominal annual yield convertible <code>k</code> times per year
-(= <code>k * i_period</code>). When <code>k = 2</code>, this is the bond-equivalent
-yield.</p></dd>
+    (= <code>k * i_period</code>). When <code>k = 2</code>, this is the bond-equivalent
+    yield.</p></dd>
 
-<dt>i_effective_annual</dt>
+  <dt>i_effective_annual</dt>
 <dd><p>Annual effective yield.</p></dd>
 
-<dt>k</dt>
+  <dt>k</dt>
 <dd><p>Coupon frequency.</p></dd>
 
 
@@ -147,19 +148,26 @@ maturity, <code>k</code> is the coupon frequency, and <code>R</code> is the rede
 value.</p>
 <p>The effective yield per coupon period \(j\) is the solution to
 $$P = \sum_{r=1}^{N} C_r (1+j)^{-r}.$$</p>
-<p>The root is found numerically using <code><a href="https://rdrr.io/r/stats/uniroot.html" class="external-link">uniroot</a></code>. If no
-<code>interval</code> is supplied, the function automatically brackets the root
-starting from \((-0.999999, 0.10)\) and progressively widens the upper
-bound until a sign change is detected.</p>
+<p>With nonnegative payments and at least one positive future payment, price
+is strictly decreasing in \(j &gt; -1\), so the yield is unique. The root is
+found with <code><a href="https://rdrr.io/r/stats/uniroot.html" class="external-link">uniroot</a></code>, using the log of the discounted
+cash-flow sum relative to price to avoid monetary overflow or underflow.
+If no <code>interval</code> is supplied, the lower bound is the nearest double
+precision number above -1 and the upper bound starts at 0.10 and is widened
+until the root is bracketed. A yield outside the representable domain or an
+exhausted iteration limit causes an error. Tolerance applies to the yield
+coordinate according to <code>uniroot</code>; it does not guarantee a given price
+residual, particularly for yields near -1.</p>
 <p>From the per-period yield, the annual equivalents are:
 $$j^{(k)} = k j, \qquad i = (1 + j)^k - 1.$$</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="bond_price.html">bond_price</a></code>, <code><a href="bond_cash_flows.html">bond_cash_flows</a></code>,
-<code><a href="bond_duration.html">bond_duration</a></code>, <code><a href="bond_convexity.html">bond_convexity</a></code>,
-<code><a href="bond_callable_price.html">bond_callable_price</a></code></p>
+  <code><a href="bond_duration.html">bond_duration</a></code>, <code><a href="bond_convexity.html">bond_convexity</a></code>,
+  <code><a href="bond_callable_price.html">bond_callable_price</a></code></p>
 <p>Other bonds:
+<code><a href="accrued_interest.html">accrued_interest()</a></code>,
 <code><a href="bond_book_value.html">bond_book_value()</a></code>,
 <code><a href="bond_callable_price.html">bond_callable_price()</a></code>,
 <code><a href="bond_convexity.html">bond_convexity()</a></code>,
@@ -181,7 +189,7 @@ $$j^{(k)} = k j, \qquad i = (1 + j)^k - 1.$$</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   price i_period j_nominal i_effective_annual     k</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>   100   0.060<span style="text-decoration: underline;">0</span>    0.060<span style="text-decoration: underline;">0</span>             0.060<span style="text-decoration: underline;">0</span>     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>   100     0.06      0.06               0.06     1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">bond_ytm</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  P <span class="op">=</span> <span class="fl">950</span>,</span></span>

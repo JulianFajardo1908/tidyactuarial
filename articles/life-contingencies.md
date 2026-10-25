@@ -66,15 +66,15 @@ lt <- lifetable(
 
 lt
 #> # A tibble: 7 × 6
-#>       x     lx    dx     qx    px     mx
-#>   <int>  <dbl> <dbl>  <dbl> <dbl>  <dbl>
-#> 1    60 100000  1000 0.01   0.99  0.0101
-#> 2    61  99000  1500 0.0152 0.985 0.0153
-#> 3    62  97500  2000 0.0205 0.979 0.0207
-#> 4    63  95500  2500 0.0262 0.974 0.0265
-#> 5    64  93000  3000 0.0323 0.968 0.0328
-#> 6    65  90000  4000 0.0444 0.956 0.0455
-#> 7    66  86000 86000 1      0     2
+#>       x     lx    dx      qx     px      mx
+#>   <int>  <dbl> <dbl>   <dbl>  <dbl>   <dbl>
+#> 1    60 100000  1000  0.01    0.99   0.0101
+#> 2    61  99000  1500  0.0152  0.985  0.0153
+#> 3    62  97500  2000  0.0205  0.979  0.0207
+#> 4    63  95500  2500  0.0262  0.974  0.0265
+#> 5    64  93000  3000  0.0323  0.968  0.0328
+#> 6    65  90000  4000  0.0444  0.956  0.0455
+#> 7    66  86000    NA NA      NA     NA
 ```
 
 For example,
@@ -112,13 +112,13 @@ survival_audit <- tibble(
 
 survival_audit
 #> # A tibble: 6 × 3
-#>   duration survival  death
-#>      <int>    <dbl>  <dbl>
-#> 1        0    1     0     
-#> 2        1    0.99  0.0100
-#> 3        2    0.975 0.0250
-#> 4        3    0.955 0.0450
-#> 5        4    0.93  0.0700
+#>   duration survival death
+#>      <int>    <dbl> <dbl>
+#> 1        0    1     0    
+#> 2        1    0.99  0.01 
+#> 3        2    0.975 0.025
+#> 4        3    0.955 0.045
+#> 5        4    0.93  0.07 
 #> 6        5    0.9   0.1
 ```
 
@@ -334,7 +334,7 @@ tibble(
 #> # A tibble: 1 × 3
 #>   direct_insurance identity_value difference
 #>              <dbl>          <dbl>      <dbl>
-#> 1           0.0845         0.0845  -2.78e-16
+#> 1           0.0845         0.0845  -2.78e-17
 ```
 
 The difference should be zero up to numerical precision. The point of
@@ -502,14 +502,14 @@ reserve_schedule <- reserve_x(
 
 reserve_schedule
 #> # A tibble: 6 × 6
-#>       t   age reserve premium_annualized premium_per_payment method     
-#>   <int> <int>   <dbl>              <dbl>               <dbl> <chr>      
-#> 1     0    60      0               1912.               1912. prospective
-#> 2     1    61   1018.              1912.               1912. prospective
-#> 3     2    62   1586.              1912.               1912. prospective
-#> 4     3    63   1656.              1912.               1912. prospective
-#> 5     4    64   1160.              1912.               1912. prospective
-#> 6     5    65      0               1912.               1912. prospective
+#>       t   age   reserve premium_annualized premium_per_payment method     
+#>   <int> <int>     <dbl>              <dbl>               <dbl> <chr>      
+#> 1     0    60 -1.82e-12              1912.               1912. prospective
+#> 2     1    61  1.02e+ 3              1912.               1912. prospective
+#> 3     2    62  1.59e+ 3              1912.               1912. prospective
+#> 4     3    63  1.66e+ 3              1912.               1912. prospective
+#> 5     4    64  1.16e+ 3              1912.               1912. prospective
+#> 6     5    65  0                     1912.               1912. prospective
 ```
 
 For this annual fully discrete contract, the recursive method provides a
@@ -533,14 +533,14 @@ reserve_x(
   output = "summary"
 )
 #> # A tibble: 6 × 6
-#>       t   age  reserve premium_annualized premium_per_payment method   
-#>   <int> <int>    <dbl>              <dbl>               <dbl> <chr>    
-#> 1     0    60 0                     1912.               1912. recursive
-#> 2     1    61 1.02e+ 3              1912.               1912. recursive
-#> 3     2    62 1.59e+ 3              1912.               1912. recursive
-#> 4     3    63 1.66e+ 3              1912.               1912. recursive
-#> 5     4    64 1.16e+ 3              1912.               1912. recursive
-#> 6     5    65 9.40e-13              1912.               1912. recursive
+#>       t   age   reserve premium_annualized premium_per_payment method   
+#>   <int> <int>     <dbl>              <dbl>               <dbl> <chr>    
+#> 1     0    60 -6.82e-13              1912.               1912. recursive
+#> 2     1    61  1.02e+ 3              1912.               1912. recursive
+#> 3     2    62  1.59e+ 3              1912.               1912. recursive
+#> 4     3    63  1.66e+ 3              1912.               1912. recursive
+#> 5     4    64  1.16e+ 3              1912.               1912. recursive
+#> 6     5    65  0                     1912.               1912. recursive
 ```
 
 The prospective and recursive approaches answer the same actuarial

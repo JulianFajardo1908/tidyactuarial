@@ -64,7 +64,8 @@ bond_convexity(
 
 - tol:
 
-  Numeric scalar. Tolerance used to check maturity alignment.
+  Finite positive numeric scalar. Tolerance used to check maturity
+  alignment with integer coupon periods, not a monetary price threshold.
 
 - check:
 
@@ -122,8 +123,8 @@ Yield input conventions:
   effective yield per coupon period.
 
 - Otherwise, `y`, `y_type`, and `y_m` define an annual yield
-  specification, which is converted first to annual effective yield and
-  then to effective yield per coupon period.
+  specification. Calculations retain its original log growth; reported
+  effective equivalents remain subject to numeric range.
 
 This function follows the compact bond notation used in `tidyactuarial`:
 `face` is the face value, `c` is the annual coupon rate, `n` is the time
@@ -136,12 +137,26 @@ periods \\r = 1, \dots, N\\. With \\v = 1/(1+j)\\ and \\P = \sum_r C_r
 v^r\\, the discrete convexity in coupon periods is \$\$C_p = \frac{1}{P}
 \frac{\sum\_{r=1}^{N} C_r r(r+1) v^r}{(1+j)^2}.\$\$
 
-Discrete convexity in years is \\C_p / k^2\\.
+Discrete convexity in years is \\C_p / k^2\\. This is sensitivity to the
+nominal annual yield \\z=kj\\; it is generally not the relative second
+derivative with respect to the annual effective yield \\i=(1+j)^k-1\\.
+Before passing convexity to
+[`immunize_duration_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/immunize_duration_convexity.md),
+apply the chain rule described there or compute
+[`convexity_cash_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/convexity_cash_flow.md)
+from annual cash-flow times.
 
 This is the second-order sensitivity of the bond price to changes in the
 yield per period. Together with
 [`bond_duration`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_duration.md),
 it is used in the second-order Taylor approximation of price changes.
+Prices use original log yields and moments use relative present values,
+avoiding monetary numerator overflow. Nonzero-term bonds require a
+positive finite price and finite risk measures; changing currency alone
+does not create an undefined sensitivity. Reported equivalent yields may
+reach -1 or Inf by rounding while the original specification remains
+usable. At zero term, the existing convention returns immediate
+redemption and zero risk.
 
 ## See also
 
@@ -152,6 +167,7 @@ it is used in the second-order Taylor approximation of price changes.
 [`bond_ytm`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_ytm.md)
 
 Other bonds:
+[`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md),
 [`bond_book_value()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_book_value.md),
 [`bond_callable_price()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md),
 [`bond_duration()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_duration.md),

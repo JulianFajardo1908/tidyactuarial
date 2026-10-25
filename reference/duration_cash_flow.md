@@ -25,35 +25,36 @@ duration_cash_flow(
 - t:
 
   Numeric vector of cash-flow times. Times must be expressed in the same
-  units used by `rate`.
+  units used by \`rate\`.
 
 - rate:
 
   Effective yield per unit of time. It must be a finite numeric scalar
-  greater than `-1`.
+  greater than \`-1\`.
 
 - valuation_time:
 
-  Finite numeric scalar indicating the valuation time. Defaults to `0`.
+  Finite numeric scalar indicating the valuation time. Defaults to
+  \`0\`.
 
 - duration:
 
-  Character scalar indicating the duration measure: `"macaulay"` or
-  `"modified"`.
+  Character scalar indicating the duration measure: \`"macaulay"\` or
+  \`"modified"\`.
 
 - output:
 
-  Character scalar indicating the returned object: `"value"` returns the
-  selected duration as a numeric scalar; `"audit"` returns a detailed
-  tibble.
+  Character scalar indicating the returned object: \`"value"\` returns
+  the selected duration as a numeric scalar; \`"audit"\` returns a
+  detailed tibble.
 
 ## Value
 
-If `output = "value"`, a numeric scalar.
+If \`output = "value"\`, a numeric scalar.
 
-If `output = "audit"`, a tibble with six columns: `time`,
-`remaining_time`, `cash_flow`, `discount_factor`, `present_value`, and
-`duration_contribution`.
+If \`output = "audit"\`, a tibble with six columns: \`time\`,
+\`remaining_time\`, \`cash_flow\`, \`discount_factor\`,
+\`present_value\`, and \`duration_contribution\`.
 
 ## Details
 
@@ -72,12 +73,19 @@ The modified duration with respect to the effective yield is
 \$\$ D\_{\mathrm{mod},\tau} = \frac{D\_{\mathrm{Mac},\tau}}{1+i}. \$\$
 
 The function follows an ex-cash-flow convention: cash flows occurring
-exactly at `valuation_time` are excluded. Therefore, the result
+exactly at \`valuation_time\` are excluded. Therefore, the result
 represents duration immediately after any cash flow paid at that time.
 
 For streams containing both positive and negative cash flows, duration
 remains a yield-sensitivity measure, but it may not have the usual
-interpretation as a weighted-average payment time.
+interpretation as a weighted-average payment time. Relative
+contributions are computed without first forming a monetary duration
+numerator. Representable products can be recovered when a standalone
+discount factor underflows; its audit column can then be zero while
+present value is positive. Discount factors, present values, their
+total/absolute sum, and the selected contributions/result must remain
+finite. A signed stream is rejected when absolute total value is at most
+\`sqrt(.Machine\$double.eps)\` times the sum of absolute present values.
 
 ## Examples
 

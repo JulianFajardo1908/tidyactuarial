@@ -11,7 +11,7 @@ last-survivor (second death)."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,9 +93,10 @@ the maximum horizon allowed by the table.</p></dd>
 
 <dt id="arg-frac">frac<a class="anchor" aria-label="anchor" href="#arg-frac"></a></dt>
 <dd><p>Fractional-age assumption for <code>type = "complete"</code>,
-passed to <code><a href="t_pxy.html">t_pxy</a></code>: <code>"UDD"</code>, <code>"CF"</code>,
+as in <code><a href="t_pxy.html">t_pxy</a></code>: <code>"UDD"</code>, <code>"CF"</code>,
 <code>"CML"</code>, or <code>"Balducci"</code>. If not specified and <code>lt</code>
-carries a <code>frac</code> attribute, that value is used.</p></dd>
+carries a <code>frac</code> attribute, that value is used.
+An inherited <code>"CML"</code> attribute is normalized to <code>"CF"</code>.</p></dd>
 
 
 <dt id="arg-cohort">cohort<a class="anchor" aria-label="anchor" href="#arg-cohort"></a></dt>
@@ -108,7 +109,8 @@ carries a <code>frac</code> attribute, that value is used.</p></dd>
 
 
 <dt id="arg-check">check<a class="anchor" aria-label="anchor" href="#arg-check"></a></dt>
-<dd><p>Logical. If <code>TRUE</code>, performs basic input checks.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, performs basic input checks.
+Table consistency and scalar logical controls are always checked.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
@@ -126,11 +128,24 @@ $$e_{xy} = \sum_{k=1}^{\infty} {}_kp_{xy}, \quad
   e_{\overline{xy}} = \sum_{k=1}^{\infty} {}_kp_{\overline{xy}}.$$</p>
 <p><strong>Complete expectation</strong> (Finan, Section 56.4):
 $$\mathring{e}_{xy} = \int_0^{\infty} {}_tp_{xy} \, dt.$$</p>
-<p>The integral is decomposed year-by-year. Within each year, the survival
-integral for the two-life status is computed numerically via composite
-trapezoid (80-point grid), since closed-form expressions for joint/last
-survivor under fractional-age assumptions are complex.</p>
-<p><strong>Key identity</strong> (Finan, Example 57.4):
+<p>The integral is decomposed year-by-year and evaluated analytically under
+UDD, constant force, or Balducci, retaining small survival in log form.
+Observed annual <code>lx</code> ratios determine the fractional survival.
+Survival is always
+measured from the initial ages, conditional on both lives being alive
+at time zero. In particular, last-survivor survival at later times does
+not imply that both lives remain alive.</p>
+<p>Horizons end at the last recorded age: the older life limits joint-life
+expectation and the younger life limits last-survivor expectation.
+Survival beyond that age is taken as zero, as in <code>t_px</code>; an open
+table therefore gives a truncated expectation. Missing initial ages or
+zero initial survivors give <code>NA</code>, including when <code>t = 0</code>.
+Tables must have unique consecutive annual integer ages and finite,
+nonnegative, nonincreasing <code>lx</code>. Observed <code>px</code>/<code>qx</code> must
+be probabilities consistent with annual <code>lx</code> ratios within
+<code>1e-10</code>; unknown probabilities may be <code>NA</code>. The age tolerance
+<code>tol</code> does not relax this mortality consistency threshold.</p>
+<p>**Key identity** (Finan, Example 57.4):
 $$\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
   - \mathring{e}_{xy}.$$</p>
 <p>This can be used to cross-validate results.</p>
@@ -138,8 +153,8 @@ $$\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="e_x.html">e_x</a></code> for single-life expectancy,
-<code><a href="t_pxy.html">t_pxy</a></code> for two-life survival probabilities,
-<code><a href="annuity_xy.html">annuity_xy</a></code> for two-life annuity APVs.</p></div>
+  <code><a href="t_pxy.html">t_pxy</a></code> for two-life survival probabilities,
+  <code><a href="annuity_xy.html">annuity_xy</a></code> for two-life annuity APVs.</p></div>
     </div>
 
     <div class="section level2">
@@ -151,11 +166,11 @@ $$\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Curtate joint-life expectancy (Finan, Sec. 56.4)</span></span></span>
 <span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.601538</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Curtate last-survivor expectancy (Finan, Sec. 57)</span></span></span>
 <span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"last"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5.746923</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Verify identity (Finan, Example 57.4):</span></span></span>
 <span class="r-in"><span><span class="co"># e_{xy-bar} = e_x + e_y - e_xy</span></span></span>
@@ -165,11 +180,11 @@ $$\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
 <span class="r-in"><span><span class="va">e_y_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="e_x.html">e_x</a></span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>last_surv <span class="op">=</span> <span class="va">e_last</span>, sum_minus_joint <span class="op">=</span> <span class="va">e_x_val</span> <span class="op">+</span> <span class="va">e_y_val</span> <span class="op">-</span> <span class="va">e_joint</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       last_surv sum_minus_joint </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              NA              NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        5.746923        5.746923 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Complete joint-life expectancy under UDD</span></span></span>
 <span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"complete"</span>, frac <span class="op">=</span> <span class="st">"UDD"</span>, cohort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.691013</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Temporary: 3-year curtate joint-life</span></span></span>
 <span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, t <span class="op">=</span> <span class="fl">3</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span></span>
@@ -180,7 +195,7 @@ $$\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       x     y     t type    frac  cohort    ex</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    60    62    <span style="color: #BB0000;">NA</span> curtate UDD   first     <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    60    62    <span style="color: #BB0000;">NA</span> curtate UDD   first   3.60</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

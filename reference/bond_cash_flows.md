@@ -35,7 +35,8 @@ bond_cash_flows(face, c, n, k = 1L, R = NULL, tol = 1e-10, check = TRUE)
 
 - tol:
 
-  Numeric scalar. Tolerance.
+  Finite positive numeric scalar. Absolute tolerance for integer
+  alignment of `k` and `n * k`; it is not a monetary tolerance.
 
 - check:
 
@@ -54,6 +55,10 @@ to maturity, `k` is the number of coupon payments per year, and `R` is
 the redemption value.
 
 Stub periods are not supported; therefore, `n * k` must be an integer.
+The coupon is \\face \cdot c/k\\. Coupons and redemption remain separate
+rows at maturity. At `n = 0`, only immediate redemption is returned. The
+schedule requires finite coupons and an integer number of periods below
+`.Machine$integer.max`, with sufficient memory for the resulting rows.
 
 ## Examples
 

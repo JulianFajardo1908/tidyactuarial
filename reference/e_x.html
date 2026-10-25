@@ -9,7 +9,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,8 +107,8 @@ attribute (set by <code><a href="lifetable.html">lifetable</a></code>), that val
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A numeric vector of expected future lifetimes, or a tibble if
-<code>tidy = TRUE</code> with columns <code>x</code>, <code>t</code>, <code>type</code>,
-<code>frac</code>, <code>ex</code>.</p>
+  <code>tidy = TRUE</code> with columns <code>x</code>, <code>t</code>, <code>type</code>,
+  <code>frac</code>, <code>ex</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -126,7 +126,15 @@ in closed form under the selected fractional-age assumption
 (Finan, Section 24):</p><ul><li><p>UDD (Sec. 24.1): \(\int_0^s {}_u p_y \, du = s - \frac{1}{2} s^2 q_y\)</p></li>
 <li><p>CF (Sec. 24.2): \(\int_0^s {}_u p_y \, du = (1 - p_y^s) / (-\ln p_y)\)</p></li>
 <li><p>Balducci (Sec. 24.3): \(\int_0^s {}_u p_y \, du = \frac{p_y}{q_y} \ln \left( \frac{p_y + q_y s}{p_y} \right)\)</p></li>
-</ul><p>Under UDD, the complete expectancy satisfies the well-known approximation
+</ul><p>Integrals use stable exponential/logarithmic increments for small durations.
+Extinct cohorts contribute zero to later intervals, even if their
+conditional probabilities are undefined. The CF/Balducci zero-survival
+interval has integral zero; UDD retains its linear decline.
+Unknown survivor counts propagate as missing expectations.
+When annual probabilities must be derived from survivor counts, survival
+uses the direct count ratio rather than \(1-q_y\). Its logarithm retains
+the CF integral even when the annual ratio is below floating-point range.</p>
+<p>Under UDD, the complete expectancy satisfies the well-known approximation
 (Finan, Example 20.24):
 $$\breve{e}_x \approx e_x + \frac{1}{2}.$$</p>
     </div>

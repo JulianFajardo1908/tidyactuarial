@@ -70,5 +70,14 @@ The fractional-year factor \\{}\_s p_y\\ depends on the assumption:
 - Balducci (Finan, Sec. 24.3): \\{}\_s p_y = \frac{p_y}{1 - (1 - s)
   \times q_y}\\
 
-If \\x + t \> \omega\\ (the terminal age), the function returns 0 since
-no survival is possible beyond the table's limiting age.
+Missing annual survival probabilities are derived directly from adjacent
+survivor counts, avoiding cancellation in \\1-q_y\\. CF and Balducci
+retain logarithmic survival when that count ratio underflows. Supplied
+`px` values remain in use; input columns should describe a consistent
+annual life table.
+
+If \\x + t \> \omega\\ (the terminal age), the function returns 0 by the
+established table-horizon convention, including open tables. This is
+truncation, not inference about survival beyond observed ages; extend
+the table before evaluating a longer horizon. Interval tables with
+nonannual widths from `km_lifetable` require annual conversion first.

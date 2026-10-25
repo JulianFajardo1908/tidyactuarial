@@ -174,8 +174,13 @@ annualized premium. The installment is \$\$ P\_{\text{per payment}} =
 
 Standard whole-life, term, and endowment benefits are valued through
 [`insurance_xy`](https://julianfajardo1908.github.io/tidyactuarial/reference/insurance_xy.md).
-A pure endowment is obtained as the difference between the corresponding
-endowment and term insurance values.
+A pure endowment is valued directly as the discounted benefit times
+status survival at maturity, retaining the issue-age conditioning,
+including for deferred last-survivor benefits. The identity endowment
+minus term remains a mathematical check, rather than the numerical
+calculation. Tables and horizons are validated without inventing
+terminal mortality. The premium annuity must have a positive finite
+representable APV; the output is one contract, not parallel scenarios.
 
 A contract assembled with pipes may be valued directly:
 

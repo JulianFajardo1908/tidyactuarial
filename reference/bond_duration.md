@@ -64,7 +64,8 @@ bond_duration(
 
 - tol:
 
-  Numeric scalar. Tolerance used to check maturity alignment.
+  Finite positive numeric scalar. Tolerance used to check maturity
+  alignment with integer coupon periods, not a monetary price threshold.
 
 - check:
 
@@ -132,8 +133,8 @@ Yield input conventions:
   effective yield per coupon period.
 
 - Otherwise, `y`, `y_type`, and `y_m` define an annual yield
-  specification, which is converted first to annual effective yield and
-  then to effective yield per coupon period.
+  specification. Calculations retain its original log growth; reported
+  effective equivalents remain subject to numeric range.
 
 This function follows the compact bond notation used in `tidyactuarial`:
 `face` is the face value, `c` is the annual coupon rate, `n` is the time
@@ -159,7 +160,18 @@ years, is \\D^\*\_i = D / (1 + i)\\, where \\i = (1+j)^k - 1\\.
 Modified duration measures the first-order sensitivity of the bond price
 to yield changes. Together with
 [`bond_convexity`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md),
-it forms the second-order Taylor approximation of price changes.
+it forms the second-order Taylor approximation of price changes. The two
+coefficients must use the same yield coordinate: pair
+`modified_duration_periods_j` with the period convexity for changes in
+\\j\\. Annual effective duration requires annual effective convexity,
+obtained using the chain rule or
+[`convexity_cash_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/convexity_cash_flow.md)
+on year times. Prices use original log yields and moments use relative
+present values. Nonzero-term bonds require a positive finite price and
+finite risk measures; calendar tolerance does not define a monetary
+zero. Reported equivalent yields may reach -1 or Inf by rounding while
+the specification remains usable. At zero term, immediate redemption and
+zero risk follow the existing convention.
 
 ## See also
 
@@ -170,6 +182,7 @@ it forms the second-order Taylor approximation of price changes.
 [`bond_ytm`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_ytm.md)
 
 Other bonds:
+[`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md),
 [`bond_book_value()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_book_value.md),
 [`bond_callable_price()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md),
 [`bond_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md),

@@ -11,7 +11,7 @@ whereas a last-survivor status terminates at the last death."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,7 +79,9 @@ whereas a last-survivor status terminates at the last death.</p>
 
 
 <dt id="arg-col-sim">col_sim<a class="anchor" aria-label="anchor" href="#arg-col-sim"></a></dt>
-<dd><p>Character scalar naming the simulation identifier column.</p></dd>
+<dd><p>Character scalar naming the simulation identifier column.
+It must not collide with the output fields <code>K_status</code>,
+<code>T_status</code>, <code>n_lives</code>, or <code>status</code>.</p></dd>
 
 
 <dt id="arg-col-life">col_life<a class="anchor" aria-label="anchor" href="#arg-col-life"></a></dt>
@@ -98,8 +100,8 @@ across simulations but cannot detect duplicated or substituted lives.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Nonnegative numeric tolerance used when checking that each
-complete future lifetime is compatible with its curtate lifetime.</p></dd>
+<dd><p>Nonnegative numeric tolerance for checking whole-number curtate
+lifetimes. It does not relax the interval \(K \le T &lt; K+1\).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -107,21 +109,21 @@ complete future lifetime is compatible with its curtate lifetime.</p></dd>
     <p>A tibble with one row per simulation and:</p><dl><dt>sim_id</dt>
 <dd><p>Standard simulation identifier.</p></dd>
 
-<dt>sim</dt>
+  <dt>sim</dt>
 <dd><p>Compatibility alias for the simulation identifier.</p></dd>
 
-<dt>K_status</dt>
+  <dt>K_status</dt>
 <dd><p>Curtate future lifetime of the status.</p></dd>
 
-<dt>T_status</dt>
+  <dt>T_status</dt>
 <dd><p>Complete future lifetime of the status.</p></dd>
 
-<dt>n_lives</dt>
+  <dt>n_lives</dt>
 <dd><p>Number of lives represented in each simulation.</p></dd>
 
-<dt>status</dt>
+  <dt>status</dt>
 <dd><p>Canonical status: <code>"joint"</code> or
-<code>"last_survivor"</code>.</p></dd>
+  <code>"last_survivor"</code>.</p></dd>
 
 
 </dl><p>If <code>col_sim</code> is neither <code>"sim_id"</code> nor <code>"sim"</code>, that
@@ -142,7 +144,11 @@ for the last-survivor status.</p>
 <p>The corresponding curtate future lifetime is obtained with the same minimum
 or maximum operation on \(K_1,\ldots,K_r\). Because the function validates
 \(K_j \le T_j &lt; K_j+1\), the returned values satisfy the same
-curtate-complete relationship.</p>
+curtate-complete relationship.
+Each complete lifetime must satisfy this interval exactly after the
+existing whole-number check and rounding of <code>K</code>. Incompatible
+complete lifetimes are rejected, not rounded or repaired. Ordinary
+curtate outputs use integer storage; larger values retain numeric storage.</p>
 <p>When <code>col_life</code> is available, every simulation must contain exactly one
 row for every life and the same set of lives must appear in every
 simulation. This prevents a missing or duplicated life from being silently
@@ -151,7 +157,7 @@ treated as a different multiple-life contract.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="simulate_lifetimes.html">simulate_lifetimes</a></code>, <code><a href="mc_insurance.html">mc_insurance</a></code>,
-<code><a href="mc_annuity.html">mc_annuity</a></code>, <code><a href="mc_reserve.html">mc_reserve</a></code></p>
+  <code><a href="mc_annuity.html">mc_annuity</a></code>, <code><a href="mc_reserve.html">mc_reserve</a></code></p>
 <p>Other monte-carlo:
 <code><a href="mc_annuity.html">mc_annuity()</a></code>,
 <code><a href="mc_insurance.html">mc_insurance()</a></code>,

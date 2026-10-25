@@ -68,7 +68,8 @@ annuity_xy(
 
   Optional list with numeric scalar weights `both`, `x_only`, and
   `y_only`. These weights define the payment rate according to the
-  survival state of the two lives.
+  survival state of the two lives. Weights may be signed; an expected
+  payment is then a benefit weight, not necessarily a probability.
 
 - n:
 
@@ -149,11 +150,41 @@ so each payment has size \\1/k\\. For exact valuation, a fractional term
 is admissible whenever it contains a whole number of payments: \$\$nk
 \in \mathbb{N}.\$\$
 
-Woolhouse approximations are applied only to the standard joint-life and
-last-survivor statuses. For a deferred annuity, the Woolhouse endpoint
-corrections are multiplied by the issue-date value of the status at the
-beginning of the payment period. This preserves the deferment factor
-\\v^h\\{}\_hp\_{xy}\\ or its last-survivor analogue.
+Both lives are alive at issue; both, x_only and y_only refer to
+occupation at each payment date, without restarting both lives after a
+death. A designated reversion to y uses both=0, x_only=0, y_only=1; this
+differs from payments to either sole survivor and from a
+joint-and-survivor annuity paying while both are alive as well.
+
+Exact valuation sums signed state payments on dates h+j/k, with each
+payment equal to its state rate divided by k. Cumulative death
+probabilities use direct survivor-count decrements and fractional
+interval masses, avoiding cancellation in 1-S. Original log interest,
+probabilities and monetary weights are combined before exponentiating
+when necessary.
+
+Woolhouse approximations apply only to standard joint-life/last-survivor
+statuses. Put F(t)=exp(-g\*t)w(t), where w is the status survival from
+issue and g is the input rate's annual log accumulation. First order
+subtracts (1-1/k)(F(h)-F(h+n))/2 from the annual due annuity. Second
+order also subtracts (1-1/k^2)((g+eta(h))F(h)-(g+eta(h+n))F(h+n))/12,
+with eta(t)=-log(w(t+1)/w(t)), a forward annual estimate, not an exact
+instantaneous force. Second order requires positive supported weights
+and the following year at both borders; otherwise use none or first.
+Immediate subtracts (F(h)-F(h+n))/k from the due approximation. A
+negative approximation is reported with a warning, without clipping.
+
+Tables must satisfy the annual consistency requirements of
+[`t_pxy`](https://julianfajardo1908.github.io/tidyactuarial/reference/t_pxy.md);
+issue ages must have positive lx for nonempty valuations. Payment grids
+must be finite, representable and no larger than R's integer range. One
+call values one contract; benefit vectors describe states, not
+scenarios. The existing table-horizon convention is retained: each
+marginal survival becomes zero beyond its last recorded age. On open
+tables this is truncation, not evidence of death, and may affect
+last-survivor or reversionary weights after the shorter horizon. Extend
+the tables for those interpretations. Infinite n means available
+horizon, not extrapolated lifetime coverage.
 
 ## See also
 
@@ -208,7 +239,7 @@ annuity_xy(
   status = "last",
   timing = "due"
 )
-#> [1] NA
+#> [1] 5.240099
 
 # Different life tables for the two lives
 lt_m <- lt
@@ -236,5 +267,5 @@ annuity_xy(
   benefit = list(both = 0, x_only = 1, y_only = 0),
   timing = "due"
 )
-#> [1] NA
+#> [1] 0.8752761
 ```

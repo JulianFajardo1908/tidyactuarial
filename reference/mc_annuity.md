@@ -35,7 +35,10 @@ mc_annuity(
   [`simulate_lifetime`](https://julianfajardo1908.github.io/tidyactuarial/reference/simulate_lifetime.md)
   or by
   [`mc_multilife_status`](https://julianfajardo1908.github.io/tidyactuarial/reference/mc_multilife_status.md)
-  when working with multiple-life statuses.
+  when working with multiple-life statuses. For life-contingent
+  calculations, observed curtate lifetimes must be finite nonnegative
+  integers and observed complete lifetimes finite and nonnegative.
+  Paired observations must satisfy \\K_x \le T_x \< K_x+1\\.
 
 - i:
 
@@ -66,7 +69,9 @@ mc_annuity(
 - h:
 
   Numeric scalar. Deferral period in years. Default is `0`. Required to
-  be positive for `"deferred"` and `"deferred_temporary"` annuities.
+  be positive for `"deferred"` and `"deferred_temporary"` annuities. For
+  fractional payments, the calendar is anchored at `h`, which need not
+  be a multiple of `1 / k`.
 
 - n_guar:
 
@@ -229,7 +234,17 @@ through `payment_per_payment = payment` and
 For annual payments, `k = 1`, the function works directly with \\K_x\\.
 For fractional payments, such as monthly, quarterly, or semiannual
 payments, the function uses \\T_x\\ to determine whether the life is
-alive at each fractional payment time.
+alive at each fractional payment time. Missing lifetimes produce missing
+life-contingent present values and payment counts; certain annuities
+remain independent of lifetime data. Fractional due payments use dates
+strictly before death; fractional immediate payments include a date
+exactly equal to the complete lifetime. Guaranteed payments remain
+payable throughout the guarantee period. Discounting retains the log
+accumulation rate from the original interest convention and combines
+monetary amounts with discount factors before losing their numerical
+range. At extreme rates, the displayed effective rate or annual discount
+factor may be infinite or rounded to a boundary; these metadata are not
+used to value the payments.
 
 For annual whole-life annuity-immediate, the simulated present value is
 \$\$ Y = \sum\_{j=1}^{K_x} c v^j, \$\$ where \\c\\ is the amount of each

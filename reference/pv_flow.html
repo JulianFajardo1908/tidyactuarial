@@ -15,7 +15,7 @@ a term structure of spot rates, one rate per cash flow.
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -115,14 +115,22 @@ supplied either through <code>t</code> (in years) or <code>date</code> (calendar
 If <code>date</code> is supplied, the earliest date is taken as time 0.</p>
 <p>Interest-rate input:</p><ul><li><p>If <code>i</code> has length 1, the same rate is used for all cash flows.</p></li>
 <li><p>If <code>i</code> has the same length as <code>cf</code>, each rate is
-interpreted as the spot rate associated with the corresponding
-cash-flow time.</p></li>
+        interpreted as the spot rate associated with the corresponding
+        cash-flow time.</p></li>
 </ul><p>Rate types may be supplied in FM-style notation:</p><ul><li><p>annual effective rate \(i\),</p></li>
 <li><p>nominal annual interest rate \(j^{(m)}\),</p></li>
 <li><p>nominal annual discount rate \(d^{(m)}\),</p></li>
 <li><p>force of interest \(\delta\).</p></li>
 </ul><p>Internally, all supplied rates are converted to annual effective rates using
-<code><a href="standardize_interest.html">standardize_interest</a></code>.</p>
+<code><a href="standardize_interest.html">standardize_interest</a></code>.
+Discounting retains the original log accumulation rates, including when
+annual effective equivalents round to -1 or overflow to Inf.</p>
+
+<p>Products are evaluated in log space when separate factors lose range or
+precision; original cash-flow signs and known zero amounts are preserved.
+If individual values overflow, amounts with exactly equal finite log
+factors are netted before valuation. Cancellation between unequal factors
+is not recovered by this rule and may still produce non-finite results.</p>
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>cf</code> denotes cash flows, <code>t</code> denotes time,
 <code>i</code> denotes the interest rate, <code>i_type</code> denotes the interest-rate
@@ -136,7 +144,7 @@ cash flow \(k\). When a single constant rate is supplied,
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="fv_flow.html">fv_flow</a></code>, <code><a href="present_value.html">present_value</a></code>,
-<code><a href="irr_flow.html">irr_flow</a></code>, <code><a href="standardize_interest.html">standardize_interest</a></code></p>
+  <code><a href="irr_flow.html">irr_flow</a></code>, <code><a href="standardize_interest.html">standardize_interest</a></code></p>
 <p>Other time-value:
 <code><a href="accumulation_factor.html">accumulation_factor()</a></code>,
 <code><a href="discount_factor.html">discount_factor()</a></code>,

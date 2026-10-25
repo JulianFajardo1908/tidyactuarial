@@ -24,29 +24,30 @@ convexity_cash_flow(
 - t:
 
   Numeric vector of cash-flow times. Times must be expressed in the same
-  units used by `rate`.
+  units used by \`rate\`.
 
 - rate:
 
   Effective yield per unit of time. It must be a finite numeric scalar
-  greater than `-1`.
+  greater than \`-1\`.
 
 - valuation_time:
 
-  Finite numeric scalar indicating the valuation time. Defaults to `0`.
+  Finite numeric scalar indicating the valuation time. Defaults to
+  \`0\`.
 
 - output:
 
-  Character scalar indicating the returned object: `"value"` returns
-  convexity as a numeric scalar; `"audit"` returns a detailed tibble.
+  Character scalar indicating the returned object: \`"value"\` returns
+  convexity as a numeric scalar; \`"audit"\` returns a detailed tibble.
 
 ## Value
 
-If `output = "value"`, a numeric scalar.
+If \`output = "value"\`, a numeric scalar.
 
-If `output = "audit"`, a tibble with six columns: `time`,
-`remaining_time`, `cash_flow`, `discount_factor`, `present_value`, and
-`convexity_contribution`.
+If \`output = "audit"\`, a tibble with six columns: \`time\`,
+\`remaining_time\`, \`cash_flow\`, \`discount_factor\`,
+\`present_value\`, and \`convexity_contribution\`.
 
 ## Details
 
@@ -74,16 +75,24 @@ approximation
 i)^2. \$\$
 
 The function follows an ex-cash-flow convention: cash flows occurring
-exactly at `valuation_time` are excluded. Therefore, the result
+exactly at \`valuation_time\` are excluded. Therefore, the result
 represents convexity immediately after any cash flow paid at that time.
 
 For streams containing both positive and negative cash flows, convexity
 remains a yield-sensitivity measure, but it may be negative and may not
 have the usual interpretation associated with conventional bonds.
+Relative contributions retain log weights rather than first forming a
+monetary convexity numerator. Representable products can be recovered
+when a standalone discount factor underflows; its audit column can then
+be zero while present value is positive. Discount factors, present
+values, their total/absolute sum, and the contributions/result must
+remain finite. Signed streams with absolute total value at most
+\`sqrt(.Machine\$double.eps)\` times the sum of absolute present values
+are rejected as numerically cancelled.
 
 ## See also
 
-[`duration_cash_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/duration_cash_flow.md)
+\[duration_cash_flow()\]
 
 ## Examples
 

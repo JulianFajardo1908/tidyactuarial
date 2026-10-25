@@ -33,7 +33,10 @@ mc_insurance(
   [`simulate_lifetime`](https://julianfajardo1908.github.io/tidyactuarial/reference/simulate_lifetime.md)
   or by
   [`mc_multilife_status`](https://julianfajardo1908.github.io/tidyactuarial/reference/mc_multilife_status.md)
-  when working with multiple-life statuses.
+  when working with multiple-life statuses. Observed curtate lifetimes
+  must be finite nonnegative integers and observed complete lifetimes
+  finite and nonnegative. Paired observations must satisfy \\K_x \le T_x
+  \< K_x+1\\; missing values remain missing.
 
 - i:
 
@@ -178,6 +181,13 @@ when needed the complete future lifetime \\T_x\\, and evaluates the
 present value random variable associated with classical life insurance
 benefits.
 
+Discounting uses the log accumulation rate from the original interest
+convention and combines the benefit amount with the discount factor. The
+displayed annual effective rate and discount factor may lose range at
+extreme rates; they are metadata rather than the valuation basis. A zero
+benefit remains zero for an observed eligible event, while a missing
+required lifetime continues to give a missing present value.
+
 This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `i` is the interest-rate input, `i_type` is the
 interest-rate convention, `m` is the nominal conversion frequency, `n`
@@ -213,6 +223,12 @@ The following insurance types are supported:
 
 - `"endowment"`: death benefit is paid if death occurs within `n` years;
   otherwise, a survival benefit is paid at time `n`.
+
+With `timing = "moment_of_death"`, death at exactly `n` belongs to the
+term component. A pure endowment requires \\T_x \> n\\, so term and
+pure-endowment benefits are disjoint and sum to the endowment benefit on
+every observed trajectory. The annual convention continues to partition
+the events using \\K_x \< n\\ and \\K_x \ge n\\.
 
 The function returns simulated present values, not only their expected
 value. Therefore the resulting column can be summarized with

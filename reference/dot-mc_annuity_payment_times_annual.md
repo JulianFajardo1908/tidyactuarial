@@ -20,7 +20,7 @@ Internal helper: annual annuity payment times
 
 - n:
 
-  Numeric scalar or `NULL`.
+  Numeric scalar or \`NULL\`.
 
 - h:
 
@@ -28,11 +28,11 @@ Internal helper: annual annuity payment times
 
 - n_guar:
 
-  Numeric scalar or `NULL`.
+  Numeric scalar or \`NULL\`.
 
 - timing:
 
-  Character string. Either `"immediate"` or `"due"`.
+  Character string. Either \`"immediate"\` or \`"due"\`.
 
 ## Value
 

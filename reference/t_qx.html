@@ -13,7 +13,7 @@ actuarial assumptions."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,12 +100,14 @@ Passed directly to <code><a href="t_px.html">t_px</a></code>.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Numeric vector of \({}_t q_x\), or a tibble if
-<code>tidy = TRUE</code>.</p>
+  <code>tidy = TRUE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This is a thin wrapper around <code><a href="t_px.html">t_px</a></code>:
-$${}_t q_x = 1 - {}_t p_x.$$</p>
+    <p>Uses <code><a href="t_px.html">t_px</a></code> for input and horizon conventions; the identity is:
+$${}_t q_x = 1 - {}_t p_x.$$
+Small fractional losses are formed directly before subtracting from one,
+preserving probabilities whose survival rounds to one.</p>
 <p>The identity \({}_tq_x = {}_td_x / \ell_x\) (Finan, Section 22) holds
 for integer \(t\), where \({}_td_x = \ell_x - \ell_{x+t}\) is the
 expected number of deaths between ages \(x\) and \(x+t\).</p>
@@ -119,9 +121,9 @@ $${}_{n|}q_x = {}_np_x \cdot q_{x+n} = {}_{n+1}q_x - {}_nq_x.$$</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="t_px.html">t_px</a></code> for the complementary survival probability,
-<code><a href="t_Ex.html">t_Ex</a></code> for the pure endowment (discounted survival),
-<code><a href="e_x.html">e_x</a></code> for life expectancy,
-<code><a href="lifetable.html">lifetable</a></code> for building the life table input.</p></div>
+  <code><a href="t_Ex.html">t_Ex</a></code> for the pure endowment (discounted survival),
+  <code><a href="e_x.html">e_x</a></code> for life expectancy,
+  <code><a href="lifetable.html">lifetable</a></code> for building the life table input.</p></div>
     </div>
 
     <div class="section level2">
@@ -175,7 +177,7 @@ $${}_{n|}q_x = {}_np_x \cdot q_{x+n} = {}_{n+1}q_x - {}_nq_x.$$</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     age duration  surv  death</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     0      3   0.982 0.018<span style="text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     0      3   0.982 0.018 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     1      2.5 0.981 0.019<span style="text-decoration: underline;">1</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     2      1.7 0.983 0.016<span style="text-decoration: underline;">6</span></span>
 <span class="r-in"><span></span></span>

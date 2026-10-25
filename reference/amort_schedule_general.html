@@ -11,7 +11,7 @@ period."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,7 +110,7 @@ the end of each period or <code>"due"</code> for payments at the beginning.</p><
 <li><p>a nonnegative numeric scalar;</p></li>
 <li><p>a nonnegative numeric vector of length <code>n</code>;</p></li>
 <li><p>a function with arguments <code>period</code>, <code>ob_start</code>, and
-<code>i_effective_period</code>, returning one nonnegative payment.</p></li>
+    <code>i_effective_period</code>, returning one nonnegative payment.</p></li>
 </ul></dd>
 
 
@@ -125,7 +125,8 @@ amortization table or <code>"summary"</code> for a compact actuarial summary.</p
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Positive numeric scalar used for zero-balance detection.</p></dd>
+<dd><p>Finite positive numeric scalar in monetary units used for
+zero-balance detection and the negative-amortization threshold.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -143,7 +144,12 @@ balance, and an indicator of negative amortization.</p>
 <li><p>a level payment computed automatically;</p></li>
 <li><p>a scalar or period-specific payment vector;</p></li>
 <li><p>a payment function depending on the current loan state.</p></li>
-</ul><p>Each value of <code>i</code> is interpreted as an annual rate under its associated
+</ul><p>Original log accumulation rates are converted directly to period rates.
+Level-payment discount factors use cumulative log growth, rather than
+products of rounded accumulation factors. Period rates must remain finite
+and greater than -1; a displayed annual equivalent may overflow even when
+the period rate is representable. The term is <code>n / k</code> years.</p>
+<p>Each value of <code>i</code> is interpreted as an annual rate under its associated
 <code>i_type</code> and <code>m</code>. It is first converted to an annual effective
 rate and then to the effective rate for one amortization period:
 $$i_j^{(p)} = (1 + i_j)^{1/k} - 1.$$</p>
@@ -156,11 +162,28 @@ $$P =
 \(0,1,\ldots,n-1\).</p>
 <p>A payment smaller than the interest charged may produce negative
 amortization. The schedule identifies such periods explicitly.</p>
+<p>Negative amortization means that interest exceeds the total payment,
+including extras, by more than <code>tol</code>. This condition applies to both
+timings, including interest accrued after an advance payment. Under due
+timing, the principal columns continue to record payments before interest;
+the negative-amortization flag refers to the net debt movement.</p>
+<p>On a payoff row the regular payment is applied first and extras are capped
+at the remaining debt; no callback is evaluated after full payoff. This
+allocation differs from <code><a href="amort_schedule.html">amort_schedule</a></code>, which preserves the
+requested extra first. Both cap total cash flow at the amount due.
+Automatically calculated level payments are determined before extras and
+are not recast by this function. The discount sum is evaluated in log space
+before combining it with the principal. Active balances require a positive,
+representable calculated payment; non-finite monetary ledgers cause errors.
+A principal below <code>tol</code> may produce an empty schedule, and small
+residual balances may be treated as zero within that absolute tolerance.
+Storage grows with <code>n</code>; feasible terms are limited by integer indexing
+and available memory.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="amort_schedule.html">amort_schedule</a></code>, <code><a href="a_angle.html">a_angle</a></code>,
-<code><a href="standardize_interest.html">standardize_interest</a></code></p>
+  <code><a href="standardize_interest.html">standardize_interest</a></code></p>
 <p>Other amortization:
 <code><a href="amort_schedule.html">amort_schedule()</a></code>,
 <code><a href="sinking_fund_schedule.html">sinking_fund_schedule()</a></code></p></div>
@@ -180,18 +203,18 @@ amortization. The schedule identifies such periods explicitly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 12 × 15</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    period ob_start i_effective_annual i_effective_period interest payment</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1  <span style="text-decoration: underline;">100</span>000               0.127             0.010<span style="text-decoration: underline;">0</span>   <span style="text-decoration: underline;">1</span>000.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2   <span style="text-decoration: underline;">92</span>115.              0.127             0.010<span style="text-decoration: underline;">0</span>    921.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3   <span style="text-decoration: underline;">84</span>151.              0.127             0.010<span style="text-decoration: underline;">0</span>    842.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4   <span style="text-decoration: underline;">76</span>108.              0.127             0.010<span style="text-decoration: underline;">0</span>    761.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      5   <span style="text-decoration: underline;">67</span>984.              0.127             0.010<span style="text-decoration: underline;">0</span>    680.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      6   <span style="text-decoration: underline;">59</span>779.              0.127             0.010<span style="text-decoration: underline;">0</span>    598.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      7   <span style="text-decoration: underline;">51</span>492.              0.127             0.010<span style="text-decoration: underline;">0</span>    515.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8   <span style="text-decoration: underline;">43</span>122.              0.127             0.010<span style="text-decoration: underline;">0</span>    431.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9   <span style="text-decoration: underline;">34</span>668.              0.127             0.010<span style="text-decoration: underline;">0</span>    347.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10   <span style="text-decoration: underline;">26</span>130.              0.127             0.010<span style="text-decoration: underline;">0</span>    261.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span>     11   <span style="text-decoration: underline;">17</span>507.              0.127             0.010<span style="text-decoration: underline;">0</span>    175.    <span style="text-decoration: underline;">8</span>885.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>     12    <span style="text-decoration: underline;">8</span>797.              0.127             0.010<span style="text-decoration: underline;">0</span>     88.0   <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1  <span style="text-decoration: underline;">100</span>000               0.127               0.01   <span style="text-decoration: underline;">1</span>000     <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2   <span style="text-decoration: underline;">92</span>115.              0.127               0.01    921.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3   <span style="text-decoration: underline;">84</span>151.              0.127               0.01    842.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4   <span style="text-decoration: underline;">76</span>108.              0.127               0.01    761.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      5   <span style="text-decoration: underline;">67</span>984.              0.127               0.01    680.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      6   <span style="text-decoration: underline;">59</span>779.              0.127               0.01    598.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      7   <span style="text-decoration: underline;">51</span>492.              0.127               0.01    515.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8   <span style="text-decoration: underline;">43</span>122.              0.127               0.01    431.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9   <span style="text-decoration: underline;">34</span>668.              0.127               0.01    347.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10   <span style="text-decoration: underline;">26</span>130.              0.127               0.01    261.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span>     11   <span style="text-decoration: underline;">17</span>507.              0.127               0.01    175.    <span style="text-decoration: underline;">8</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>     12    <span style="text-decoration: underline;">8</span>797.              0.127               0.01     88.0   <span style="text-decoration: underline;">8</span>885.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 9 more variables: extra_principal &lt;dbl&gt;, principal &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   total_principal &lt;dbl&gt;, cashflow &lt;dbl&gt;, ob_end &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   negative_amortization &lt;lgl&gt;, timing &lt;chr&gt;, k &lt;int&gt;, payment_source &lt;chr&gt;</span></span>
@@ -206,11 +229,11 @@ amortization. The schedule identifies such periods explicitly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 15</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   period ob_start i_effective_annual i_effective_period interest payment</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      1   <span style="text-decoration: underline;">10</span>000                0.06             0.060<span style="text-decoration: underline;">0</span>     600.    <span style="text-decoration: underline;">1</span>800</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>      2    <span style="text-decoration: underline;">8</span>800                0.06             0.060<span style="text-decoration: underline;">0</span>     528.    <span style="text-decoration: underline;">1</span>900</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>      3    <span style="text-decoration: underline;">7</span>428                0.06             0.060<span style="text-decoration: underline;">0</span>     446.    <span style="text-decoration: underline;">2</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>      4    <span style="text-decoration: underline;">5</span>874.               0.06             0.060<span style="text-decoration: underline;">0</span>     352.    <span style="text-decoration: underline;">2</span>200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>      5    <span style="text-decoration: underline;">4</span>026.               0.06             0.060<span style="text-decoration: underline;">0</span>     242.    <span style="text-decoration: underline;">3</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      1   <span style="text-decoration: underline;">10</span>000                0.06               0.06     600     <span style="text-decoration: underline;">1</span>800</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>      2    <span style="text-decoration: underline;">8</span>800                0.06               0.06     528     <span style="text-decoration: underline;">1</span>900</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>      3    <span style="text-decoration: underline;">7</span>428                0.06               0.06     446.    <span style="text-decoration: underline;">2</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>      4    <span style="text-decoration: underline;">5</span>874.               0.06               0.06     352.    <span style="text-decoration: underline;">2</span>200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>      5    <span style="text-decoration: underline;">4</span>026.               0.06               0.06     242.    <span style="text-decoration: underline;">3</span>000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 9 more variables: extra_principal &lt;dbl&gt;, principal &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   total_principal &lt;dbl&gt;, cashflow &lt;dbl&gt;, ob_end &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   negative_amortization &lt;lgl&gt;, timing &lt;chr&gt;, k &lt;int&gt;, payment_source &lt;chr&gt;</span></span>
@@ -225,10 +248,10 @@ amortization. The schedule identifies such periods explicitly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 15</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   period ob_start i_effective_annual i_effective_period interest payment</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      1   <span style="text-decoration: underline;">10</span>000                0.04             0.040<span style="text-decoration: underline;">0</span>     400.   <span style="text-decoration: underline;">2</span>818.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>      2    <span style="text-decoration: underline;">7</span>582.               0.05             0.050<span style="text-decoration: underline;">0</span>     379.   <span style="text-decoration: underline;">2</span>818.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>      3    <span style="text-decoration: underline;">5</span>143.               0.06             0.060<span style="text-decoration: underline;">0</span>     309.   <span style="text-decoration: underline;">2</span>818.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>      4    <span style="text-decoration: underline;">2</span>634.               0.07             0.070<span style="text-decoration: underline;">0</span>     184.   <span style="text-decoration: underline;">2</span>818.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      1   <span style="text-decoration: underline;">10</span>000                0.04               0.04     400    <span style="text-decoration: underline;">2</span>818.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>      2    <span style="text-decoration: underline;">7</span>582.               0.05               0.05     379.   <span style="text-decoration: underline;">2</span>818.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>      3    <span style="text-decoration: underline;">5</span>143.               0.06               0.06     309.   <span style="text-decoration: underline;">2</span>818.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>      4    <span style="text-decoration: underline;">2</span>634.               0.07               0.07     184.   <span style="text-decoration: underline;">2</span>818.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 9 more variables: extra_principal &lt;dbl&gt;, principal &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   total_principal &lt;dbl&gt;, cashflow &lt;dbl&gt;, ob_end &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   negative_amortization &lt;lgl&gt;, timing &lt;chr&gt;, k &lt;int&gt;, payment_source &lt;chr&gt;</span></span>
@@ -251,12 +274,12 @@ amortization. The schedule identifies such periods explicitly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 15</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   period ob_start i_effective_annual i_effective_period interest payment</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      1    <span style="text-decoration: underline;">8</span>000                0.05             0.050<span style="text-decoration: underline;">0</span>    400.    <span style="text-decoration: underline;">1</span>500 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>      2    <span style="text-decoration: underline;">6</span>900                0.05             0.050<span style="text-decoration: underline;">0</span>    345.    <span style="text-decoration: underline;">1</span>600 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>      3    <span style="text-decoration: underline;">5</span>645                0.05             0.050<span style="text-decoration: underline;">0</span>    282.    <span style="text-decoration: underline;">1</span>700 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>      4    <span style="text-decoration: underline;">4</span>227.               0.05             0.050<span style="text-decoration: underline;">0</span>    211.    <span style="text-decoration: underline;">1</span>800 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>      5    <span style="text-decoration: underline;">2</span>639.               0.05             0.050<span style="text-decoration: underline;">0</span>    132.    <span style="text-decoration: underline;">1</span>900 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>      6     871.               0.05             0.050<span style="text-decoration: underline;">0</span>     43.5    914.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      1    <span style="text-decoration: underline;">8</span>000                0.05               0.05    400     <span style="text-decoration: underline;">1</span>500 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>      2    <span style="text-decoration: underline;">6</span>900                0.05               0.05    345     <span style="text-decoration: underline;">1</span>600 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>      3    <span style="text-decoration: underline;">5</span>645                0.05               0.05    282.    <span style="text-decoration: underline;">1</span>700 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>      4    <span style="text-decoration: underline;">4</span>227.               0.05               0.05    211.    <span style="text-decoration: underline;">1</span>800 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>      5    <span style="text-decoration: underline;">2</span>639.               0.05               0.05    132.    <span style="text-decoration: underline;">1</span>900 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>      6     871.               0.05               0.05     43.5    914.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 9 more variables: extra_principal &lt;dbl&gt;, principal &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   total_principal &lt;dbl&gt;, cashflow &lt;dbl&gt;, ob_end &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   negative_amortization &lt;lgl&gt;, timing &lt;chr&gt;, k &lt;int&gt;, payment_source &lt;chr&gt;</span></span>

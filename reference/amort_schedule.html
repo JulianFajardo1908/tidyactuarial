@@ -11,7 +11,7 @@ either the remaining term or the remaining payment amount."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,7 +120,8 @@ If <code>NULL</code>, it is computed from the loan data.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Numeric tolerance for zero-balance detection.</p></dd>
+<dd><p>Finite positive numeric tolerance in monetary units for
+zero-balance detection.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -128,43 +129,43 @@ If <code>NULL</code>, it is computed from the loan data.</p></dd>
     <p>A tibble with one row per realized period and columns:</p><dl><dt>period</dt>
 <dd><p>Period index.</p></dd>
 
-<dt>ob_start</dt>
+  <dt>ob_start</dt>
 <dd><p>Outstanding balance at the start of the period.</p></dd>
 
-<dt>interest</dt>
+  <dt>interest</dt>
 <dd><p>Interest charged during the period.</p></dd>
 
-<dt>payment</dt>
+  <dt>payment</dt>
 <dd><p>Regular payment in the period.</p></dd>
 
-<dt>extra_principal</dt>
+  <dt>extra_principal</dt>
 <dd><p>Extra principal paid in the period.</p></dd>
 
-<dt>principal</dt>
+  <dt>principal</dt>
 <dd><p>Principal repaid through the regular payment.</p></dd>
 
-<dt>total_principal</dt>
+  <dt>total_principal</dt>
 <dd><p>Total principal repaid in the period.</p></dd>
 
-<dt>cashflow</dt>
+  <dt>cashflow</dt>
 <dd><p>Total payment made in the period.</p></dd>
 
-<dt>ob_end</dt>
+  <dt>ob_end</dt>
 <dd><p>Outstanding balance at the end of the period.</p></dd>
 
-<dt>i_effective_annual</dt>
+  <dt>i_effective_annual</dt>
 <dd><p>Equivalent annual effective rate.</p></dd>
 
-<dt>i_effective_period</dt>
+  <dt>i_effective_period</dt>
 <dd><p>Equivalent effective rate per schedule period.</p></dd>
 
-<dt>k</dt>
+  <dt>k</dt>
 <dd><p>Schedule frequency.</p></dd>
 
-<dt>timing</dt>
+  <dt>timing</dt>
 <dd><p>Payment timing convention.</p></dd>
 
-<dt>adjust</dt>
+  <dt>adjust</dt>
 <dd><p>Adjustment rule used.</p></dd>
 
 
@@ -174,13 +175,19 @@ If <code>NULL</code>, it is computed from the loan data.</p></dd>
     <p>The annual rate is converted internally to an effective rate per schedule
 period using <code>k</code>.</p>
 <p>Adjustment policies after extra principal payments:</p><ul><li><p><code>"none"</code>: keep the original payment and contractual term,
-unless the loan is fully repaid early.</p></li>
+        unless the loan is fully repaid early.</p></li>
 <li><p><code>"term"</code>: keep the regular payment and shorten the term.
-No special logic is needed: the loop exits naturally when the
-outstanding balance reaches zero.</p></li>
+        No special logic is needed: the loop exits naturally when the
+        outstanding balance reaches zero.</p></li>
 <li><p><code>"payment"</code>: keep the remaining contractual term and
-recalculate the regular payment after each period.</p></li>
-</ul><p>This function follows the compact actuarial notation used throughout
+        recalculate the regular payment after each period.</p></li>
+</ul><p>The original log accumulation rate determines the effective period rate
+and the level payment, avoiding cancellation near zero and saturation of
+the annual equivalent. The periodic rate must remain finite and greater
+than -1. The balance tolerance is in monetary units and does not classify
+nonzero interest rates as zero. Here <code>n</code> counts periods, so the
+contractual term in years is <code>n / k</code>.</p>
+<p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>i</code> is the interest rate, <code>i_type</code> is the
 interest-rate type, <code>m</code> is the conversion frequency for nominal annual
 rates, and <code>k</code> is the number of amortization periods per year.</p>
@@ -191,11 +198,28 @@ the period and interest accrues on the balance after the payment.</p>
 <p>If the user supplies a custom <code>payment</code> that is smaller than the
 periodic interest, principal repayment will be negative (negative
 amortization). This is permitted but the user should be aware.</p>
+<p>Named extra payments must identify exact integer periods; repeated names
+are summed. On a payoff row, requested extra principal has priority and
+the regular payment is reduced to the remaining amount due. Interest
+still follows the selected timing, and no rows follow full payoff.
+The general schedule uses a different allocation priority; see
+<code><a href="amort_schedule_general.html">amort_schedule_general</a></code>.</p>
+<p>With <code>adjust = "payment"</code>, the payment is recalculated after every
+realized period for the remaining contractual periods, even if no extra
+payment occurred. A supplied <code>payment</code> is the initial payment.
+The <code>"none"</code> and <code>"term"</code> policies keep the regular amount;
+both stop when the debt is repaid and may realize fewer than <code>n</code> rows.
+A requested loan below <code>tol</code> may produce an empty schedule.
+Calculated payments for active balances must be representable and positive;
+non-finite monetary ledger entries cause an explicit error. This does not
+require a representable displayed annual effective equivalent.
+The schedule allocates up to <code>n</code> rows; feasible terms are limited by
+integer indexing and available memory.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="a_angle.html">a_angle</a></code>, <code><a href="present_value.html">present_value</a></code>,
-<code><a href="pv_flow.html">pv_flow</a></code>, <code><a href="standardize_interest.html">standardize_interest</a></code></p>
+  <code><a href="pv_flow.html">pv_flow</a></code>, <code><a href="standardize_interest.html">standardize_interest</a></code></p>
 <p>Other amortization:
 <code><a href="amort_schedule_general.html">amort_schedule_general()</a></code>,
 <code><a href="sinking_fund_schedule.html">sinking_fund_schedule()</a></code></p></div>
@@ -214,7 +238,7 @@ amortization). This is permitted but the user should be aware.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 12 × 14</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    period ob_start interest payment extra_principal principal total_principal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1  <span style="text-decoration: underline;">100</span>000    <span style="text-decoration: underline;">1</span>000.    <span style="text-decoration: underline;">8</span>885.               0     <span style="text-decoration: underline;">7</span>885.           <span style="text-decoration: underline;">7</span>885.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1  <span style="text-decoration: underline;">100</span>000    <span style="text-decoration: underline;">1</span>000     <span style="text-decoration: underline;">8</span>885.               0     <span style="text-decoration: underline;">7</span>885.           <span style="text-decoration: underline;">7</span>885.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2   <span style="text-decoration: underline;">92</span>115.    921.    <span style="text-decoration: underline;">8</span>885.               0     <span style="text-decoration: underline;">7</span>964.           <span style="text-decoration: underline;">7</span>964.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3   <span style="text-decoration: underline;">84</span>151.    842.    <span style="text-decoration: underline;">8</span>885.               0     <span style="text-decoration: underline;">8</span>043.           <span style="text-decoration: underline;">8</span>043.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4   <span style="text-decoration: underline;">76</span>108.    761.    <span style="text-decoration: underline;">8</span>885.               0     <span style="text-decoration: underline;">8</span>124.           <span style="text-decoration: underline;">8</span>124.</span>
@@ -242,7 +266,7 @@ amortization). This is permitted but the user should be aware.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 23 × 14</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    period ob_start interest payment extra_principal principal total_principal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1  <span style="text-decoration: underline;">100</span>000     <span style="text-decoration: underline;">1</span>000.   <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>707.           <span style="text-decoration: underline;">3</span>707.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1  <span style="text-decoration: underline;">100</span>000     <span style="text-decoration: underline;">1</span>000    <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>707.           <span style="text-decoration: underline;">3</span>707.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2   <span style="text-decoration: underline;">96</span>293.     963.   <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>744.           <span style="text-decoration: underline;">3</span>744.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3   <span style="text-decoration: underline;">92</span>548.     925.   <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>782.           <span style="text-decoration: underline;">3</span>782.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4   <span style="text-decoration: underline;">88</span>766.     888.   <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>820.           <span style="text-decoration: underline;">3</span>820.</span>
@@ -269,7 +293,7 @@ amortization). This is permitted but the user should be aware.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 24 × 14</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    period ob_start interest payment extra_principal principal total_principal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1  <span style="text-decoration: underline;">100</span>000     <span style="text-decoration: underline;">1</span>000.   <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>707.           <span style="text-decoration: underline;">3</span>707.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1  <span style="text-decoration: underline;">100</span>000     <span style="text-decoration: underline;">1</span>000    <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>707.           <span style="text-decoration: underline;">3</span>707.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2   <span style="text-decoration: underline;">96</span>293.     963.   <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>744.           <span style="text-decoration: underline;">3</span>744.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3   <span style="text-decoration: underline;">92</span>548.     925.   <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>782.           <span style="text-decoration: underline;">3</span>782.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4   <span style="text-decoration: underline;">88</span>766.     888.   <span style="text-decoration: underline;">4</span>707.               0     <span style="text-decoration: underline;">3</span>820.           <span style="text-decoration: underline;">3</span>820.</span>

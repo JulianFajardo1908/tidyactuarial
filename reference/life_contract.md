@@ -24,15 +24,15 @@ life_contract(
 
   A life table or a list of two life tables. For single-life contracts,
   provide one data frame or tibble. For two-life contracts, provide
-  either one data frame used for both lives, or `list(lt_x, lt_y)` with
-  one table for each life. Each life table must contain columns `x` and
-  `lx`.
+  either one data frame used for both lives, or \`list(lt_x, lt_y)\`
+  with one table for each life. Each life table must contain columns
+  \`x\` and \`lx\`.
 
 - lives:
 
-  Character string. Use `"single"` for a single-life contract, `"joint"`
-  for a joint-life two-life contract, or `"last_survivor"` for a
-  last-survivor two-life contract.
+  Character string. Use \`"single"\` for a single-life contract,
+  \`"joint"\` for a joint-life two-life contract, or \`"last_survivor"\`
+  for a last-survivor two-life contract.
 
 - x:
 
@@ -42,7 +42,7 @@ life_contract(
 - y:
 
   Numeric scalar. Age of the second life in a two-life contract.
-  Required when `lives` is `"joint"` or `"last_survivor"`.
+  Required when \`lives\` is \`"joint"\` or \`"last_survivor"\`.
 
 - i:
 
@@ -51,59 +51,55 @@ life_contract(
 - i_type:
 
   Character string indicating the interest-rate type. Allowed values are
-  `"effective"`, `"nominal_interest"`, `"nominal_discount"`, and
-  `"force"`.
+  \`"effective"\`, \`"nominal_interest"\`, \`"nominal_discount"\`, and
+  \`"force"\`.
 
 - m:
 
   Positive integer. Conversion frequency for nominal rates. Ignored for
-  `i_type = "effective"` and `i_type = "force"`.
+  \`i_type = "effective"\` and \`i_type = "force"\`.
 
 - ...:
 
   Reserved for future extensions. Deprecated argument names such as
-  `mortality_table`, `age`, `age_x`, `age_y`, `rate`, and `rate_type`
-  are not accepted.
+  \`mortality_table\`, \`age\`, \`age_x\`, \`age_y\`, \`rate\`, and
+  \`rate_type\` are not accepted.
 
 ## Value
 
-An object of class `"tidyact_life_contract"`.
+An object of class \`"tidyact_life_contract"\`.
 
 ## Details
 
 This function does not compute actuarial values. It validates and stores
 common actuarial inputs such as the life table, life status, ages, and
 interest-rate specification. Calculation functions such as
-[`annuity_x()`](https://julianfajardo1908.github.io/tidyactuarial/reference/annuity_x.md),
-[`insurance_x()`](https://julianfajardo1908.github.io/tidyactuarial/reference/insurance_x.md),
-[`premium_x()`](https://julianfajardo1908.github.io/tidyactuarial/reference/premium_x.md),
-[`reserve_x()`](https://julianfajardo1908.github.io/tidyactuarial/reference/reserve_x.md),
-[`annuity_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/annuity_xy.md),
-[`insurance_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/insurance_xy.md),
-[`premium_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/premium_xy.md),
-[`reserve_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/reserve_xy.md),
-and simulation functions can then consume this object.
+\[annuity_x()\], \[insurance_x()\], \[premium_x()\], \[reserve_x()\],
+\[annuity_xy()\], \[insurance_xy()\], \[premium_xy()\],
+\[reserve_xy()\], and simulation functions can then consume this object.
 
-`life_contract()` follows the compact actuarial notation used throughout
-`tidyactuarial`:
+\`life_contract()\` follows the compact actuarial notation used
+throughout \`tidyactuarial\`:
 
-- `lt`: life table;
-
-- `x`: age of the first or single life;
-
-- `y`: age of the second life;
-
-- `i`: interest rate;
-
-- `i_type`: type of interest rate;
-
-- `m`: conversion frequency for nominal rates.
+\* \`lt\`: life table; \* \`x\`: age of the first or single life; \*
+\`y\`: age of the second life; \* \`i\`: interest rate; \* \`i_type\`:
+type of interest rate; \* \`m\`: conversion frequency for nominal rates.
 
 The object stores actuarial fields using the compact names above. During
 the 0.1.4 API transition, it also stores internal compatibility fields
 so that functions not yet migrated can continue to read the contract.
 These internal fields are not part of the preferred user-facing
 notation.
+
+The original rate and table are retained, without converting the stored
+rate to an annual effective rate or altering the table. Rate domains
+require \`i \> -1\` for effective rates, \`1 + i/m \> 0\` for nominal
+interest and \`1 - i/m \> 0\` for nominal discount; any finite force is
+allowed. Table validation here checks structure and numeric \`x\`/\`lx\`
+columns. Valuation functions additionally check mortality consistency,
+supported ages, horizons and payment grids for their particular models.
+Integer-valued specifications outside R's integer range are stored as
+doubles, never \`NA\`.
 
 ## See also
 

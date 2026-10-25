@@ -49,13 +49,15 @@ bond_ytm(
 
 - interval:
 
-  Optional numeric vector of length 2 giving a bracket for the effective
-  yield per coupon period.
+  Optional finite numeric vector of length 2 giving an increasing
+  bracket for the effective yield per coupon period, with both bounds
+  above -1.
 
 - tol:
 
-  Numeric scalar. Tolerance passed to
-  [`uniroot`](https://rdrr.io/r/stats/uniroot.html).
+  Finite positive numeric scalar. Yield-coordinate tolerance passed to
+  [`uniroot`](https://rdrr.io/r/stats/uniroot.html), not a monetary
+  price tolerance.
 
 - maxiter:
 
@@ -114,11 +116,17 @@ frequency, and `R` is the redemption value.
 The effective yield per coupon period \\j\\ is the solution to \$\$P =
 \sum\_{r=1}^{N} C_r (1+j)^{-r}.\$\$
 
-The root is found numerically using
-[`uniroot`](https://rdrr.io/r/stats/uniroot.html). If no `interval` is
-supplied, the function automatically brackets the root starting from
-\\(-0.999999, 0.10)\\ and progressively widens the upper bound until a
-sign change is detected.
+With nonnegative payments and at least one positive future payment,
+price is strictly decreasing in \\j \> -1\\, so the yield is unique. The
+root is found with [`uniroot`](https://rdrr.io/r/stats/uniroot.html),
+using the log of the discounted cash-flow sum relative to price to avoid
+monetary overflow or underflow. If no `interval` is supplied, the lower
+bound is the nearest double precision number above -1 and the upper
+bound starts at 0.10 and is widened until the root is bracketed. A yield
+outside the representable domain or an exhausted iteration limit causes
+an error. Tolerance applies to the yield coordinate according to
+`uniroot`; it does not guarantee a given price residual, particularly
+for yields near -1.
 
 From the per-period yield, the annual equivalents are: \$\$j^{(k)} = k
 j, \qquad i = (1 + j)^k - 1.\$\$
@@ -132,6 +140,7 @@ j, \qquad i = (1 + j)^k - 1.\$\$
 [`bond_callable_price`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md)
 
 Other bonds:
+[`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md),
 [`bond_book_value()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_book_value.md),
 [`bond_callable_price()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md),
 [`bond_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md),
@@ -153,7 +162,7 @@ bond_ytm(
 #> # A tibble: 1 × 5
 #>   price i_period j_nominal i_effective_annual     k
 #>   <dbl>    <dbl>     <dbl>              <dbl> <int>
-#> 1   100   0.0600    0.0600             0.0600     1
+#> 1   100     0.06      0.06               0.06     1
 
 bond_ytm(
   P = 950,

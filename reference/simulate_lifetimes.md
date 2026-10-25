@@ -88,7 +88,10 @@ q_y = 1 - \frac{l\_{y+1}}{l_y} \$\$ for ages with positive exposure. A
 terminal zero in `lx` therefore generates the appropriate terminal
 `qx = 1`. If the final available `lx` remains positive, the resulting
 distribution is recognized as truncated and handled according to
-`truncation`.
+`truncation`. Positive exposure means `lx > 0`, independently of the
+table radix. Death probabilities use the direct decrement
+\\(l_y-l\_{y+1})/l_y\\, avoiding loss from subtracting a rounded
+survival ratio from one.
 
 Conditional on the supplied life table, the simulated lives are
 independent. A single seed is set once for the entire call; the seed is

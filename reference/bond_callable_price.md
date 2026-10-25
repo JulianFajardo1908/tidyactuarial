@@ -77,7 +77,9 @@ bond_callable_price(
 
 - tol:
 
-  Numeric scalar. Tolerance used in alignment checks.
+  Finite positive numeric scalar. Absolute tolerance for alignment of
+  `n * k` and `call_t * k` with integer periods. It is not a monetary
+  tolerance and does not define ties between scenario prices.
 
 - check:
 
@@ -94,7 +96,9 @@ If `tidy = FALSE`, a numeric scalar: the worst-case callable-bond price
 consistent with the target yield.
 
 If `tidy = TRUE`, a tibble with one row per redemption scenario,
-including scenario prices and the worst-case indicator.
+including scenario prices and the worst-case indicator. `is_worst_case`
+is `TRUE` exactly when a computed scenario price equals the computed
+minimum, including all exact computed ties. Near ties are not marked.
 
 ## Details
 
@@ -135,8 +139,8 @@ Yield input conventions:
   coupon period.
 
 - Otherwise, `y`, `y_type`, and `y_m` define an annual yield
-  specification, which is converted first to annual effective yield and
-  then to effective yield per coupon period.
+  specification. Scenario prices retain its original log accumulation
+  rate even if a reported equivalent loses numeric range.
 
 This function follows the compact bond notation used in `tidyactuarial`:
 `face` is the face value, `c` is the annual coupon rate, `n` is
@@ -154,6 +158,14 @@ Then this function returns \$\$\min_j P_j(y)\$\$ when `tidy = FALSE`.
 
 This is the maximum price an investor can pay while still guaranteeing
 at least the target yield under the least favorable redemption scenario.
+A scenario pays all coupons through its redemption date, including the
+coupon on that date, plus its specified redemption value. There is no
+assumption of reinvestment at the target yield after early redemption
+and no stochastic model of interest rates or the issuer's exercise
+decision. Call dates must remain distinct and strictly inside maturity
+after alignment to integer coupon periods; two dates cannot represent
+the same coupon date. Rows are sorted by time and retain their original
+`scenario_id`.
 
 ## See also
 
@@ -163,6 +175,7 @@ at least the target yield under the least favorable redemption scenario.
 [`bond_ytm`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_ytm.md)
 
 Other bonds:
+[`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md),
 [`bond_book_value()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_book_value.md),
 [`bond_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md),
 [`bond_duration()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_duration.md),

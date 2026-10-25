@@ -88,14 +88,16 @@ For discrete annuities, `k` is the number of payments per year, so
 payments are made every \\1/k\\ year. The function returns the
 accumulation factor, assuming a unit payment at each payment time.
 
-Horizon convention: the future value is measured at the time of the last
-payment. Under this convention, a pure deferment that shifts the entire
-payment block forward in time does not change the accumulation factor
-when the payment pattern is otherwise unchanged. Therefore, `h` is
-recorded and validated, but it does not modify the factor.
+Horizon convention: the future value is measured at the end of the
+payment term, \\h+n\\. This is the last payment time for immediate
+annuities and one payment interval after the last payment for due
+annuities. Under this convention, a pure deferment that shifts the
+entire payment block forward in time does not change the accumulation
+factor when the payment pattern is otherwise unchanged. Therefore, `h`
+is recorded and validated, but it does not modify the factor.
 
-The future value of a perpetuity diverges, so perpetuities are not
-supported in `s_angle()`.
+Only finite payment terms are supported. A perpetuity has no finite
+terminal date at which this function defines an accumulated value.
 
 This function follows the compact actuarial notation used throughout
 `tidyactuarial`:
@@ -124,6 +126,16 @@ For due annuities: \$\$\ddot{s}\_{\overline{n\|}} =
 
 For continuous annuities: \$\$\bar{s}\_{\overline{n\|}} =
 \frac{e^{\delta n} - 1}{\delta}\$\$
+
+For \\N=nk\\, let \\b=0\\ for immediate payments and \\b=1\\ for due
+payments. The discrete factor at horizon \\h+n\\ is \$\$\sum\_{j=1}^{N}
+\exp\\\delta\[n-(j-b)/k\]\\.\$\$ Discrete payments are one unit each;
+continuous payments are one unit per year. The latter factor is
+\\\int_0^n e^{\delta u}\\du\\. Original log accumulation rates and
+stable logarithmic sums/integrals preserve small nonzero rates and
+saturated annual effective equivalents. Monetary values combine payments
+and log factors stably; standalone audit rates or factors may still
+overflow or underflow.
 
 Input vectors must have length 1 or a common length. Missing values are
 propagated.
@@ -175,7 +187,7 @@ s_angle(
 #> # A tibble: 1 × 16
 #>       n     k     h timing    i_input i_type       m i_effective  delta i_period
 #>   <dbl> <int> <dbl> <chr>       <dbl> <chr>    <int>       <dbl>  <dbl>    <dbl>
-#> 1    10     1     0 immediate    0.05 effecti…     1        0.05 0.0488   0.0500
+#> 1    10     1     0 immediate    0.05 effecti…     1        0.05 0.0488     0.05
 #> # ℹ 6 more variables: v_period <dbl>, n_periods <dbl>, h_periods <dbl>,
 #> #   accumulation_factor <dbl>, payment <dbl>, future_value <dbl>
 

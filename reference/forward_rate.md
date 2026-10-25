@@ -136,9 +136,13 @@ This function follows the compact actuarial notation used throughout
 frequency for nominal spot rates. The output column `f` denotes the
 implied annual effective forward rate.
 
-Spot-rate inputs are converted to annual effective form using
-[`standardize_interest`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md)
-before interpolation and forward-rate calculation.
+Exact extraction retains the original log accumulation rates and
+evaluates the spot-forward identity without forming powers or their
+ratio. Reported annual equivalents and the final forward rate can reach
+double precision limits. Linear extraction interpolates annual effective
+spot rates, not log discounts, and requires finite annual equivalents
+greater than -1. With `.na = "propagate"`, an incomplete row keeps its
+position and has a `NULL` plot entry when plotting is requested.
 
 ## References
 
@@ -157,9 +161,12 @@ of Interest Rates.
 
 Other interest:
 [`accumulation_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accumulation_factor.md),
+[`bootstrap_spot_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bootstrap_spot_curve.md),
 [`discount_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor.md),
 [`discount_factor_spot()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor_spot.md),
+[`forward_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_curve.md),
 [`interest_equivalents()`](https://julianfajardo1908.github.io/tidyactuarial/reference/interest_equivalents.md),
+[`par_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/par_rate.md),
 [`standardize_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md),
 [`yield_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/yield_curve.md)
 

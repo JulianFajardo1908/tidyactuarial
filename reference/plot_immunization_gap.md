@@ -1,9 +1,9 @@
 # Plot immunization performance under interest-rate shifts
 
-Computes and plots the difference between the present value of
-liabilities and the present value of an immunized asset portfolio under
-small interest rate changes. This allows visual evaluation of duration
-or duration-convexity immunization quality.
+Computes and plots asset present value minus liability present value for
+an immunized portfolio under small interest rate changes. This allows
+visual evaluation of duration or duration-convexity immunization
+quality.
 
 ## Usage
 
@@ -64,7 +64,8 @@ plot_immunization_gap(
 
 - n_grid:
 
-  Number of rate values to evaluate.
+  Number of rate values to evaluate. Integer from 2 through
+  `.Machine$integer.max`, with sufficient memory for the requested grid.
 
 ## Value
 
@@ -88,7 +89,19 @@ For a portfolio of assets with weights \\w_j\\: \$\$PV_A(i) = \sum_j w_j
 The curve \\\Delta(i) = PV_A(i) - PV_L(i)\\ illustrates immunization
 robustness. Under perfect duration immunization, this curve is tangent
 to zero at the base rate and non-negative nearby if the convexity
-condition is also met.
+condition is also met. The grid is expressed in annual effective yields
+and clipped, when needed, to the nearest representable value strictly
+above -1. Its base annual effective equivalent and grid endpoints must
+be finite and representable. Gap values combine signed weighted cash
+flows using log discounts, rather than subtracting separately overflowed
+portfolio values. Zero-weight assets contribute zero after validation. A
+nonfinite gap causes an explicit error. Recovery is limited by double
+precision and by cancellation already lost in input data; arbitrary
+extreme signed cancellation is not guaranteed. The graph reprices the
+supplied cash flows. Their consistency with the prices and sensitivities
+used to solve for weights remains the caller's responsibility. Matching
+convexity gives zero second derivative at the base yield and does not by
+itself ensure a positive surplus on either side.
 
 ## See also
 

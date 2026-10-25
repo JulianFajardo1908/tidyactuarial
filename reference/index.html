@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -208,6 +208,13 @@
 
         <dt>
 
+          <code><a href="accrued_interest.html">accrued_interest()</a></code>
+
+        </dt>
+        <dd>Accrued coupon interest and clean/dirty bond prices</dd>
+
+        <dt>
+
           <code><a href="bond_price.html">bond_price()</a></code>
 
         </dt>
@@ -326,6 +333,27 @@
 
         </dt>
         <dd>Compute an implied forward rate from a discrete spot curve</dd>
+
+        <dt>
+
+          <code><a href="bootstrap_spot_curve.html">bootstrap_spot_curve()</a></code>
+
+        </dt>
+        <dd>Bootstrap a spot yield curve from instrument prices</dd>
+
+        <dt>
+
+          <code><a href="forward_curve.html">forward_curve()</a></code>
+
+        </dt>
+        <dd>Construct a forward-rate curve from spot rates</dd>
+
+        <dt>
+
+          <code><a href="par_rate.html">par_rate()</a></code>
+
+        </dt>
+        <dd>Par coupon rate implied by a spot yield curve</dd>
       </dl></div><div class="section level2">
       <h2 id="life-tables-and-survival">Life Tables and Survival<a class="anchor" aria-label="anchor" href="#life-tables-and-survival"></a></h2>
 
@@ -456,6 +484,13 @@
 
         </dt>
         <dd>Actuarial present value of a payment stream under mortality</dd>
+
+        <dt>
+
+          <code><a href="plot_contingent_cash_flow.html">plot_contingent_cash_flow()</a></code>
+
+        </dt>
+        <dd>Plot discrete life-contingent cash flows</dd>
 
         <dt>
 
@@ -658,6 +693,190 @@
 
         </dt>
         <dd>Summarise Monte Carlo simulation output</dd>
+      </dl></div><div class="section level2">
+      <h2 id="collective-risk-coverage-and-tail-measures">Collective Risk, Coverage, and Tail Measures<a class="anchor" aria-label="anchor" href="#collective-risk-coverage-and-tail-measures"></a></h2>
+
+      <div class="section-desc"><p>Frequency and severity models, insurance payments, aggregate losses, simulation, and risk measures.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="frequency_spec.html">frequency_spec()</a></code>
+
+        </dt>
+        <dd>Specify a claim frequency distribution</dd>
+
+        <dt>
+
+          <code><a href="severity_spec.html">severity_spec()</a></code>
+
+        </dt>
+        <dd>Specify an individual claim severity distribution</dd>
+
+        <dt>
+
+          <code><a href="empirical_frequency.html">empirical_frequency()</a></code>
+
+        </dt>
+        <dd>Specify an empirical claim frequency distribution</dd>
+
+        <dt>
+
+          <code><a href="empirical_severity.html">empirical_severity()</a></code>
+
+        </dt>
+        <dd>Specify an empirical claim severity distribution</dd>
+
+        <dt>
+
+          <code><a href="distribution_moments.html">distribution_moments()</a></code>
+
+        </dt>
+        <dd>Calculate moments of a frequency or severity distribution</dd>
+
+        <dt>
+
+          <code><a href="collective_risk_spec.html">collective_risk_spec()</a></code>
+
+        </dt>
+        <dd>Specify a collective risk model</dd>
+
+        <dt>
+
+          <code><a href="coverage_spec.html">coverage_spec()</a></code>
+
+        </dt>
+        <dd>Specify an insurance coverage contract</dd>
+
+        <dt>
+
+          <code><a href="apply_coverage.html">apply_coverage()</a></code>
+
+        </dt>
+        <dd>Apply an insurance contract to a loss severity specification</dd>
+
+        <dt>
+
+          <code><a href="to_payment_basis.html">to_payment_basis()</a></code>
+
+        </dt>
+        <dd>Specify a change from per-loss to per-payment basis</dd>
+
+        <dt>
+
+          <code><a href="discretize_severity.html">discretize_severity()</a></code>
+
+        </dt>
+        <dd>Discretize a continuous claim severity distribution</dd>
+
+        <dt>
+
+          <code><a href="distribution_convolution.html">distribution_convolution()</a></code>
+
+        </dt>
+        <dd>Specify a convolution of probability distributions</dd>
+
+        <dt>
+
+          <code><a href="aggregate_moments.html">aggregate_moments()</a></code>
+
+        </dt>
+        <dd>Calculate moments of a collective aggregate loss</dd>
+
+        <dt>
+
+          <code><a href="aggregate_distribution.html">aggregate_distribution()</a></code>
+
+        </dt>
+        <dd>Compute the aggregate loss distribution</dd>
+
+        <dt>
+
+          <code><a href="simulate_frequency.html">simulate_frequency()</a></code>
+
+        </dt>
+        <dd>Simulate claim counts from a frequency model</dd>
+
+        <dt>
+
+          <code><a href="simulate_severity.html">simulate_severity()</a></code>
+
+        </dt>
+        <dd>Simulate individual claim severities</dd>
+
+        <dt>
+
+          <code><a href="simulate_aggregate.html">simulate_aggregate()</a></code>
+
+        </dt>
+        <dd>Simulate a collective risk model</dd>
+
+        <dt>
+
+          <code><a href="value_at_risk.html">value_at_risk()</a></code>
+
+        </dt>
+        <dd>Value at Risk for actuarial losses</dd>
+
+        <dt>
+
+          <code><a href="tail_value_at_risk.html">tail_value_at_risk()</a></code>
+
+        </dt>
+        <dd>Tail Value at Risk (Expected Shortfall)</dd>
+
+        <dt>
+
+          <code><a href="stop_loss_premium.html">stop_loss_premium()</a></code>
+
+        </dt>
+        <dd>Net stop-loss premium</dd>
+
+        <dt>
+
+          <code><a href="print.tidyact_aggregate_distribution.html">print(<i>&lt;tidyact_aggregate_distribution&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print an aggregate loss distribution</dd>
+
+        <dt>
+
+          <code><a href="print.tidyact_collective_risk_spec.html">print(<i>&lt;tidyact_collective_risk_spec&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print a collective risk model specification</dd>
+
+        <dt>
+
+          <code><a href="print.tidyact_convolution_spec.html">print(<i>&lt;tidyact_convolution_spec&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print a convolution specification</dd>
+
+        <dt>
+
+          <code><a href="print.tidyact_frequency_spec.html">print(<i>&lt;tidyact_frequency_spec&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print a frequency distribution specification</dd>
+
+        <dt>
+
+          <code><a href="print.tidyact_payment_spec.html">print(<i>&lt;tidyact_payment_spec&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print a payment severity specification</dd>
+
+        <dt>
+
+          <code><a href="print.tidyact_severity_spec.html">print(<i>&lt;tidyact_severity_spec&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print a severity distribution specification</dd>
       </dl></div><div class="section level2">
       <h2 id="datasets">Datasets<a class="anchor" aria-label="anchor" href="#datasets"></a></h2>
 

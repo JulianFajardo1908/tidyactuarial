@@ -9,7 +9,7 @@ actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,13 +128,16 @@ accumulation factors, payment amounts, and future values.</p>
 payments are made every \(1/k\) year. The function returns the accumulation
 factor, assuming a unit payment at each payment time.</p>
 <p>Horizon convention:
-the future value is measured at the time of the last payment. Under this
+the future value is measured at the end of the payment term, \(h+n\).
+This is the last payment time for immediate annuities and one payment
+interval after the last payment for due annuities. Under this
 convention, a pure deferment that shifts the entire payment block forward in
 time does not change the accumulation factor when the payment pattern is
 otherwise unchanged. Therefore, <code>h</code> is recorded and validated, but it
 does not modify the factor.</p>
-<p>The future value of a perpetuity diverges, so perpetuities are not supported
-in <code>s_angle()</code>.</p>
+<p>Only finite payment terms are supported. A perpetuity has no finite terminal
+date at which this function defines an accumulated value.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>:</p>
 <ul><li><p><code>n</code>: annuity term;</p></li>
@@ -151,13 +154,22 @@ $$s_{\overline{n|}} = \frac{(1+i)^n - 1}{i}$$</p>
 $$\ddot{s}_{\overline{n|}} = (1+i)s_{\overline{n|}}$$</p>
 <p>For continuous annuities:
 $$\bar{s}_{\overline{n|}} = \frac{e^{\delta n} - 1}{\delta}$$</p>
+<p>For \(N=nk\), let \(b=0\) for immediate payments and \(b=1\)
+for due payments. The discrete factor at horizon \(h+n\) is
+$$\sum_{j=1}^{N} \exp\{\delta[n-(j-b)/k]\}.$$
+Discrete payments are one unit each; continuous payments are one unit per
+year. The latter factor is \(\int_0^n e^{\delta u}\,du\).
+Original log accumulation rates and stable logarithmic sums/integrals
+preserve small nonzero rates and saturated annual effective equivalents.
+Monetary values combine payments and log factors stably; standalone audit
+rates or factors may still overflow or underflow.</p>
 <p>Input vectors must have length 1 or a common length. Missing values are
 propagated.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="a_angle.html">a_angle</a></code>, <code><a href="standardize_interest.html">standardize_interest</a></code>,
-<code><a href="future_value.html">future_value</a></code></p>
+  <code><a href="future_value.html">future_value</a></code></p>
 <p>Other annuities:
 <code><a href="a_angle.html">a_angle()</a></code>,
 <code><a href="annuity_arith.html">annuity_arith()</a></code>,
@@ -199,7 +211,7 @@ propagated.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       n     k     h timing    i_input i_type       m i_effective  delta i_period</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    10     1     0 immediate    0.05 effecti…     1        0.05 0.048<span style="text-decoration: underline;">8</span>   0.050<span style="text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    10     1     0 immediate    0.05 effecti…     1        0.05 0.048<span style="text-decoration: underline;">8</span>     0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 6 more variables: v_period &lt;dbl&gt;, n_periods &lt;dbl&gt;, h_periods &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   accumulation_factor &lt;dbl&gt;, payment &lt;dbl&gt;, future_value &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>

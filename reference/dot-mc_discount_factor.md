@@ -22,23 +22,23 @@ Computes the annual discount factor from an interest-rate convention.
 
 - i_type:
 
-  Character string. Interest-rate convention. One of `"effective"`,
-  `"nominal_interest"`, `"nominal_discount"`, or `"force"`. The legacy
-  value `"nominal"` is accepted internally and treated as
-  `"nominal_interest"`.
+  Character string. Interest-rate convention. One of \`"effective"\`,
+  \`"nominal_interest"\`, \`"nominal_discount"\`, or \`"force"\`. The
+  legacy value \`"nominal"\` is accepted internally and treated as
+  \`"nominal_interest"\`.
 
 - m:
 
   Numeric scalar. Number of interest conversion periods per year for
-  nominal annual rates. Default is `1`.
+  nominal annual rates. Default is \`1\`.
 
 - rate:
 
-  Deprecated internal alias for `i`.
+  Deprecated internal alias for \`i\`.
 
 - interest_type:
 
-  Deprecated internal alias for `i_type`.
+  Deprecated internal alias for \`i_type\`.
 
 ## Value
 

@@ -9,7 +9,7 @@ flat yield-to-maturity assumption, using compact actuarial notation."></head><bo
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,7 +109,8 @@ defaults to <code>face</code>.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Numeric scalar. Tolerance used to check maturity alignment.</p></dd>
+<dd><p>Finite positive numeric scalar. Tolerance used to check maturity
+alignment with integer coupon periods, not a monetary price threshold.</p></dd>
 
 
 <dt id="arg-check">check<a class="anchor" aria-label="anchor" href="#arg-check"></a></dt>
@@ -121,22 +122,22 @@ defaults to <code>face</code>.</p></dd>
     <p>A one-row tibble with:</p><dl><dt>price</dt>
 <dd><p>Dirty price at the given yield.</p></dd>
 
-<dt>discrete_convexity_periods</dt>
+  <dt>discrete_convexity_periods</dt>
 <dd><p>Discrete convexity in coupon periods.</p></dd>
 
-<dt>discrete_convexity_years</dt>
+  <dt>discrete_convexity_years</dt>
 <dd><p>Discrete convexity in years.</p></dd>
 
-<dt>yield_per_period</dt>
+  <dt>yield_per_period</dt>
 <dd><p>Effective yield per coupon period.</p></dd>
 
-<dt>yield_effective_annual</dt>
+  <dt>yield_effective_annual</dt>
 <dd><p>Annual effective yield.</p></dd>
 
-<dt>k</dt>
+  <dt>k</dt>
 <dd><p>Coupon frequency.</p></dd>
 
-<dt>n_periods</dt>
+  <dt>n_periods</dt>
 <dd><p>Total number of coupon periods.</p></dd>
 
 
@@ -149,10 +150,10 @@ defaults to <code>face</code>.</p></dd>
 <li><p>Valuation is at a coupon date with no accrued interest.</p></li>
 <li><p>A single flat yield is used to discount all cash flows.</p></li>
 </ul><p>Yield input conventions:</p><ul><li><p>If <code>y_effective_per_period</code> is supplied, it is interpreted as the
-effective yield per coupon period.</p></li>
+        effective yield per coupon period.</p></li>
 <li><p>Otherwise, <code>y</code>, <code>y_type</code>, and <code>y_m</code> define an annual
-yield specification, which is converted first to annual effective
-yield and then to effective yield per coupon period.</p></li>
+        yield specification. Calculations retain its original log growth;
+        reported effective equivalents remain subject to numeric range.</p></li>
 </ul><p>This function follows the compact bond notation used in
 <code>tidyactuarial</code>: <code>face</code> is the face value, <code>c</code> is the annual
 coupon rate, <code>n</code> is the time to maturity, <code>k</code> is the coupon
@@ -165,17 +166,29 @@ periods \(r = 1, \dots, N\). With \(v = 1/(1+j)\) and
 $$C_p =
 \frac{1}{P}
 \frac{\sum_{r=1}^{N} C_r r(r+1) v^r}{(1+j)^2}.$$</p>
-<p>Discrete convexity in years is \(C_p / k^2\).</p>
+<p>Discrete convexity in years is \(C_p / k^2\).
+This is sensitivity to the nominal annual yield \(z=kj\); it is
+generally not the relative second derivative with respect to the annual
+effective yield \(i=(1+j)^k-1\). Before passing convexity to
+<code><a href="immunize_duration_convexity.html">immunize_duration_convexity()</a></code>, apply the chain rule described
+there or compute <code><a href="convexity_cash_flow.html">convexity_cash_flow()</a></code> from annual cash-flow times.</p>
 <p>This is the second-order sensitivity of the bond price to changes in the
 yield per period. Together with <code><a href="bond_duration.html">bond_duration</a></code>, it is used in
-the second-order Taylor approximation of price changes.</p>
+the second-order Taylor approximation of price changes.
+Prices use original log yields and moments use relative present values,
+avoiding monetary numerator overflow. Nonzero-term bonds require a positive
+finite price and finite risk measures; changing currency alone does not
+create an undefined sensitivity. Reported equivalent yields may reach -1 or
+Inf by rounding while the original specification remains usable. At zero
+term, the existing convention returns immediate redemption and zero risk.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="bond_duration.html">bond_duration</a></code>, <code><a href="bond_price.html">bond_price</a></code>,
-<code><a href="bond_cash_flows.html">bond_cash_flows</a></code>, <code><a href="bond_book_value.html">bond_book_value</a></code>,
-<code><a href="bond_ytm.html">bond_ytm</a></code></p>
+  <code><a href="bond_cash_flows.html">bond_cash_flows</a></code>, <code><a href="bond_book_value.html">bond_book_value</a></code>,
+  <code><a href="bond_ytm.html">bond_ytm</a></code></p>
 <p>Other bonds:
+<code><a href="accrued_interest.html">accrued_interest()</a></code>,
 <code><a href="bond_book_value.html">bond_book_value()</a></code>,
 <code><a href="bond_callable_price.html">bond_callable_price()</a></code>,
 <code><a href="bond_duration.html">bond_duration()</a></code>,

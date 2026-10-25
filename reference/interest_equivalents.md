@@ -36,8 +36,9 @@ A tibble with columns:
 
 - family:
 
-  Rate family: `"effective"`, `"discount"`, `"force"`,
-  `"nominal_interest"`, or `"nominal_discount"`.
+  Rate or factor family: `"effective"`, `"discount"`,
+  `"discount_factor"`, `"force"`, `"nominal_interest"`, or
+  `"nominal_discount"`.
 
 - notation:
 
@@ -65,6 +66,10 @@ This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `i` denotes the interest-rate value, `i_type` denotes
 the type of interest rate, and `m` denotes the conversion frequency for
 nominal rates.
+
+Calculations retain the log accumulation rate of the original input. An
+extreme annual effective equivalent may round to -1 or overflow to Inf
+while other equivalent quantities remain representable.
 
 Given the annual effective interest rate \\i\\, the equivalents are:
 
@@ -95,9 +100,12 @@ Given the annual effective interest rate \\i\\, the equivalents are:
 
 Other interest:
 [`accumulation_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accumulation_factor.md),
+[`bootstrap_spot_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bootstrap_spot_curve.md),
 [`discount_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor.md),
 [`discount_factor_spot()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor_spot.md),
+[`forward_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_curve.md),
 [`forward_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_rate.md),
+[`par_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/par_rate.md),
 [`standardize_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md),
 [`yield_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/yield_curve.md)
 
@@ -112,7 +120,7 @@ interest_equivalents(i_type = "nominal_interest", i = 0.18, m = 4)
 #> 2 discount         d           NA effective annual discount rate           0.161
 #> 3 discount_factor  v           NA annual discount factor                   0.839
 #> 4 force            delta       NA force of interest                        0.176
-#> 5 nominal_interest j^(4)        4 nominal annual interest rate convertibl… 0.180
+#> 5 nominal_interest j^(4)        4 nominal annual interest rate convertibl… 0.18 
 #> 6 nominal_discount d^(4)        4 nominal annual discount rate convertibl… 0.172
 interest_equivalents(i_type = "nominal_discount", i = 0.10, m = 12)
 #> # A tibble: 6 × 5
@@ -123,7 +131,7 @@ interest_equivalents(i_type = "nominal_discount", i = 0.10, m = 12)
 #> 3 discount_factor  v           NA annual discount factor                  0.904 
 #> 4 force            delta       NA force of interest                       0.100 
 #> 5 nominal_interest j^(12)      12 nominal annual interest rate convertib… 0.101 
-#> 6 nominal_discount d^(12)      12 nominal annual discount rate convertib… 0.1000
+#> 6 nominal_discount d^(12)      12 nominal annual discount rate convertib… 0.1   
 interest_equivalents(i_type = "force", i = 0.12)
 #> # A tibble: 6 × 5
 #>   family           notation     m description                              value

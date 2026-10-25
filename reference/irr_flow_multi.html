@@ -11,7 +11,7 @@ present value (NPV) function, using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -115,38 +115,38 @@ One of <code>"act/365"</code> or <code>"act/360"</code>.</p></dd>
     <p>A tibble with one row per detected IRR and columns:</p><dl><dt>root_id</dt>
 <dd><p>Root index.</p></dd>
 
-<dt>irr</dt>
+  <dt>irr</dt>
 <dd><p>Detected IRR as an annual effective rate.</p></dd>
 
-<dt>i_effective_annual</dt>
+  <dt>i_effective_annual</dt>
 <dd><p>Same as <code>irr</code>, reported explicitly.</p></dd>
 
-<dt>j_nominal_interest</dt>
+  <dt>j_nominal_interest</dt>
 <dd><p>Equivalent nominal annual interest rate
-convertible <code>m</code> times.</p></dd>
+    convertible <code>m</code> times.</p></dd>
 
-<dt>delta</dt>
+  <dt>delta</dt>
 <dd><p>Equivalent force of interest.</p></dd>
 
-<dt>npv</dt>
+  <dt>npv</dt>
 <dd><p>NPV evaluated at the detected root, approximately zero.</p></dd>
 
-<dt>interval_left</dt>
+  <dt>interval_left</dt>
 <dd><p>Left endpoint of the local search bracket.</p></dd>
 
-<dt>interval_right</dt>
+  <dt>interval_right</dt>
 <dd><p>Right endpoint of the local search bracket.</p></dd>
 
-<dt>n_cashflows</dt>
+  <dt>n_cashflows</dt>
 <dd><p>Length of <code>cf</code>.</p></dd>
 
-<dt>has_both_signs</dt>
+  <dt>has_both_signs</dt>
 <dd><p>Whether the cash flow has at least one positive
-and one negative value.</p></dd>
+    and one negative value.</p></dd>
 
-<dt>n_sign_changes_cashflow</dt>
+  <dt>n_sign_changes_cashflow</dt>
 <dd><p>Number of sign changes in the nonzero
-cash-flow sequence.</p></dd>
+    cash-flow sequence.</p></dd>
 
 
 </dl><p>If no roots are detected, the function returns a tibble with zero rows.</p>
@@ -156,12 +156,19 @@ cash-flow sequence.</p></dd>
     <p>This function is intended for cash flows with multiple sign changes, where
 more than one IRR may exist. It evaluates the NPV on a fine grid over the
 search interval, identifies subintervals with sign changes (and grid points
-where the NPV is approximately zero), and applies
+where the scaled NPV evaluates to zero), and applies
 <code><a href="https://rdrr.io/r/stats/uniroot.html" class="external-link">uniroot</a></code> to each candidate interval.</p>
 <p>The IRRs returned are interpreted as annual effective rates.</p>
 <p>Timing can be supplied either through <code>t</code> (in years) or <code>date</code>
 (calendar dates). If <code>date</code> is supplied, the earliest date is treated
 as time 0.</p>
+
+<p>Cash flows are divided by their largest absolute amount during the search;
+reported NPVs remain in the original currency. Scaling that would erase a
+nonzero amount through underflow is rejected. Only exact computed grid
+zeros and sign-changing brackets generate candidates: an absolutely small
+monetary NPV is not by itself evidence of a root. Grid detection remains
+heuristic, including for tangential or very close roots.</p>
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>cf</code> denotes cash flows, <code>t</code> denotes time,
 and <code>m</code> denotes the conversion frequency used to report the equivalent
@@ -198,7 +205,7 @@ It may miss roots if:</p><ul><li><p>the grid is too coarse,</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 11</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   root_id    irr i_effective_annual j_nominal_interest  delta      npv</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       1 0.089<span style="text-decoration: underline;">0</span>             0.089<span style="text-decoration: underline;">0</span>             0.089<span style="text-decoration: underline;">0</span> 0.085<span style="text-decoration: underline;">2</span> 1.36<span style="color: #949494;">e</span><span style="color: #BB0000;">-12</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       1 0.089<span style="text-decoration: underline;">0</span>             0.089<span style="text-decoration: underline;">0</span>             0.089<span style="text-decoration: underline;">0</span> 0.085<span style="text-decoration: underline;">2</span> 1.31<span style="color: #949494;">e</span><span style="color: #BB0000;">-12</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 5 more variables: interval_left &lt;dbl&gt;, interval_right &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   n_cashflows &lt;int&gt;, has_both_signs &lt;lgl&gt;, n_sign_changes_cashflow &lt;int&gt;</span></span>
 <span class="r-in"><span></span></span>

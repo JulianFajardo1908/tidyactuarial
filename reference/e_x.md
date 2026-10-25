@@ -92,6 +92,15 @@ Section 24):
 - Balducci (Sec. 24.3): \\\int_0^s {}\_u p_y \\ du = \frac{p_y}{q_y} \ln
   \left( \frac{p_y + q_y s}{p_y} \right)\\
 
+Integrals use stable exponential/logarithmic increments for small
+durations. Extinct cohorts contribute zero to later intervals, even if
+their conditional probabilities are undefined. The CF/Balducci
+zero-survival interval has integral zero; UDD retains its linear
+decline. Unknown survivor counts propagate as missing expectations. When
+annual probabilities must be derived from survivor counts, survival uses
+the direct count ratio rather than \\1-q_y\\. Its logarithm retains the
+CF integral even when the annual ratio is below floating-point range.
+
 Under UDD, the complete expectancy satisfies the well-known
 approximation (Finan, Example 20.24): \$\$\breve{e}\_x \approx e_x +
 \frac{1}{2}.\$\$

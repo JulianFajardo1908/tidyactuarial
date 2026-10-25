@@ -55,9 +55,12 @@ Numeric vector of \\{}\_t q_x\\, or a tibble if `tidy = TRUE`.
 
 ## Details
 
-This is a thin wrapper around
-[`t_px`](https://julianfajardo1908.github.io/tidyactuarial/reference/t_px.md):
-\$\${}\_t q_x = 1 - {}\_t p_x.\$\$
+Uses
+[`t_px`](https://julianfajardo1908.github.io/tidyactuarial/reference/t_px.md)
+for input and horizon conventions; the identity is: \$\${}\_t q_x = 1 -
+{}\_t p_x.\$\$ Small fractional losses are formed directly before
+subtracting from one, preserving probabilities whose survival rounds to
+one.
 
 The identity \\{}\_tq_x = {}\_td_x / \ell_x\\ (Finan, Section 22) holds
 for integer \\t\\, where \\{}\_td_x = \ell_x - \ell\_{x+t}\\ is the
@@ -135,7 +138,7 @@ if (requireNamespace("dplyr", quietly = TRUE)) {
 #> # A tibble: 3 × 4
 #>     age duration  surv  death
 #>   <dbl>    <dbl> <dbl>  <dbl>
-#> 1     0      3   0.982 0.0180
+#> 1     0      3   0.982 0.018 
 #> 2     1      2.5 0.981 0.0191
 #> 3     2      1.7 0.983 0.0166
 ```

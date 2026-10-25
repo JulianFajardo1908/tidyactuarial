@@ -1,7 +1,7 @@
 # Internal helper: safe payment times
 
 Creates a sequence of payment times. If the upper bound is smaller than
-the lower bound, it returns `numeric(0)`.
+the lower bound, it returns \`numeric(0)\`.
 
 ## Usage
 
@@ -21,7 +21,7 @@ the lower bound, it returns `numeric(0)`.
 
 - by:
 
-  Numeric scalar. Step between payment times. Default is `1`.
+  Numeric scalar. Step between payment times. Default is \`1\`.
 
 ## Value
 

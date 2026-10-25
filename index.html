@@ -12,8 +12,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Tidy Tools for Actuarial Mathematics and Life Contingencies">
-<meta name="description" content="Provides tidyverse-aligned tools for actuarial mathematics and life contingencies, including life tables, survival probabilities, actuarial present values of cash flows, life annuities, life insurance, premiums, reserves, multiple-life calculations, Monte Carlo simulation, and deterministic cash-flow diagrams. The package emphasizes clear actuarial notation, reproducible workflows, and pipe-friendly tools for actuarial education and applied actuarial analysis.">
-<meta property="og:description" content="Provides tidyverse-aligned tools for actuarial mathematics and life contingencies, including life tables, survival probabilities, actuarial present values of cash flows, life annuities, life insurance, premiums, reserves, multiple-life calculations, Monte Carlo simulation, and deterministic cash-flow diagrams. The package emphasizes clear actuarial notation, reproducible workflows, and pipe-friendly tools for actuarial education and applied actuarial analysis.">
+<meta name="description" content="Provides tidyverse-aligned tools for actuarial mathematics and life contingencies, including life tables, survival probabilities, actuarial present values of cash flows, life annuities, life insurance, premiums, reserves, multiple-life calculations, Monte Carlo simulation, collective risk models, insurance coverage, tail risk measures, and deterministic cash-flow diagrams. The package emphasizes clear actuarial notation, reproducible workflows, and pipe-friendly tools for actuarial education and applied actuarial analysis.">
+<meta property="og:description" content="Provides tidyverse-aligned tools for actuarial mathematics and life contingencies, including life tables, survival probabilities, actuarial present values of cash flows, life annuities, life insurance, premiums, reserves, multiple-life calculations, Monte Carlo simulation, collective risk models, insurance coverage, tail risk measures, and deterministic cash-flow diagrams. The package emphasizes clear actuarial notation, reproducible workflows, and pipe-friendly tools for actuarial education and applied actuarial analysis.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,8 +60,8 @@
 <div class="page-header"><h1 id="tidyactuarial">tidyactuarial<a class="anchor" aria-label="anchor" href="#tidyactuarial"></a>
 </h1></div>
 <p><strong>Actuarial mathematics in R with transparent formulas, reproducible workflows, and tidy outputs where they add value.</strong></p>
-<p><code>tidyactuarial</code> provides tools for financial mathematics and life contingencies in R. The package is designed so that the actuarial model remains visible: formulas, timing conventions, mortality assumptions, and valuation dates come first; computation is then used to reproduce, audit, and scale the calculation.</p>
-<p>The stable release is <strong>0.1.6</strong> on CRAN. The development version is <strong>0.1.6.9000</strong>.</p>
+<p><code>tidyactuarial</code> provides tools for financial mathematics, life contingencies, and collective risk in R. The package is designed so that the actuarial model remains visible: formulas, timing conventions, mortality assumptions, and valuation dates come first; computation is then used to reproduce, audit, and scale the calculation.</p>
+<p>The current stable release is <strong>tidyactuarial 0.2.0</strong>, published on CRAN on October 25, 2026. This repository and its reference website document the released features, including collective risk, insurance coverage, aggregate loss distributions, and tail risk measures.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -93,6 +93,8 @@
 <strong>Multiple-life and multiple-decrement models:</strong> joint-life and last-survivor quantities, premiums, reserves, and cause-specific decrement calculations.</li>
 <li>
 <strong>Simulation and actuarial risk:</strong> lifetime simulation and Monte Carlo tools for annuities, insurance, premiums, reserves, losses, and multiple-life status models.</li>
+<li>
+<strong>Collective risk and coverage:</strong> frequency and severity models, deductibles and limits, aggregate loss distributions and simulation, VaR, TVaR, and stop-loss premiums.</li>
 </ul>
 <p>The full API is organized by actuarial area in the <strong>Reference</strong> section of the package website.</p>
 </div>
@@ -318,7 +320,7 @@ E_t.
 <div class="section level2">
 <h2 id="reliability">Reliability<a class="anchor" aria-label="anchor" href="#reliability"></a>
 </h2>
-<p>The package is developed with automated unit and regression tests. The development branch is also checked through continuous integration on Linux, Windows, and macOS.</p>
+<p>The package is developed with automated unit and regression tests. Continuous integration is configured for Linux, Windows, and macOS, including the declared minimum R version on Ubuntu. A successful run applies to the commit it checks; it does not certify later development changes.</p>
 <p>For released work where stability is the priority, use the CRAN version.</p>
 </div>
 <div class="section level2">

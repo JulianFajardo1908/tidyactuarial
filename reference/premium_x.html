@@ -19,7 +19,7 @@ $$"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,7 +129,10 @@ function of time may be supplied.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>Insurance term in years. Use <code>Inf</code> for whole-life insurance.</p></dd>
+<dd><p>Insurance term in years. Use <code>Inf</code> for whole-life insurance.
+For <code>type = "variable_k"</code>, fractional terms aligned with the benefit
+frequency are permitted; the default <code>Inf</code> infers a finite term from
+a numeric benefit schedule.</p></dd>
 
 
 <dt id="arg-h">h<a class="anchor" aria-label="anchor" href="#arg-h"></a></dt>
@@ -204,6 +207,7 @@ inputs and calculated components.</p>
     <p>For premiums payable \(k\) times per year, the function distinguishes
 between the annualized premium \(P^{(k)}\) and the amount paid at each
 installment, \(P^{(k)} / k\).</p>
+
 <p>Let \(Z\) be the present-value random variable of benefits and let
 \(Y^{(k)}\) be the present-value random variable of a premium annuity
 normalized to an annual payment rate of 1. The loss at issue is
@@ -232,13 +236,22 @@ $$</p>
 
 <p>Explicit arguments supplied to <code>premium_x()</code> override values stored in
 the contract components.</p>
+<p>For variable benefits the actual coverage term, including a term inferred
+from the benefit vector, bounds the premium-paying period and is reported
+in audit output. Benefit frequency inherited from an insurance component
+can differ from premium frequency. The benefit vector describes payments
+within one contract, not independent scenarios. This function retains its
+scalar-contract interface; use separate calls for different contracts.
+The premium annuity must have a positive finite APV. An undefined or
+nonfinite premium-annuity factor is rejected, rather than treating an
+indeterminate ratio of two infinite APVs as a premium.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="life_contract.html">life_contract</a></code>, <code><a href="add_insurance.html">add_insurance</a></code>,
-<code><a href="add_premium_schedule.html">add_premium_schedule</a></code>, <code><a href="insurance_x.html">insurance_x</a></code>,
-<code><a href="insurance_variable_k.html">insurance_variable_k</a></code>, <code><a href="annuity_x.html">annuity_x</a></code>,
-<code><a href="premium_xy.html">premium_xy</a></code>, <code><a href="premium_gross.html">premium_gross</a></code></p>
+  <code><a href="add_premium_schedule.html">add_premium_schedule</a></code>, <code><a href="insurance_x.html">insurance_x</a></code>,
+  <code><a href="insurance_variable_k.html">insurance_variable_k</a></code>, <code><a href="annuity_x.html">annuity_x</a></code>,
+  <code><a href="premium_xy.html">premium_xy</a></code>, <code><a href="premium_gross.html">premium_gross</a></code></p>
 <p>Other life-contingencies:
 <code><a href="add_insurance.html">add_insurance()</a></code>,
 <code><a href="add_premium_schedule.html">add_premium_schedule()</a></code>,

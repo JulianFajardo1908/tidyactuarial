@@ -11,7 +11,7 @@ notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -134,7 +134,7 @@ used in the calculation.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with one row per portfolio and columns for portfolio
-duration, total portfolio value, and number of positions used.</p>
+  duration, total portfolio value, and number of positions used.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -147,13 +147,26 @@ duration measures on a common basis within each portfolio.</p>
 $$D_P = \frac{\sum_{j=1}^r P_j D_j}{\sum_{j=1}^r P_j}$$
 where \(P_j\) is the present value, price, or market value of position
 \(j\), and \(D_j\) is its duration.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>P</code> denotes price, present value, or market value,
 and <code>D</code> denotes duration.</p>
 <p>The function is deliberately agnostic about the duration convention, but all
 individual durations must be expressed on the same basis within each
 portfolio. For example, do not mix Macaulay durations in years with
-durations measured in coupon periods.</p>
+durations measured in coupon periods.
+All measures must refer to the same yield coordinate as well as the same
+time units for an interpretation as price sensitivity to a common shift.
+Values and durations are finite and nonnegative, and each portfolio requires
+a finite positive total value. Zero-value positions remain in the position
+count. Relative weights are combined with durations without forming monetary
+duration products, recovering representable weighted contributions when
+separate products or weights lose range.
+Under <code>.na = "propagate"</code>, incomplete known portfolios have missing
+results. Positions with missing portfolio identifiers are retained as one
+final row with an <code>NA</code> identifier and missing duration, total value and
+position count. They are not assigned to any known portfolio. <code>"drop"</code>
+removes incomplete positions with a warning; <code>"error"</code> rejects them.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -166,8 +179,9 @@ Duration, Convexity and Immunization.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="portfolio_convexity.html">portfolio_convexity</a></code>,
-<code><a href="bond_duration.html">bond_duration</a></code>, <code><a href="bond_convexity.html">bond_convexity</a></code></p>
+  <code><a href="bond_duration.html">bond_duration</a></code>, <code><a href="bond_convexity.html">bond_convexity</a></code></p>
 <p>Other bonds:
+<code><a href="accrued_interest.html">accrued_interest()</a></code>,
 <code><a href="bond_book_value.html">bond_book_value()</a></code>,
 <code><a href="bond_callable_price.html">bond_callable_price()</a></code>,
 <code><a href="bond_convexity.html">bond_convexity()</a></code>,

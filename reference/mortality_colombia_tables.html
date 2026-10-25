@@ -11,7 +11,7 @@ used in Colombian actuarial applications."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,43 +60,43 @@ used in Colombian actuarial applications.</p>
     <p>A tibble with 12 variables:</p><dl><dt>table_id</dt>
 <dd><p>Mortality table identifier.</p></dd>
 
-<dt>sex</dt>
+  <dt>sex</dt>
 <dd><p>Sex category, typically <code>"male"</code> or <code>"female"</code>.</p></dd>
 
-<dt>x</dt>
+  <dt>x</dt>
 <dd><p>Integer actuarial age.</p></dd>
 
-<dt>lx</dt>
+  <dt>lx</dt>
 <dd><p>Number of survivors at exact age <code>x</code>.</p></dd>
 
-<dt>dx</dt>
+  <dt>dx</dt>
 <dd><p>Expected number of deaths between ages <code>x</code> and
-<code>x + 1</code>.</p></dd>
+  <code>x + 1</code>.</p></dd>
 
-<dt>qx</dt>
+  <dt>qx</dt>
 <dd><p>One-year death probability between ages <code>x</code> and
-<code>x + 1</code>.</p></dd>
+  <code>x + 1</code>.</p></dd>
 
-<dt>px</dt>
+  <dt>px</dt>
 <dd><p>One-year survival probability between ages <code>x</code> and
-<code>x + 1</code>.</p></dd>
+  <code>x + 1</code>.</p></dd>
 
-<dt>mu_x</dt>
+  <dt>mu_x</dt>
 <dd><p>Force of mortality at age <code>x</code>, when available.</p></dd>
 
-<dt>ex</dt>
+  <dt>ex</dt>
 <dd><p>Complete life expectancy at age <code>x</code>, when available.</p></dd>
 
-<dt>source</dt>
+  <dt>source</dt>
 <dd><p>Source identifier or reference.</p></dd>
 
-<dt>qx_calc</dt>
+  <dt>qx_calc</dt>
 <dd><p>Death probability recalculated from <code>lx</code> and
-<code>dx</code>, when available.</p></dd>
+  <code>dx</code>, when available.</p></dd>
 
-<dt>qx_diff</dt>
+  <dt>qx_diff</dt>
 <dd><p>Difference between reported <code>qx</code> and recalculated
-<code>qx</code>, when available.</p></dd>
+  <code>qx</code>, when available.</p></dd>
 
 
 </dl></div>

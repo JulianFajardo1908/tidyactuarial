@@ -107,7 +107,19 @@ This function follows the compact actuarial notation used throughout
 The function is deliberately agnostic about the duration convention, but
 all individual durations must be expressed on the same basis within each
 portfolio. For example, do not mix Macaulay durations in years with
-durations measured in coupon periods.
+durations measured in coupon periods. All measures must refer to the
+same yield coordinate as well as the same time units for an
+interpretation as price sensitivity to a common shift. Values and
+durations are finite and nonnegative, and each portfolio requires a
+finite positive total value. Zero-value positions remain in the position
+count. Relative weights are combined with durations without forming
+monetary duration products, recovering representable weighted
+contributions when separate products or weights lose range. Under
+`.na = "propagate"`, incomplete known portfolios have missing results.
+Positions with missing portfolio identifiers are retained as one final
+row with an `NA` identifier and missing duration, total value and
+position count. They are not assigned to any known portfolio. `"drop"`
+removes incomplete positions with a warning; `"error"` rejects them.
 
 ## References
 
@@ -125,6 +137,7 @@ Convexity and Immunization.
 [`bond_convexity`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md)
 
 Other bonds:
+[`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md),
 [`bond_book_value()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_book_value.md),
 [`bond_callable_price()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md),
 [`bond_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md),

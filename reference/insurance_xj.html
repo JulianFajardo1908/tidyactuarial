@@ -13,7 +13,7 @@ actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,8 +103,9 @@ Must contain columns <code>x</code>, <code>p_total</code>, and the requested
 
 
 <dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
-<dd><p>Annual interest-rate input. Must produce an annual effective rate
-greater than <code>-1</code>.</p></dd>
+<dd><p>Finite annual interest-rate input in the valid domain of its
+original rate specification. Extreme annual equivalents may round to -1
+or overflow, while the original log accumulation remains usable.</p></dd>
 
 
 <dt id="arg-cause">cause<a class="anchor" aria-label="anchor" href="#arg-cause"></a></dt>
@@ -164,6 +165,7 @@ rates. Ignored for <code>"effective"</code> and <code>"force"</code>.</p></dd>
 that pays <code>benefit</code> at the end of the year of decrement by a specified
 cause <code>j</code>, using a multiple decrement table produced by
 <code><a href="md_table.html">md_table</a></code>.</p>
+
 <p>Let \(q_{x+k}^{(j)}\) be the one-year decrement probability for cause
 \(j\) at age \(x+k\), and let \(p_{x+r}^{(\tau)}\) be the one-year
 total survival probability against all decrements at age \(x+r\).</p>
@@ -178,7 +180,22 @@ $$</p>
 <p>Here \(v = (1+i_e)^{-1}\), where \(i_e\) is the annual effective
 interest rate obtained from <code>i</code>, <code>i_type</code>, and <code>m</code>.</p>
 <p>If <code>type = "whole"</code>, the function sets <code>n</code> to the remaining length
-of the table after deferment, that is, whole life over the available ages.</p>
+of the table after deferment, that is, whole life over the available ages.
+With an open table this is a truncated value, not a complete whole-life APV;
+completeness requires that no active survivors remain beyond the last row.
+Cause probabilities are dependent probabilities of exit from the active
+state in a competing-decrement model, not independent/net decrement rates.
+Survival to each year's start uses all decrements. The payment is at year
+end, not the moment of exit; the cause-specific probability is not multiplied
+by survival to year end. Values are conditional on active status at issue.</p>
+<p>The selected probabilities must be finite, in [0,1], with cause probability
+no greater than total decrement. Ages must be consecutive annual ages.
+Optional `q_total` is checked against `p_total`; redundant cohort counts
+are not the valuation basis. `q_total` itself can be selected to value all
+exits. Original log accumulation and cumulative log survival retain
+representable values despite overflowing annual equivalent rates or
+underflowing intermediate survival. Scalar inputs recycle to a common
+positive scenario length; `cause` and `type` select one model per call.</p>
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>md</code> is a multiple decrement table, <code>x</code> is
 age at issue, <code>i</code> is the interest rate, <code>i_type</code> is the
@@ -188,8 +205,8 @@ interest-rate type, <code>m</code> is the conversion frequency for nominal rates
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="t_qxj.html">t_qxj</a></code> for cause-specific decrement probabilities,
-<code><a href="lt_tau.html">lt_tau</a></code> to build a single-decrement life table for the total
-decrement.</p></div>
+  <code><a href="lt_tau.html">lt_tau</a></code> to build a single-decrement life table for the total
+  decrement.</p></div>
     </div>
 
     <div class="section level2">

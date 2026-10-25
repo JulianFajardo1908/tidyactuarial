@@ -11,7 +11,7 @@ death, using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,13 +107,13 @@ the length of <code>benefit</code> when <code>benefit</code> is numeric. If
 
 
 <dt id="arg-i-type">i_type<a class="anchor" aria-label="anchor" href="#arg-i-type"></a></dt>
-<dd><p>Character vector indicating the interest-rate type. Allowed
+<dd><p>Character scalar indicating the interest-rate type. Allowed
 values are <code>"effective"</code>, <code>"nominal_interest"</code>,
 <code>"nominal_discount"</code>, and <code>"force"</code>.</p></dd>
 
 
 <dt id="arg-m">m<a class="anchor" aria-label="anchor" href="#arg-m"></a></dt>
-<dd><p>Positive integer vector giving the conversion frequency for nominal
+<dd><p>Positive integer scalar giving the conversion frequency for nominal
 interest-rate inputs. Ignored for <code>"effective"</code> and <code>"force"</code>.</p></dd>
 
 
@@ -139,12 +139,13 @@ used.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A numeric actuarial present value, or a one-row tibble if
-<code>tidy = TRUE</code>.</p>
+  <code>tidy = TRUE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is useful for level, increasing, decreasing, and credit-style
 life insurance benefits when benefits are specified at a subannual frequency.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>lt</code> is the life table, <code>x</code> is the age at
 issue, <code>i</code> is the interest-rate input, <code>i_type</code> is the
@@ -168,14 +169,28 @@ effective interest rate equivalent to the input <code>i</code>, <code>i_type</co
 If it is numeric with length greater than 1, its length must equal
 \(n k\). If <code>benefit</code> is a function, it is evaluated at the end of
 each subperiod, at times \(1/k, 2/k, \ldots, n\).</p>
-<p>Fractional survival probabilities are computed via <code><a href="t_px.html">t_px</a></code> under
-the selected fractional-age assumption.</p>
+<p>Fractional mortality is interpolated under the selected assumption. Death
+masses are evaluated directly from annual survivor decrements and stable
+fractional formulas, avoiding subtraction of rounded survival probabilities.
+The table must have consecutive annual ages and nonincreasing finite `lx`,
+with positive exposure at issue and support through `x + h + n`. No extra
+terminal death year is invented. A zero annual survival under CF or Balducci
+uses the limiting mass at the beginning of that annual interval, consistently
+with the package's fractional survival convention.</p>
+<p>This values one policy per call. A benefit vector is a sequence of payments,
+not a vector of policy scenarios; signed benefits are supported. Functional
+benefits are evaluated at times relative to the start of coverage, excluding
+`h`; discounting and death probabilities use absolute times including `h`.
+The payment is at the end of the subperiod of death, not at the exact death
+time. Full contractual amounts are used, without division by `k`.
+`i_effective` is diagnostic and may round to -1 or Inf for an extreme valid
+original rate; valuation retains the original log accumulation rate.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="insurance_x.html">insurance_x</a></code> for level-benefit life insurance,
-<code><a href="annuity_x.html">annuity_x</a></code> for life annuity APVs,
-<code><a href="t_px.html">t_px</a></code> for survival probabilities.</p>
+  <code><a href="annuity_x.html">annuity_x</a></code> for life annuity APVs,
+  <code><a href="t_px.html">t_px</a></code> for survival probabilities.</p>
 <p>Other life-contingencies:
 <code><a href="add_insurance.html">add_insurance()</a></code>,
 <code><a href="add_premium_schedule.html">add_premium_schedule()</a></code>,

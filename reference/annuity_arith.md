@@ -46,7 +46,8 @@ annuity_arith(
 - m:
 
   Positive integer vector giving the conversion frequency for nominal
-  rates. Ignored for `"effective"` and `"force"`.
+  rates. Observed values are validated for every rate family, although
+  only nominal conversions use this frequency.
 
 - h:
 
@@ -114,9 +115,10 @@ This function follows the compact actuarial notation used throughout
 the interest-rate input, `i_type` is the interest-rate type, `m` is the
 conversion frequency for nominal rates, and `h` is the deferment period.
 
-The function first converts the supplied rate to the equivalent annual
-effective interest rate using
+Rate validation uses
 [`standardize_interest`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md).
+Valuation retains the original log accumulation rate, even if the
+displayed annual effective equivalent rounds to -1 or overflows.
 
 For each scenario, the total number of payments is \$\$N = n k.\$\$
 
@@ -124,6 +126,18 @@ The present value is computed by summing the discounted payment stream.
 The accumulated value is computed at the end of the annuity term. Under
 this convention, `h` affects the present value factor but not the
 accumulated value factor.
+
+Let \\b=0\\ for immediate payments and \\b=1\\ for due payments,
+\\r=\delta/k\\, and \\H=hk\\. The present value is \\\sum\_{j=1}^N
+P_j\exp\[-r(H+j-b)\]\\; the value at \\h+n\\ years is \\\sum\_{j=1}^N
+P_j\exp\[r(N-j+b)\]\\. In a custom stream, `g` is an increment in
+currency per payment, not an annual growth rate. Signed and zero
+payments are supported.
+
+Payments are enumerated explicitly, so memory grows with \\N\\.
+Capital-factor products are evaluated stably using the shared cash-flow
+rules. Those rules do not recover arbitrary extreme signed cancellation
+across different factors, or payments already outside the numeric range.
 
 ## See also
 

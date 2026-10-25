@@ -33,7 +33,9 @@ mc_multilife_status(
 
 - col_sim:
 
-  Character scalar naming the simulation identifier column.
+  Character scalar naming the simulation identifier column. It must not
+  collide with the output fields `K_status`, `T_status`, `n_lives`, or
+  `status`.
 
 - col_life:
 
@@ -52,8 +54,8 @@ mc_multilife_status(
 
 - tol:
 
-  Nonnegative numeric tolerance used when checking that each complete
-  future lifetime is compatible with its curtate lifetime.
+  Nonnegative numeric tolerance for checking whole-number curtate
+  lifetimes. It does not relax the interval \\K \le T \< K+1\\.
 
 ## Value
 
@@ -97,7 +99,11 @@ last-survivor status.
 The corresponding curtate future lifetime is obtained with the same
 minimum or maximum operation on \\K_1,\ldots,K_r\\. Because the function
 validates \\K_j \le T_j \< K_j+1\\, the returned values satisfy the same
-curtate-complete relationship.
+curtate-complete relationship. Each complete lifetime must satisfy this
+interval exactly after the existing whole-number check and rounding of
+`K`. Incompatible complete lifetimes are rejected, not rounded or
+repaired. Ordinary curtate outputs use integer storage; larger values
+retain numeric storage.
 
 When `col_life` is available, every simulation must contain exactly one
 row for every life and the same set of lives must appear in every

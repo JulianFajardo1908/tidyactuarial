@@ -82,7 +82,8 @@ amort_schedule_general(
 
 - tol:
 
-  Positive numeric scalar used for zero-balance detection.
+  Finite positive numeric scalar in monetary units used for zero-balance
+  detection and the negative-amortization threshold.
 
 ## Value
 
@@ -108,6 +109,12 @@ without modifying that function. It supports:
 
 - a payment function depending on the current loan state.
 
+Original log accumulation rates are converted directly to period rates.
+Level-payment discount factors use cumulative log growth, rather than
+products of rounded accumulation factors. Period rates must remain
+finite and greater than -1; a displayed annual equivalent may overflow
+even when the period rate is representable. The term is `n / k` years.
+
 Each value of `i` is interpreted as an annual rate under its associated
 `i_type` and `m`. It is first converted to an annual effective rate and
 then to the effective rate for one amortization period: \$\$i_j^{(p)} =
@@ -122,6 +129,27 @@ times \\0,1,\ldots,n-1\\.
 
 A payment smaller than the interest charged may produce negative
 amortization. The schedule identifies such periods explicitly.
+
+Negative amortization means that interest exceeds the total payment,
+including extras, by more than `tol`. This condition applies to both
+timings, including interest accrued after an advance payment. Under due
+timing, the principal columns continue to record payments before
+interest; the negative-amortization flag refers to the net debt
+movement.
+
+On a payoff row the regular payment is applied first and extras are
+capped at the remaining debt; no callback is evaluated after full
+payoff. This allocation differs from
+[`amort_schedule`](https://julianfajardo1908.github.io/tidyactuarial/reference/amort_schedule.md),
+which preserves the requested extra first. Both cap total cash flow at
+the amount due. Automatically calculated level payments are determined
+before extras and are not recast by this function. The discount sum is
+evaluated in log space before combining it with the principal. Active
+balances require a positive, representable calculated payment;
+non-finite monetary ledgers cause errors. A principal below `tol` may
+produce an empty schedule, and small residual balances may be treated as
+zero within that absolute tolerance. Storage grows with `n`; feasible
+terms are limited by integer indexing and available memory.
 
 ## See also
 
@@ -148,18 +176,18 @@ amort_schedule_general(
 #> # A tibble: 12 × 15
 #>    period ob_start i_effective_annual i_effective_period interest payment
 #>     <int>    <dbl>              <dbl>              <dbl>    <dbl>   <dbl>
-#>  1      1  100000               0.127             0.0100   1000.    8885.
-#>  2      2   92115.              0.127             0.0100    921.    8885.
-#>  3      3   84151.              0.127             0.0100    842.    8885.
-#>  4      4   76108.              0.127             0.0100    761.    8885.
-#>  5      5   67984.              0.127             0.0100    680.    8885.
-#>  6      6   59779.              0.127             0.0100    598.    8885.
-#>  7      7   51492.              0.127             0.0100    515.    8885.
-#>  8      8   43122.              0.127             0.0100    431.    8885.
-#>  9      9   34668.              0.127             0.0100    347.    8885.
-#> 10     10   26130.              0.127             0.0100    261.    8885.
-#> 11     11   17507.              0.127             0.0100    175.    8885.
-#> 12     12    8797.              0.127             0.0100     88.0   8885.
+#>  1      1  100000               0.127               0.01   1000     8885.
+#>  2      2   92115.              0.127               0.01    921.    8885.
+#>  3      3   84151.              0.127               0.01    842.    8885.
+#>  4      4   76108.              0.127               0.01    761.    8885.
+#>  5      5   67984.              0.127               0.01    680.    8885.
+#>  6      6   59779.              0.127               0.01    598.    8885.
+#>  7      7   51492.              0.127               0.01    515.    8885.
+#>  8      8   43122.              0.127               0.01    431.    8885.
+#>  9      9   34668.              0.127               0.01    347.    8885.
+#> 10     10   26130.              0.127               0.01    261.    8885.
+#> 11     11   17507.              0.127               0.01    175.    8885.
+#> 12     12    8797.              0.127               0.01     88.0   8885.
 #> # ℹ 9 more variables: extra_principal <dbl>, principal <dbl>,
 #> #   total_principal <dbl>, cashflow <dbl>, ob_end <dbl>,
 #> #   negative_amortization <lgl>, timing <chr>, k <int>, payment_source <chr>
@@ -174,11 +202,11 @@ amort_schedule_general(
 #> # A tibble: 5 × 15
 #>   period ob_start i_effective_annual i_effective_period interest payment
 #>    <int>    <dbl>              <dbl>              <dbl>    <dbl>   <dbl>
-#> 1      1   10000                0.06             0.0600     600.    1800
-#> 2      2    8800                0.06             0.0600     528.    1900
-#> 3      3    7428                0.06             0.0600     446.    2000
-#> 4      4    5874.               0.06             0.0600     352.    2200
-#> 5      5    4026.               0.06             0.0600     242.    3000
+#> 1      1   10000                0.06               0.06     600     1800
+#> 2      2    8800                0.06               0.06     528     1900
+#> 3      3    7428                0.06               0.06     446.    2000
+#> 4      4    5874.               0.06               0.06     352.    2200
+#> 5      5    4026.               0.06               0.06     242.    3000
 #> # ℹ 9 more variables: extra_principal <dbl>, principal <dbl>,
 #> #   total_principal <dbl>, cashflow <dbl>, ob_end <dbl>,
 #> #   negative_amortization <lgl>, timing <chr>, k <int>, payment_source <chr>
@@ -193,10 +221,10 @@ amort_schedule_general(
 #> # A tibble: 4 × 15
 #>   period ob_start i_effective_annual i_effective_period interest payment
 #>    <int>    <dbl>              <dbl>              <dbl>    <dbl>   <dbl>
-#> 1      1   10000                0.04             0.0400     400.   2818.
-#> 2      2    7582.               0.05             0.0500     379.   2818.
-#> 3      3    5143.               0.06             0.0600     309.   2818.
-#> 4      4    2634.               0.07             0.0700     184.   2818.
+#> 1      1   10000                0.04               0.04     400    2818.
+#> 2      2    7582.               0.05               0.05     379.   2818.
+#> 3      3    5143.               0.06               0.06     309.   2818.
+#> 4      4    2634.               0.07               0.07     184.   2818.
 #> # ℹ 9 more variables: extra_principal <dbl>, principal <dbl>,
 #> #   total_principal <dbl>, cashflow <dbl>, ob_end <dbl>,
 #> #   negative_amortization <lgl>, timing <chr>, k <int>, payment_source <chr>
@@ -219,12 +247,12 @@ amort_schedule_general(
 #> # A tibble: 6 × 15
 #>   period ob_start i_effective_annual i_effective_period interest payment
 #>    <int>    <dbl>              <dbl>              <dbl>    <dbl>   <dbl>
-#> 1      1    8000                0.05             0.0500    400.    1500 
-#> 2      2    6900                0.05             0.0500    345.    1600 
-#> 3      3    5645                0.05             0.0500    282.    1700 
-#> 4      4    4227.               0.05             0.0500    211.    1800 
-#> 5      5    2639.               0.05             0.0500    132.    1900 
-#> 6      6     871.               0.05             0.0500     43.5    914.
+#> 1      1    8000                0.05               0.05    400     1500 
+#> 2      2    6900                0.05               0.05    345     1600 
+#> 3      3    5645                0.05               0.05    282.    1700 
+#> 4      4    4227.               0.05               0.05    211.    1800 
+#> 5      5    2639.               0.05               0.05    132.    1900 
+#> 6      6     871.               0.05               0.05     43.5    914.
 #> # ℹ 9 more variables: extra_principal <dbl>, principal <dbl>,
 #> #   total_principal <dbl>, cashflow <dbl>, ob_end <dbl>,
 #> #   negative_amortization <lgl>, timing <chr>, k <int>, payment_source <chr>

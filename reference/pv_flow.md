@@ -85,6 +85,15 @@ Rate types may be supplied in FM-style notation:
 Internally, all supplied rates are converted to annual effective rates
 using
 [`standardize_interest`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md).
+Discounting retains the original log accumulation rates, including when
+annual effective equivalents round to -1 or overflow to Inf.
+
+Products are evaluated in log space when separate factors lose range or
+precision; original cash-flow signs and known zero amounts are
+preserved. If individual values overflow, amounts with exactly equal
+finite log factors are netted before valuation. Cancellation between
+unequal factors is not recovered by this rule and may still produce
+non-finite results.
 
 This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `cf` denotes cash flows, `t` denotes time, `i` denotes

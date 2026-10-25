@@ -77,7 +77,8 @@ amort_schedule(
 
 - tol:
 
-  Numeric tolerance for zero-balance detection.
+  Finite positive numeric tolerance in monetary units for zero-balance
+  detection.
 
 ## Value
 
@@ -156,6 +157,13 @@ Adjustment policies after extra principal payments:
 - `"payment"`: keep the remaining contractual term and recalculate the
   regular payment after each period.
 
+The original log accumulation rate determines the effective period rate
+and the level payment, avoiding cancellation near zero and saturation of
+the annual equivalent. The periodic rate must remain finite and greater
+than -1. The balance tolerance is in monetary units and does not
+classify nonzero interest rates as zero. Here `n` counts periods, so the
+contractual term in years is `n / k`.
+
 This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `i` is the interest rate, `i_type` is the interest-rate
 type, `m` is the conversion frequency for nominal annual rates, and `k`
@@ -170,6 +178,25 @@ payment.
 If the user supplies a custom `payment` that is smaller than the
 periodic interest, principal repayment will be negative (negative
 amortization). This is permitted but the user should be aware.
+
+Named extra payments must identify exact integer periods; repeated names
+are summed. On a payoff row, requested extra principal has priority and
+the regular payment is reduced to the remaining amount due. Interest
+still follows the selected timing, and no rows follow full payoff. The
+general schedule uses a different allocation priority; see
+[`amort_schedule_general`](https://julianfajardo1908.github.io/tidyactuarial/reference/amort_schedule_general.md).
+
+With `adjust = "payment"`, the payment is recalculated after every
+realized period for the remaining contractual periods, even if no extra
+payment occurred. A supplied `payment` is the initial payment. The
+`"none"` and `"term"` policies keep the regular amount; both stop when
+the debt is repaid and may realize fewer than `n` rows. A requested loan
+below `tol` may produce an empty schedule. Calculated payments for
+active balances must be representable and positive; non-finite monetary
+ledger entries cause an explicit error. This does not require a
+representable displayed annual effective equivalent. The schedule
+allocates up to `n` rows; feasible terms are limited by integer indexing
+and available memory.
 
 ## See also
 
@@ -196,7 +223,7 @@ amort_schedule(
 #> # A tibble: 12 × 14
 #>    period ob_start interest payment extra_principal principal total_principal
 #>     <int>    <dbl>    <dbl>   <dbl>           <dbl>     <dbl>           <dbl>
-#>  1      1  100000    1000.    8885.               0     7885.           7885.
+#>  1      1  100000    1000     8885.               0     7885.           7885.
 #>  2      2   92115.    921.    8885.               0     7964.           7964.
 #>  3      3   84151.    842.    8885.               0     8043.           8043.
 #>  4      4   76108.    761.    8885.               0     8124.           8124.
@@ -224,7 +251,7 @@ amort_schedule(
 #> # A tibble: 23 × 14
 #>    period ob_start interest payment extra_principal principal total_principal
 #>     <int>    <dbl>    <dbl>   <dbl>           <dbl>     <dbl>           <dbl>
-#>  1      1  100000     1000.   4707.               0     3707.           3707.
+#>  1      1  100000     1000    4707.               0     3707.           3707.
 #>  2      2   96293.     963.   4707.               0     3744.           3744.
 #>  3      3   92548.     925.   4707.               0     3782.           3782.
 #>  4      4   88766.     888.   4707.               0     3820.           3820.
@@ -251,7 +278,7 @@ amort_schedule(
 #> # A tibble: 24 × 14
 #>    period ob_start interest payment extra_principal principal total_principal
 #>     <int>    <dbl>    <dbl>   <dbl>           <dbl>     <dbl>           <dbl>
-#>  1      1  100000     1000.   4707.               0     3707.           3707.
+#>  1      1  100000     1000    4707.               0     3707.           3707.
 #>  2      2   96293.     963.   4707.               0     3744.           3744.
 #>  3      3   92548.     925.   4707.               0     3782.           3782.
 #>  4      4   88766.     888.   4707.               0     3820.           3820.

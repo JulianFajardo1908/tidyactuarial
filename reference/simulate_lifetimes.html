@@ -15,7 +15,7 @@ random-number conventions remain consistent across the Monte Carlo module."></he
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -139,7 +139,10 @@ $$
 for ages with positive exposure. A terminal zero in <code>lx</code> therefore
 generates the appropriate terminal <code>qx = 1</code>. If the final available
 <code>lx</code> remains positive, the resulting distribution is recognized as
-truncated and handled according to <code>truncation</code>.</p>
+truncated and handled according to <code>truncation</code>.
+Positive exposure means <code>lx &gt; 0</code>, independently of the table radix.
+Death probabilities use the direct decrement \((l_y-l_{y+1})/l_y\),
+avoiding loss from subtracting a rounded survival ratio from one.</p>
 <p>Conditional on the supplied life table, the simulated lives are independent.
 A single seed is set once for the entire call; the seed is not reset for each
 life, which avoids introducing artificial perfect dependence between lives
@@ -148,8 +151,8 @@ of the same age.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="simulate_lifetime.html">simulate_lifetime</a></code>,
-<code><a href="mc_multilife_status.html">mc_multilife_status</a></code>, <code><a href="mc_insurance.html">mc_insurance</a></code>,
-<code><a href="mc_annuity.html">mc_annuity</a></code>, <code><a href="mc_reserve.html">mc_reserve</a></code></p>
+  <code><a href="mc_multilife_status.html">mc_multilife_status</a></code>, <code><a href="mc_insurance.html">mc_insurance</a></code>,
+  <code><a href="mc_annuity.html">mc_annuity</a></code>, <code><a href="mc_reserve.html">mc_reserve</a></code></p>
 <p>Other monte-carlo:
 <code><a href="mc_annuity.html">mc_annuity()</a></code>,
 <code><a href="mc_insurance.html">mc_insurance()</a></code>,

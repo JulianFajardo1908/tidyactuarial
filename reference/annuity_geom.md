@@ -49,7 +49,8 @@ annuity_geom(
 - m:
 
   Positive integer vector giving the conversion frequency for nominal
-  interest-rate inputs. Ignored for `"effective"` and `"force"`.
+  interest-rate inputs. Observed values are validated for every rate
+  family, although only nominal conversions use this frequency.
 
 - g:
 
@@ -64,7 +65,8 @@ annuity_geom(
 - g_m:
 
   Positive integer vector giving the conversion frequency for nominal
-  growth-rate inputs. Ignored for `"effective"` and `"force"`.
+  growth-rate inputs. Observed values are validated for every rate
+  family, although only nominal conversions use this frequency.
 
 - h:
 
@@ -137,6 +139,31 @@ horizon: \$\$ gs_N = \sum\_{r=1}^{N}(1+g_p)^{r-1}(1+i_p)^{N-r}. \$\$
 
 For annuities-due, the corresponding immediate factor is multiplied by
 \\1+i_p\\.
+
+Valuation retains the original annual log rates \\\delta_i\\ and
+\\\delta_g\\. Let \\r=\delta_i/k\\, \\s=\delta_g/k\\, \\H=hk\\, and
+\\b=0\\ for immediate or \\b=1\\ for due payments. With
+\\G_N(z)=\sum\_{j=0}^{N-1}\exp(zj)\\, the finite present value is
+\$\$P_1\exp\[-r(H+1-b)\]G_N(s-r).\$\$ The accumulated value at \\h+n\\
+years is \$\$P_1\exp\[br+(N-1)\max(r,s)\]G_N(-\|s-r\|).\$\$ Stable
+logarithmic sums avoid subtracting nearly equal effective rates or
+accumulation levels. The spread is computed before period conversion as
+\\(\delta_g-\delta_i)/k\\; no nonzero spread is replaced by zero. For
+matching effective rates or nominal rates with equal conversion
+frequencies, log-ratio identities preserve close input differences
+before taking logarithms. Widely separated ratios that lose range fall
+back to the original log rates. Different rate families retain the
+accuracy limits of their separate conversions.
+
+A perpetuity requires \\\delta_i\>\delta_g\\, without an arbitrary
+numerical gap. Its value is \\P_1\exp\[-r(H+1-b)\]/\[1-\exp(s-r)\]\\.
+Missing finite terms propagate missing values. Signed and zero first
+payments retain their meaning. Standalone audit rates may saturate,
+while monetary values combine the first payment with log factors before
+declaring range loss. No arbitrary precision or universal extreme-range
+guarantee is implied. Unlike `g` in `annuity_arith`, this `g` is an
+annual growth-rate specification and not a monetary increment per
+payment.
 
 ## See also
 

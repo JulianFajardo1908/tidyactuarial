@@ -9,7 +9,7 @@ the prospective or recursive method."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -203,6 +203,7 @@ APV, future premium APV, reserve, and premium amounts at each duration.</p>
 advance. The premium input <code>P</code> is always interpreted as the annualized
 premium \(P^{(k)}\). The amount paid at each premium date is
 \(P^{(k)} / k\).</p>
+
 <p>At integer duration \(t\), conditional on survival to age \(x+t\), the
 prospective reserve is
 $$
@@ -226,12 +227,31 @@ $$
 ({}_tV_x + P_t)(1+i) - b_{t+1}q_{x+t}
 }{p_{x+t}}.
 $$</p>
+<p>The implementation evaluates its algebraically equivalent backward form
+$${}_tV_x = v(p_{x+t}{}_{t+1}V_x + q_{x+t}b_{t+1}) - P_t.$$
+This avoids amplification by repeated division by small survival
+probabilities. The boundary value is the prospective value at the last
+supported positive cohort within the contract horizon; it is not generally
+zero for whole-life insurance. Already defined maturity payments are retained.
+Unrequested extinct conditioning states are not traversed. A requested
+intermediate reserve conditional on an extinct cohort remains undefined.</p>
+<p>Tables must have nonincreasing finite <code>lx</code> on an annual age grid.
+The recursive calculation retains the original log accumulation rate and
+forms death decrements before dividing survivor counts. Positive survival is
+obtained directly from counts, not as \(1-q_x\). The whole-life output
+horizon remains the last recorded age with positive <code>lx</code>; finite
+coverage must be supported by recorded table ages. These local conventions
+are retained separately from the implicit final interval in insurance APVs.
+<code>t</code> indexes durations of one contract, not independent policy scenarios.
+No clipping or zeroing of small/negative reserves is applied. Nonfinite
+future APV components do not in general identify their difference; exact
+recovery of arbitrary cancellations between infinite components is not promised.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="premium_x.html">premium_x</a></code>, <code><a href="insurance_x.html">insurance_x</a></code>,
-<code><a href="annuity_x.html">annuity_x</a></code>, <code><a href="life_contract.html">life_contract</a></code>,
-<code><a href="add_insurance.html">add_insurance</a></code>, <code><a href="add_premium_schedule.html">add_premium_schedule</a></code></p>
+  <code><a href="annuity_x.html">annuity_x</a></code>, <code><a href="life_contract.html">life_contract</a></code>,
+  <code><a href="add_insurance.html">add_insurance</a></code>, <code><a href="add_premium_schedule.html">add_premium_schedule</a></code></p>
 <p>Other life-contingencies:
 <code><a href="add_insurance.html">add_insurance()</a></code>,
 <code><a href="add_premium_schedule.html">add_premium_schedule()</a></code>,

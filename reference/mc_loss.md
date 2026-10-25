@@ -87,7 +87,8 @@ mc_loss(
 
 ## Value
 
-A tibble containing the original simulation and standardized columns:
+A data frame or tibble containing the original simulation and
+standardized columns:
 
 - premium_annualized:
 
@@ -145,7 +146,21 @@ the annualized premium divided by `k`.
 For backward compatibility, legacy columns `P` and `premium` are
 interpreted as coefficients that multiply the supplied annuity present
 value directly. If such a coefficient is \\q\\, then \$\$
-P\_{\mathrm{per\\ payment}} = q c, \qquad P^{(k)} = k q c. \$\$
+P\_{\mathrm{per\\ payment}} = q c, \qquad P^{(k)} = k q c. \$\$ For
+annualized or per-payment inputs, monetary income retains the original
+premium amount and frequency until it is combined with the annuity
+present value. This avoids losing a representable income when an
+intermediate annuity-scale coefficient underflows or overflows.
+Displayed converted amounts may still be zero or infinite if they
+themselves do not fit in double precision. An explicitly supplied
+annuity-scale coefficient is used as supplied; a rounded zero or
+nonfinite coefficient cannot reconstruct information that has already
+been lost. Select a representable monetary premium column when passing
+extreme results from
+[`mc_premium`](https://julianfajardo1908.github.io/tidyactuarial/reference/mc_premium.md).
+Positive infinite annualized annuity-basis metadata are accepted only
+when they agree with the product of the finite per-payment basis and
+frequency; they cannot be used alone to infer the payment basis.
 
 ## References
 

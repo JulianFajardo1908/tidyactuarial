@@ -143,7 +143,7 @@ plot_cash_flow(
 
 - label_digits:
 
-  Integer number of decimal digits for cash-flow labels.
+  Integer between 0 and 50: decimal digits for cash-flow labels.
 
 - label_format:
 
@@ -181,6 +181,27 @@ plot_cash_flow(
 A `ggplot2` object.
 
 ## Details
+
+Present values use the original interest specification and combine
+capital and discount factors stably. Opposite amounts with exactly equal
+finite log factors are netted if individual present values overflow.
+Numeric timelines may include negative times; the valuation origin
+remains zero. Dated timelines use the earliest date as origin.
+Non-finite inferred present values or aggregated amounts are rejected.
+Extreme monetary magnitudes use scaled graphical coordinates, with the
+power of ten stated on the axis; raw amounts remain in `plot$data$C`.
+Automatic/compact labels use scientific notation beyond the available
+suffixes or when fixed decimals would show a nonzero amount as zero.
+`label_format = "full"` retains explicit fixed-decimal formatting.
+Overlapping text labels may be omitted at rendering time; every arrow
+remains. For dense streams, use `show_labels = FALSE`. Simultaneous
+flows are netted by default; `aggregate = FALSE` keeps their exact
+positions, so arrows at identical times can overlap. No dates are
+jittered. `PV` is a supplied annotation when present, not a
+recalculation or check. Date origins and day counts differ from
+[`apv_life_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/apv_life_flow.md)
+and are not silently unified. The returned ggplot remains editable with
+additional layers.
 
 This function uses compact actuarial notation: `C` denotes cash-flow
 amounts, `t` denotes times in years, `i` denotes the interest-rate

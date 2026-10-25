@@ -11,7 +11,7 @@ actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -158,8 +158,8 @@ objects. Used only if <code>plot = TRUE</code>.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble. By default it returns the original columns plus a new
-numeric column named by <code>.out</code>. If <code>plot = TRUE</code>, it also adds
-a list-column named by <code>.out_plot</code> containing <code>ggplot2</code> objects.</p>
+  numeric column named by <code>.out</code>. If <code>plot = TRUE</code>, it also adds
+  a list-column named by <code>.out_plot</code> containing <code>ggplot2</code> objects.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -174,17 +174,22 @@ so that
 $$f_{t_1,t_2} =
 \left(\frac{(1+i_2)^{t_2}}{(1+i_1)^{t_1}}\right)^{1/(t_2-t_1)} - 1.$$</p>
 <p>Two extraction methods are supported for the spot rates:</p><ul><li><p><code>"exact"</code>: requires that <code>t_start</code> and <code>t_end</code>
-match curve nodes.</p></li>
+    match curve nodes.</p></li>
 <li><p><code>"linear"</code>: uses linear interpolation between adjacent nodes.</p></li>
 </ul><p>No extrapolation is performed outside the observed maturity range.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>t</code> denotes maturity, <code>i</code> denotes the spot
 rate, <code>i_type</code> denotes the interest-rate type, and <code>m</code> denotes the
 conversion frequency for nominal spot rates. The output column <code>f</code>
 denotes the implied annual effective forward rate.</p>
-<p>Spot-rate inputs are converted to annual effective form using
-<code><a href="standardize_interest.html">standardize_interest</a></code> before interpolation and forward-rate
-calculation.</p>
+<p>Exact extraction retains the original log accumulation rates and evaluates
+the spot-forward identity without forming powers or their ratio. Reported
+annual equivalents and the final forward rate can reach double precision
+limits. Linear extraction interpolates annual effective spot rates, not log
+discounts, and requires finite annual equivalents greater than -1.
+With <code>.na = "propagate"</code>, an incomplete row keeps its position and has
+a <code>NULL</code> plot entry when plotting is requested.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -197,12 +202,15 @@ The Term Structure of Interest Rates.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="yield_curve.html">yield_curve</a></code>, <code><a href="discount_factor_spot.html">discount_factor_spot</a></code>,
-<code><a href="standardize_interest.html">standardize_interest</a></code></p>
+  <code><a href="standardize_interest.html">standardize_interest</a></code></p>
 <p>Other interest:
 <code><a href="accumulation_factor.html">accumulation_factor()</a></code>,
+<code><a href="bootstrap_spot_curve.html">bootstrap_spot_curve()</a></code>,
 <code><a href="discount_factor.html">discount_factor()</a></code>,
 <code><a href="discount_factor_spot.html">discount_factor_spot()</a></code>,
+<code><a href="forward_curve.html">forward_curve()</a></code>,
 <code><a href="interest_equivalents.html">interest_equivalents()</a></code>,
+<code><a href="par_rate.html">par_rate()</a></code>,
 <code><a href="standardize_interest.html">standardize_interest()</a></code>,
 <code><a href="yield_curve.html">yield_curve()</a></code></p></div>
     </div>

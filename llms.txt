@@ -3,14 +3,16 @@
 **Actuarial mathematics in R with transparent formulas, reproducible
 workflows, and tidy outputs where they add value.**
 
-`tidyactuarial` provides tools for financial mathematics and life
-contingencies in R. The package is designed so that the actuarial model
-remains visible: formulas, timing conventions, mortality assumptions,
-and valuation dates come first; computation is then used to reproduce,
-audit, and scale the calculation.
+`tidyactuarial` provides tools for financial mathematics, life
+contingencies, and collective risk in R. The package is designed so that
+the actuarial model remains visible: formulas, timing conventions,
+mortality assumptions, and valuation dates come first; computation is
+then used to reproduce, audit, and scale the calculation.
 
-The stable release is **0.1.6** on CRAN. The development version is
-**0.1.6.9000**.
+The current stable release is **tidyactuarial 0.2.0**, published on CRAN
+on October 25, 2026. This repository and its reference website document
+the released features, including collective risk, insurance coverage,
+aggregate loss distributions, and tail risk measures.
 
 ## Installation
 
@@ -52,6 +54,9 @@ The package currently includes tools for:
 - **Simulation and actuarial risk:** lifetime simulation and Monte Carlo
   tools for annuities, insurance, premiums, reserves, losses, and
   multiple-life status models.
+- **Collective risk and coverage:** frequency and severity models,
+  deductibles and limits, aggregate loss distributions and simulation,
+  VaR, TVaR, and stop-loss premiums.
 
 The full API is organized by actuarial area in the **Reference** section
 of the package website.
@@ -294,9 +299,11 @@ remain inspectable and reproducible.
 
 ## Reliability
 
-The package is developed with automated unit and regression tests. The
-development branch is also checked through continuous integration on
-Linux, Windows, and macOS.
+The package is developed with automated unit and regression tests.
+Continuous integration is configured for Linux, Windows, and macOS,
+including the declared minimum R version on Ubuntu. A successful run
+applies to the commit it checks; it does not certify later development
+changes.
 
 For released work where stability is the priority, use the CRAN version.
 
@@ -407,6 +414,8 @@ portfolio measures, and immunization.
 
 - [`bond_cash_flows()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_cash_flows.md)
   : Cash flow structure of a level coupon bond
+- [`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md)
+  : Accrued coupon interest and clean/dirty bond prices
 - [`bond_price()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_price.md)
   : Price of a level coupon bond from its yield
 - [`bond_ytm()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_ytm.md)
@@ -445,6 +454,12 @@ Spot discount factors, yield curves, and forward rates.
   : Validate a yield curve and compute discount factors
 - [`forward_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_rate.md)
   : Compute an implied forward rate from a discrete spot curve
+- [`bootstrap_spot_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bootstrap_spot_curve.md)
+  : Bootstrap a spot yield curve from instrument prices
+- [`forward_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_curve.md)
+  : Construct a forward-rate curve from spot rates
+- [`par_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/par_rate.md)
+  : Par coupon rate implied by a spot yield curve
 
 ## Life Tables and Survival
 
@@ -490,6 +505,8 @@ workflows for a single life.
   benefits
 - [`apv_life_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/apv_life_flow.md)
   : Actuarial present value of a payment stream under mortality
+- [`plot_contingent_cash_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/plot_contingent_cash_flow.md)
+  : Plot discrete life-contingent cash flows
 - [`premium_x()`](https://julianfajardo1908.github.io/tidyactuarial/reference/premium_x.md)
   : Net premium for single-life insurance by the equivalence principle
 - [`premium_gross()`](https://julianfajardo1908.github.io/tidyactuarial/reference/premium_gross.md)
@@ -561,6 +578,62 @@ reserves, multi-life simulation, and simulation summaries.
   : Compute multiple-life simulated status variables
 - [`summary_mc()`](https://julianfajardo1908.github.io/tidyactuarial/reference/summary_mc.md)
   : Summarise Monte Carlo simulation output
+
+## Collective Risk, Coverage, and Tail Measures
+
+Frequency and severity models, insurance payments, aggregate losses,
+simulation, and risk measures.
+
+- [`frequency_spec()`](https://julianfajardo1908.github.io/tidyactuarial/reference/frequency_spec.md)
+  : Specify a claim frequency distribution
+- [`severity_spec()`](https://julianfajardo1908.github.io/tidyactuarial/reference/severity_spec.md)
+  : Specify an individual claim severity distribution
+- [`empirical_frequency()`](https://julianfajardo1908.github.io/tidyactuarial/reference/empirical_frequency.md)
+  : Specify an empirical claim frequency distribution
+- [`empirical_severity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/empirical_severity.md)
+  : Specify an empirical claim severity distribution
+- [`distribution_moments()`](https://julianfajardo1908.github.io/tidyactuarial/reference/distribution_moments.md)
+  : Calculate moments of a frequency or severity distribution
+- [`collective_risk_spec()`](https://julianfajardo1908.github.io/tidyactuarial/reference/collective_risk_spec.md)
+  : Specify a collective risk model
+- [`coverage_spec()`](https://julianfajardo1908.github.io/tidyactuarial/reference/coverage_spec.md)
+  : Specify an insurance coverage contract
+- [`apply_coverage()`](https://julianfajardo1908.github.io/tidyactuarial/reference/apply_coverage.md)
+  : Apply an insurance contract to a loss severity specification
+- [`to_payment_basis()`](https://julianfajardo1908.github.io/tidyactuarial/reference/to_payment_basis.md)
+  : Specify a change from per-loss to per-payment basis
+- [`discretize_severity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discretize_severity.md)
+  : Discretize a continuous claim severity distribution
+- [`distribution_convolution()`](https://julianfajardo1908.github.io/tidyactuarial/reference/distribution_convolution.md)
+  : Specify a convolution of probability distributions
+- [`aggregate_moments()`](https://julianfajardo1908.github.io/tidyactuarial/reference/aggregate_moments.md)
+  : Calculate moments of a collective aggregate loss
+- [`aggregate_distribution()`](https://julianfajardo1908.github.io/tidyactuarial/reference/aggregate_distribution.md)
+  : Compute the aggregate loss distribution
+- [`simulate_frequency()`](https://julianfajardo1908.github.io/tidyactuarial/reference/simulate_frequency.md)
+  : Simulate claim counts from a frequency model
+- [`simulate_severity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/simulate_severity.md)
+  : Simulate individual claim severities
+- [`simulate_aggregate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/simulate_aggregate.md)
+  : Simulate a collective risk model
+- [`value_at_risk()`](https://julianfajardo1908.github.io/tidyactuarial/reference/value_at_risk.md)
+  : Value at Risk for actuarial losses
+- [`tail_value_at_risk()`](https://julianfajardo1908.github.io/tidyactuarial/reference/tail_value_at_risk.md)
+  : Tail Value at Risk (Expected Shortfall)
+- [`stop_loss_premium()`](https://julianfajardo1908.github.io/tidyactuarial/reference/stop_loss_premium.md)
+  : Net stop-loss premium
+- [`print(`*`<tidyact_aggregate_distribution>`*`)`](https://julianfajardo1908.github.io/tidyactuarial/reference/print.tidyact_aggregate_distribution.md)
+  : Print an aggregate loss distribution
+- [`print(`*`<tidyact_collective_risk_spec>`*`)`](https://julianfajardo1908.github.io/tidyactuarial/reference/print.tidyact_collective_risk_spec.md)
+  : Print a collective risk model specification
+- [`print(`*`<tidyact_convolution_spec>`*`)`](https://julianfajardo1908.github.io/tidyactuarial/reference/print.tidyact_convolution_spec.md)
+  : Print a convolution specification
+- [`print(`*`<tidyact_frequency_spec>`*`)`](https://julianfajardo1908.github.io/tidyactuarial/reference/print.tidyact_frequency_spec.md)
+  : Print a frequency distribution specification
+- [`print(`*`<tidyact_payment_spec>`*`)`](https://julianfajardo1908.github.io/tidyactuarial/reference/print.tidyact_payment_spec.md)
+  : Print a payment severity specification
+- [`print(`*`<tidyact_severity_spec>`*`)`](https://julianfajardo1908.github.io/tidyactuarial/reference/print.tidyact_severity_spec.md)
+  : Print a severity distribution specification
 
 ## Datasets
 

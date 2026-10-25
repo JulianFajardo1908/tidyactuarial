@@ -1,8 +1,8 @@
 # Benefit reserves for two-life insurance
 
 Computes prospective or recursive terminal reserves for joint-life and
-last-survivor insurance. For k-thly premiums, `P` is the annualized
-premium and each installment equals `P / k`.
+last-survivor insurance. For k-thly premiums, \`P\` is the annualized
+premium and each installment equals \`P / k\`.
 
 ## Usage
 
@@ -40,9 +40,8 @@ reserve_xy(
 
 - lt:
 
-  One life table, `list(lt_x, lt_y)`, or a two-life
-  [`life_contract()`](https://julianfajardo1908.github.io/tidyactuarial/reference/life_contract.md)
-  object.
+  One life table, \`list(lt_x, lt_y)\`, or a two-life
+  \[life_contract()\] object.
 
 - x, y:
 
@@ -62,11 +61,12 @@ reserve_xy(
 
 - type:
 
-  One of `"whole"`, `"term"`, `"endowment"`, or `"pure_endowment"`.
+  One of \`"whole"\`, \`"term"\`, \`"endowment"\`, or
+  \`"pure_endowment"\`.
 
 - status:
 
-  `"joint"` or `"last"`.
+  \`"joint"\` or \`"last"\`.
 
 - n:
 
@@ -82,14 +82,12 @@ reserve_xy(
 
 - P:
 
-  Optional annualized premium. If `NULL`,
-  [`premium_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/premium_xy.md)
-  is used.
+  Optional annualized premium. If \`NULL\`, \[premium_xy()\] is used.
 
 - n_prem:
 
-  Premium-paying term. Fractional values require `n_prem * k` to be an
-  integer.
+  Premium-paying term. Fractional values require \`n_prem \* k\` to be
+  an integer.
 
 - k:
 
@@ -97,11 +95,11 @@ reserve_xy(
 
 - timing:
 
-  `"due"` or `"immediate"`.
+  \`"due"\` or \`"immediate"\`.
 
 - premium_start:
 
-  `"issue"` or `"deferred"`.
+  \`"issue"\` or \`"deferred"\`.
 
 - frac:
 
@@ -109,7 +107,7 @@ reserve_xy(
 
 - woolhouse:
 
-  `"none"`, `"first"`, or `"second"`.
+  \`"none"\`, \`"first"\`, or \`"second"\`.
 
 - t:
 
@@ -117,13 +115,13 @@ reserve_xy(
 
 - method:
 
-  `"prospective"` or `"recursive"`. Recursion currently requires
-  `h = 0`, `k = 1`, due premiums, and premiums starting at issue.
+  \`"prospective"\` or \`"recursive"\`. Recursion currently requires \`h
+  = 0\`, \`k = 1\`, due premiums, and premiums starting at issue.
 
 - output:
 
-  `"summary"`, `"value"`, or `"audit"`. `"table"` is a compatibility
-  alias for `"summary"`.
+  \`"summary"\`, \`"value"\`, or \`"audit"\`. \`"table"\` is a
+  compatibility alias for \`"summary"\`.
 
 - tidy:
 
@@ -150,20 +148,30 @@ A compact tibble, a named numeric vector, or a long audit tibble.
 The prospective reserve is \$\${}\_tV =
 \operatorname{APV}\_t(\text{future benefits}) -
 P^{(k)}\operatorname{APV}\_t(\text{future premium annuity}).\$\$ Because
-[`annuity_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/annuity_xy.md)
-assigns amount `1 / k` to each payment, `P` is annualized and the actual
-installment is `P / k`.
+\[annuity_xy()\] assigns amount \`1 / k\` to each payment, \`P\` is
+annualized and the actual installment is \`P / k\`.
 
 Reserves are measured immediately before a premium payable at duration
-`t`. Pure endowments are valued as endowment APV minus term-insurance
-APV.
+\`t\`. With immediate premiums this includes the installment scheduled
+exactly at \`t\`, including a last installment at maturity. Future
+installments use the selected annuity method; the current installment is
+an exact \`P / k\`. Pure endowments use direct discounted survival to
+maturity, avoiding a subtraction of nearly equal insurance values. Both
+lives are assumed alive at the valuation duration, under independent
+mortality. In particular, \`status = "last"\` selects the insured event;
+it does not condition on an unspecified surviving life. Last-survivor
+recursion tracks the both-alive and each single-survivor state
+separately. Both recursive statuses use backward conditional transition
+identities, direct annual \`lx\` decrements and the original log
+interest basis. This avoids forward cancellation and loss from an
+effective-rate conversion. Unreachable transitions contribute exactly
+zero. The recursion's existing timing and deferment restrictions are
+retained. Conditional states whose reserves themselves overflow double
+precision are not generally recoverable.
 
 ## See also
 
-[`premium_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/premium_xy.md),
-[`annuity_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/annuity_xy.md),
-[`insurance_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/insurance_xy.md),
-[`reserve_x()`](https://julianfajardo1908.github.io/tidyactuarial/reference/reserve_x.md)
+\[premium_xy()\], \[annuity_xy()\], \[insurance_xy()\], \[reserve_x()\]
 
 Other life-contingencies:
 [`add_insurance()`](https://julianfajardo1908.github.io/tidyactuarial/reference/add_insurance.md),

@@ -181,7 +181,7 @@ level_schedule |>
 #> # A tibble: 5 × 6
 #>   period ob_start interest payment principal ob_end
 #>    <int>    <dbl>    <dbl>   <dbl>     <dbl>  <dbl>
-#> 1      1   50000     500.    1112.      612. 49388.
+#> 1      1   50000     500     1112.      612. 49388.
 #> 2      2   49388.    494.    1112.      618. 48769.
 #> 3     12   42919.    429.    1112.      683. 42235.
 #> 4     24   34256.    343.    1112.      770. 33486.
@@ -333,7 +333,7 @@ The recurrence remains
 What changes is the rule used to define i_t, R_t, and E_t.
 
 [`amort_schedule_general()`](https://julianfajardo1908.github.io/tidyactuarial/reference/amort_schedule_general.md)
-represents this broader problem directly. In `tidyactuarial 0.1.6`, the
+represents this broader problem directly. In `tidyactuarial`, the
 interest-rate input may be a scalar or a vector with one rate
 specification per period, while `payment` may be calculated
 automatically, supplied as a scalar or vector, or defined as a function
@@ -395,7 +395,7 @@ variable_rate_schedule |>
 #> # A tibble: 6 × 6
 #>   period ob_start interest payment principal  ob_end
 #>    <int>    <dbl>    <dbl>   <dbl>     <dbl>   <dbl>
-#> 1      1  120000     4800.  24086.    19286. 100714.
+#> 1      1  120000     4800   24086.    19286. 100714.
 #> 2      2  100714.    5036.  24086.    19051.  81663.
 #> 3      3   81663.    4900.  24086.    19187.  62476.
 #> 4      4   62476.    4373.  24086.    19713.  42763.
@@ -479,7 +479,7 @@ constant_principal_schedule |>
 #> # A tibble: 5 × 6
 #>   period ob_start interest payment principal ob_end
 #>    <int>    <dbl>    <dbl>   <dbl>     <dbl>  <dbl>
-#> 1      1   50000    500.     1333.      833. 49167.
+#> 1      1   50000    500      1333.      833. 49167.
 #> 2      2   49167.   492.     1325       833. 48333.
 #> 3     12   40833.   408.     1242.      833. 40000 
 #> 4     24   30833.   308.     1142.      833. 30000 

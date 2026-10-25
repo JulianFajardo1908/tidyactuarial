@@ -19,7 +19,7 @@ a time-varying force of interest delta(t).
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -146,22 +146,29 @@ $$A(s,t) = \frac{a(t)}{a(s)}$$
 for an accumulation function, and
 $$A(s,t) = \exp\left(\int_s^t \delta(u)\,du\right)$$
 for a time-varying force of interest.</p>
+
 <p>Exactly one of <code>i</code>, <code>a</code>, or <code>delta</code> must be supplied.</p>
 <p>Numeric arguments must have length 1 or a common length. Scalars are
 recycled over the remaining scenarios, making the function suitable for
 use inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code> pipelines.</p>
 <p>Times must satisfy \(0 \le s \le t\). Missing times propagate as missing
-accumulation factors.</p>
+accumulation factors.
+Conventional inputs are valued using their original log accumulation rate.
+In tidy output, the annual equivalent may round to -1 or overflow to Inf
+even when the requested interval factor is positive and finite.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="standardize_interest.html">standardize_interest</a></code>,
-<code><a href="present_value.html">present_value</a></code>, <code><a href="future_value.html">future_value</a></code></p>
+  <code><a href="present_value.html">present_value</a></code>, <code><a href="future_value.html">future_value</a></code></p>
 <p>Other interest:
+<code><a href="bootstrap_spot_curve.html">bootstrap_spot_curve()</a></code>,
 <code><a href="discount_factor.html">discount_factor()</a></code>,
 <code><a href="discount_factor_spot.html">discount_factor_spot()</a></code>,
+<code><a href="forward_curve.html">forward_curve()</a></code>,
 <code><a href="forward_rate.html">forward_rate()</a></code>,
 <code><a href="interest_equivalents.html">interest_equivalents()</a></code>,
+<code><a href="par_rate.html">par_rate()</a></code>,
 <code><a href="standardize_interest.html">standardize_interest()</a></code>,
 <code><a href="yield_curve.html">yield_curve()</a></code></p>
 <p>Other time-value:
@@ -181,6 +188,15 @@ accumulation factors.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Constant annual effective interest</span></span></span>
 <span class="r-in"><span><span class="fu">accumulation_factor</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span>, i <span class="op">=</span> <span class="fl">0.07</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.402552</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The same financial law in three representations</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  rate <span class="op">=</span> <span class="fu">accumulation_factor</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span>, i <span class="op">=</span> <span class="fl">0.03</span>, i_type <span class="op">=</span> <span class="st">"force"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  accumulation <span class="op">=</span> <span class="fu">accumulation_factor</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span>, a <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">0.03</span> <span class="op">*</span> <span class="va">t</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  varying_force <span class="op">=</span> <span class="fu">accumulation_factor</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span>, delta <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.03</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          rate  accumulation varying_force </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      1.161834      1.161834      1.161834 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># One rate recycled over several times</span></span></span>
 <span class="r-in"><span><span class="fu">accumulation_factor</span><span class="op">(</span></span></span>

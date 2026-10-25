@@ -28,11 +28,11 @@ Internal helper: validate numeric scalar
 
 - min:
 
-  Minimum allowed value. Default is `-Inf`.
+  Minimum allowed value. Default is \`-Inf\`.
 
 - max:
 
-  Maximum allowed value. Default is `Inf`.
+  Maximum allowed value. Default is \`Inf\`.
 
 - strict_min:
 
@@ -44,8 +44,8 @@ Internal helper: validate numeric scalar
 
 - allow_null:
 
-  Logical. Should `NULL` be allowed?
+  Logical. Should \`NULL\` be allowed?
 
 ## Value
 
-Invisibly returns `TRUE` if validation is successful.
+Invisibly returns \`TRUE\` if validation is successful.

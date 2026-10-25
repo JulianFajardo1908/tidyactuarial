@@ -19,7 +19,8 @@ annuity_multi(
   cohort = c("first", "last"),
   alpha = NULL,
   timing = c("immediate", "due"),
-  woolhouse = c("none", "first", "second")
+  woolhouse = c("none", "first", "second"),
+  frac = c("UDD", "CF", "CML", "Balducci")
 )
 ```
 
@@ -93,6 +94,11 @@ annuity_multi(
 
   `"none"`, `"first"`, or `"second"`.
 
+- frac:
+
+  Fractional-age assumption for exact payments: `"UDD"` (default),
+  `"CF"`, `"CML"` (alias of CF), or `"Balducci"`.
+
 ## Value
 
 A single numeric value representing the APV.
@@ -103,7 +109,7 @@ This implementation supports up to three lives, which covers the most
 common practical multi-life arrangements.
 
 Supports status-based annuities (joint-life / last-survivor) and a
-joint-and-survivor style annuity (`"reversionary"`) that pays 1 while
+joint-and-survivor style annuity (\`"reversionary"\`) that pays 1 while
 all lives are alive and then pays a fraction \\\alpha\\ while at least
 one life remains alive.
 
@@ -124,6 +130,29 @@ probability for the status is calculated as:
 For `annuity = "reversionary"`, the APV is a weighted combination of the
 two statuses: \$\$APV = APV(\text{joint-life}) + \alpha
 \[APV(\text{last-survivor}) - APV(\text{joint-life})\].\$\$
+
+All values are measured at issue, conditional on the stated lives being
+alive at issue. Ages identify lives within one policy, not policy
+scenarios. A k-thly payment is \\1/k\\ of an annual unit: exact
+valuation sums \\F(h+j/k)/k\\, with \\F(t)=e^{-\delta t}w(t)\\ and the
+expected payment weight \\w(t)\\ defined above. Due uses
+\\j=0,\ldots,nk-1\\; immediate uses \\j=1,\ldots,nk\\. The historical
+name `"reversionary"` means joint-and-survivor payments; it does not
+mean payments only after a death.
+
+For `k > 1`, `woolhouse = "none"` uses the actual fractional payment
+grid. First-order Woolhouse subtracts \\(1-1/k)\[F(h)-F(h+n)\]/2\\ from
+the annual due value. Second-order also subtracts
+\\(1-1/k^2)\[(\delta+\eta_h)F(h)- (\delta+\eta\_{h+n})F(h+n)\]/12\\.
+Here \\\eta_t=-\log(w(t+1)/w(t))\\ is an annual forward estimate of the
+logarithmic decay of the payment weight, not an exact instantaneous
+force. Positive supported weights at both borders and the following year
+are required for second-order approximation. This is a smoothness
+approximation, not exact fractional valuation under `frac`; negative
+approximations produce a warning. Immediate subtracts
+\\\[F(h)-F(h+n)\]/k\\ from due. Exact valuation requires consecutive
+annual ages and retains the documented conservative common-age horizon;
+it does not extrapolate unobserved lives.
 
 ## See also
 
@@ -166,6 +195,11 @@ annuity_multi(
   timing = "due"
 )
 #> [1] 3.979153
+
+# Half-yearly payments, each equal to half an annual unit, under UDD
+annuity_multi(lt, ages = c(60, 62), i = 0.05, n = 5, k = 2,
+              timing = "due", frac = "UDD")
+#> [1] 3.860308
 
 annuity_multi(
   lt = lt,

@@ -2,7 +2,7 @@
 
 The function builds annual commutation columns from `x`, `lx`, and an
 interest-rate specification. The interest rate is converted internally
-to an annual effective rate before constructing the discount factor.
+to an original log accumulation rate before forming discounted products.
 
 ## Usage
 
@@ -55,16 +55,20 @@ This function follows the compact actuarial notation used throughout
 `i_type` is the interest-rate type, and `m` is the conversion frequency
 for nominal rates.
 
-The annual effective rate is obtained through
+The rate specification is validated through
 [`standardize_interest`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md).
 If \\i_e\\ denotes the annual effective rate, then \$\$v =
 \frac{1}{1+i_e}.\$\$
 
 The annual deaths are computed as \$\$d_x = l_x - l\_{x+1},\$\$ closing
 the table with \\l\_{\omega+1}=0\\. The main commutation functions are
-then computed as \$\$D_x = v^x l_x, \qquad C_x = v^{x+1} d_x,\$\$ with
-reverse cumulative sums used to obtain \\N_x\\, \\S_x\\, \\M_x\\, and
-\\R_x\\.
+then computed as \$\$D_x = v^x l_x, \qquad C_x = v^{x+1} d_x,\$\$
+Discounted products retain the original log accumulation rate to avoid
+intermediate factor overflow or underflow. This constructor always
+closes the terminal count, including when the input carries open-table
+metadata. The horizon is therefore different from the truncated integral
+in `e_x`. Reverse cumulative sums are used to obtain \\N_x\\, \\S_x\\,
+\\M_x\\, and \\R_x\\.
 
 ## Examples
 

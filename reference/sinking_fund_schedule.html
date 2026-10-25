@@ -9,7 +9,7 @@ accumulation rate for the sinking fund, using compact actuarial notation."></hea
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -102,23 +102,25 @@ type. Allowed values are <code>"effective"</code>, <code>"nominal_interest"</cod
 
 <dt id="arg-m">m<a class="anchor" aria-label="anchor" href="#arg-m"></a></dt>
 <dd><p>Positive integer. Conversion frequency for nominal loan rates.
-Ignored for <code>i_type = "effective"</code> and <code>i_type = "force"</code>.</p></dd>
+Validated for every rate family, although it affects conversion only for
+nominal rates.</p></dd>
 
 
 <dt id="arg-j-m">j_m<a class="anchor" aria-label="anchor" href="#arg-j-m"></a></dt>
 <dd><p>Positive integer. Conversion frequency for nominal sinking-fund
-rates. Ignored for <code>j_type = "effective"</code> and
-<code>j_type = "force"</code>.</p></dd>
+rates. Validated for every rate family, although it affects conversion
+only for nominal rates.</p></dd>
 
 
 <dt id="arg-deposit">deposit<a class="anchor" aria-label="anchor" href="#arg-deposit"></a></dt>
 <dd><p>Optional numeric scalar. Level sinking-fund deposit per
 period. If <code>NULL</code>, it is computed so that the fund accumulates to
-<code>principal</code> at time <code>n</code>.</p></dd>
+<code>principal</code> at the end of period <code>n</code> (<code>n / k</code> years).</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Numeric tolerance used for zero checks and final-balance checks.</p></dd>
+<dd><p>Finite positive numeric tolerance in monetary units used for
+final-balance checks.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -126,49 +128,49 @@ period. If <code>NULL</code>, it is computed so that the fund accumulates to
     <p>A tibble with one row per period and columns:</p><dl><dt>period</dt>
 <dd><p>Period index.</p></dd>
 
-<dt>loan_balance_start</dt>
+  <dt>loan_balance_start</dt>
 <dd><p>Outstanding loan balance at the start of the period.</p></dd>
 
-<dt>interest_loan</dt>
+  <dt>interest_loan</dt>
 <dd><p>Interest paid on the loan during the period.</p></dd>
 
-<dt>sinking_deposit</dt>
+  <dt>sinking_deposit</dt>
 <dd><p>Deposit made into the sinking fund.</p></dd>
 
-<dt>fund_balance_start</dt>
+  <dt>fund_balance_start</dt>
 <dd><p>Fund balance at the start of the period.</p></dd>
 
-<dt>interest_fund</dt>
+  <dt>interest_fund</dt>
 <dd><p>Interest earned by the fund during the period.</p></dd>
 
-<dt>fund_balance_end_before_redemption</dt>
+  <dt>fund_balance_end_before_redemption</dt>
 <dd><p>Fund balance before final redemption.</p></dd>
 
-<dt>redemption_from_fund</dt>
+  <dt>redemption_from_fund</dt>
 <dd><p>Amount withdrawn from the fund to redeem the loan at maturity.</p></dd>
 
-<dt>fund_balance_end</dt>
+  <dt>fund_balance_end</dt>
 <dd><p>Fund balance after redemption.</p></dd>
 
-<dt>loan_balance_end</dt>
+  <dt>loan_balance_end</dt>
 <dd><p>Outstanding loan balance after redemption.</p></dd>
 
-<dt>total_cashflow_borrower</dt>
+  <dt>total_cashflow_borrower</dt>
 <dd><p>Borrower's external cash outflow during the period.</p></dd>
 
-<dt>i_effective_loan_annual</dt>
+  <dt>i_effective_loan_annual</dt>
 <dd><p>Equivalent annual effective loan rate.</p></dd>
 
-<dt>i_effective_fund_annual</dt>
+  <dt>i_effective_fund_annual</dt>
 <dd><p>Equivalent annual effective fund rate.</p></dd>
 
-<dt>i_loan_period</dt>
+  <dt>i_loan_period</dt>
 <dd><p>Effective loan rate per schedule period.</p></dd>
 
-<dt>i_fund_period</dt>
+  <dt>i_fund_period</dt>
 <dd><p>Effective fund rate per schedule period.</p></dd>
 
-<dt>k</dt>
+  <dt>k</dt>
 <dd><p>Schedule frequency.</p></dd>
 
 
@@ -178,6 +180,7 @@ period. If <code>NULL</code>, it is computed so that the fund accumulates to
     <p>The borrower pays:</p><ul><li><p>interest on the loan each period, and</p></li>
 <li><p>a level deposit into the sinking fund.</p></li>
 </ul><p>At maturity, the sinking fund is used to redeem the principal.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>i</code> is the loan interest rate, <code>j</code> is the
 sinking-fund accumulation rate, <code>k</code> is the number of schedule periods
@@ -187,9 +190,19 @@ per year, <code>m</code> is the conversion frequency for the loan rate, and
 rates and then to effective rates per schedule period:
 $$i_p = (1+i_e)^{1/k} - 1,\qquad
       j_p = (1+j_e)^{1/k} - 1.$$</p>
-<p>If <code>deposit</code> is <code>NULL</code> and the sinking-fund periodic rate
-<code>j_p</code> is approximately zero, the deposit is computed as
-<code>principal / n</code>.</p>
+<p>If <code>deposit</code> is <code>NULL</code>, the unit-payment accumulation sum is
+evaluated stably from the original log fund rate. Only an exactly zero
+rate uses the zero-rate limit <code>principal / n</code>. The monetary balance
+tolerance does not determine whether a rate is zero. The existing
+requirement of finite annual and period equivalents is retained.
+Non-finite monetary ledger entries cause an explicit error.
+A user-supplied deposit is not adjusted to force exact redemption: any
+uncovered loan balance or fund surplus remains in the corresponding final
+column and triggers the existing mismatch warning when it exceeds
+<code>tol</code>. Redemption from the fund is an internal transfer and is not
+counted again in the borrower's external cash flow.
+Storage grows with <code>n</code>; feasible terms are limited by integer indexing
+and available memory.</p>
 <p>Otherwise, the standard sinking-fund formula is used:
 $$deposit = \frac{principal}{s_{\overline{n}|j_p}}$$
 where
@@ -220,18 +233,18 @@ $$s_{\overline{n}|j_p} =
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 12 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    period loan_balance_start interest_loan sinking_deposit fund_balance_start</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.                 0 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.              <span style="text-decoration: underline;">7</span>973.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">16</span>010.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">24</span>111.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      5             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">32</span>277.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      6             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">40</span>508.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      7             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">48</span>805.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">57</span>168.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">65</span>599.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">74</span>097.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span>     11             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">82</span>662.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>     12             <span style="text-decoration: underline;">100</span>000         <span style="text-decoration: underline;">1</span>000.           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">91</span>297.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.                 0 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.              <span style="text-decoration: underline;">7</span>973.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">16</span>010.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">24</span>111.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      5             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">32</span>277.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      6             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">40</span>508.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      7             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">48</span>805.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">57</span>168.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">65</span>599.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">74</span>097.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span>     11             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">82</span>662.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>     12             <span style="text-decoration: underline;">100</span>000          <span style="text-decoration: underline;">1</span>000           <span style="text-decoration: underline;">7</span>973.             <span style="text-decoration: underline;">91</span>297.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: interest_fund &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   fund_balance_end_before_redemption &lt;dbl&gt;, redemption_from_fund &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   fund_balance_end &lt;dbl&gt;, loan_balance_end &lt;dbl&gt;,</span></span>
@@ -249,16 +262,16 @@ $$s_{\overline{n}|j_p} =
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    period loan_balance_start interest_loan sinking_deposit fund_balance_start</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000                  0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000               <span style="text-decoration: underline;">5</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">10</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">15</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      5              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">20</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      6              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">25</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      7              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">30</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">35</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">40</span>000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10              <span style="text-decoration: underline;">50</span>000         <span style="text-decoration: underline;">1</span>000.            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">45</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000               <span style="text-decoration: underline;">5</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">10</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">15</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      5              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">20</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      6              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">25</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      7              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">30</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">35</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">40</span>000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10              <span style="text-decoration: underline;">50</span>000          <span style="text-decoration: underline;">1</span>000            <span style="text-decoration: underline;">5</span>000              <span style="text-decoration: underline;">45</span>000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: interest_fund &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   fund_balance_end_before_redemption &lt;dbl&gt;, redemption_from_fund &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   fund_balance_end &lt;dbl&gt;, loan_balance_end &lt;dbl&gt;,</span></span>

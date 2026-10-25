@@ -34,13 +34,13 @@ annuity_x(
 
 - x:
 
-  Integer actuarial age. Optional when `lt` is a single-life
-  `tidyact_life_contract`.
+  Integer actuarial age, or a vector of scenario ages. Optional when
+  `lt` is a single-life `tidyact_life_contract`.
 
 - i:
 
-  Numeric scalar. Annual interest-rate input. Optional when `lt` is a
-  single-life `tidyact_life_contract`.
+  Numeric annual interest-rate input, scalar or by scenario. Optional
+  when `lt` is a single-life `tidyact_life_contract`.
 
 - i_type:
 
@@ -94,17 +94,17 @@ annuity_x(
 
 - tidy:
 
-  Logical. If `FALSE`, returns a numeric APV. If `TRUE`, returns a
-  one-row tibble with intermediate quantities.
+  Logical. If `FALSE`, returns a numeric APV. If `TRUE`, returns one
+  tibble row per scenario with intermediate quantities.
 
 ## Value
 
-If `tidy = FALSE`, a numeric scalar containing the actuarial present
-value.
+If `tidy = FALSE`, a numeric vector of actuarial present values, of
+length one for a single scenario.
 
-If `tidy = TRUE`, a one-row tibble with the main input values,
-equivalent interest rate, deferment factor, pure endowment factor, and
-APV.
+If `tidy = TRUE`, a tibble with one row per scenario, the main input
+values, equivalent interest rate, deferment factor, pure endowment
+factor, and APV.
 
 ## Details
 
@@ -159,6 +159,34 @@ amount \\1/k\\. This normalization is essential when the function is
 used as the premium annuity in the equivalence principle: the resulting
 premium is annualized, and the amount paid at each installment is the
 annualized premium divided by \\k\\.
+
+**Scenarios and tidy workflows.** All arguments except `lt` and `tidy`
+may have a common positive length; only length-one arguments recycle.
+`n = NULL` and `frac = NULL` keep their scalar default meanings.
+Scenarios are paired by position, not expanded to a Cartesian product,
+and each describes one life under the shared table. Invalid or missing
+inputs are rejected with the scenario number; no partial result is
+returned. Use
+[`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
+with `tidy = FALSE` for portfolios, or `tidy = TRUE` for an auditable
+scenario table. Different mortality tables require separate calls, for
+example in a list-column workflow.
+
+**Model and numerical limits.** Discounting retains the original log
+accumulation rate; exact payments are valued from the issue age,
+avoiding products of separately rounded deferment and conditional
+values. Intermediate diagnostic values can be zero or infinite while the
+APV remains finite. Tables must have an annual age grid and
+nonincreasing finite `lx`, with a positive count at issue. For
+compatibility, a count of zero is assumed at one year beyond the last
+recorded age, even for an open input table. Known extinct tails
+contribute zero. Woolhouse is an approximation using annual survival
+estimates of boundary forces, not an exact integral; its second order
+requires positive survival where a boundary force is needed. Negative
+approximations generate a warning and are not clamped. Prefer
+`woolhouse = "none"` for exact payments under the chosen fractional
+assumption. At `n = 0`, APV and the annuity value at start are zero,
+while the zero-term pure endowment factor is one.
 
 ## See also
 
@@ -251,4 +279,23 @@ annuity_x(
 life_contract(lt = lt, lives = "single", x = 60, i = 0.06) |>
   annuity_x(n = 3, timing = "due")
 #> [1] 2.801709
+
+# Parallel single-life scenarios, suitable for mutate()
+policies <- tibble::tibble(age = c(60, 61, 62), rate = c(0.03, 0.04, 0.05))
+dplyr::mutate(policies,
+  apv = annuity_x(lt, x = age, i = rate, n = 2, k = 12, timing = "due"))
+#> # A tibble: 3 × 3
+#>     age  rate   apv
+#>   <dbl> <dbl> <dbl>
+#> 1    60  0.03  1.92
+#> 2    61  0.04  1.90
+#> 3    62  0.05  1.87
+annuity_x(lt, x = c(60, 61), i = 0.04, n = c(2, 3), tidy = TRUE)
+#> # A tibble: 2 × 17
+#>       x     i i_type        m i_effective     n n_used     h   x_h     k timing 
+#>   <int> <dbl> <chr>     <int>       <dbl> <dbl>  <dbl> <int> <int> <int> <chr>  
+#> 1    60  0.04 effective     1        0.04     2      2     0    60     1 immedi…
+#> 2    61  0.04 effective     1        0.04     3      3     0    61     1 immedi…
+#> # ℹ 6 more variables: woolhouse <chr>, frac <chr>, deferment_factor <dbl>,
+#> #   pure_endowment_factor <dbl>, annuity_value_at_start <dbl>, apv <dbl>
 ```

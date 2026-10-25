@@ -11,7 +11,7 @@ at each premium date."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,30 +129,31 @@ inferred from <code>payment_per_payment</code>, <code>payment</code>, or
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble containing the original simulations and standardized
+    <p>A data frame or tibble containing the original simulations and standardized
 premium columns:</p><dl><dt>premium_annualized</dt>
 <dd><p>Estimated annualized premium
-\(\widehat P^{(k)}\).</p></dd>
+  \(\widehat P^{(k)}\).</p></dd>
 
-<dt>premium_per_payment</dt>
+  <dt>premium_per_payment</dt>
 <dd><p>Amount collected at each premium date.</p></dd>
 
-<dt>payments_per_year</dt>
+  <dt>payments_per_year</dt>
 <dd><p>Premium payment frequency <code>k</code>.</p></dd>
 
-<dt>premium_annuity_scale</dt>
+  <dt>premium_annuity_scale</dt>
 <dd><p>Coefficient \(\widehat q\) multiplying
-<code>col_Y</code>.</p></dd>
+  <code>col_Y</code>.</p></dd>
 
-<dt>mc_equivalence_residual</dt>
+  <dt>mc_equivalence_residual</dt>
 <dd><p>Difference
-\(\overline Z-\widehat q\overline{Y_c}\) within the estimation group.</p></dd>
+  \(\overline Z-\widehat q\overline{Y_c}\) within the estimation group.</p></dd>
 
 
 </dl><p>The column selected by <code>col_P</code> stores
 <code>premium_annuity_scale</code> for backward compatibility. Unless
 <code>col_P = "premium"</code>, a compatibility column <code>premium</code> is also
-created with the same scale coefficient.</p>
+created with the same scale coefficient.
+Existing grouping is used for estimation and removed from the result.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -187,7 +188,18 @@ each premium date, while the annualized premium is \(k\widehat q\).</p>
 <p>When <code>na_rm = TRUE</code>, missing values are removed jointly: a simulation
 contributes only if both <code>col_Z</code> and <code>col_Y</code> are observed. This
 prevents the numerator and denominator from being estimated from different
-simulated samples.</p>
+simulated samples.
+Monetary premium amounts retain the ratio before intermediate overflow or
+underflow. A displayed annuity-scale coefficient may still be zero or
+infinite when the coefficient itself is outside double precision, while
+the per-payment and annualized amounts remain representable. The
+equivalence residual uses the ratio before that loss of range.
+Positive subnormal observations are retained using scaled means when an
+ordinary mean rounds to zero. A genuinely zero annuity exposure is rejected.
+A positive infinite <code>payment_annualized</code> metadata value is accepted
+only when it agrees with the product of a finite payment basis and finite
+frequency. The payment basis cannot be inferred from that infinite value
+alone; retain <code>payment_per_payment</code> or supply <code>annuity_payment</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

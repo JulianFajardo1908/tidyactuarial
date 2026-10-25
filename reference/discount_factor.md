@@ -95,7 +95,12 @@ effective rate, \$\$v(s,t) = \frac{a(s)}{a(t)}\$\$ for an accumulation
 function, and \$\$v(s,t) = \exp\left(-\int_s^t \delta(u)\\du\right)\$\$
 for a time-varying force of interest.
 
-Exactly one of `i`, `a`, or `delta` must be supplied.
+Exactly one of `i`, `a`, or `delta` must be supplied. The requested
+discount factor is evaluated from the log accumulation, without
+requiring its reciprocal to be representable. It must be positive and
+finite. In tidy output, an unrepresentable intermediate accumulation
+factor may be Inf or zero; the discount factor is computed
+independently.
 
 Numeric arguments may have length 1 or a common length. Scalars are
 recycled over the remaining scenarios, making the function suitable for
@@ -116,9 +121,12 @@ For discount factors obtained specifically from a spot-rate curve, see
 
 Other interest:
 [`accumulation_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accumulation_factor.md),
+[`bootstrap_spot_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bootstrap_spot_curve.md),
 [`discount_factor_spot()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor_spot.md),
+[`forward_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_curve.md),
 [`forward_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_rate.md),
 [`interest_equivalents()`](https://julianfajardo1908.github.io/tidyactuarial/reference/interest_equivalents.md),
+[`par_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/par_rate.md),
 [`standardize_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md),
 [`yield_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/yield_curve.md)
 

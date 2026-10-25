@@ -9,7 +9,7 @@ an equivalent annual effective interest rate."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,22 +68,22 @@ an equivalent annual effective interest rate.</p>
 
 <dt id="arg-i-type">i_type<a class="anchor" aria-label="anchor" href="#arg-i-type"></a></dt>
 <dd><p>Character string. Interest-rate convention. One of
-<code>"effective"</code>, <code>"nominal_interest"</code>, <code>"nominal_discount"</code>, or <code>"force"</code>.
-The legacy value <code>"nominal"</code> is accepted internally and treated as
-<code>"nominal_interest"</code>.</p></dd>
+`"effective"`, `"nominal_interest"`, `"nominal_discount"`, or `"force"`.
+The legacy value `"nominal"` is accepted internally and treated as
+`"nominal_interest"`.</p></dd>
 
 
 <dt id="arg-m">m<a class="anchor" aria-label="anchor" href="#arg-m"></a></dt>
 <dd><p>Numeric scalar. Number of interest conversion periods per year for
-nominal annual rates. Default is <code>1</code>.</p></dd>
+nominal annual rates. Default is `1`.</p></dd>
 
 
 <dt id="arg-rate">rate<a class="anchor" aria-label="anchor" href="#arg-rate"></a></dt>
-<dd><p>Deprecated internal alias for <code>i</code>.</p></dd>
+<dd><p>Deprecated internal alias for `i`.</p></dd>
 
 
 <dt id="arg-interest-type">interest_type<a class="anchor" aria-label="anchor" href="#arg-interest-type"></a></dt>
-<dd><p>Deprecated internal alias for <code>i_type</code>.</p></dd>
+<dd><p>Deprecated internal alias for `i_type`.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -93,12 +93,12 @@ nominal annual rates. Default is <code>1</code>.</p></dd>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This helper follows the compact actuarial notation used throughout
-<code>tidyactuarial</code>: <code>i</code> is the interest-rate input, <code>i_type</code> is the
-interest-rate type, and <code>m</code> is the conversion frequency for nominal rates.</p>
-<p>The argument <code>m</code> is used only to convert nominal annual rates into equivalent
+`tidyactuarial`: `i` is the interest-rate input, `i_type` is the
+interest-rate type, and `m` is the conversion frequency for nominal rates.</p>
+<p>The argument `m` is used only to convert nominal annual rates into equivalent
 annual effective rates. It does not represent annuity payment frequency.</p>
 <p>Transitional compatibility is intentionally retained for older internal Monte
-Carlo calls using <code>rate =</code> and <code>interest_type =</code>.</p>
+Carlo calls using `rate =` and `interest_type =`.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

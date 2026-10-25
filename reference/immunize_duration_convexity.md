@@ -38,8 +38,11 @@ immunize_duration_convexity(L, t, P, D, C, i, i_type = "effective", m = 1L)
 
 - C:
 
-  Numeric vector with the discrete convexity of each asset, expressed in
-  the same time units as `t`.
+  Numeric vector with each asset's relative second derivative
+  \\P_j''(i_e)/P_j(i_e)\\ with respect to the annual effective yield
+  \\i_e\\, using the same time units as `t`. A coupon-period convexity
+  divided by squared coupon frequency generally uses a different yield
+  variable and must be converted before use here.
 
 - i:
 
@@ -117,7 +120,37 @@ the rows of \\A\\ are \$\$(P_1,\ldots,P_r),\$\$
 
 For three assets, the system is square and solved directly. For four or
 more assets, the minimum-norm solution \$\$ w = A^T(AA^T)^{-1}b \$\$ is
-computed.
+computed. It is evaluated by singular value decomposition of the
+row-scaled constraint matrix, without forming normal equations. The norm
+is over asset units `w`, not market-value fractions; short positions are
+allowed.
+
+All asset sensitivities must use the same annual effective yield as the
+liabilities, even when `i_type` specifies a nominal rate or a force. For
+coupon frequency \\k\\, let \\j=(1+i_e)^{1/k}-1\\. If \\C_j=P''(j)/P\\
+and \\D_j^\*=-P'(j)/P\\, the required convexity is
+\$\$C\_{i_e}=C_j\[j'(i_e)\]^2-D_j^\*j''(i_e).\$\$ The outputs
+`discrete_convexity_periods` from
+[`bond_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md)
+and `modified_duration_periods_j` from
+[`bond_duration()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_duration.md)
+give \\C_j\\ and \\D_j^\*\\. Alternatively, use
+[`convexity_cash_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/convexity_cash_flow.md)
+on the asset cash flows at the annual effective yield.
+
+Matching convexity makes the surplus's second derivative zero at the
+base yield. This differs from Redington's strict positive-curvature
+condition and does not guarantee a nonnegative surplus after rate
+shifts. Liability values retain the original log accumulation rate;
+convexity is still with respect to the annual effective yield. Relative
+moments and row scaling before monetary products prevent avoidable
+overflow. Scaling uses common monetary and moment magnitudes, preserving
+the minimum norm over asset units, without rescaling asset columns
+independently. Time-zero liabilities contribute value but zero duration
+and convexity. Final values, weights and sensitivities must be finite;
+nearly cancelled liability values are rejected. Rank and cancellation
+tests remain subject to double precision; reported portfolio moments
+should be inspected for ill-conditioned systems.
 
 ## See also
 
@@ -138,15 +171,15 @@ immunize_duration_convexity(
   t = c(3, 5, 7),
   P = c(100, 150, 200),
   D = c(2, 5, 8),
-  C = c(6, 30, 72),
+  C = c(6, 30, 72) / (1.05)^2,
   i = 0.05
 )
 #> # A tibble: 3 × 8
-#>         w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets
-#>     <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>    <int>
-#> 1 -16.8   17694.  5.32  32.7 17694.  5.32  32.7        3
-#> 2 128.    17694.  5.32  32.7 17694.  5.32  32.7        3
-#> 3   0.869 17694.  5.32  32.7 17694.  5.32  32.7        3
+#>       w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets
+#>   <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>    <int>
+#> 1  16.1 17694.  5.32  32.7 17694.  5.32  32.7        3
+#> 2  84.1 17694.  5.32  32.7 17694.  5.32  32.7        3
+#> 3  17.3 17694.  5.32  32.7 17694.  5.32  32.7        3
 
 # Four-asset immunization: minimum-norm solution
 immunize_duration_convexity(
@@ -154,16 +187,16 @@ immunize_duration_convexity(
   t = c(3, 5, 7),
   P = c(100, 120, 150, 200),
   D = c(2, 4, 6, 8),
-  C = c(6, 20, 42, 72),
+  C = c(6, 20, 42, 72) / (1.05)^2,
   i = 0.05
 )
 #> # A tibble: 4 × 8
-#>        w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets
-#>    <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>    <int>
-#> 1 -19.5  17694.  5.32  32.7 17694.  5.32  32.7        4
-#> 2  66.7  17694.  5.32  32.7 17694.  5.32  32.7        4
-#> 3  90.7  17694.  5.32  32.7 17694.  5.32  32.7        4
-#> 4  -9.80 17694.  5.32  32.7 17694.  5.32  32.7        4
+#>       w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets
+#>   <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>    <int>
+#> 1  12.7 17694.  5.32  32.7 17694.  5.32  32.7        4
+#> 2  47.9 17694.  5.32  32.7 17694.  5.32  32.7        4
+#> 3  56.3 17694.  5.32  32.7 17694.  5.32  32.7        4
+#> 4  11.2 17694.  5.32  32.7 17694.  5.32  32.7        4
 
 # Nominal annual interest rate convertible monthly
 immunize_duration_convexity(
@@ -171,15 +204,15 @@ immunize_duration_convexity(
   t = c(3, 5, 7),
   P = c(100, 150, 200),
   D = c(2, 5, 8),
-  C = c(6, 30, 72),
+  C = c(6, 30, 72) / (1 + 0.06 / 12)^(2 * 12),
   i = 0.06,
   i_type = "nominal_interest",
   m = 12
 )
 #> # A tibble: 3 × 8
-#>        w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets
-#>    <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>    <int>
-#> 1 -21.5  16687.  5.29  31.7 16687.  5.29  31.7        3
-#> 2 129.   16687.  5.29  31.7 16687.  5.29  31.7        3
-#> 3  -2.74 16687.  5.29  31.7 16687.  5.29  31.7        3
+#>       w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets
+#>   <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>    <int>
+#> 1  15.9 16687.  5.29  31.7 16687.  5.29  31.7        3
+#> 2  79.4 16687.  5.29  31.7 16687.  5.29  31.7        3
+#> 3  15.9 16687.  5.29  31.7 16687.  5.29  31.7        3
 ```

@@ -11,7 +11,7 @@ supplied interest-rate specification and compact actuarial notation."></head><bo
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,8 @@ Allowed values are <code>"effective"</code>, <code>"nominal_interest"</code>,
 
 <dt id="arg-m">m<a class="anchor" aria-label="anchor" href="#arg-m"></a></dt>
 <dd><p>Positive integer vector giving the conversion frequency for nominal
-rates. Ignored for <code>"effective"</code> and <code>"force"</code>.</p></dd>
+rates. Observed values are validated as positive integers for all rate
+families; only nominal conversions use their numeric value.</p></dd>
 
 
 <dt id="arg-t">t<a class="anchor" aria-label="anchor" href="#arg-t"></a></dt>
@@ -104,6 +105,12 @@ where \(i\) is the annual effective interest rate.</p>
 <li><p>force of interest.</p></li>
 </ul><p>Internally, all rate specifications are first converted to the equivalent
 annual effective interest rate using <code><a href="standardize_interest.html">standardize_interest</a></code>.</p>
+
+<p>Valuation retains the log accumulation rate of the original specification.
+In tidy output, an extreme annual equivalent can round to -1 or overflow
+to Inf while the requested accumulation factor remains representable.
+Capital-factor products use log space when a separate factor loses range
+or precision. The product can be representable even when the factor is not.</p>
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>C</code> denotes the initial payment amount or capital,
 <code>t</code> denotes time, <code>i</code> denotes the interest-rate input,
@@ -116,7 +123,7 @@ for dated cash flows.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="standardize_interest.html">standardize_interest</a></code>, <code><a href="present_value.html">present_value</a></code>,
-<code><a href="fv_flow.html">fv_flow</a></code></p>
+  <code><a href="fv_flow.html">fv_flow</a></code></p>
 <p>Other time-value:
 <code><a href="accumulation_factor.html">accumulation_factor()</a></code>,
 <code><a href="discount_factor.html">discount_factor()</a></code>,

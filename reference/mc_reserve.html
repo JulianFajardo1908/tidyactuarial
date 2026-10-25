@@ -11,7 +11,7 @@ requested duration."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,7 +91,10 @@ requested duration.</p>
 
 <dl><dt id="arg--data">.data<a class="anchor" aria-label="anchor" href="#arg--data"></a></dt>
 <dd><p>A data frame or tibble containing simulated curtate future
-lifetimes and, when required, complete future lifetimes.</p></dd>
+lifetimes and, when required, complete future lifetimes.
+Observed curtate lifetimes must be finite nonnegative integers and
+observed complete lifetimes finite and nonnegative. Paired observations
+must satisfy \(K_x \le T_x &lt; K_x+1\); missing values remain missing.</p></dd>
 
 
 <dt id="arg-t">t<a class="anchor" aria-label="anchor" href="#arg-t"></a></dt>
@@ -225,25 +228,25 @@ formal argument because otherwise R partially matches it against
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with one row per simulation and requested duration. Important
-standardized columns include:</p><dl><dt>Z_t</dt>
+  standardized columns include:</p><dl><dt>Z_t</dt>
 <dd><p>Future benefit present value at duration <code>t</code>.</p></dd>
 
-<dt>Y_t</dt>
+  <dt>Y_t</dt>
 <dd><p>Future premium-annuity basis present value.</p></dd>
 
-<dt>future_pv_premiums</dt>
+  <dt>future_pv_premiums</dt>
 <dd><p>Actual future premium present value.</p></dd>
 
-<dt>premium_annualized</dt>
+  <dt>premium_annualized</dt>
 <dd><p>Annualized premium \(P^{(k)}\).</p></dd>
 
-<dt>premium_per_payment</dt>
+  <dt>premium_per_payment</dt>
 <dd><p>Premium paid at each date.</p></dd>
 
-<dt>premium_annuity_scale</dt>
+  <dt>premium_annuity_scale</dt>
 <dd><p>Coefficient multiplying <code>Y_t</code>.</p></dd>
 
-<dt>L_t</dt>
+  <dt>L_t</dt>
 <dd><p>Prospective loss, or the name supplied through <code>col_L</code>.</p></dd>
 
 
@@ -276,17 +279,48 @@ $$
 \widehat q=\frac{\overline Z_0}{\overline Y_{0,c}}.
 $$
 This makes the sample mean issue loss equal to zero, up to numerical error,
-when <code>reserve_timing = "before_payment"</code>.</p>
+when <code>reserve_timing = "before_payment"</code>.
+In this case <code>premium_unit</code> does not reinterpret the estimated
+coefficient: the selected unit only describes a supplied premium input.
+Missing issue annuities are excluded jointly with missing benefits.</p>
 <p>The column <code>Y_t</code> is the present value of the premium-annuity basis,
 including the amount supplied through <code>payment</code>. The column
 <code>future_pv_premiums</code> is the actual simulated present value of premium
-income, equal to <code>premium_annuity_scale * Y_t</code>.</p>
+income, equal to <code>premium_annuity_scale * Y_t</code>.
+This identity is mathematical: the actual cash flows are valued directly
+using the original log interest rate, so a rounded or overflowing displayed
+coefficient or annuity basis need not destroy representable premium income.
+A supplied annuity-scale coefficient is interpreted as received; lost
+information is not inferred from an explicitly rounded coefficient.</p>
+<p>For <code>type = "pure_endowment"</code> and
+<code>timing = "moment_of_death"</code>, survival requires \(T_x &gt; n\).
+Death at exactly <code>n</code> belongs to the term component, so term and
+pure-endowment benefits form a disjoint partition of the endowment.
+The annual convention retains \(K_x &lt; n\) and \(K_x \ge n\).</p>
+<p>These are scenario-specific prospective losses, not conditional expected
+reserves. The existing in-force filter takes precedence over payment-date
+inclusion: complete lifetimes require \(T_x &gt; t\), and curtate lifetimes
+require \(K_x \ge t\). Thus a complete lifetime dying exactly at <code>t</code>
+is not in force even for a before-payment calculation. The chosen
+<code>not_in_force</code> policy applies afterwards; unknown lifetimes stay missing.
+Known scenarios without a covered benefit have zero benefit value.</p>
+<p>At extreme rates, effective-rate and discount-factor metadata can lose
+range. The function retains the original rate and monetary amounts for
+valuation. Exactly coincident finite monetary flows can cancel even if
+their separate present values overflow. General cancellation between
+unrepresentable flows is not guaranteed. Internal premium estimation
+requires representable observed issue present values. Nonfinite converted
+premium metadata are accepted only when they match a conversion from the
+resolved premium; directly supplied premiums must remain finite.
+Positive infinite annualized annuity-basis metadata are likewise accepted
+only if they agree with the product of a finite payment basis and frequency.
+That infinite annualized value alone cannot identify the payment basis.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="mc_annuity.html">mc_annuity</a></code>, <code><a href="mc_insurance.html">mc_insurance</a></code>,
-<code><a href="mc_premium.html">mc_premium</a></code>, <code><a href="mc_loss.html">mc_loss</a></code>,
-<code><a href="reserve_x.html">reserve_x</a></code>, <code><a href="reserve_xy.html">reserve_xy</a></code></p>
+  <code><a href="mc_premium.html">mc_premium</a></code>, <code><a href="mc_loss.html">mc_loss</a></code>,
+  <code><a href="reserve_x.html">reserve_x</a></code>, <code><a href="reserve_xy.html">reserve_xy</a></code></p>
 <p>Other monte-carlo:
 <code><a href="mc_annuity.html">mc_annuity()</a></code>,
 <code><a href="mc_insurance.html">mc_insurance()</a></code>,

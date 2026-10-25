@@ -29,7 +29,8 @@ discount_factor_spot(t, i, i_type = "effective", m = 1L, tidy = FALSE)
 - m:
 
   Positive integer vector giving the conversion frequency for nominal
-  spot-rate inputs.
+  spot-rate inputs. Observed values are validated as positive integers
+  for every family, even when the conversion itself does not use `m`.
 
 - tidy:
 
@@ -65,7 +66,10 @@ This function follows the compact actuarial notation used throughout
 `i_type` denotes the interest-rate type, and `m` denotes the conversion
 frequency for nominal rates.
 
-If \\t = 0\\, the discount factor is 1.
+If \\t = 0\\, the discount factor is 1. Valuation retains the original
+log accumulation rate. In tidy output, an extreme annual equivalent can
+round to -1 or overflow to Inf without invalidating a representable
+discount factor.
 
 Input vectors must have length 1 or a common length. Missing values are
 propagated.
@@ -78,9 +82,12 @@ propagated.
 
 Other interest:
 [`accumulation_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accumulation_factor.md),
+[`bootstrap_spot_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bootstrap_spot_curve.md),
 [`discount_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor.md),
+[`forward_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_curve.md),
 [`forward_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_rate.md),
 [`interest_equivalents()`](https://julianfajardo1908.github.io/tidyactuarial/reference/interest_equivalents.md),
+[`par_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/par_rate.md),
 [`standardize_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md),
 [`yield_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/yield_curve.md)
 

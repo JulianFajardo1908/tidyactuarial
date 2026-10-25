@@ -9,7 +9,7 @@ effective interest rate i, using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,28 +91,36 @@ conversion frequency for nominal rates.</p>
 <p>The conversion formulas are:</p><dl><dt>effective:</dt>
 <dd><p>\(i = i\) (identity)</p></dd>
 
-<dt>nominal_interest:</dt>
+  <dt>nominal_interest:</dt>
 <dd><p>\(i_e = (1 + j^{(m)}/m)^m - 1\)</p></dd>
 
-<dt>nominal_discount:</dt>
+  <dt>nominal_discount:</dt>
 <dd><p>\(i_e = (1 - d^{(m)}/m)^{-m} - 1\)</p></dd>
 
-<dt>force:</dt>
+  <dt>force:</dt>
 <dd><p>\(i_e = e^{\delta} - 1\)</p></dd>
 
 
-</dl><p>Input vectors must have length 1 or a common length.</p>
+</dl><p>Input vectors must have length 1 or a common length.
+Conversions use log1p and expm1 to retain precision near zero.
+A missing rate type produces a missing equivalent rate.
+At extreme inputs, an annual equivalent can round to -1 or overflow to
+Inf. This is a limit of its numeric representation; interval factors and
+basic cash-flow valuations retain the original log accumulation rate.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="interest_equivalents.html">interest_equivalents</a></code>,
-<code><a href="discount_factor_spot.html">discount_factor_spot</a></code></p>
+  <code><a href="discount_factor_spot.html">discount_factor_spot</a></code></p>
 <p>Other interest:
 <code><a href="accumulation_factor.html">accumulation_factor()</a></code>,
+<code><a href="bootstrap_spot_curve.html">bootstrap_spot_curve()</a></code>,
 <code><a href="discount_factor.html">discount_factor()</a></code>,
 <code><a href="discount_factor_spot.html">discount_factor_spot()</a></code>,
+<code><a href="forward_curve.html">forward_curve()</a></code>,
 <code><a href="forward_rate.html">forward_rate()</a></code>,
 <code><a href="interest_equivalents.html">interest_equivalents()</a></code>,
+<code><a href="par_rate.html">par_rate()</a></code>,
 <code><a href="yield_curve.html">yield_curve()</a></code></p></div>
     </div>
 

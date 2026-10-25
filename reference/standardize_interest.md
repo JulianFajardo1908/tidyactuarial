@@ -61,7 +61,12 @@ The conversion formulas are:
 
   \\i_e = e^{\delta} - 1\\
 
-Input vectors must have length 1 or a common length.
+Input vectors must have length 1 or a common length. Conversions use
+log1p and expm1 to retain precision near zero. A missing rate type
+produces a missing equivalent rate. At extreme inputs, an annual
+equivalent can round to -1 or overflow to Inf. This is a limit of its
+numeric representation; interval factors and basic cash-flow valuations
+retain the original log accumulation rate.
 
 ## See also
 
@@ -70,10 +75,13 @@ Input vectors must have length 1 or a common length.
 
 Other interest:
 [`accumulation_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accumulation_factor.md),
+[`bootstrap_spot_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bootstrap_spot_curve.md),
 [`discount_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor.md),
 [`discount_factor_spot()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor_spot.md),
+[`forward_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_curve.md),
 [`forward_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_rate.md),
 [`interest_equivalents()`](https://julianfajardo1908.github.io/tidyactuarial/reference/interest_equivalents.md),
+[`par_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/par_rate.md),
 [`yield_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/yield_curve.md)
 
 ## Examples

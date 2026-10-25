@@ -20,4 +20,4 @@ Internal helper: validate character scalar
 
 ## Value
 
-Invisibly returns `TRUE` if validation is successful.
+Invisibly returns \`TRUE\` if validation is successful.

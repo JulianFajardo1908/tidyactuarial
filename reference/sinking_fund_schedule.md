@@ -58,23 +58,26 @@ sinking_fund_schedule(
 
 - m:
 
-  Positive integer. Conversion frequency for nominal loan rates. Ignored
-  for `i_type = "effective"` and `i_type = "force"`.
+  Positive integer. Conversion frequency for nominal loan rates.
+  Validated for every rate family, although it affects conversion only
+  for nominal rates.
 
 - j_m:
 
   Positive integer. Conversion frequency for nominal sinking-fund rates.
-  Ignored for `j_type = "effective"` and `j_type = "force"`.
+  Validated for every rate family, although it affects conversion only
+  for nominal rates.
 
 - deposit:
 
   Optional numeric scalar. Level sinking-fund deposit per period. If
   `NULL`, it is computed so that the fund accumulates to `principal` at
-  time `n`.
+  the end of period `n` (`n / k` years).
 
 - tol:
 
-  Numeric tolerance used for zero checks and final-balance checks.
+  Finite positive numeric tolerance in monetary units used for
+  final-balance checks.
 
 ## Value
 
@@ -164,8 +167,18 @@ The supplied annual rate specifications are converted to effective
 annual rates and then to effective rates per schedule period: \$\$i_p =
 (1+i_e)^{1/k} - 1,\qquad j_p = (1+j_e)^{1/k} - 1.\$\$
 
-If `deposit` is `NULL` and the sinking-fund periodic rate `j_p` is
-approximately zero, the deposit is computed as `principal / n`.
+If `deposit` is `NULL`, the unit-payment accumulation sum is evaluated
+stably from the original log fund rate. Only an exactly zero rate uses
+the zero-rate limit `principal / n`. The monetary balance tolerance does
+not determine whether a rate is zero. The existing requirement of finite
+annual and period equivalents is retained. Non-finite monetary ledger
+entries cause an explicit error. A user-supplied deposit is not adjusted
+to force exact redemption: any uncovered loan balance or fund surplus
+remains in the corresponding final column and triggers the existing
+mismatch warning when it exceeds `tol`. Redemption from the fund is an
+internal transfer and is not counted again in the borrower's external
+cash flow. Storage grows with `n`; feasible terms are limited by integer
+indexing and available memory.
 
 Otherwise, the standard sinking-fund formula is used: \$\$deposit =
 \frac{principal}{s\_{\overline{n}\|j_p}}\$\$ where
@@ -197,18 +210,18 @@ sinking_fund_schedule(
 #> # A tibble: 12 × 16
 #>    period loan_balance_start interest_loan sinking_deposit fund_balance_start
 #>     <int>              <dbl>         <dbl>           <dbl>              <dbl>
-#>  1      1             100000         1000.           7973.                 0 
-#>  2      2             100000         1000.           7973.              7973.
-#>  3      3             100000         1000.           7973.             16010.
-#>  4      4             100000         1000.           7973.             24111.
-#>  5      5             100000         1000.           7973.             32277.
-#>  6      6             100000         1000.           7973.             40508.
-#>  7      7             100000         1000.           7973.             48805.
-#>  8      8             100000         1000.           7973.             57168.
-#>  9      9             100000         1000.           7973.             65599.
-#> 10     10             100000         1000.           7973.             74097.
-#> 11     11             100000         1000.           7973.             82662.
-#> 12     12             100000         1000.           7973.             91297.
+#>  1      1             100000          1000           7973.                 0 
+#>  2      2             100000          1000           7973.              7973.
+#>  3      3             100000          1000           7973.             16010.
+#>  4      4             100000          1000           7973.             24111.
+#>  5      5             100000          1000           7973.             32277.
+#>  6      6             100000          1000           7973.             40508.
+#>  7      7             100000          1000           7973.             48805.
+#>  8      8             100000          1000           7973.             57168.
+#>  9      9             100000          1000           7973.             65599.
+#> 10     10             100000          1000           7973.             74097.
+#> 11     11             100000          1000           7973.             82662.
+#> 12     12             100000          1000           7973.             91297.
 #> # ℹ 11 more variables: interest_fund <dbl>,
 #> #   fund_balance_end_before_redemption <dbl>, redemption_from_fund <dbl>,
 #> #   fund_balance_end <dbl>, loan_balance_end <dbl>,
@@ -226,16 +239,16 @@ sinking_fund_schedule(
 #> # A tibble: 10 × 16
 #>    period loan_balance_start interest_loan sinking_deposit fund_balance_start
 #>     <int>              <dbl>         <dbl>           <dbl>              <dbl>
-#>  1      1              50000         1000.            5000                  0
-#>  2      2              50000         1000.            5000               5000
-#>  3      3              50000         1000.            5000              10000
-#>  4      4              50000         1000.            5000              15000
-#>  5      5              50000         1000.            5000              20000
-#>  6      6              50000         1000.            5000              25000
-#>  7      7              50000         1000.            5000              30000
-#>  8      8              50000         1000.            5000              35000
-#>  9      9              50000         1000.            5000              40000
-#> 10     10              50000         1000.            5000              45000
+#>  1      1              50000          1000            5000                  0
+#>  2      2              50000          1000            5000               5000
+#>  3      3              50000          1000            5000              10000
+#>  4      4              50000          1000            5000              15000
+#>  5      5              50000          1000            5000              20000
+#>  6      6              50000          1000            5000              25000
+#>  7      7              50000          1000            5000              30000
+#>  8      8              50000          1000            5000              35000
+#>  9      9              50000          1000            5000              40000
+#> 10     10              50000          1000            5000              45000
 #> # ℹ 11 more variables: interest_fund <dbl>,
 #> #   fund_balance_end_before_redemption <dbl>, redemption_from_fund <dbl>,
 #> #   fund_balance_end <dbl>, loan_balance_end <dbl>,

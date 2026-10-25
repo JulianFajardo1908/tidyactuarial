@@ -13,7 +13,7 @@ fractional-age assumption."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -148,10 +148,10 @@ within the year of death: <code>"udd"</code>, <code>"cml"</code>, or
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with one row per simulation, or a summary from
-<code><a href="summary_mc.html">summary_mc</a></code>. Simulation output includes
-<code>payment_per_payment</code>, <code>payment_annualized</code>, <code>Kx</code>,
-<code>Tx</code>, <code>n_payments</code>, <code>present_value</code>, and
-<code>pv_annuity</code>.</p>
+  <code><a href="summary_mc.html">summary_mc</a></code>. Simulation output includes
+  <code>payment_per_payment</code>, <code>payment_annualized</code>, <code>Kx</code>,
+  <code>Tx</code>, <code>n_payments</code>, <code>present_value</code>, and
+  <code>pv_annuity</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -162,7 +162,14 @@ $$
 $$</p>
 <p>For <code>k &gt; 1</code>, the curtate lifetime alone is insufficient because
 payments may occur during the year of death. The function therefore
-simulates a complete lifetime \(T_x=K_x+S\) under <code>frac</code>.</p>
+simulates a complete lifetime \(T_x=K_x+S\) under <code>frac</code>.
+Fractional survival is retained in log form, including when an annual
+<code>lx</code> ratio underflows. Cash flows use the original log interest rate
+and combine the monetary amount before exponentiating. The displayed
+annual effective rate may overflow or round to -1 at extreme forces.
+With a finite horizon, surviving paths have <code>Kx = n</code>, missing
+<code>Tx</code>, and <code>died_within_horizon = FALSE</code>; their future lifetime
+is censored, not observed to equal <code>n</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

@@ -9,7 +9,7 @@ life-contingency inputs for use in pipe workflows."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,14 +68,14 @@ life-contingency inputs for use in pipe workflows.</p>
 <dl><dt id="arg-lt">lt<a class="anchor" aria-label="anchor" href="#arg-lt"></a></dt>
 <dd><p>A life table or a list of two life tables. For single-life
 contracts, provide one data frame or tibble. For two-life contracts,
-provide either one data frame used for both lives, or <code>list(lt_x, lt_y)</code>
-with one table for each life. Each life table must contain columns <code>x</code>
-and <code>lx</code>.</p></dd>
+provide either one data frame used for both lives, or `list(lt_x, lt_y)`
+with one table for each life. Each life table must contain columns `x`
+and `lx`.</p></dd>
 
 
 <dt id="arg-lives">lives<a class="anchor" aria-label="anchor" href="#arg-lives"></a></dt>
-<dd><p>Character string. Use <code>"single"</code> for a single-life contract,
-<code>"joint"</code> for a joint-life two-life contract, or <code>"last_survivor"</code> for a
+<dd><p>Character string. Use `"single"` for a single-life contract,
+`"joint"` for a joint-life two-life contract, or `"last_survivor"` for a
 last-survivor two-life contract.</p></dd>
 
 
@@ -86,7 +86,7 @@ a two-life contract.</p></dd>
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
 <dd><p>Numeric scalar. Age of the second life in a two-life contract.
-Required when <code>lives</code> is <code>"joint"</code> or <code>"last_survivor"</code>.</p></dd>
+Required when `lives` is `"joint"` or `"last_survivor"`.</p></dd>
 
 
 <dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
@@ -95,44 +95,54 @@ Required when <code>lives</code> is <code>"joint"</code> or <code>"last_survivor
 
 <dt id="arg-i-type">i_type<a class="anchor" aria-label="anchor" href="#arg-i-type"></a></dt>
 <dd><p>Character string indicating the interest-rate type. Allowed
-values are <code>"effective"</code>, <code>"nominal_interest"</code>, <code>"nominal_discount"</code>,
-and <code>"force"</code>.</p></dd>
+values are `"effective"`, `"nominal_interest"`, `"nominal_discount"`,
+and `"force"`.</p></dd>
 
 
 <dt id="arg-m">m<a class="anchor" aria-label="anchor" href="#arg-m"></a></dt>
 <dd><p>Positive integer. Conversion frequency for nominal rates. Ignored
-for <code>i_type = "effective"</code> and <code>i_type = "force"</code>.</p></dd>
+for `i_type = "effective"` and `i_type = "force"`.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Reserved for future extensions. Deprecated argument names such as
-<code>mortality_table</code>, <code>age</code>, <code>age_x</code>, <code>age_y</code>, <code>rate</code>, and <code>rate_type</code> are
+`mortality_table`, `age`, `age_x`, `age_y`, `rate`, and `rate_type` are
 not accepted.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>"tidyact_life_contract"</code>.</p>
+    <p>An object of class `"tidyact_life_contract"`.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function does not compute actuarial values. It validates and stores
 common actuarial inputs such as the life table, life status, ages, and
-interest-rate specification. Calculation functions such as <code><a href="annuity_x.html">annuity_x()</a></code>,
-<code><a href="insurance_x.html">insurance_x()</a></code>, <code><a href="premium_x.html">premium_x()</a></code>, <code><a href="reserve_x.html">reserve_x()</a></code>, <code><a href="annuity_xy.html">annuity_xy()</a></code>,
-<code><a href="insurance_xy.html">insurance_xy()</a></code>, <code><a href="premium_xy.html">premium_xy()</a></code>, <code><a href="reserve_xy.html">reserve_xy()</a></code>, and simulation functions
+interest-rate specification. Calculation functions such as [annuity_x()],
+[insurance_x()], [premium_x()], [reserve_x()], [annuity_xy()],
+[insurance_xy()], [premium_xy()], [reserve_xy()], and simulation functions
 can then consume this object.</p>
-<p><code>life_contract()</code> follows the compact actuarial notation used throughout
-<code>tidyactuarial</code>:</p><ul><li><p><code>lt</code>: life table;</p></li>
-<li><p><code>x</code>: age of the first or single life;</p></li>
-<li><p><code>y</code>: age of the second life;</p></li>
-<li><p><code>i</code>: interest rate;</p></li>
-<li><p><code>i_type</code>: type of interest rate;</p></li>
-<li><p><code>m</code>: conversion frequency for nominal rates.</p></li>
-</ul><p>The object stores actuarial fields using the compact names above. During the
+
+<p>`life_contract()` follows the compact actuarial notation used throughout
+`tidyactuarial`:</p>
+<p>* `lt`: life table;
+* `x`: age of the first or single life;
+* `y`: age of the second life;
+* `i`: interest rate;
+* `i_type`: type of interest rate;
+* `m`: conversion frequency for nominal rates.</p>
+<p>The object stores actuarial fields using the compact names above. During the
 0.1.4 API transition, it also stores internal compatibility fields so that
 functions not yet migrated can continue to read the contract. These internal
 fields are not part of the preferred user-facing notation.</p>
+<p>The original rate and table are retained, without converting the stored
+rate to an annual effective rate or altering the table. Rate domains require
+`i &gt; -1` for effective rates, `1 + i/m &gt; 0` for nominal interest and
+`1 - i/m &gt; 0` for nominal discount; any finite force is allowed.
+Table validation here checks structure and numeric `x`/`lx` columns.
+Valuation functions additionally check mortality consistency, supported ages,
+horizons and payment grids for their particular models. Integer-valued
+specifications outside R's integer range are stored as doubles, never `NA`.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

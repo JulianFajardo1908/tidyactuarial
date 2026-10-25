@@ -73,7 +73,9 @@ premium_gross(
 
 - tol:
 
-  Nonnegative numeric tolerance used for consistency checks.
+  Nonnegative finite numeric tolerance. Monetary consistency is checked
+  relatively to the compared amounts, without a one-currency-unit floor;
+  frequency and integer checks use absolute tolerance.
 
 - ...:
 
@@ -130,6 +132,18 @@ Legacy annual tables using `P`, `premium`, `P_net`, `a_premiums`, or
 
 Legacy premium columns are accepted automatically only when `k = 1`,
 because their unit is ambiguous for subannual premiums.
+
+When annualized and per-payment premiums are both supplied, both must be
+valid and agree in their units. A supplied payment frequency is
+validated even if `k` is explicit. Acquisition shares and expense
+products retain representable values without overflowing \\k a^{(k)}\\
+first. The loading is evaluated directly from the expense equation; a
+small positive loading can be reported even when the rounded gross and
+net premiums coincide. The equivalence residual uses the same equation
+factored in annuity units, avoiding subtraction of overflowing APVs
+where possible; it is not forced to zero. Individual audit APVs may
+still be infinite. No finite result is promised when the annualized
+premium itself is outside numeric range.
 
 ## See also
 

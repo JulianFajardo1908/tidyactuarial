@@ -1,7 +1,8 @@
 # Build an annual life table (tidy tibble) from lx, qx, px, or mx
 
-Creates an annual life table with **integer, consecutive ages** and
-returns a **tibble** (tidyverse-friendly) with class `"lifetable"`.
+Creates an annual life table with \*\*integer, consecutive ages\*\* and
+returns a \*\*tibble\*\* (tidyverse-friendly) with class
+\`"lifetable"\`.
 
 ## Usage
 
@@ -27,8 +28,8 @@ lifetable(
 
 - x:
 
-  Numeric vector of ages. Must be **integer** and **consecutive**
-  (annual table), e.g. `0:110`.
+  Numeric vector of ages. Must be \*\*integer\*\* and
+  \*\*consecutive\*\* (annual table), e.g. `0:110`.
 
 - lx:
 
@@ -67,15 +68,18 @@ lifetable(
 - close:
 
   Logical. If `TRUE` (default), closes the table at `omega` (forces
-  terminal conditions).
+  terminal conditions). With `FALSE` and only `lx`, the last
+  `dx/qx/px/mx` are unknown (`NA`); a supplied terminal probability is
+  used when available.
 
 - ax:
 
   Scalar in `[0,1]`. Average fraction of the year lived by those who die
   in the interval \\\[x, x+1)\\. Under UDD (Finan, Sec. 24.1),
   `ax = 0.5`. Under constant force, \\a_x = 1/\mu - 1/(\exp(\mu)-1)\\.
-  At the terminal age with `close = TRUE`, `mx` equals \\1/(1 - a_x)\\,
-  which is 2 for `ax = 0.5`. Default is `0.5`.
+  At the terminal age with `close = TRUE`, `mx` equals \\1/a_x\\, which
+  is 2 for `ax = 0.5`, 1 for `ax = 1`, and `Inf` for `ax = 0`. Default
+  is `0.5`.
 
 - type:
 
@@ -91,7 +95,8 @@ lifetable(
 - check:
 
   Logical. If `TRUE` (default), performs strict validity and consistency
-  checks.
+  checks, including `px = 1 - qx` when both are provided. Validated ages
+  within tolerance of integers are rounded before truncation.
 
 - tol:
 
@@ -113,14 +118,13 @@ columns:
 - `px`: probability of survival to \\x+1\\
 
 - `mx`: central death rate (derived using `ax`). At the terminal age
-  with `close = TRUE`, `mx` equals \\1/(1 - a_x)\\ and may be `Inf` if
-  `ax = 1`.
+  with `close = TRUE`, `mx` equals \\1/a_x\\ and is `Inf` if `ax = 0`.
 
 Attributes include: `radix`, `omega`, `type`, `frac`, `closed`, `ax`.
 
 ## Details
 
-The table can be built from exactly one of:
+The table can be built from any one of:
 
 - `lx` (survivors), or
 
@@ -149,16 +153,21 @@ The basic identities are (Finan, Section 22): \$\$\ell_x = \ell_0 \cdot
 s(x), \quad d_x = \ell_x - \ell\_{x+1}, \quad q_x = d_x / \ell_x, \quad
 p_x = \ell\_{x+1} / \ell_x.\$\$
 
-The central death rate `mx` is computed via the discrete approximation
-(Finan, Section 23.9): \$\$m_x = \frac{q_x}{1 - a_x \cdot q_x}\$\$ which
-under UDD (`ax = 0.5`) reduces to the classical formula \\m_x = q_x /
-(1 - 0.5 \\ q_x)\\ (Finan, Section 24.1). This arises because under UDD,
-\\L_x = \ell_x - \tfrac{1}{2} d_x\\, and therefore \\m_x = d_x / L_x\\.
+With \\a_x\\ the mean fraction of the year lived by those who die,
+exposure is \\L_x = \ell\_{x+1} + a_x d_x\\ and \\m_x = d_x / L_x\\.
+Consequently, \$\$m_x = \frac{q_x}{1 - (1 - a_x) q_x}, \quad q_x =
+\frac{m_x}{1 + (1 - a_x) m_x}\$\$ which under UDD (`ax = 0.5`) reduces
+to the classical formula \\m_x = q_x / (1 - 0.5 \\ q_x)\\ (Finan,
+Section 24.1). This arises because under UDD, \\L_x = \ell_x -
+\tfrac{1}{2} d_x\\, and therefore \\m_x = d_x / L_x\\.
 
 At the terminal age \\\omega\\ with `close = TRUE`, closure forces
 \\q\_\omega = 1\\, \\p\_\omega = 0\\, and \\d\_\omega = \ell\_\omega\\.
-The corresponding \\m\_\omega\\ equals \\1/(1 - a_x)\\, which is 2 under
-UDD (`ax = 0.5`). If `ax = 1`, \\m\_\omega = \infty\\.
+For positive terminal survivors, \\L\_\omega = a_x \ell\_\omega\\ and
+\\m\_\omega = 1/a_x\\, which is 2 under UDD (`ax = 0.5`). At `ax = 0`,
+the zero-exposure limit is \\m\_\omega = \infty\\; at `ax = 1`,
+\\m\_\omega = 1\\. Infinite `mx` inputs remain unsupported; this limit
+can be obtained from `lx` or `qx`.
 
 ## See also
 
@@ -277,7 +286,7 @@ lt1$lx[lt1$x == 4] / lt1$lx[lt1$x == 2]
 # Example 8: without closure - qx at omega is not forced to 1
 lt_open <- lifetable(x = 0:3, lx = c(1000, 900, 750, 500), close = FALSE)
 lt_open$qx  # last element is NA
-#> [1] 0.1000000 0.1666667 0.3333333 1.0000000
+#> [1] 0.1000000 0.1666667 0.3333333        NA
 
 # Example 9: access table metadata
 attr(lt1, "omega")   # 5

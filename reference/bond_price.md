@@ -64,8 +64,8 @@ bond_price(
 
 - tol:
 
-  Numeric scalar. Tolerance used when checking alignment of maturity
-  with coupon periods.
+  Finite positive numeric scalar. Tolerance used when checking alignment
+  of maturity with coupon periods.
 
 - check:
 
@@ -95,9 +95,9 @@ The yield may be supplied in either of two ways:
 
 - as an annual rate specification through `y`, `y_type`, and `y_m`.
 
-If an annual rate specification is supplied, it is first converted to
-the equivalent annual effective yield and then to the effective yield
-per coupon period.
+Annual yield specifications are valued using their original log
+accumulation rate, avoiding loss of precision or range in intermediate
+annual equivalents.
 
 This function follows the compact bond notation used in `tidyactuarial`:
 `face` is the face value, `c` is the annual coupon rate, `n` is the time
@@ -121,6 +121,7 @@ flows indexed by coupon period \\r\\.
 [`bond_callable_price`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md)
 
 Other bonds:
+[`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md),
 [`bond_book_value()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_book_value.md),
 [`bond_callable_price()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md),
 [`bond_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md),

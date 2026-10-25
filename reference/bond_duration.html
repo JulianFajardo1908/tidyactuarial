@@ -11,7 +11,7 @@ actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,7 +112,8 @@ defaults to <code>face</code>.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Numeric scalar. Tolerance used to check maturity alignment.</p></dd>
+<dd><p>Finite positive numeric scalar. Tolerance used to check maturity
+alignment with integer coupon periods, not a monetary price threshold.</p></dd>
 
 
 <dt id="arg-check">check<a class="anchor" aria-label="anchor" href="#arg-check"></a></dt>
@@ -124,30 +125,30 @@ defaults to <code>face</code>.</p></dd>
     <p>A one-row tibble with:</p><dl><dt>price</dt>
 <dd><p>Dirty price at the given yield.</p></dd>
 
-<dt>macaulay_duration_periods</dt>
+  <dt>macaulay_duration_periods</dt>
 <dd><p>Macaulay duration in coupon periods.</p></dd>
 
-<dt>macaulay_duration_years</dt>
+  <dt>macaulay_duration_years</dt>
 <dd><p>Macaulay duration in years.</p></dd>
 
-<dt>modified_duration_periods_j</dt>
+  <dt>modified_duration_periods_j</dt>
 <dd><p>Modified duration with respect to the
-effective yield per coupon period, expressed in coupon periods.</p></dd>
+  effective yield per coupon period, expressed in coupon periods.</p></dd>
 
-<dt>modified_duration_years_i</dt>
+  <dt>modified_duration_years_i</dt>
 <dd><p>Modified duration with respect to the
-annual effective yield, expressed in years.</p></dd>
+  annual effective yield, expressed in years.</p></dd>
 
-<dt>yield_per_period</dt>
+  <dt>yield_per_period</dt>
 <dd><p>Effective yield per coupon period.</p></dd>
 
-<dt>yield_effective_annual</dt>
+  <dt>yield_effective_annual</dt>
 <dd><p>Annual effective yield.</p></dd>
 
-<dt>k</dt>
+  <dt>k</dt>
 <dd><p>Coupon frequency.</p></dd>
 
-<dt>n_periods</dt>
+  <dt>n_periods</dt>
 <dd><p>Total number of coupon periods.</p></dd>
 
 
@@ -160,10 +161,10 @@ annual effective yield, expressed in years.</p></dd>
 <li><p>Valuation is at a coupon date with no accrued interest.</p></li>
 <li><p>A single flat yield is used to discount all cash flows.</p></li>
 </ul><p>Yield input conventions:</p><ul><li><p>If <code>y_effective_per_period</code> is supplied, it is interpreted as the
-effective yield per coupon period.</p></li>
+        effective yield per coupon period.</p></li>
 <li><p>Otherwise, <code>y</code>, <code>y_type</code>, and <code>y_m</code> define an annual
-yield specification, which is converted first to annual effective
-yield and then to effective yield per coupon period.</p></li>
+        yield specification. Calculations retain its original log growth;
+        reported effective equivalents remain subject to numeric range.</p></li>
 </ul><p>This function follows the compact bond notation used in
 <code>tidyactuarial</code>: <code>face</code> is the face value, <code>c</code> is the annual
 coupon rate, <code>n</code> is the time to maturity, <code>k</code> is the coupon
@@ -184,14 +185,24 @@ years, is \(D^*_i = D / (1 + i)\), where
 \(i = (1+j)^k - 1\).</p>
 <p>Modified duration measures the first-order sensitivity of the bond price to
 yield changes. Together with <code><a href="bond_convexity.html">bond_convexity</a></code>, it forms the
-second-order Taylor approximation of price changes.</p>
+second-order Taylor approximation of price changes.
+The two coefficients must use the same yield coordinate: pair
+<code>modified_duration_periods_j</code> with the period convexity for changes
+in \(j\). Annual effective duration requires annual effective convexity,
+obtained using the chain rule or <code><a href="convexity_cash_flow.html">convexity_cash_flow()</a></code> on year times.
+Prices use original log yields and moments use relative present values.
+Nonzero-term bonds require a positive finite price and finite risk measures;
+calendar tolerance does not define a monetary zero. Reported equivalent
+yields may reach -1 or Inf by rounding while the specification remains usable.
+At zero term, immediate redemption and zero risk follow the existing convention.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="bond_convexity.html">bond_convexity</a></code>, <code><a href="bond_price.html">bond_price</a></code>,
-<code><a href="bond_cash_flows.html">bond_cash_flows</a></code>, <code><a href="bond_book_value.html">bond_book_value</a></code>,
-<code><a href="bond_ytm.html">bond_ytm</a></code></p>
+  <code><a href="bond_cash_flows.html">bond_cash_flows</a></code>, <code><a href="bond_book_value.html">bond_book_value</a></code>,
+  <code><a href="bond_ytm.html">bond_ytm</a></code></p>
 <p>Other bonds:
+<code><a href="accrued_interest.html">accrued_interest()</a></code>,
 <code><a href="bond_book_value.html">bond_book_value()</a></code>,
 <code><a href="bond_callable_price.html">bond_callable_price()</a></code>,
 <code><a href="bond_convexity.html">bond_convexity()</a></code>,

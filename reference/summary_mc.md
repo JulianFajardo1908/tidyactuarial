@@ -39,11 +39,15 @@ summary_mc(
 
 - probs:
 
-  Numeric vector of probabilities for quantiles.
+  Numeric vector of probabilities for quantiles. Use
+  [`numeric()`](https://rdrr.io/r/base/numeric.html) to omit these
+  columns.
 
 - var_probs:
 
-  Numeric vector of probabilities for VaR and TVaR.
+  Numeric vector of probabilities for VaR and TVaR. Use
+  [`numeric()`](https://rdrr.io/r/base/numeric.html) to omit these
+  columns.
 
 - na_rm:
 
@@ -75,8 +79,42 @@ The function computes the number of simulations used, number of missing
 values, mean, variance, standard deviation, standard error, minimum,
 maximum, selected quantiles, empirical VaR, and empirical TVaR.
 
-TVaR is computed empirically as the mean of simulated values greater
-than or equal to the corresponding empirical VaR.
+Empirical VaR uses the lower quantile (the inverse empirical CDF; type
+1), without interpolation between observed loss amounts. In contrast,
+the descriptive \`q...\` columns retain the default interpolated
+quantiles from \[stats::quantile()\].
+
+TVaR uses the mean of the upper \`1 - p\` fraction of the empirical loss
+distribution, with the appropriate fraction of any probability mass at
+VaR. Equivalently, for \`0 \<= p \< 1\` and \`v = VaR_p(X)\`,
+\`TVaR_p(X) = v + E\[(X - v)\_+\] / (1 - p)\`. For \`p = 1\`, the finite
+empirical upper-endpoint limit (\`max(x)\`) is reported. At \`p = 0\`,
+TVaR is the empirical mean. Negative simulated values are permitted
+because \`summary_mc()\` is a generic numeric summary. TVaR is evaluated
+from ordered empirical probability masses, avoiding subtraction of
+extreme losses. A fractional boundary atom is retained. Variance,
+standard deviation and error are evaluated independently in scaled form
+when squaring loses range: variance may be zero or infinite while the
+deviation or error remains representable. Undefined moments for
+nonfinite observations remain missing; extended upper tails can be
+infinite. A sample smaller than two has missing variance, deviation and
+error.
+
+The column `se_mean` is the usual \\s/\sqrt{n}\\ estimate under
+independent, identically distributed observations. It is not a general
+Monte Carlo error estimate for antithetic, clustered, weighted or
+otherwise dependent samples. A method label alone does not identify
+independent sampling units after filtering, grouping or reordering, so
+pairs are not inferred automatically. For known independent antithetic
+pairs, summarise their pair means instead. An odd unpaired observation
+or unequal weights requires an error calculation appropriate to that
+sampling design.
+
+Quantile labels retain the existing rounding to thousandths of
+probability; probabilities within a selector must yield distinct labels.
+Empty grouped inputs retain the statistical columns with zero output
+rows. An ungrouped empty effective sample retains one row of counts and
+missing statistics.
 
 If `na_rm = TRUE`, missing values in `col_value` are removed before
 computing statistics. If `na_rm = FALSE` and missing values are present,

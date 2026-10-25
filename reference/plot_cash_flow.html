@@ -9,7 +9,7 @@ and outflows over time, using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -181,7 +181,7 @@ and outflows over time, using compact actuarial notation.</p>
 
 
 <dt id="arg-label-digits">label_digits<a class="anchor" aria-label="anchor" href="#arg-label-digits"></a></dt>
-<dd><p>Integer number of decimal digits for cash-flow labels.</p></dd>
+<dd><p>Integer between 0 and 50: decimal digits for cash-flow labels.</p></dd>
 
 
 <dt id="arg-label-format">label_format<a class="anchor" aria-label="anchor" href="#arg-label-format"></a></dt>
@@ -221,7 +221,25 @@ abbreviated values such as <code>1.25M</code>.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function uses compact actuarial notation: <code>C</code> denotes cash-flow amounts,
+    <p>Present values use the original interest specification and combine capital
+and discount factors stably. Opposite amounts with exactly equal finite
+log factors are netted if individual present values overflow.
+Numeric timelines may include negative times; the valuation origin remains
+zero. Dated timelines use the earliest date
+as origin. Non-finite inferred present values or aggregated amounts are
+rejected. Extreme monetary magnitudes use scaled graphical coordinates,
+with the power of ten stated on the axis; raw amounts remain in <code>plot$data$C</code>.
+Automatic/compact labels use scientific notation beyond the available
+suffixes or when fixed decimals would show a nonzero amount as zero.
+<code>label_format = "full"</code> retains explicit fixed-decimal formatting.
+Overlapping text labels may be omitted at rendering time; every arrow
+remains. For dense streams, use <code>show_labels = FALSE</code>. Simultaneous flows
+are netted by default; <code>aggregate = FALSE</code> keeps their exact positions,
+so arrows at identical times can overlap. No dates are jittered.
+<code>PV</code> is a supplied annotation when present, not a recalculation or check.
+Date origins and day counts differ from <code><a href="apv_life_flow.html">apv_life_flow()</a></code> and are not
+silently unified. The returned ggplot remains editable with additional layers.</p>
+<p>This function uses compact actuarial notation: <code>C</code> denotes cash-flow amounts,
 <code>t</code> denotes times in years, <code>i</code> denotes the interest-rate input, and <code>PV</code>
 denotes present value.</p>
     </div>

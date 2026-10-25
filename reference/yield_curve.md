@@ -103,9 +103,12 @@ This function follows the compact actuarial notation used throughout
 `i_type` denotes the interest-rate type, and `m` denotes the conversion
 frequency for nominal spot rates.
 
-The spot-rate input is converted to annual effective form through
-[`standardize_interest`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md)
-before discount factors are computed.
+Discount factors use the original log accumulation rate under the
+supplied convention. The reported annual effective equivalent may round
+to -1 or overflow to Inf while a finite discount factor remains
+recoverable. Final factors remain subject to double precision range.
+With `.na = "propagate"`, an incomplete row keeps its position and has a
+`NULL` plot entry when plotting is requested.
 
 ## References
 
@@ -123,10 +126,13 @@ Kellison, S. G. *The Theory of Interest*.
 
 Other interest:
 [`accumulation_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accumulation_factor.md),
+[`bootstrap_spot_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bootstrap_spot_curve.md),
 [`discount_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor.md),
 [`discount_factor_spot()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor_spot.md),
+[`forward_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_curve.md),
 [`forward_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_rate.md),
 [`interest_equivalents()`](https://julianfajardo1908.github.io/tidyactuarial/reference/interest_equivalents.md),
+[`par_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/par_rate.md),
 [`standardize_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md)
 
 ## Examples

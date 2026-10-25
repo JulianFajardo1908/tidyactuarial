@@ -11,7 +11,7 @@ amounts paid at each premium date."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,22 +136,22 @@ amount used to construct <code>col_Y</code>. It is normally inferred from
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble containing the original simulation and standardized columns:</p><dl><dt>premium_annualized</dt>
+    <p>A data frame or tibble containing the original simulation and standardized columns:</p><dl><dt>premium_annualized</dt>
 <dd><p>Annualized premium \(P^{(k)}\).</p></dd>
 
-<dt>premium_per_payment</dt>
+  <dt>premium_per_payment</dt>
 <dd><p>Amount collected at each premium date.</p></dd>
 
-<dt>payments_per_year</dt>
+  <dt>payments_per_year</dt>
 <dd><p>Premium payment frequency <code>k</code>.</p></dd>
 
-<dt>premium_annuity_scale</dt>
+  <dt>premium_annuity_scale</dt>
 <dd><p>Coefficient multiplying <code>col_Y</code>.</p></dd>
 
-<dt>pv_premiums</dt>
+  <dt>pv_premiums</dt>
 <dd><p>Simulated present value of premium income.</p></dd>
 
-<dt>L</dt>
+  <dt>L</dt>
 <dd><p>Simulated loss, or the name supplied through <code>col_L</code>.</p></dd>
 
 
@@ -193,7 +193,19 @@ $$
 P_{\mathrm{per\ payment}} = q c,
 \qquad
 P^{(k)} = k q c.
-$$</p>
+$$
+For annualized or per-payment inputs, monetary income retains the original
+premium amount and frequency until it is combined with the annuity present
+value. This avoids losing a representable income when an intermediate
+annuity-scale coefficient underflows or overflows. Displayed converted
+amounts may still be zero or infinite if they themselves do not fit in
+double precision. An explicitly supplied annuity-scale coefficient is used
+as supplied; a rounded zero or nonfinite coefficient cannot reconstruct
+information that has already been lost. Select a representable monetary
+premium column when passing extreme results from <code><a href="mc_premium.html">mc_premium</a></code>.
+Positive infinite annualized annuity-basis metadata are accepted only when
+they agree with the product of the finite per-payment basis and frequency;
+they cannot be used alone to infer the payment basis.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

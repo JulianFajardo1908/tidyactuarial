@@ -109,7 +109,14 @@ at times \\t_j\\, the simulated present value is \$\$ \sum\_{j=1}^{N}
 
 For `k > 1`, the curtate lifetime alone is insufficient because payments
 may occur during the year of death. The function therefore simulates a
-complete lifetime \\T_x=K_x+S\\ under `frac`.
+complete lifetime \\T_x=K_x+S\\ under `frac`. Fractional survival is
+retained in log form, including when an annual `lx` ratio underflows.
+Cash flows use the original log interest rate and combine the monetary
+amount before exponentiating. The displayed annual effective rate may
+overflow or round to -1 at extreme forces. With a finite horizon,
+surviving paths have `Kx = n`, missing `Tx`, and
+`died_within_horizon = FALSE`; their future lifetime is censored, not
+observed to equal `n`.
 
 ## See also
 

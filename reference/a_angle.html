@@ -9,7 +9,7 @@ actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,6 +137,7 @@ factor, assuming a unit payment at each payment time.</p>
 deferment must align with the payment grid, that is, \(hk\) must be an
 integer.</p>
 <p>If <code>perpetuity = TRUE</code>, the infinite-term annuity factor is returned.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>:</p>
 <ul><li><p><code>n</code>: annuity term;</p></li>
@@ -153,13 +154,26 @@ $$a_{\overline{n|}} = \frac{1 - v^n}{i}$$</p>
 $$\ddot{a}_{\overline{n|}} = (1+i)a_{\overline{n|}}$$</p>
 <p>For continuous annuities:
 $$\bar{a}_{\overline{n|}} = \frac{1 - e^{-\delta n}}{\delta}$$</p>
+<p>More generally, let \(N=nk\), let \(b=0\) for immediate payments and
+\(b=1\) for due payments. The deferred discrete factor is
+$$\sum_{j=1}^{N} \exp\{-\delta[h+(j-b)/k]\}.$$
+Each discrete payment is one unit, whereas a continuous annuity pays one
+unit per year. The continuous deferred factor is
+\(\int_h^{h+n} e^{-\delta t}\,dt\).</p>
+<p>The original log accumulation rate is retained even if its annual
+effective equivalent rounds to -1 or overflows. Geometric sums and
+continuous integrals use stable logarithmic formulas with exact zero-rate
+limits, rather than replacing a small nonzero rate by zero. Perpetuities
+require a strictly positive rate, without a numerical lower cutoff.
+Monetary values combine payments with log factors before declaring range
+loss; a reported annuity factor or equivalent rate may still be non-finite.</p>
 <p>Input vectors must have length 1 or a common length. Missing values are
 propagated.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="s_angle.html">s_angle</a></code>, <code><a href="standardize_interest.html">standardize_interest</a></code>,
-<code><a href="present_value.html">present_value</a></code></p>
+  <code><a href="present_value.html">present_value</a></code></p>
 <p>Other annuities:
 <code><a href="annuity_arith.html">annuity_arith()</a></code>,
 <code><a href="annuity_geom.html">annuity_geom()</a></code>,

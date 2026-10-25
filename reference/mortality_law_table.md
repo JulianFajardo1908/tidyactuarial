@@ -52,9 +52,9 @@ mortality_law_table(
 
 - frac:
 
-  Character. Within-year assumption used to convert \\\mu_x\\ to
-  \\q_x\\. One of `"CF"`, `"UDD"`, `"Balducci"`, or `"CML"`. `"CML"` is
-  treated as `"CF"`.
+  Character. Within-year interpolation label, independent of the annual
+  probability calculation. One of `"CF"`, `"UDD"`, `"Balducci"`, or
+  `"CML"`. `"CML"` is treated as `"CF"`.
 
 - l0:
 
@@ -68,7 +68,9 @@ mortality_law_table(
 - a_x:
 
   Numeric scalar. Average fraction of the year lived by those dying
-  between age \\x\\ and \\x+1\\. Default is `0.5`.
+  between age \\x\\ and \\x+1\\. Default is `0.5`. Exposure uses \\L_x =
+  l\_{x+1} + a_x d_x\\; this is an approximation controlled by `a_x`,
+  not an integration of continuous survival.
 
 - check:
 
@@ -100,7 +102,17 @@ This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `x` denotes age, `l0` denotes the starting radix, `a_x`
 denotes the average fraction of the year lived by those dying during the
 age interval, `qx` denotes the one-year death probability, and
-`px = 1 - qx`.
+`px = 1 - qx`. Ratios use their actual denominators: `mx = dx / Lx` and
+`ex = Tx / lx`. Positive deaths with zero exposure give infinite `mx`;
+extinct cohorts with zero numerators and denominators give `NaN` for
+these undefined ratios.
+
+Heligman-Pollard follows the eight-parameter odds specification in
+Heligman and Pollard (1980), section 2.1, equation (1),
+[doi:10.1017/S0020268100040257](https://doi.org/10.1017/S0020268100040257)
+. Earlier seven-parameter calls must be respecified: the previous
+implementation omitted the childhood exponent and assigned different
+meanings to `C` through `G`.
 
 The parameter `F_hp` is used for the Heligman-Pollard law instead of
 `F`, because `F` is historically associated with `FALSE` in R and should
@@ -124,7 +136,9 @@ as a transitional alias.
 
 - **Beta**: scaled lifetime model \\X/\omega \sim Beta(\alpha,\beta)\\.
 
-- **HeligmanPollard**: odds model returning \\q_x\\ directly.
+- **HeligmanPollard**: eight-parameter odds model \\q_x/p_x =
+  A^{(x+B)^C} + D\exp(-E(\log x-\log F)^2) + GH^x\\, with `F_hp`
+  denoting \\F\\.
 
 ## Law parameters
 
@@ -149,19 +163,25 @@ Required parameters:
 
 - `"Beta"`: `alpha`, `beta`, `omega`.
 
-- `"HeligmanPollard"`: `A`, `B`, `C`, `D`, `E`, `F_hp`, and `G`.
-  Transitional alias `F` is accepted and mapped to `F_hp`.
+- `"HeligmanPollard"`: `A`, `B`, `C`, `D`, `E`, `F_hp`, `G`, and `H`.
+  `A`, `B`, `D`, and `G` must be nonnegative; `C`, `E`, `F_hp`, and `H`
+  must be positive. At least one of `A`, `D`, or `G` must be positive.
+  Ages must be at least 1. Transitional alias `F` is accepted and mapped
+  to `F_hp`.
 
 ## Converting mu(x) to qx
 
 For laws defined by a force of mortality \\\mu_x\\, the one-year death
-probability \\q_x\\ is obtained using `frac`:
-
-- `"CF"` or `"CML"`: \\q_x = 1 - \exp(-\mu_x)\\.
-
-- `"UDD"`: \\q_x = \mu_x\\.
-
-- `"Balducci"`: \\q_x = \mu_x/(1+\mu_x)\\.
+probability is \\q_x = 1 - \exp(-\int_x^{x+1}\mu(s)\\ds)\\,
+independently of `frac`. The column `mu_x` contains the force evaluated
+at age \\x\\, not its annual integral. Exponential, Gompertz, Makeham
+and Weibull use analytic integrals; Logistic uses numerical integration
+with relative tolerance `1e-10`. The `frac` label records a within-year
+interpolation convention; it does not replace integration of the
+continuous law. Force products and Logistic ratios use logarithmic
+evaluation to avoid intermediate power overflow; Weibull annual
+increments use `log1p/expm1` instead of subtracting nearly equal
+cumulative hazards.
 
 ## Direct qx laws
 
@@ -201,18 +221,18 @@ mortality_law_table("Exponential", 0, 110, lambda = 0.01)
 
 mortality_law_table("Gompertz", 0, 110, B = 1e-5, c = 1.08)
 #> # A tibble: 111 × 12
-#>        x law     frac     mu_x       qx    px      lx    dx      Lx     Tx    ex
-#>    <int> <chr>   <chr>   <dbl>    <dbl> <dbl>   <dbl> <dbl>   <dbl>  <dbl> <dbl>
-#>  1     0 Gomper… CF    1   e-5 1.000e-5 1.000 100000  1.000 100000. 1.04e7 104. 
-#>  2     1 Gomper… CF    1.08e-5 1.08 e-5 1.000  99999. 1.08   99998. 1.03e7 103. 
-#>  3     2 Gomper… CF    1.17e-5 1.17 e-5 1.000  99998. 1.17   99997. 1.02e7 102. 
-#>  4     3 Gomper… CF    1.26e-5 1.26 e-5 1.000  99997. 1.26   99996. 1.01e7 101. 
-#>  5     4 Gomper… CF    1.36e-5 1.36 e-5 1.000  99995. 1.36   99995. 9.96e6  99.6
-#>  6     5 Gomper… CF    1.47e-5 1.47 e-5 1.000  99994. 1.47   99993. 9.86e6  98.6
-#>  7     6 Gomper… CF    1.59e-5 1.59 e-5 1.000  99993. 1.59   99992. 9.76e6  97.6
-#>  8     7 Gomper… CF    1.71e-5 1.71 e-5 1.000  99991. 1.71   99990. 9.66e6  96.6
-#>  9     8 Gomper… CF    1.85e-5 1.85 e-5 1.000  99989. 1.85   99988. 9.56e6  95.6
-#> 10     9 Gomper… CF    2.00e-5 2.00 e-5 1.000  99988. 2.00   99987. 9.46e6  94.6
+#>        x law      frac      mu_x      qx    px      lx    dx     Lx     Tx    ex
+#>    <int> <chr>    <chr>    <dbl>   <dbl> <dbl>   <dbl> <dbl>  <dbl>  <dbl> <dbl>
+#>  1     0 Gompertz CF     1   e-5 1.04e-5 1.000 100000   1.04 99999. 1.03e7 103. 
+#>  2     1 Gompertz CF     1.08e-5 1.12e-5 1.000  99999.  1.12 99998. 1.02e7 102. 
+#>  3     2 Gompertz CF     1.17e-5 1.21e-5 1.000  99998.  1.21 99997. 1.01e7 101. 
+#>  4     3 Gompertz CF     1.26e-5 1.31e-5 1.000  99997.  1.31 99996. 1.00e7 100. 
+#>  5     4 Gompertz CF     1.36e-5 1.41e-5 1.000  99995.  1.41 99995. 9.93e6  99.4
+#>  6     5 Gompertz CF     1.47e-5 1.53e-5 1.000  99994.  1.53 99993. 9.83e6  98.4
+#>  7     6 Gompertz CF     1.59e-5 1.65e-5 1.000  99992.  1.65 99992. 9.74e6  97.4
+#>  8     7 Gompertz CF     1.71e-5 1.78e-5 1.000  99991.  1.78 99990. 9.64e6  96.4
+#>  9     8 Gompertz CF     1.85e-5 1.92e-5 1.000  99989.  1.92 99988. 9.54e6  95.4
+#> 10     9 Gompertz CF     2.00e-5 2.08e-5 1.000  99987.  2.08 99986. 9.44e6  94.4
 #> # ℹ 101 more rows
 #> # ℹ 1 more variable: mx <dbl>
 
@@ -223,13 +243,13 @@ mortality_law_table("Makeham", 0, 110, A = 5e-4, B = 1e-6, c = 1.10)
 #>  1     0 Makeham CF    0.000501 0.000501 0.999 100000   50.1 99975. 1.04e7 104. 
 #>  2     1 Makeham CF    0.000501 0.000501 0.999  99950.  50.1 99925. 1.03e7 103. 
 #>  3     2 Makeham CF    0.000501 0.000501 0.999  99900.  50.1 99875. 1.02e7 102. 
-#>  4     3 Makeham CF    0.000501 0.000501 0.999  99850.  50.0 99825. 1.01e7 101. 
-#>  5     4 Makeham CF    0.000501 0.000501 0.999  99800.  50.0 99775. 1.00e7 100. 
-#>  6     5 Makeham CF    0.000502 0.000501 0.999  99750.  50.0 99725. 9.91e6  99.3
-#>  7     6 Makeham CF    0.000502 0.000502 0.999  99700.  50.0 99675. 9.81e6  98.4
-#>  8     7 Makeham CF    0.000502 0.000502 0.999  99650.  50.0 99625. 9.71e6  97.4
-#>  9     8 Makeham CF    0.000502 0.000502 0.999  99600.  50.0 99575. 9.61e6  96.5
-#> 10     9 Makeham CF    0.000502 0.000502 0.999  99550.  50.0 99525. 9.51e6  95.5
+#>  4     3 Makeham CF    0.000501 0.000501 0.999  99850.  50.1 99825. 1.01e7 101. 
+#>  5     4 Makeham CF    0.000501 0.000501 0.999  99800.  50.0 99775. 9.99e6 100. 
+#>  6     5 Makeham CF    0.000502 0.000502 0.999  99750.  50.0 99725. 9.89e6  99.2
+#>  7     6 Makeham CF    0.000502 0.000502 0.999  99700.  50.0 99675. 9.79e6  98.2
+#>  8     7 Makeham CF    0.000502 0.000502 0.999  99650.  50.0 99625. 9.69e6  97.3
+#>  9     8 Makeham CF    0.000502 0.000502 0.999  99600.  50.0 99575. 9.59e6  96.3
+#> 10     9 Makeham CF    0.000502 0.000502 0.999  99550.  50.0 99525. 9.50e6  95.4
 #> # ℹ 101 more rows
 #> # ℹ 1 more variable: mx <dbl>
 
@@ -237,16 +257,16 @@ mortality_law_table("Weibull", 1, 110, shape = 2.5, scale = 90)
 #> # A tibble: 110 × 12
 #>        x law     frac      mu_x      qx    px      lx     dx     Lx     Tx    ex
 #>    <int> <chr>   <chr>    <dbl>   <dbl> <dbl>   <dbl>  <dbl>  <dbl>  <dbl> <dbl>
-#>  1     1 Weibull CF     3.25e-5 3.25e-5 1.000 100000    3.25 99998. 7.53e6  75.3
-#>  2     2 Weibull CF     9.20e-5 9.20e-5 1.000  99997.   9.20 99992. 7.43e6  74.3
-#>  3     3 Weibull CF     1.69e-4 1.69e-4 1.000  99988.  16.9  99979. 7.33e6  73.3
-#>  4     4 Weibull CF     2.60e-4 2.60e-4 1.000  99971.  26.0  99958. 7.23e6  72.3
-#>  5     5 Weibull CF     3.64e-4 3.64e-4 1.000  99945.  36.3  99926. 7.13e6  71.3
-#>  6     6 Weibull CF     4.78e-4 4.78e-4 1.000  99908.  47.8  99884. 7.03e6  70.4
-#>  7     7 Weibull CF     6.03e-4 6.02e-4 0.999  99861.  60.2  99830. 6.93e6  69.4
-#>  8     8 Weibull CF     7.36e-4 7.36e-4 0.999  99800.  73.4  99764. 6.83e6  68.5
-#>  9     9 Weibull CF     8.78e-4 8.78e-4 0.999  99727.  87.6  99683. 6.73e6  67.5
-#> 10    10 Weibull CF     1.03e-3 1.03e-3 0.999  99639. 102.   99588. 6.63e6  66.6
+#>  1     1 Weibull CF     3.25e-5 6.06e-5 1.000 100000    6.06 99997. 7.49e6  74.9
+#>  2     2 Weibull CF     9.20e-5 1.29e-4 1.000  99994.  12.9  99987. 7.39e6  73.9
+#>  3     3 Weibull CF     1.69e-4 2.14e-4 1.000  99981.  21.4  99970. 7.29e6  72.9
+#>  4     4 Weibull CF     2.60e-4 3.11e-4 1.000  99960.  31.1  99944. 7.19e6  71.9
+#>  5     5 Weibull CF     3.64e-4 4.20e-4 1.000  99929.  42.0  99908. 7.09e6  71.0
+#>  6     6 Weibull CF     4.78e-4 5.39e-4 0.999  99887.  53.9  99860. 6.99e6  70.0
+#>  7     7 Weibull CF     6.03e-4 6.68e-4 0.999  99833.  66.7  99799. 6.89e6  69.0
+#>  8     8 Weibull CF     7.36e-4 8.06e-4 0.999  99766.  80.4  99726. 6.79e6  68.1
+#>  9     9 Weibull CF     8.78e-4 9.52e-4 0.999  99686.  94.9  99638. 6.69e6  67.1
+#> 10    10 Weibull CF     1.03e-3 1.11e-3 0.999  99591. 110.   99536. 6.59e6  66.2
 #> # ℹ 100 more rows
 #> # ℹ 1 more variable: mx <dbl>
 
@@ -266,7 +286,7 @@ mortality_law_table(
 #>  3     2 Logistic CF    0.000101 1.01e-4 1.000  99980.  10.1 99975. 1.07e7  107.
 #>  4     3 Logistic CF    0.000101 1.01e-4 1.000  99970.  10.1 99965. 1.06e7  106.
 #>  5     4 Logistic CF    0.000101 1.01e-4 1.000  99960.  10.1 99955. 1.05e7  105.
-#>  6     5 Logistic CF    0.000101 1.01e-4 1.000  99949.  10.1 99944. 1.04e7  104.
+#>  6     5 Logistic CF    0.000101 1.02e-4 1.000  99949.  10.1 99944. 1.04e7  104.
 #>  7     6 Logistic CF    0.000102 1.02e-4 1.000  99939.  10.2 99934. 1.03e7  103.
 #>  8     7 Logistic CF    0.000102 1.02e-4 1.000  99929.  10.2 99924. 1.02e7  102.
 #>  9     8 Logistic CF    0.000102 1.02e-4 1.000  99919.  10.2 99914. 1.01e7  101.
@@ -312,25 +332,26 @@ mortality_law_table(
   1, 110,
   A = 0.0002,
   B = 0.1,
-  C = 0.03,
-  D = 10,
-  E = 20,
-  F_hp = 0.00005,
-  G = 1.08
+  C = 0.3,
+  D = 0.03,
+  E = 10,
+  F_hp = 20,
+  G = 0.00005,
+  H = 1.08
 )
 #> # A tibble: 110 × 12
 #>        x law         frac   mu_x      qx    px      lx    dx     Lx     Tx    ex
 #>    <int> <chr>       <chr> <dbl>   <dbl> <dbl>   <dbl> <dbl>  <dbl>  <dbl> <dbl>
-#>  1     1 HeligmanPo… NA       NA 1.39e-4 1.000 100000  13.9  99993. 6.81e6  68.1
-#>  2     2 HeligmanPo… NA       NA 5.83e-5 1.000  99986.  5.83 99983. 6.71e6  67.1
-#>  3     3 HeligmanPo… NA       NA 6.30e-5 1.000  99980.  6.30 99977. 6.61e6  66.1
-#>  4     4 HeligmanPo… NA       NA 6.80e-5 1.000  99974.  6.80 99971. 6.51e6  65.2
-#>  5     5 HeligmanPo… NA       NA 7.35e-5 1.000  99967.  7.34 99963. 6.41e6  64.2
-#>  6     6 HeligmanPo… NA       NA 7.94e-5 1.000  99960.  7.93 99956. 6.31e6  63.2
-#>  7     7 HeligmanPo… NA       NA 8.62e-5 1.000  99952.  8.61 99948. 6.21e6  62.2
-#>  8     8 HeligmanPo… NA       NA 9.93e-5 1.000  99943.  9.93 99938. 6.11e6  61.2
-#>  9     9 HeligmanPo… NA       NA 1.51e-4 1.000  99933. 15.1  99926. 6.01e6  60.2
-#> 10    10 HeligmanPo… NA       NA 3.54e-4 1.000  99918. 35.3  99901. 5.91e6  59.2
+#>  1     1 HeligmanPo… NA       NA 2.10e-4 1.000 100000  21.0  99989. 6.81e6  68.1
+#>  2     2 HeligmanPo… NA       NA 8.22e-5 1.000  99979.  8.22 99975. 6.71e6  67.1
+#>  3     3 HeligmanPo… NA       NA 6.94e-5 1.000  99971.  6.94 99967. 6.61e6  66.1
+#>  4     4 HeligmanPo… NA       NA 7.03e-5 1.000  99964.  7.02 99960. 6.51e6  65.2
+#>  5     5 HeligmanPo… NA       NA 7.44e-5 1.000  99957.  7.44 99953. 6.41e6  64.2
+#>  6     6 HeligmanPo… NA       NA 7.98e-5 1.000  99949.  7.97 99945. 6.31e6  63.2
+#>  7     7 HeligmanPo… NA       NA 8.64e-5 1.000  99941.  8.63 99937. 6.21e6  62.2
+#>  8     8 HeligmanPo… NA       NA 9.94e-5 1.000  99933.  9.94 99928. 6.11e6  61.2
+#>  9     9 HeligmanPo… NA       NA 1.51e-4 1.000  99923. 15.1  99915. 6.01e6  60.2
+#> 10    10 HeligmanPo… NA       NA 3.54e-4 1.000  99908. 35.3  99890. 5.91e6  59.2
 #> # ℹ 100 more rows
 #> # ℹ 1 more variable: mx <dbl>
 
@@ -339,16 +360,16 @@ mortality_law_table("Weibull", 1, 110, k = 2.5, lambda = 90)
 #> # A tibble: 110 × 12
 #>        x law     frac      mu_x      qx    px      lx     dx     Lx     Tx    ex
 #>    <int> <chr>   <chr>    <dbl>   <dbl> <dbl>   <dbl>  <dbl>  <dbl>  <dbl> <dbl>
-#>  1     1 Weibull CF     3.25e-5 3.25e-5 1.000 100000    3.25 99998. 7.53e6  75.3
-#>  2     2 Weibull CF     9.20e-5 9.20e-5 1.000  99997.   9.20 99992. 7.43e6  74.3
-#>  3     3 Weibull CF     1.69e-4 1.69e-4 1.000  99988.  16.9  99979. 7.33e6  73.3
-#>  4     4 Weibull CF     2.60e-4 2.60e-4 1.000  99971.  26.0  99958. 7.23e6  72.3
-#>  5     5 Weibull CF     3.64e-4 3.64e-4 1.000  99945.  36.3  99926. 7.13e6  71.3
-#>  6     6 Weibull CF     4.78e-4 4.78e-4 1.000  99908.  47.8  99884. 7.03e6  70.4
-#>  7     7 Weibull CF     6.03e-4 6.02e-4 0.999  99861.  60.2  99830. 6.93e6  69.4
-#>  8     8 Weibull CF     7.36e-4 7.36e-4 0.999  99800.  73.4  99764. 6.83e6  68.5
-#>  9     9 Weibull CF     8.78e-4 8.78e-4 0.999  99727.  87.6  99683. 6.73e6  67.5
-#> 10    10 Weibull CF     1.03e-3 1.03e-3 0.999  99639. 102.   99588. 6.63e6  66.6
+#>  1     1 Weibull CF     3.25e-5 6.06e-5 1.000 100000    6.06 99997. 7.49e6  74.9
+#>  2     2 Weibull CF     9.20e-5 1.29e-4 1.000  99994.  12.9  99987. 7.39e6  73.9
+#>  3     3 Weibull CF     1.69e-4 2.14e-4 1.000  99981.  21.4  99970. 7.29e6  72.9
+#>  4     4 Weibull CF     2.60e-4 3.11e-4 1.000  99960.  31.1  99944. 7.19e6  71.9
+#>  5     5 Weibull CF     3.64e-4 4.20e-4 1.000  99929.  42.0  99908. 7.09e6  71.0
+#>  6     6 Weibull CF     4.78e-4 5.39e-4 0.999  99887.  53.9  99860. 6.99e6  70.0
+#>  7     7 Weibull CF     6.03e-4 6.68e-4 0.999  99833.  66.7  99799. 6.89e6  69.0
+#>  8     8 Weibull CF     7.36e-4 8.06e-4 0.999  99766.  80.4  99726. 6.79e6  68.1
+#>  9     9 Weibull CF     8.78e-4 9.52e-4 0.999  99686.  94.9  99638. 6.69e6  67.1
+#> 10    10 Weibull CF     1.03e-3 1.11e-3 0.999  99591. 110.   99536. 6.59e6  66.2
 #> # ℹ 100 more rows
 #> # ℹ 1 more variable: mx <dbl>
 
@@ -357,25 +378,26 @@ mortality_law_table(
   1, 110,
   A = 0.0002,
   B = 0.1,
-  C = 0.03,
-  D = 10,
-  E = 20,
-  F = 0.00005,
-  G = 1.08
+  C = 0.3,
+  D = 0.03,
+  E = 10,
+  F = 20,
+  G = 0.00005,
+  H = 1.08
 )
 #> # A tibble: 110 × 12
 #>        x law         frac   mu_x      qx    px      lx    dx     Lx     Tx    ex
 #>    <int> <chr>       <chr> <dbl>   <dbl> <dbl>   <dbl> <dbl>  <dbl>  <dbl> <dbl>
-#>  1     1 HeligmanPo… NA       NA 1.39e-4 1.000 100000  13.9  99993. 6.81e6  68.1
-#>  2     2 HeligmanPo… NA       NA 5.83e-5 1.000  99986.  5.83 99983. 6.71e6  67.1
-#>  3     3 HeligmanPo… NA       NA 6.30e-5 1.000  99980.  6.30 99977. 6.61e6  66.1
-#>  4     4 HeligmanPo… NA       NA 6.80e-5 1.000  99974.  6.80 99971. 6.51e6  65.2
-#>  5     5 HeligmanPo… NA       NA 7.35e-5 1.000  99967.  7.34 99963. 6.41e6  64.2
-#>  6     6 HeligmanPo… NA       NA 7.94e-5 1.000  99960.  7.93 99956. 6.31e6  63.2
-#>  7     7 HeligmanPo… NA       NA 8.62e-5 1.000  99952.  8.61 99948. 6.21e6  62.2
-#>  8     8 HeligmanPo… NA       NA 9.93e-5 1.000  99943.  9.93 99938. 6.11e6  61.2
-#>  9     9 HeligmanPo… NA       NA 1.51e-4 1.000  99933. 15.1  99926. 6.01e6  60.2
-#> 10    10 HeligmanPo… NA       NA 3.54e-4 1.000  99918. 35.3  99901. 5.91e6  59.2
+#>  1     1 HeligmanPo… NA       NA 2.10e-4 1.000 100000  21.0  99989. 6.81e6  68.1
+#>  2     2 HeligmanPo… NA       NA 8.22e-5 1.000  99979.  8.22 99975. 6.71e6  67.1
+#>  3     3 HeligmanPo… NA       NA 6.94e-5 1.000  99971.  6.94 99967. 6.61e6  66.1
+#>  4     4 HeligmanPo… NA       NA 7.03e-5 1.000  99964.  7.02 99960. 6.51e6  65.2
+#>  5     5 HeligmanPo… NA       NA 7.44e-5 1.000  99957.  7.44 99953. 6.41e6  64.2
+#>  6     6 HeligmanPo… NA       NA 7.98e-5 1.000  99949.  7.97 99945. 6.31e6  63.2
+#>  7     7 HeligmanPo… NA       NA 8.64e-5 1.000  99941.  8.63 99937. 6.21e6  62.2
+#>  8     8 HeligmanPo… NA       NA 9.94e-5 1.000  99933.  9.94 99928. 6.11e6  61.2
+#>  9     9 HeligmanPo… NA       NA 1.51e-4 1.000  99923. 15.1  99915. 6.01e6  60.2
+#> 10    10 HeligmanPo… NA       NA 3.54e-4 1.000  99908. 35.3  99890. 5.91e6  59.2
 #> # ℹ 100 more rows
 #> # ℹ 1 more variable: mx <dbl>
 ```

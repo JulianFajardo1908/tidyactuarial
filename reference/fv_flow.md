@@ -39,8 +39,9 @@ fv_flow(
 
 - m:
 
-  Positive integer vector giving the conversion frequency for nominal
-  rates. May have length 1 or the same length as `cf`.
+  Conversion frequency for nominal rates. Must contain positive integers
+  for nominal conversions and is ignored by other rate families. May
+  have length 1 or the same length as `cf`.
 
 - t:
 
@@ -96,7 +97,18 @@ Internally, all supplied rates are converted to annual effective rates
 using
 [`standardize_interest`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md).
 When `i` is a vector, the accumulation uses the implied discount-factor
-ratio under the spot-rate interpretation.
+ratio under the spot-rate interpretation. The ratio is evaluated from
+log accumulation rates, avoiding overflow of its separate numerator and
+denominator. If a horizon annual equivalent rounds to -1 or overflows to
+Inf, tied horizon flows must have exactly equal log accumulation rates;
+otherwise the existing annual-rate tolerance applies.
+
+Products are evaluated in log space when separate factors lose range or
+precision; original cash-flow signs and known zero amounts are
+preserved. If individual values overflow, amounts with exactly equal
+finite log factors are netted before valuation. Cancellation between
+unequal factors is not recovered by this rule and may still produce
+non-finite results.
 
 This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `cf` denotes cash flows, `t` denotes time, `i` denotes

@@ -9,7 +9,7 @@ insurance contract."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -204,6 +204,7 @@ benefits, APV of the premium annuity, and equivalence residual.</p>
     <p>For premiums payable \(k\) times per year, the function distinguishes
 between the annualized premium \(P^{(k)}\) and the amount paid at each
 installment, \(P^{(k)} / k\).</p>
+
 <p>Let \(Z\) denote the present-value random variable of the two-life
 insurance benefit and let \(Y^{(k)}\) denote the present value of the
 contingent premium annuity normalized to an annual payment rate of 1.
@@ -224,8 +225,13 @@ $$
 P_{\text{per payment}} = \frac{P^{(k)}}{k}.
 $$</p>
 <p>Standard whole-life, term, and endowment benefits are valued through
-<code><a href="insurance_xy.html">insurance_xy</a></code>. A pure endowment is obtained as the difference
-between the corresponding endowment and term insurance values.</p>
+<code><a href="insurance_xy.html">insurance_xy</a></code>. A pure endowment is valued directly as the
+discounted benefit times status survival at maturity, retaining the
+issue-age conditioning, including for deferred last-survivor benefits.
+The identity endowment minus term remains a mathematical check, rather
+than the numerical calculation. Tables and horizons are validated without
+inventing terminal mortality. The premium annuity must have a positive
+finite representable APV; the output is one contract, not parallel scenarios.</p>
 <p>A contract assembled with pipes may be valued directly:</p>
 <div class="sourceCode"><pre><code><span></span>
 <span><span class="fu"><a href="../reference/life_contract.html">life_contract</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -239,9 +245,9 @@ in the contract components.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="premium_x.html">premium_x</a></code>, <code><a href="insurance_xy.html">insurance_xy</a></code>,
-<code><a href="annuity_xy.html">annuity_xy</a></code>, <code><a href="reserve_xy.html">reserve_xy</a></code>,
-<code><a href="life_contract.html">life_contract</a></code>, <code><a href="add_insurance.html">add_insurance</a></code>,
-<code><a href="add_premium_schedule.html">add_premium_schedule</a></code></p>
+  <code><a href="annuity_xy.html">annuity_xy</a></code>, <code><a href="reserve_xy.html">reserve_xy</a></code>,
+  <code><a href="life_contract.html">life_contract</a></code>, <code><a href="add_insurance.html">add_insurance</a></code>,
+  <code><a href="add_premium_schedule.html">add_premium_schedule</a></code></p>
 <p>Other life-contingencies:
 <code><a href="add_insurance.html">add_insurance()</a></code>,
 <code><a href="add_premium_schedule.html">add_premium_schedule()</a></code>,

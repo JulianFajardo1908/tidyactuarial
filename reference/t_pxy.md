@@ -40,8 +40,10 @@ t_pxy(lt, x, y, t, frac, status = c("joint", "last"))
   `"Balducci"`. If not specified and the supplied life table(s) carry a
   `frac` attribute, that value is used. If two tables are supplied and
   their `frac` attributes differ, `frac` must be supplied explicitly.
-  Passed to
+  Uses the same assumptions as
   [`t_px`](https://julianfajardo1908.github.io/tidyactuarial/reference/t_px.md).
+  Inherited `"CML"` is normalized to `"CF"` before comparing the two
+  tables' assumptions.
 
 - status:
 
@@ -55,19 +57,27 @@ A single numeric value.
 
 Independence is assumed throughout (Finan, Sections 56–57).
 
-**Joint-life status** (Finan, Section 56): the status survives as long
-as *both* lives are alive. \$\${}\_tp\_{xy} = {}\_tp_x \cdot
+\*\*Joint-life status\*\* (Finan, Section 56): the status survives as
+long as *both* lives are alive. \$\${}\_tp\_{xy} = {}\_tp_x \cdot
 {}\_tp_y.\$\$
 
-**Last-survivor status** (Finan, Section 57): the status survives as
+\*\*Last-survivor status\*\* (Finan, Section 57): the status survives as
 long as *at least one* life is alive. \$\${}\_tp\_{\overline{xy}} =
 {}\_tp_x + {}\_tp_y - {}\_tp_x \cdot {}\_tp_y.\$\$
 
-Individual survival probabilities \\{}\_tp_x\\ and \\{}\_tp_y\\ are
-computed via
-[`t_px`](https://julianfajardo1908.github.io/tidyactuarial/reference/t_px.md),
-which supports fractional ages under UDD, constant force, and Balducci
-assumptions (Finan, Section 24).
+Individual survival probabilities \\{}\_tp_x\\ and \\{}\_tp_y\\ use
+observed `lx` ratios and fractional survival under UDD, constant force,
+or Balducci (Finan, Section 24). Logarithmic calculations retain small
+annual survival without subtracting a rounded death probability from
+one. Last-survivor survival is evaluated as
+\\\max(p_x,p_y)+(1-\max(p_x,p_y))\min(p_x,p_y)\\. Tables must have
+unique consecutive annual integer ages and finite, nonnegative,
+nonincreasing `lx`. Supplied `px`/`qx` must lie in \[0,1\] and agree
+with each other and observed annual `lx` ratios within `1e-10`; unknown
+probabilities may be `NA`. Ages must fit R's integer range and durations
+must be finite. The established `t_px` horizon and zero-duration
+conventions apply; survival beyond the last recorded age is a
+truncation, not extrapolation.
 
 ## See also
 
@@ -128,7 +138,7 @@ lt_ilt <- data.frame(
          6114913)
 )
 t_pxy(lt_ilt, x = 50, y = 60, t = 10, status = "joint")
-#> [1] NA
+#> [1] 0.6831617
 
 # Finan Problem 56.1: t_q_xy = t_q_x + t_q_y - t_q_x * t_q_y
 p_joint <- t_pxy(lt, x = 60, y = 62, t = 3, status = "joint")

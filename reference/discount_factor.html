@@ -19,7 +19,7 @@ a time-varying force of interest delta(t).
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -148,7 +148,12 @@ for an accumulation function, and
 $$v(s,t) =
 \exp\left(-\int_s^t \delta(u)\,du\right)$$
 for a time-varying force of interest.</p>
-<p>Exactly one of <code>i</code>, <code>a</code>, or <code>delta</code> must be supplied.</p>
+
+<p>Exactly one of <code>i</code>, <code>a</code>, or <code>delta</code> must be supplied.
+The requested discount factor is evaluated from the log accumulation,
+without requiring its reciprocal to be representable. It must be positive
+and finite. In tidy output, an unrepresentable intermediate accumulation
+factor may be Inf or zero; the discount factor is computed independently.</p>
 <p>Numeric arguments may have length 1 or a common length. Scalars are
 recycled over the remaining scenarios, making the function suitable for
 use inside <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code> pipelines.</p>
@@ -159,13 +164,16 @@ For discount factors obtained specifically from a spot-rate curve, see
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="accumulation_factor.html">accumulation_factor</a></code>,
-<code><a href="discount_factor_spot.html">discount_factor_spot</a></code>,
-<code><a href="present_value.html">present_value</a></code>, <code><a href="pv_flow.html">pv_flow</a></code></p>
+  <code><a href="discount_factor_spot.html">discount_factor_spot</a></code>,
+  <code><a href="present_value.html">present_value</a></code>, <code><a href="pv_flow.html">pv_flow</a></code></p>
 <p>Other interest:
 <code><a href="accumulation_factor.html">accumulation_factor()</a></code>,
+<code><a href="bootstrap_spot_curve.html">bootstrap_spot_curve()</a></code>,
 <code><a href="discount_factor_spot.html">discount_factor_spot()</a></code>,
+<code><a href="forward_curve.html">forward_curve()</a></code>,
 <code><a href="forward_rate.html">forward_rate()</a></code>,
 <code><a href="interest_equivalents.html">interest_equivalents()</a></code>,
+<code><a href="par_rate.html">par_rate()</a></code>,
 <code><a href="standardize_interest.html">standardize_interest()</a></code>,
 <code><a href="yield_curve.html">yield_curve()</a></code></p>
 <p>Other time-value:

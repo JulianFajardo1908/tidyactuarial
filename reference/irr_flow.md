@@ -124,6 +124,11 @@ supplied, the earliest date is treated as time 0.
 
 The IRR returned is interpreted as an annual effective rate.
 
+Root finding scales the cash flows by their largest absolute amount;
+this preserves roots across monetary units. The reported NPV remains in
+the original currency. Scaling that would erase a nonzero amount through
+underflow is rejected. The tolerance controls the rate-coordinate solve.
+
 This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `cf` denotes cash flows, `t` denotes time, and `m`
 denotes the conversion frequency used to report the equivalent nominal

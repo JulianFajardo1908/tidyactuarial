@@ -9,7 +9,7 @@ rates for the same conversion frequency m."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,20 +78,20 @@ rates.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with columns:</p><dl><dt>family</dt>
-<dd><p>Rate family: <code>"effective"</code>, <code>"discount"</code>,
-<code>"force"</code>, <code>"nominal_interest"</code>, or
-<code>"nominal_discount"</code>.</p></dd>
+<dd><p>Rate or factor family: <code>"effective"</code>, <code>"discount"</code>,
+    <code>"discount_factor"</code>, <code>"force"</code>, <code>"nominal_interest"</code>, or
+    <code>"nominal_discount"</code>.</p></dd>
 
-<dt>notation</dt>
+  <dt>notation</dt>
 <dd><p>Actuarial notation for the equivalent rate.</p></dd>
 
-<dt>m</dt>
+  <dt>m</dt>
 <dd><p>Conversion frequency used for nominal rates.</p></dd>
 
-<dt>description</dt>
+  <dt>description</dt>
 <dd><p>Human-readable description.</p></dd>
 
-<dt>value</dt>
+  <dt>value</dt>
 <dd><p>Equivalent rate value.</p></dd>
 
 
@@ -100,23 +100,27 @@ rates.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Internally, the supplied rate is first converted to the annual effective
 interest rate \(i\) using <code><a href="standardize_interest.html">standardize_interest</a></code>.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>i</code> denotes the interest-rate value,
 <code>i_type</code> denotes the type of interest rate, and <code>m</code> denotes the
 conversion frequency for nominal rates.</p>
+<p>Calculations retain the log accumulation rate of the original input.
+An extreme annual effective equivalent may round to -1 or overflow to Inf
+while other equivalent quantities remain representable.</p>
 <p>Given the annual effective interest rate \(i\), the equivalents are:</p><dl><dt>Effective discount rate:</dt>
 <dd><p>\(d = i/(1+i)\)</p></dd>
 
-<dt>Discount factor:</dt>
+  <dt>Discount factor:</dt>
 <dd><p>\(v = 1/(1+i)\)</p></dd>
 
-<dt>Force of interest:</dt>
+  <dt>Force of interest:</dt>
 <dd><p>\(\delta = \ln(1+i)\)</p></dd>
 
-<dt>Nominal interest:</dt>
+  <dt>Nominal interest:</dt>
 <dd><p>\(j^{(m)} = m[(1+i)^{1/m} - 1]\)</p></dd>
 
-<dt>Nominal discount:</dt>
+  <dt>Nominal discount:</dt>
 <dd><p>\(d^{(m)} = m[1 - (1+i)^{-1/m}]\)</p></dd>
 
 
@@ -124,12 +128,15 @@ conversion frequency for nominal rates.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="standardize_interest.html">standardize_interest</a></code>,
-<code><a href="discount_factor_spot.html">discount_factor_spot</a></code></p>
+  <code><a href="discount_factor_spot.html">discount_factor_spot</a></code></p>
 <p>Other interest:
 <code><a href="accumulation_factor.html">accumulation_factor()</a></code>,
+<code><a href="bootstrap_spot_curve.html">bootstrap_spot_curve()</a></code>,
 <code><a href="discount_factor.html">discount_factor()</a></code>,
 <code><a href="discount_factor_spot.html">discount_factor_spot()</a></code>,
+<code><a href="forward_curve.html">forward_curve()</a></code>,
 <code><a href="forward_rate.html">forward_rate()</a></code>,
+<code><a href="par_rate.html">par_rate()</a></code>,
 <code><a href="standardize_interest.html">standardize_interest()</a></code>,
 <code><a href="yield_curve.html">yield_curve()</a></code></p></div>
     </div>
@@ -144,7 +151,7 @@ conversion frequency for nominal rates.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> discount         d           <span style="color: #BB0000;">NA</span> effective annual discount rate           0.161</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> discount_factor  v           <span style="color: #BB0000;">NA</span> annual discount factor                   0.839</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> force            delta       <span style="color: #BB0000;">NA</span> force of interest                        0.176</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> nominal_interest j^(4)        4 nominal annual interest rate convertibl… 0.180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> nominal_interest j^(4)        4 nominal annual interest rate convertibl… 0.18 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> nominal_discount d^(4)        4 nominal annual discount rate convertibl… 0.172</span>
 <span class="r-in"><span><span class="fu">interest_equivalents</span><span class="op">(</span>i_type <span class="op">=</span> <span class="st">"nominal_discount"</span>, i <span class="op">=</span> <span class="fl">0.10</span>, m <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 5</span></span>
@@ -155,7 +162,7 @@ conversion frequency for nominal rates.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> discount_factor  v           <span style="color: #BB0000;">NA</span> annual discount factor                  0.904 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> force            delta       <span style="color: #BB0000;">NA</span> force of interest                       0.100 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> nominal_interest j^(12)      12 nominal annual interest rate convertib… 0.101 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> nominal_discount d^(12)      12 nominal annual discount rate convertib… 0.100<span style="text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> nominal_discount d^(12)      12 nominal annual discount rate convertib… 0.1   </span>
 <span class="r-in"><span><span class="fu">interest_equivalents</span><span class="op">(</span>i_type <span class="op">=</span> <span class="st">"force"</span>, i <span class="op">=</span> <span class="fl">0.12</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   family           notation     m description                              value</span>

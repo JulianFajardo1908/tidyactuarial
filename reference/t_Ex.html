@@ -13,7 +13,7 @@ $${}_tE_x = v^t \cdot {}_tp_x.$$"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -126,7 +126,7 @@ attribute, that value is used.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Numeric vector of \({}_tE_x\), or a tibble if
-<code>tidy = TRUE</code>.</p>
+  <code>tidy = TRUE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -139,16 +139,20 @@ frequency for nominal rates.</p>
 mathematics. It serves as the actuarial discount factor, combining financial
 discounting with mortality:
 $${}_tE_x = v^t \cdot {}_tp_x.$$</p>
-<p>The interest-rate input is converted to an annual effective rate before
-applying the discount factor:
+<p>Discounted products use the original log accumulation rate, retaining
+representable values when the annual effective equivalent loses range.
+This is an actuarial present value, not a probability: it can exceed one
+with negative interest rates and is not capped. The equivalent rate in
+tidy output may round to -1 or overflow, without being used for valuation.
+In ordinary notation the discount factor is:
 $$v = (1+i_e)^{-1}.$$</p>
 <p>Key identities involving \({}_nE_x\):</p><ul><li><p>Actuarial accumulated value:
-\(\ddot{s}_{x:\overline{n}|} = \ddot{a}_{x:\overline{n}|} /
+    \(\ddot{s}_{x:\overline{n}|} = \ddot{a}_{x:\overline{n}|} /
     {}_nE_x\).</p></li>
 <li><p>Endowment insurance decomposition:
-\(A_{x:\overline{n}|} = A^1_{x:\overline{n}|} + {}_nE_x\).</p></li>
+    \(A_{x:\overline{n}|} = A^1_{x:\overline{n}|} + {}_nE_x\).</p></li>
 <li><p>Deferred annuity:
-\({}_{n|}\ddot{a}_x = {}_nE_x \cdot \ddot{a}_{x+n}\).</p></li>
+    \({}_{n|}\ddot{a}_x = {}_nE_x \cdot \ddot{a}_{x+n}\).</p></li>
 </ul><p>For a constant force of mortality \(\mu\) and force of interest
 \(\delta\):
 $${}_nE_x = e^{-n(\mu + \delta)}.$$</p>
@@ -158,8 +162,8 @@ $$\mathrm{Var}(Z) = v^{2n} \cdot {}_np_x \cdot {}_nq_x.$$</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="t_px.html">t_px</a></code> for survival probabilities without discounting,
-<code><a href="insurance_x.html">insurance_x</a></code> for insurance APVs, <code><a href="annuity_x.html">annuity_x</a></code> for
-life annuity APVs.</p></div>
+  <code><a href="insurance_x.html">insurance_x</a></code> for insurance APVs, <code><a href="annuity_x.html">annuity_x</a></code> for
+  life annuity APVs.</p></div>
     </div>
 
     <div class="section level2">

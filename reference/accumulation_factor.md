@@ -103,7 +103,10 @@ use inside
 pipelines.
 
 Times must satisfy \\0 \le s \le t\\. Missing times propagate as missing
-accumulation factors.
+accumulation factors. Conventional inputs are valued using their
+original log accumulation rate. In tidy output, the annual equivalent
+may round to -1 or overflow to Inf even when the requested interval
+factor is positive and finite.
 
 ## See also
 
@@ -112,10 +115,13 @@ accumulation factors.
 [`future_value`](https://julianfajardo1908.github.io/tidyactuarial/reference/future_value.md)
 
 Other interest:
+[`bootstrap_spot_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bootstrap_spot_curve.md),
 [`discount_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor.md),
 [`discount_factor_spot()`](https://julianfajardo1908.github.io/tidyactuarial/reference/discount_factor_spot.md),
+[`forward_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_curve.md),
 [`forward_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/forward_rate.md),
 [`interest_equivalents()`](https://julianfajardo1908.github.io/tidyactuarial/reference/interest_equivalents.md),
+[`par_rate()`](https://julianfajardo1908.github.io/tidyactuarial/reference/par_rate.md),
 [`standardize_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md),
 [`yield_curve()`](https://julianfajardo1908.github.io/tidyactuarial/reference/yield_curve.md)
 
@@ -136,6 +142,15 @@ Other time-value:
 # Constant annual effective interest
 accumulation_factor(t = 5, i = 0.07)
 #> [1] 1.402552
+
+# The same financial law in three representations
+c(
+  rate = accumulation_factor(t = 5, i = 0.03, i_type = "force"),
+  accumulation = accumulation_factor(t = 5, a = function(t) exp(0.03 * t)),
+  varying_force = accumulation_factor(t = 5, delta = function(t) 0.03)
+)
+#>          rate  accumulation varying_force 
+#>      1.161834      1.161834      1.161834 
 
 # One rate recycled over several times
 accumulation_factor(

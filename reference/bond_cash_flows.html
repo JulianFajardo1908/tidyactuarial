@@ -11,7 +11,7 @@ notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,8 @@ to <code>face</code>.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Numeric scalar. Tolerance.</p></dd>
+<dd><p>Finite positive numeric scalar. Absolute tolerance for integer
+alignment of <code>k</code> and <code>n * k</code>; it is not a monetary tolerance.</p></dd>
 
 
 <dt id="arg-check">check<a class="anchor" aria-label="anchor" href="#arg-check"></a></dt>
@@ -91,7 +92,7 @@ to <code>face</code>.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with the bond cash-flow schedule. The main actuarial
-columns are <code>t</code> for payment time and <code>cf</code> for cash flow.</p>
+  columns are <code>t</code> for payment time and <code>cf</code> for cash flow.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -99,7 +100,11 @@ columns are <code>t</code> for payment time and <code>cf</code> for cash flow.</
 <code>tidyactuarial</code>: <code>face</code> is the face value, <code>c</code> is the annual
 coupon rate, <code>n</code> is the term to maturity, <code>k</code> is the number of
 coupon payments per year, and <code>R</code> is the redemption value.</p>
-<p>Stub periods are not supported; therefore, <code>n * k</code> must be an integer.</p>
+<p>Stub periods are not supported; therefore, <code>n * k</code> must be an integer.
+The coupon is \(face \cdot c/k\). Coupons and redemption remain separate
+rows at maturity. At <code>n = 0</code>, only immediate redemption is returned.
+The schedule requires finite coupons and an integer number of periods below
+<code>.Machine$integer.max</code>, with sufficient memory for the resulting rows.</p>
     </div>
 
     <div class="section level2">

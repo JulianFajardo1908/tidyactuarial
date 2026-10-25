@@ -11,7 +11,7 @@ independent future lifetimes and using compact actuarial notation."></head><body
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -156,17 +156,30 @@ interest rate, deferment factor, unit APV, and APV.</p>
 <li><p><code>"term"</code>: n-year two-life term insurance.</p></li>
 <li><p><code>"endowment"</code>: n-year two-life endowment insurance.</p></li>
 </ul><p>The <code>status</code> argument determines the two-life status:</p><ul><li><p><code>status = "joint"</code>: first-death insurance, based on the
-joint-life status.</p></li>
+  joint-life status.</p></li>
 <li><p><code>status = "last"</code>: second-death insurance, based on the
-last-survivor status.</p></li>
+  last-survivor status.</p></li>
 </ul><p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>lt</code> is the life table input, <code>x</code> and
 <code>y</code> are the two actuarial ages, <code>i</code> is the interest-rate input,
 <code>i_type</code> is the interest-rate type, <code>m</code> is the conversion
 frequency for nominal rates, <code>n</code> is the insurance term, and <code>h</code> is
 the deferment period.</p>
-<p>The function uses the standard fully discrete identities that express
-insurance values through two-life annuity-due values.</p>
+<p>Both lives are alive at issue (state 11). Internal states 10 and 01 mean
+only x or only y is alive; 00 is absorbing. The API does not take an
+observed single-survivor initial state. In a joint-life contract, leaving
+11 triggers the first-death benefit once. A last-survivor contract continues
+through 10 or 01 and pays on entering 00. Both deaths within one annual
+interval trigger one benefit, payable at the end of that year.</p>
+<p>Valuation sums discounted annual transition masses from the issue ages;
+it does not subtract rounded annuity values. With marginal survival Sx, Sy,
+cumulative death Qx, Qy, and interval death masses Dx, Dy, the first-death
+mass in (t,t+1] is Dx(t) Sy(t) + Sx(t+1) Dy(t); the second-death mass is
+Dx(t) Qy(t) + Qx(t) Dy(t) + Dx(t) Dy(t). Counts supply the decrements
+directly. Original log interest and monetary amounts are combined before
+exponentiating when necessary. The annual payment model is independent of
+fractional interpolation; frac is retained as an audit assumption.</p>
+<p>The following fully discrete identities remain checks on the result:</p>
 <p>For a whole-life contract:
 $$A = 1 - d \ddot{a}.$$</p>
 <p>For an n-year term insurance:
@@ -175,15 +188,31 @@ $$A^1_{:\overline{n}|} =
 <p>For an n-year endowment insurance:
 $$A_{:\overline{n}|} =
 1 - d\ddot{a}_{:\overline{n}|}.$$</p>
-<p>A deferred insurance is valued by multiplying the value at deferred ages
-<code>x + h</code> and <code>y + h</code> by the deferment factor
+<p>Whole-life valuation requires observed mortality through extinction of the
+selected status: at least one marginal must reach zero within the joint
+horizon, and both must reach zero for last-survivor insurance. An open
+table cannot imply a terminal death or maturity benefit. Use an explicit
+term or endowment for the observed horizon, or extend the table.
+No missing annual interval of an open marginal table is extrapolated.
+A zero-term endowment pays benefit at h if the status survives; a zero-term
+term insurance has no death coverage and pays zero. Annual tables must
+satisfy the consistency requirements of <code><a href="t_pxy.html">t_pxy</a></code>, and issue
+ages must have positive lx. One call values one contract, not scenarios.</p>
+<p>A deferred insurance retains survival probabilities from the issue ages.
+Its continuation value conditional on the selected status surviving to
+<code>h</code> is multiplied by the deferment factor
 $$v^h\,{}_hp_{xy}$$
-for the selected two-life status.</p>
+for the selected two-life status.
+For last-survivor insurance, this conditioning includes paths with only
+one survivor at <code>h</code>; it does not restart both lives at deferred ages.
+In tidy output, <code>annuity_due_value</code> is the annuity at time <code>h</code>
+conditional on that status surviving to <code>h</code>, and
+<code>survival_to_maturity</code>, when reported, uses the same conditioning.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="annuity_xy.html">annuity_xy</a></code>, <code><a href="premium_xy.html">premium_xy</a></code>,
-<code><a href="insurance_x.html">insurance_x</a></code>, <code><a href="t_pxy.html">t_pxy</a></code></p>
+  <code><a href="insurance_x.html">insurance_x</a></code>, <code><a href="t_pxy.html">t_pxy</a></code></p>
 <p>Other life-contingencies:
 <code><a href="add_insurance.html">add_insurance()</a></code>,
 <code><a href="add_premium_schedule.html">add_premium_schedule()</a></code>,

@@ -73,7 +73,10 @@ premium_x(
 
 - n:
 
-  Insurance term in years. Use `Inf` for whole-life insurance.
+  Insurance term in years. Use `Inf` for whole-life insurance. For
+  `type = "variable_k"`, fractional terms aligned with the benefit
+  frequency are permitted; the default `Inf` infers a finite term from a
+  numeric benefit schedule.
 
 - h:
 
@@ -172,6 +175,17 @@ A contract assembled with pipes may be valued directly:
 
 Explicit arguments supplied to `premium_x()` override values stored in
 the contract components.
+
+For variable benefits the actual coverage term, including a term
+inferred from the benefit vector, bounds the premium-paying period and
+is reported in audit output. Benefit frequency inherited from an
+insurance component can differ from premium frequency. The benefit
+vector describes payments within one contract, not independent
+scenarios. This function retains its scalar-contract interface; use
+separate calls for different contracts. The premium annuity must have a
+positive finite APV. An undefined or nonfinite premium-annuity factor is
+rejected, rather than treating an indeterminate ratio of two infinite
+APVs as a premium.
 
 ## See also
 

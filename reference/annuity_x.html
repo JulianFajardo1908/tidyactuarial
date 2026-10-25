@@ -9,7 +9,7 @@ actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,12 +76,12 @@ A life table must contain columns <code>x</code> and <code>lx</code>.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Integer actuarial age. Optional when <code>lt</code> is a single-life
+<dd><p>Integer actuarial age, or a vector of scenario ages. Optional when <code>lt</code> is a single-life
 <code>tidyact_life_contract</code>.</p></dd>
 
 
 <dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
-<dd><p>Numeric scalar. Annual interest-rate input. Optional when <code>lt</code>
+<dd><p>Numeric annual interest-rate input, scalar or by scenario. Optional when <code>lt</code>
 is a single-life <code>tidyact_life_contract</code>.</p></dd>
 
 
@@ -140,14 +140,14 @@ otherwise <code>"UDD"</code> is used.</p></dd>
 
 <dt id="arg-tidy">tidy<a class="anchor" aria-label="anchor" href="#arg-tidy"></a></dt>
 <dd><p>Logical. If <code>FALSE</code>, returns a numeric APV. If <code>TRUE</code>,
-returns a one-row tibble with intermediate quantities.</p></dd>
+returns one tibble row per scenario with intermediate quantities.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>If <code>tidy = FALSE</code>, a numeric scalar containing the actuarial present
-value.</p>
-<p>If <code>tidy = TRUE</code>, a one-row tibble with the main input values,
+    <p>If <code>tidy = FALSE</code>, a numeric vector of actuarial present values,
+of length one for a single scenario.</p>
+<p>If <code>tidy = TRUE</code>, a tibble with one row per scenario, the main input values,
 equivalent interest rate, deferment factor, pure endowment factor, and APV.</p>
     </div>
     <div class="section level2">
@@ -188,11 +188,34 @@ normalization is essential when the function is used as the premium
 annuity in the equivalence principle: the resulting premium is annualized,
 and the amount paid at each installment is the annualized premium divided
 by \(k\).</p>
+<p><strong>Scenarios and tidy workflows.</strong> All arguments except <code>lt</code> and
+<code>tidy</code> may have a common positive length; only length-one arguments
+recycle. <code>n = NULL</code> and <code>frac = NULL</code> keep their scalar default
+meanings. Scenarios are paired by position, not expanded to a Cartesian
+product, and each describes one life under the shared table. Invalid or
+missing inputs are rejected with the scenario number; no partial result is
+returned. Use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code> with <code>tidy = FALSE</code> for portfolios,
+or <code>tidy = TRUE</code> for an auditable scenario table. Different mortality
+tables require separate calls, for example in a list-column workflow.</p>
+<p><strong>Model and numerical limits.</strong> Discounting retains the original log
+accumulation rate; exact payments are valued from the issue age, avoiding
+products of separately rounded deferment and conditional values. Intermediate
+diagnostic values can be zero or infinite while the APV remains finite.
+Tables must have an annual age grid and nonincreasing finite <code>lx</code>,
+with a positive count at issue. For compatibility, a count of zero is assumed
+at one year beyond the last recorded age, even for an open input table.
+Known extinct tails contribute zero. Woolhouse is an approximation using
+annual survival estimates of boundary forces, not an exact integral; its
+second order requires positive survival where a boundary force is needed.
+Negative approximations generate a warning and are not clamped. Prefer
+<code>woolhouse = "none"</code> for exact payments under the chosen fractional
+assumption. At <code>n = 0</code>, APV and the annuity value at start are zero,
+while the zero-term pure endowment factor is one.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="insurance_x.html">insurance_x</a></code>, <code><a href="premium_x.html">premium_x</a></code>,
-<code><a href="reserve_x.html">reserve_x</a></code>, <code><a href="t_px.html">t_px</a></code>, <code><a href="t_Ex.html">t_Ex</a></code></p>
+  <code><a href="reserve_x.html">reserve_x</a></code>, <code><a href="t_px.html">t_px</a></code>, <code><a href="t_Ex.html">t_Ex</a></code></p>
 <p>Other life-contingencies:
 <code><a href="add_insurance.html">add_insurance()</a></code>,
 <code><a href="add_premium_schedule.html">add_premium_schedule()</a></code>,
@@ -276,6 +299,25 @@ by \(k\).</p>
 <span class="r-in"><span><span class="fu"><a href="life_contract.html">life_contract</a></span><span class="op">(</span>lt <span class="op">=</span> <span class="va">lt</span>, lives <span class="op">=</span> <span class="st">"single"</span>, x <span class="op">=</span> <span class="fl">60</span>, i <span class="op">=</span> <span class="fl">0.06</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">annuity_x</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3</span>, timing <span class="op">=</span> <span class="st">"due"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.801709</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Parallel single-life scenarios, suitable for mutate()</span></span></span>
+<span class="r-in"><span><span class="va">policies</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">61</span>, <span class="fl">62</span><span class="op">)</span>, rate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.03</span>, <span class="fl">0.04</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">policies</span>,</span></span>
+<span class="r-in"><span>  apv <span class="op">=</span> <span class="fu">annuity_x</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="va">age</span>, i <span class="op">=</span> <span class="va">rate</span>, n <span class="op">=</span> <span class="fl">2</span>, k <span class="op">=</span> <span class="fl">12</span>, timing <span class="op">=</span> <span class="st">"due"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     age  rate   apv</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    60  0.03  1.92</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>    61  0.04  1.90</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>    62  0.05  1.87</span>
+<span class="r-in"><span><span class="fu">annuity_x</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">61</span><span class="op">)</span>, i <span class="op">=</span> <span class="fl">0.04</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, tidy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 17</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       x     i i_type        m i_effective     n n_used     h   x_h     k timing </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    60  0.04 effective     1        0.04     2      2     0    60     1 immedi…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>    61  0.04 effective     1        0.04     3      3     0    61     1 immedi…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 6 more variables: woolhouse &lt;chr&gt;, frac &lt;chr&gt;, deferment_factor &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   pure_endowment_factor &lt;dbl&gt;, annuity_value_at_start &lt;dbl&gt;, apv &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -24,4 +24,4 @@ Internal helper: validate column existence
 
 ## Value
 
-Invisibly returns `TRUE` if validation is successful.
+Invisibly returns \`TRUE\` if validation is successful.

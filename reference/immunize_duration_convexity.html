@@ -19,7 +19,7 @@ convexity of assets = convexity of liabilities.
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,8 +88,11 @@ in the same time units as <code>t</code>.</p></dd>
 
 
 <dt id="arg-c">C<a class="anchor" aria-label="anchor" href="#arg-c"></a></dt>
-<dd><p>Numeric vector with the discrete convexity of each asset, expressed
-in the same time units as <code>t</code>.</p></dd>
+<dd><p>Numeric vector with each asset's relative second derivative
+\(P_j''(i_e)/P_j(i_e)\) with respect to the annual effective yield
+\(i_e\), using the same time units as <code>t</code>. A coupon-period
+convexity divided by squared coupon frequency generally uses a different
+yield variable and must be converted before use here.</p></dd>
 
 
 <dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
@@ -113,25 +116,25 @@ for <code>i_type = "effective"</code> and <code>i_type = "force"</code>.</p></dd
     <p>A tibble with:</p><dl><dt>w</dt>
 <dd><p>Numeric vector of asset weights or units.</p></dd>
 
-<dt>PV_L</dt>
+  <dt>PV_L</dt>
 <dd><p>Present value of the liabilities.</p></dd>
 
-<dt>D_L</dt>
+  <dt>D_L</dt>
 <dd><p>Macaulay duration of the liabilities.</p></dd>
 
-<dt>C_L</dt>
+  <dt>C_L</dt>
 <dd><p>Discrete convexity of the liabilities.</p></dd>
 
-<dt>PV_A</dt>
+  <dt>PV_A</dt>
 <dd><p>Present value of the asset portfolio.</p></dd>
 
-<dt>D_A</dt>
+  <dt>D_A</dt>
 <dd><p>Macaulay duration of the asset portfolio.</p></dd>
 
-<dt>C_A</dt>
+  <dt>C_A</dt>
 <dd><p>Discrete convexity of the asset portfolio.</p></dd>
 
-<dt>n_assets</dt>
+  <dt>n_assets</dt>
 <dd><p>Number of assets used.</p></dd>
 
 
@@ -140,6 +143,7 @@ for <code>i_type = "effective"</code> and <code>i_type = "force"</code>.</p></dd
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For exactly three assets, the system is solved directly. For four or more
 assets, a minimum-norm solution is computed by linear algebra.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>L</code> denotes liabilities, <code>t</code> denotes payment
 times, <code>P</code> denotes asset prices or present values, <code>D</code> denotes
@@ -170,12 +174,36 @@ assets, the minimum-norm solution
 $$
 w = A^T(AA^T)^{-1}b
 $$
-is computed.</p>
+is computed.
+It is evaluated by singular value decomposition of the row-scaled
+constraint matrix, without forming normal equations. The norm is over
+asset units <code>w</code>, not market-value fractions; short positions are allowed.</p>
+<p>All asset sensitivities must use the same annual effective yield as the
+liabilities, even when <code>i_type</code> specifies a nominal rate or a force.
+For coupon frequency \(k\), let \(j=(1+i_e)^{1/k}-1\). If
+\(C_j=P''(j)/P\) and \(D_j^*=-P'(j)/P\), the required convexity is
+$$C_{i_e}=C_j[j'(i_e)]^2-D_j^*j''(i_e).$$
+The outputs <code>discrete_convexity_periods</code> from <code><a href="bond_convexity.html">bond_convexity()</a></code>
+and <code>modified_duration_periods_j</code> from <code><a href="bond_duration.html">bond_duration()</a></code> give
+\(C_j\) and \(D_j^*\). Alternatively, use <code><a href="convexity_cash_flow.html">convexity_cash_flow()</a></code>
+on the asset cash flows at the annual effective yield.</p>
+<p>Matching convexity makes the surplus's second derivative zero at the
+base yield. This differs from Redington's strict positive-curvature
+condition and does not guarantee a nonnegative surplus after rate shifts.
+Liability values retain the original log accumulation rate; convexity is
+still with respect to the annual effective yield. Relative moments and row
+scaling before monetary products prevent avoidable overflow. Scaling uses
+common monetary and moment magnitudes, preserving the minimum norm over
+asset units, without rescaling asset columns independently. Time-zero
+liabilities contribute value but zero duration and convexity. Final values,
+weights and sensitivities must be finite; nearly cancelled liability values
+are rejected. Rank and cancellation tests remain subject to double precision;
+reported portfolio moments should be inspected for ill-conditioned systems.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="immunize_duration.html">immunize_duration</a></code>, <code><a href="bond_duration.html">bond_duration</a></code>,
-<code><a href="bond_convexity.html">bond_convexity</a></code></p>
+  <code><a href="bond_convexity.html">bond_convexity</a></code></p>
 <p>Other immunization:
 <code><a href="immunize_duration.html">immunize_duration()</a></code>,
 <code><a href="plot_immunization_gap.html">plot_immunization_gap()</a></code></p></div>
@@ -189,15 +217,15 @@ is computed.</p>
 <span class="r-in"><span>  t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  P <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">150</span>, <span class="fl">200</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  D <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">8</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  C <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">30</span>, <span class="fl">72</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  C <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">30</span>, <span class="fl">72</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1.05</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>,</span></span>
 <span class="r-in"><span>  i <span class="op">=</span> <span class="fl">0.05</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> -<span style="color: #BB0000;">16.8</span>   <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 128.    <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>   0.869 <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  16.1 <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  84.1 <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  17.3 <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        3</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Four-asset immunization: minimum-norm solution</span></span></span>
 <span class="r-in"><span><span class="fu">immunize_duration_convexity</span><span class="op">(</span></span></span>
@@ -205,16 +233,16 @@ is computed.</p>
 <span class="r-in"><span>  t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  P <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">120</span>, <span class="fl">150</span>, <span class="fl">200</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  D <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">6</span>, <span class="fl">8</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  C <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">20</span>, <span class="fl">42</span>, <span class="fl">72</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  C <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">20</span>, <span class="fl">42</span>, <span class="fl">72</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1.05</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>,</span></span>
 <span class="r-in"><span>  i <span class="op">=</span> <span class="fl">0.05</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> -<span style="color: #BB0000;">19.5</span>  <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  66.7  <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  90.7  <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  -<span style="color: #BB0000;">9.80</span> <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  12.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  47.9 <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  56.3 <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  11.2 <span style="text-decoration: underline;">17</span>694.  5.32  32.7 <span style="text-decoration: underline;">17</span>694.  5.32  32.7        4</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Nominal annual interest rate convertible monthly</span></span></span>
 <span class="r-in"><span><span class="fu">immunize_duration_convexity</span><span class="op">(</span></span></span>
@@ -222,17 +250,17 @@ is computed.</p>
 <span class="r-in"><span>  t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  P <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">150</span>, <span class="fl">200</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  D <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">8</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  C <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">30</span>, <span class="fl">72</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  C <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">30</span>, <span class="fl">72</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">0.06</span> <span class="op">/</span> <span class="fl">12</span><span class="op">)</span><span class="op">^</span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="fl">12</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  i <span class="op">=</span> <span class="fl">0.06</span>,</span></span>
 <span class="r-in"><span>  i_type <span class="op">=</span> <span class="st">"nominal_interest"</span>,</span></span>
 <span class="r-in"><span>  m <span class="op">=</span> <span class="fl">12</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> -<span style="color: #BB0000;">21.5</span>  <span style="text-decoration: underline;">16</span>687.  5.29  31.7 <span style="text-decoration: underline;">16</span>687.  5.29  31.7        3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 129.   <span style="text-decoration: underline;">16</span>687.  5.29  31.7 <span style="text-decoration: underline;">16</span>687.  5.29  31.7        3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  -<span style="color: #BB0000;">2.74</span> <span style="text-decoration: underline;">16</span>687.  5.29  31.7 <span style="text-decoration: underline;">16</span>687.  5.29  31.7        3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       w   PV_L   D_L   C_L   PV_A   D_A   C_A n_assets</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  15.9 <span style="text-decoration: underline;">16</span>687.  5.29  31.7 <span style="text-decoration: underline;">16</span>687.  5.29  31.7        3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  79.4 <span style="text-decoration: underline;">16</span>687.  5.29  31.7 <span style="text-decoration: underline;">16</span>687.  5.29  31.7        3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  15.9 <span style="text-decoration: underline;">16</span>687.  5.29  31.7 <span style="text-decoration: underline;">16</span>687.  5.29  31.7        3</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

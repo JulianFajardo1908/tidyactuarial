@@ -13,7 +13,7 @@ dates."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -142,7 +142,9 @@ not all are alive, <code>alpha</code> times the benefit is paid.</p></dd>
 <code>t</code>, <code>cf</code>, <code>surv_prob</code>, <code>discount</code>,
 <code>expected_cf</code>, <code>pv</code>, and <code>pv_cum</code>. If <code>date</code> was
 provided, a <code>date</code> column is included. The total APV is stored as
-<code>attr(result, "apv")</code>.</p>
+<code>attr(result, "apv")</code>.
+The <code>contingency</code> attribute identifies <code>"survival"</code> or <code>"weighted"</code>
+(reversionary benefit fraction) for <code><a href="plot_contingent_cash_flow.html">plot_contingent_cash_flow()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -164,7 +166,18 @@ so all lives must be alive.</p></li>
 so at least one life must be alive.</p></li>
 <li><p><code>"reversionary"</code>: full benefit while all lives are alive, and
 fraction \(\alpha\) while at least one but not all lives are alive.</p></li>
-</ul><p>Fractional-year survival is computed under UDD within each year.</p>
+</ul><p>Fractional-year survival is computed under UDD within each year.
+Discounting uses the log accumulation rate from the original interest
+specification. A displayed discount factor may be zero or infinite even
+when its monetary APV contribution is representable.</p>
+<p>Unknown mortality intervals produce missing contributions, unless survival
+has already reached zero. Missing numeric payment times and cash flows are
+retained as missing rows. Cumulative APV follows input row order and remains
+missing after a missing contribution. For compatibility, the <code>apv</code> attribute
+is the sum of nonmissing contributions (zero if none are known), so it is a
+subtotal when any contribution is missing, not a complete contract valuation.
+Calendar times use actual elapsed days divided by 365.25; all dates must be
+finite and nonmissing. Payments at the same time remain separate rows.</p>
     </div>
 
     <div class="section level2">

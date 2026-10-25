@@ -107,7 +107,19 @@ This function follows the compact actuarial notation used throughout
 The function is deliberately agnostic about the convexity convention,
 but all individual convexities must be expressed on the same basis
 within each portfolio. For example, do not mix convexities measured in
-coupon periods with convexities measured in years.
+coupon periods with convexities measured in years. All convexities must
+also use the same yield coordinate; nominal and annual effective yield
+convexities generally differ even when both use years. Values and
+convexities are finite and nonnegative, and each portfolio requires a
+finite positive total value. Zero-value positions remain in the position
+count. Relative weights are combined with convexities without forming
+monetary convexity products, recovering representable weighted
+contributions when separate products or weights lose range. Under
+`.na = "propagate"`, incomplete known portfolios have missing results.
+Positions with missing portfolio identifiers are retained as one final
+row with an `NA` identifier and missing convexity, total value and
+position count. They are not assigned to any known portfolio. `"drop"`
+removes incomplete positions with a warning; `"error"` rejects them.
 
 ## References
 
@@ -125,6 +137,7 @@ Convexity and Immunization.
 [`bond_duration`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_duration.md)
 
 Other bonds:
+[`accrued_interest()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accrued_interest.md),
 [`bond_book_value()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_book_value.md),
 [`bond_callable_price()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_callable_price.md),
 [`bond_convexity()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_convexity.md),

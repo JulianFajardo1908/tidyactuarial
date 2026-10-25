@@ -35,7 +35,8 @@ md_table(
 - cause_cols:
 
   Character vector. Names of the cause columns. If `NULL` (default), all
-  columns other than `age_col` are treated as causes.
+  columns other than `age_col` are treated as causes. Cause names must
+  not collide with reserved totals or generated death columns.
 
 - radix:
 

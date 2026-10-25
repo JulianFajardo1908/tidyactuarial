@@ -86,8 +86,8 @@ mc_premium(
 
 ## Value
 
-A tibble containing the original simulations and standardized premium
-columns:
+A data frame or tibble containing the original simulations and
+standardized premium columns:
 
 - premium_annualized:
 
@@ -113,6 +113,7 @@ columns:
 The column selected by `col_P` stores `premium_annuity_scale` for
 backward compatibility. Unless `col_P = "premium"`, a compatibility
 column `premium` is also created with the same scale coefficient.
+Existing grouping is used for estimation and removed from the result.
 
 ## Details
 
@@ -137,7 +138,18 @@ premium date, while the annualized premium is \\k\widehat q\\.
 When `na_rm = TRUE`, missing values are removed jointly: a simulation
 contributes only if both `col_Z` and `col_Y` are observed. This prevents
 the numerator and denominator from being estimated from different
-simulated samples.
+simulated samples. Monetary premium amounts retain the ratio before
+intermediate overflow or underflow. A displayed annuity-scale
+coefficient may still be zero or infinite when the coefficient itself is
+outside double precision, while the per-payment and annualized amounts
+remain representable. The equivalence residual uses the ratio before
+that loss of range. Positive subnormal observations are retained using
+scaled means when an ordinary mean rounds to zero. A genuinely zero
+annuity exposure is rejected. A positive infinite `payment_annualized`
+metadata value is accepted only when it agrees with the product of a
+finite payment basis and finite frequency. The payment basis cannot be
+inferred from that infinite value alone; retain `payment_per_payment` or
+supply `annuity_payment`.
 
 ## References
 

@@ -13,7 +13,7 @@ decrement probabilities for each cause."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,8 @@ Recommended naming convention: cause columns start with <code>"q_"</code>
 
 <dt id="arg-cause-cols">cause_cols<a class="anchor" aria-label="anchor" href="#arg-cause-cols"></a></dt>
 <dd><p>Character vector. Names of the cause columns. If <code>NULL</code>
-(default), all columns other than <code>age_col</code> are treated as causes.</p></dd>
+(default), all columns other than <code>age_col</code> are treated as causes.
+Cause names must not collide with reserved totals or generated death columns.</p></dd>
 
 
 <dt id="arg-radix">radix<a class="anchor" aria-label="anchor" href="#arg-radix"></a></dt>

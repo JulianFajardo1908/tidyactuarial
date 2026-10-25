@@ -97,7 +97,10 @@ recursion would otherwise no longer represent \\{}\_kp_x\\.
 Under UDD, the fractional part of \\T_x\\ is uniform conditional on the
 year of death. Under CML, it follows the conditional constant-force
 distribution. Under Balducci, it follows the corresponding conditional
-Balducci distribution.
+Balducci distribution. Positive annual survival is retained even below
+`tol`; only exact zero survival gives the established zero fractional
+lifetime under CML and Balducci. Tolerances do not replace a positive
+probability by zero.
 
 ## References
 

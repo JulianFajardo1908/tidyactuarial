@@ -9,7 +9,7 @@ using a life table and compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,11 +74,11 @@ contain columns <code>x</code> and <code>lx</code>.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Integer actuarial age at issue.</p></dd>
+<dd><p>Integer actuarial age at issue, or a vector of scenario ages.</p></dd>
 
 
 <dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
-<dd><p>Numeric scalar. Annual interest-rate input.</p></dd>
+<dd><p>Numeric annual interest-rate input, scalar or by scenario.</p></dd>
 
 
 <dt id="arg-i-type">i_type<a class="anchor" aria-label="anchor" href="#arg-i-type"></a></dt>
@@ -108,12 +108,13 @@ for whole-life insurance.</p></dd>
 
 
 <dt id="arg-benefit">benefit<a class="anchor" aria-label="anchor" href="#arg-benefit"></a></dt>
-<dd><p>Numeric scalar. Benefit amount.</p></dd>
+<dd><p>Numeric benefit amount, scalar or by scenario. A vector
+represents separate contracts, not a benefit schedule within one contract.</p></dd>
 
 
 <dt id="arg-tidy">tidy<a class="anchor" aria-label="anchor" href="#arg-tidy"></a></dt>
 <dd><p>Logical scalar. If <code>FALSE</code>, returns a numeric APV. If
-<code>TRUE</code>, returns a one-row tibble with intermediate quantities.</p></dd>
+<code>TRUE</code>, returns one tibble row per scenario with intermediate quantities.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -125,9 +126,9 @@ for whole-life insurance.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>If <code>tidy = FALSE</code>, a numeric scalar containing the actuarial present
-value.</p>
-<p>If <code>tidy = TRUE</code>, a one-row tibble with the main input values,
+    <p>If <code>tidy = FALSE</code>, a numeric vector of actuarial present values,
+of length one for a single scenario.</p>
+<p>If <code>tidy = TRUE</code>, a tibble with one row per scenario, the main input values,
 equivalent interest rate, deferral factor, pure endowment factor,
 annuity-due value used in the standard identities, and APV.</p>
     </div>
@@ -152,11 +153,35 @@ is computed over the available life-table horizon. For term and endowment
 insurance, the death benefit is computed over the first <code>n</code> years.
 Endowment insurance additionally includes the pure endowment component
 $$v^n\,{}_np_x.$$</p>
+<p><strong>Scenarios.</strong> <code>x</code>, <code>i</code>, <code>i_type</code>, <code>m</code>,
+<code>n</code>, <code>h</code>, <code>type</code>, and <code>benefit</code> may have a common
+positive length; only length-one arguments recycle. The table and <code>tidy</code>
+control are shared. Scenarios are paired by position, not expanded to a
+Cartesian product. Missing or invalid cases are rejected with the scenario
+number. Use the numeric result in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">dplyr::mutate()</a></code>, or request a tibble
+for intermediate values. Explicit interest arguments override contract defaults.</p>
+<p><strong>Valuation and scope.</strong> For annual deaths in interval \([r,r+1)\),
+the unconditional payment probability is
+\((l_{x+r}-l_{x+r+1})/l_x\). The benefit is discounted at \(r+1\),
+not at the exact moment of death. Decrements are formed before division,
+and log ratios and original interest rates retain representable APVs when
+intermediate conditional values or discount factors overflow or underflow.
+Intermediate diagnostics may therefore be zero or infinite while APV is finite.
+Tables require an annual age grid, nonincreasing finite <code>lx</code>, and a
+positive count at issue. For compatibility the terminal count one year beyond
+the table is zero, even for an open input table. Extinct tails contribute zero.
+A zero-term endowment pays the benefit at time <code>h</code> on survival;
+zero-term death insurance pays nothing.</p>
+<p>Use <code><a href="insurance_variable_k.html">insurance_variable_k</a></code> for benefits varying by subperiod,
+including level benefits paid at the end of the subperiod of death, and
+<code><a href="t_Ex.html">t_Ex</a></code> for pure endowments. Continuous death-time insurance,
+fractional issue ages and time-varying interest curves require additional
+model specifications and are not implied by this annual contract.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="annuity_x.html">annuity_x</a></code>, <code><a href="premium_x.html">premium_x</a></code>,
-<code><a href="reserve_x.html">reserve_x</a></code>, <code><a href="t_Ex.html">t_Ex</a></code>, <code><a href="insurance_xy.html">insurance_xy</a></code></p>
+  <code><a href="reserve_x.html">reserve_x</a></code>, <code><a href="t_Ex.html">t_Ex</a></code>, <code><a href="insurance_xy.html">insurance_xy</a></code></p>
 <p>Other life-contingencies:
 <code><a href="add_insurance.html">add_insurance()</a></code>,
 <code><a href="add_premium_schedule.html">add_premium_schedule()</a></code>,
@@ -234,6 +259,19 @@ $$v^n\,{}_np_x.$$</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       x   age     i  rate i_type   rate_type     m i_effective d_effective     n</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    60    60  0.06  0.06 effecti… effective     1        0.06      0.056<span style="text-decoration: underline;">6</span>     5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more variables: term_years &lt;int&gt;, h &lt;int&gt;, deferral_years &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   start_x &lt;int&gt;, start_age &lt;int&gt;, type &lt;chr&gt;, insurance_type &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   benefit &lt;dbl&gt;, deferment_factor &lt;dbl&gt;, annuity_due_value &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   pure_endowment_factor &lt;dbl&gt;, value_at_start &lt;dbl&gt;, apv &lt;dbl&gt;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Parallel single-life scenarios with a shared mortality table</span></span></span>
+<span class="r-in"><span><span class="fu">insurance_x</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">61</span><span class="op">)</span>, i <span class="op">=</span> <span class="fl">0.04</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>            type <span class="op">=</span> <span class="st">"term"</span>, benefit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10000</span>, <span class="fl">20000</span><span class="op">)</span>, tidy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 23</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       x   age     i  rate i_type   rate_type     m i_effective d_effective     n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    60    60  0.04  0.04 effecti… effective     1        0.04      0.038<span style="text-decoration: underline;">5</span>     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>    61    61  0.04  0.04 effecti… effective     1        0.04      0.038<span style="text-decoration: underline;">5</span>     3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more variables: term_years &lt;int&gt;, h &lt;int&gt;, deferral_years &lt;int&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   start_x &lt;int&gt;, start_age &lt;int&gt;, type &lt;chr&gt;, insurance_type &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   benefit &lt;dbl&gt;, deferment_factor &lt;dbl&gt;, annuity_due_value &lt;dbl&gt;,</span></span>

@@ -9,7 +9,7 @@ two or more assets, using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,19 +96,19 @@ for <code>i_type = "effective"</code> and <code>i_type = "force"</code>.</p></dd
     <p>A tibble with:</p><dl><dt>w</dt>
 <dd><p>Numeric vector of asset weights or units.</p></dd>
 
-<dt>PV_L</dt>
+  <dt>PV_L</dt>
 <dd><p>Present value of the liabilities.</p></dd>
 
-<dt>D_L</dt>
+  <dt>D_L</dt>
 <dd><p>Macaulay duration of the liabilities.</p></dd>
 
-<dt>PV_A</dt>
+  <dt>PV_A</dt>
 <dd><p>Present value of the immunized asset portfolio.</p></dd>
 
-<dt>D_A</dt>
+  <dt>D_A</dt>
 <dd><p>Macaulay duration of the asset portfolio.</p></dd>
 
-<dt>n_assets</dt>
+  <dt>n_assets</dt>
 <dd><p>Number of assets used.</p></dd>
 
 
@@ -119,6 +119,7 @@ for <code>i_type = "effective"</code> and <code>i_type = "force"</code>.</p></dd
 <li><p>Macaulay duration of assets = Macaulay duration of liabilities.</p></li>
 </ol><p>For exactly two assets, a closed-form solution is used. For three or more
 assets, a minimum-norm solution is computed by linear algebra.</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>L</code> denotes liabilities, <code>t</code> denotes payment
 times, <code>P</code> denotes asset prices or present values, <code>D</code> denotes
@@ -148,11 +149,27 @@ rows</p>
 <p>$$(P_1D_1,\ldots,P_rD_r),$$</p>
 <p>and</p>
 <p>$$b = (PV_L, PV_LD_L)^T.$$</p>
+<p>The minimum Euclidean norm is taken over asset units <code>w</code>, not
+portfolio market-value fractions. It is evaluated by singular value
+decomposition of the row-scaled constraint matrix, without forming
+normal equations. Short positions are allowed. Matching present value
+and duration gives a zero value and first derivative of the surplus at
+the base yield, but does not ensure nonnegative surplus after rate shifts;
+the Redington convexity condition must be checked separately.
+Liability values retain the original log accumulation rate, and relative
+moments avoid monetary numerator overflow. Payment times include zero:
+a liability at time zero contributes value but no duration. Constraints are
+scaled by a common monetary magnitude and by moment magnitudes before
+products are formed. These are row transformations, preserving the norm over
+units; asset columns are not rescaled independently. Final values, weights
+and sensitivities must be finite, and nearly cancelled liability value is
+rejected. Rank and cancellation tests remain subject to double precision;
+reported portfolio moments should be inspected for ill-conditioned systems.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="immunize_duration_convexity.html">immunize_duration_convexity</a></code>,
-<code><a href="bond_duration.html">bond_duration</a></code>, <code><a href="bond_convexity.html">bond_convexity</a></code></p>
+  <code><a href="bond_duration.html">bond_duration</a></code>, <code><a href="bond_convexity.html">bond_convexity</a></code></p>
 <p>Other immunization:
 <code><a href="immunize_duration_convexity.html">immunize_duration_convexity()</a></code>,
 <code><a href="plot_immunization_gap.html">plot_immunization_gap()</a></code></p></div>

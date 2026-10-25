@@ -9,7 +9,7 @@ simulated future lifetimes, using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,7 +74,10 @@ simulated future lifetimes, using compact actuarial notation.</p>
 <dl><dt id="arg--data">.data<a class="anchor" aria-label="anchor" href="#arg--data"></a></dt>
 <dd><p>A data frame or tibble containing simulated future lifetimes,
 typically returned by <code><a href="simulate_lifetime.html">simulate_lifetime</a></code> or by
-<code><a href="mc_multilife_status.html">mc_multilife_status</a></code> when working with multiple-life statuses.</p></dd>
+<code><a href="mc_multilife_status.html">mc_multilife_status</a></code> when working with multiple-life statuses.
+Observed curtate lifetimes must be finite nonnegative integers and
+observed complete lifetimes finite and nonnegative. Paired observations
+must satisfy \(K_x \le T_x &lt; K_x+1\); missing values remain missing.</p></dd>
 
 
 <dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
@@ -157,42 +160,42 @@ simulated present values of benefits. Default is <code>"pv_benefit"</code>.</p><
     <p>A tibble with the original simulation columns and additional columns:</p><dl><dt>i</dt>
 <dd><p>Original interest-rate input.</p></dd>
 
-<dt>i_type</dt>
+  <dt>i_type</dt>
 <dd><p>Interest-rate convention.</p></dd>
 
-<dt>m</dt>
+  <dt>m</dt>
 <dd><p>Interest conversion frequency.</p></dd>
 
-<dt>i_effective</dt>
+  <dt>i_effective</dt>
 <dd><p>Equivalent annual effective interest rate.</p></dd>
 
-<dt>v</dt>
+  <dt>v</dt>
 <dd><p>Annual discount factor.</p></dd>
 
-<dt>type</dt>
+  <dt>type</dt>
 <dd><p>Canonical insurance type.</p></dd>
 
-<dt>benefit</dt>
+  <dt>benefit</dt>
 <dd><p>Benefit amount.</p></dd>
 
-<dt>n</dt>
+  <dt>n</dt>
 <dd><p>Insurance term, if applicable.</p></dd>
 
-<dt>h</dt>
+  <dt>h</dt>
 <dd><p>Deferral period.</p></dd>
 
-<dt>timing</dt>
+  <dt>timing</dt>
 <dd><p>Timing used for death benefits.</p></dd>
 
-<dt>benefit_time</dt>
+  <dt>benefit_time</dt>
 <dd><p>Simulated payment time of the benefit.</p></dd>
 
-<dt>benefit_indicator</dt>
+  <dt>benefit_indicator</dt>
 <dd><p>Indicator that the benefit is paid.</p></dd>
 
-<dt>pv_benefit</dt>
+  <dt>pv_benefit</dt>
 <dd><p>Simulated present value of the benefit, or another name
-supplied through <code>col_pv</code>.</p></dd>
+  supplied through <code>col_pv</code>.</p></dd>
 
 
 </dl><p>For transition, the output also includes legacy columns such as
@@ -207,6 +210,13 @@ supplied through <code>col_pv</code>.</p></dd>
 takes simulated values of the curtate future lifetime \(K_x\), and when
 needed the complete future lifetime \(T_x\), and evaluates the present
 value random variable associated with classical life insurance benefits.</p>
+
+<p>Discounting uses the log accumulation rate from the original interest
+convention and combines the benefit amount with the discount factor.
+The displayed annual effective rate and discount factor may lose range
+at extreme rates; they are metadata rather than the valuation basis.
+A zero benefit remains zero for an observed eligible event, while a
+missing required lifetime continues to give a missing present value.</p>
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>i</code> is the interest-rate input, <code>i_type</code>
 is the interest-rate convention, <code>m</code> is the nominal conversion
@@ -222,16 +232,21 @@ from the curtate lifetime \(K_x\). If
 \(T_x\), and fractional terms or deferral periods are allowed.</p>
 <p>The following insurance types are supported:</p><ul><li><p><code>"whole"</code>: benefit is paid whenever death occurs.</p></li>
 <li><p><code>"term"</code>: benefit is paid if death occurs within <code>n</code>
-years.</p></li>
+  years.</p></li>
 <li><p><code>"deferred"</code>: benefit is paid if death occurs after the
-deferral period <code>h</code>.</p></li>
+  deferral period <code>h</code>.</p></li>
 <li><p><code>"deferred_term"</code>: benefit is paid if death occurs after
-<code>h</code> and within the following <code>n</code> years.</p></li>
+  <code>h</code> and within the following <code>n</code> years.</p></li>
 <li><p><code>"pure_endowment"</code>: benefit is paid at time <code>n</code> if the
-life survives to that time.</p></li>
+  life survives to that time.</p></li>
 <li><p><code>"endowment"</code>: death benefit is paid if death occurs within
-<code>n</code> years; otherwise, a survival benefit is paid at time <code>n</code>.</p></li>
-</ul><p>The function returns simulated present values, not only their expected value.
+  <code>n</code> years; otherwise, a survival benefit is paid at time <code>n</code>.</p></li>
+</ul><p>With <code>timing = "moment_of_death"</code>, death at exactly <code>n</code>
+belongs to the term component. A pure endowment requires \(T_x &gt; n\),
+so term and pure-endowment benefits are disjoint and sum to the endowment
+benefit on every observed trajectory. The annual convention continues to
+partition the events using \(K_x &lt; n\) and \(K_x \ge n\).</p>
+<p>The function returns simulated present values, not only their expected value.
 Therefore the resulting column can be summarized with
 <code><a href="summary_mc.html">summary_mc</a></code>, plotted with <code>ggplot2</code>, or used to construct
 premiums, losses, and reserves.</p>

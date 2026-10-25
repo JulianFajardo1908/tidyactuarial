@@ -9,7 +9,7 @@ arithmetic annuity, using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,7 +90,8 @@ values are <code>"effective"</code>, <code>"nominal_interest"</code>,
 
 <dt id="arg-m">m<a class="anchor" aria-label="anchor" href="#arg-m"></a></dt>
 <dd><p>Positive integer vector giving the conversion frequency for nominal
-rates. Ignored for <code>"effective"</code> and <code>"force"</code>.</p></dd>
+rates. Observed values are validated for every rate family, although only
+nominal conversions use this frequency.</p></dd>
 
 
 <dt id="arg-h">h<a class="anchor" aria-label="anchor" href="#arg-h"></a></dt>
@@ -142,7 +143,7 @@ functions.</p>
 <p>Supported payment patterns:</p><ul><li><p><code>"increasing"</code>: payments \(1, 2, \ldots, N\).</p></li>
 <li><p><code>"decreasing"</code>: payments \(N, N-1, \ldots, 1\).</p></li>
 <li><p><code>"custom"</code>: payments following
-\(P_r = P_1 + (r - 1)g\).</p></li>
+    \(P_r = P_1 + (r - 1)g\).</p></li>
 </ul><p>Supported timing conventions:</p><ul><li><p><code>"immediate"</code>: payments at the end of each period.</p></li>
 <li><p><code>"due"</code>: payments at the beginning of each period.</p></li>
 </ul><p>This function follows the compact actuarial notation used throughout
@@ -150,19 +151,30 @@ functions.</p>
 frequency, <code>i</code> is the interest-rate input, <code>i_type</code> is the
 interest-rate type, <code>m</code> is the conversion frequency for nominal rates,
 and <code>h</code> is the deferment period.</p>
-<p>The function first converts the supplied rate to the equivalent annual
-effective interest rate using <code><a href="standardize_interest.html">standardize_interest</a></code>.</p>
+<p>Rate validation uses <code><a href="standardize_interest.html">standardize_interest</a></code>. Valuation retains
+the original log accumulation rate, even if the displayed annual effective
+equivalent rounds to -1 or overflows.</p>
 <p>For each scenario, the total number of payments is
 $$N = n k.$$</p>
 <p>The present value is computed by summing the discounted payment stream. The
 accumulated value is computed at the end of the annuity term. Under this
 convention, <code>h</code> affects the present value factor but not the
 accumulated value factor.</p>
+<p>Let \(b=0\) for immediate payments and \(b=1\) for due payments,
+\(r=\delta/k\), and \(H=hk\). The present value is
+\(\sum_{j=1}^N P_j\exp[-r(H+j-b)]\); the value at \(h+n\)
+years is \(\sum_{j=1}^N P_j\exp[r(N-j+b)]\).
+In a custom stream, <code>g</code> is an increment in currency per payment,
+not an annual growth rate. Signed and zero payments are supported.</p>
+<p>Payments are enumerated explicitly, so memory grows with \(N\).
+Capital-factor products are evaluated stably using the shared cash-flow
+rules. Those rules do not recover arbitrary extreme signed cancellation
+across different factors, or payments already outside the numeric range.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="a_angle.html">a_angle</a></code>, <code><a href="s_angle.html">s_angle</a></code>,
-<code><a href="standardize_interest.html">standardize_interest</a></code></p>
+  <code><a href="standardize_interest.html">standardize_interest</a></code></p>
 <p>Other annuities:
 <code><a href="a_angle.html">a_angle()</a></code>,
 <code><a href="annuity_geom.html">annuity_geom()</a></code>,

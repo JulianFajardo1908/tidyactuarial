@@ -1,8 +1,8 @@
 # Solve a scalar equation of value
 
 Solves for one unknown scalar argument of an existing actuarial or
-financial function. The remaining arguments are supplied through `args`,
-and the unknown is chosen with `solve_for`.
+financial function. The remaining arguments are supplied through
+\`args\`, and the unknown is chosen with \`solve_for\`.
 
 ## Usage
 
@@ -22,7 +22,8 @@ solve_value(
   maxiter = 1000L,
   scan_points = 401L,
   max_expand = 6L,
-  output = c("value", "summary", "audit")
+  output = c("value", "summary", "audit"),
+  residual_tol = tol
 )
 ```
 
@@ -31,7 +32,7 @@ solve_value(
 - fn:
 
   A function, or the name of a function, whose scalar result is to be
-  matched to `target`.
+  matched to \`target\`.
 
 - solve_for:
 
@@ -43,27 +44,27 @@ solve_value(
 
 - args:
 
-  Named list containing all known arguments passed to `fn`. Do not
-  supply a non-`NULL` value for the argument named in `solve_for`.
+  Named list containing all known arguments passed to \`fn\`. Do not
+  supply a non-\`NULL\` value for the argument named in \`solve_for\`.
 
 - result:
 
-  Optional result extractor. Use `NULL` when `fn` returns a numeric
+  Optional result extractor. Use \`NULL\` when \`fn\` returns a numeric
   scalar; a character scalar naming a column or list element; or a
   function that extracts a numeric scalar from the object returned by
-  `fn`.
+  \`fn\`.
 
 - interval:
 
   Optional finite numeric vector of length 2. It defines the admissible
   search interval. When omitted, a conservative interval is inferred
-  from `solve_for`, `target`, and the numeric values in `args`.
+  from \`solve_for\`, \`target\`, and the numeric values in \`args\`.
 
 - start:
 
   Optional finite numeric scalar used as the initial value for
   Newton–Raphson. It is also used as a fallback starting point when
-  `method = "auto"` cannot bracket a root.
+  \`method = "auto"\` cannot bracket a root.
 
 - derivative:
 
@@ -73,18 +74,20 @@ solve_value(
 
 - method:
 
-  Character scalar. One of `"auto"`, `"uniroot"`, or `"newton"`. The
-  default first searches for bracketed roots and uses Newton–Raphson
-  only when no bracket is found and `start` is available.
+  Character scalar. One of \`"auto"\`, \`"uniroot"\`, or \`"newton"\`.
+  The default first searches for bracketed roots and uses Newton–Raphson
+  only when no bracket is found and \`start\` is available.
 
 - multiple:
 
   Character scalar controlling multiple roots found inside the interval:
-  `"error"`, `"all"`, or `"first"`.
+  \`"error"\`, \`"all"\`, or \`"first"\`.
 
 - tol:
 
-  Positive numeric scalar. Convergence and residual tolerance.
+  Positive finite numeric scalar controlling unknown-coordinate
+  precision: passed to \`uniroot\`, used relatively for Newton
+  corrections, and used when identifying duplicate roots.
 
 - maxiter:
 
@@ -103,31 +106,63 @@ solve_value(
 
 - output:
 
-  Character scalar. One of `"value"`, `"summary"`, or `"audit"`.
+  Character scalar. One of \`"value"\`, \`"summary"\`, or \`"audit"\`.
+
+- residual_tol:
+
+  Positive finite numeric scalar. Absolute residual tolerance in the
+  units of the selected result of \`fn\`. Defaults to \`tol\`.
 
 ## Value
 
-Depending on `output`:
+Depending on \`output\`:
 
-- `"value"`: numeric scalar or vector containing the solution(s).
+- \`"value"\`: numeric scalar or vector containing the solution(s).
 
-- `"summary"`: compact tibble with the unknown, solution, target,
+- \`"summary"\`: compact tibble with the unknown, solution, target,
   achieved value, residual, and method.
 
-- `"audit"`: detailed tibble with convergence diagnostics and search
+- \`"audit"\`: detailed tibble with convergence diagnostics and search
   information.
 
 ## Details
 
 The equation solved is \$\$g(x) = f(\ldots, x, \ldots) - \mathrm{target}
-= 0,\$\$ where `f` is the function supplied in `fn` and `x` is the
-argument named in `solve_for`.
+= 0,\$\$ where \`f\` is the function supplied in \`fn\` and \`x\` is the
+argument named in \`solve_for\`.
 
 This function is intended to reuse the stable calculation functions
 already available in tidyactuarial. It does not reproduce their
 actuarial formulas.
 
-`solve_value()` is restricted to one scalar unknown. It is appropriate
+Newton iteration accepts an exact zero immediately. Otherwise,
+convergence requires both a small residual and a small Newton correction
+relative to the unknown: `abs(dx) <= tol * max(1, abs(x))`. The residual
+must satisfy `abs(achieved - target) <= residual_tol`. A nonzero
+derivative is not rejected merely because its units make its absolute
+magnitude small. A step clipped to an interval boundary does not by
+itself demonstrate convergence.
+
+The audit field \`converged\` requires successful solver termination and
+the explicit residual tolerance, without a hidden numerical floor.
+Exhausting \`uniroot\` iterations is an error. A bracketed approximation
+can satisfy coordinate precision while failing residual precision;
+\`"value"\` and \`"summary"\` still return that candidate, so use
+\`"audit"\` to inspect this distinction. Newton retains its error when
+it cannot meet both criteria.
+
+When changing the units of \`fn\` and \`target\` by a positive factor,
+scale \`residual_tol\` by the same factor and retain \`tol\`. For
+example, a root in years with a value in currency has a temporal
+coordinate tolerance and a monetary residual tolerance. No automatic
+scale is inferred from \`target\`.
+
+During interval scanning, only exact computed zeros are accepted
+directly as grid roots. Other candidates require a sign-changing bracket
+and are refined numerically. A small residual alone does not establish a
+root; tangential roots may require an appropriate Newton starting value.
+
+\`solve_value()\` is restricted to one scalar unknown. It is appropriate
 for quantities such as an effective interest rate, a payment, a
 principal, a present value, or another continuous scalar parameter.
 
@@ -142,12 +177,8 @@ a model-specific wrapper should be used for those cases.
 
 ## See also
 
-[`stats::uniroot()`](https://rdrr.io/r/stats/uniroot.html),
-[`irr_flow()`](https://julianfajardo1908.github.io/tidyactuarial/reference/irr_flow.md),
-[`irr_flow_multi()`](https://julianfajardo1908.github.io/tidyactuarial/reference/irr_flow_multi.md),
-[`bond_ytm()`](https://julianfajardo1908.github.io/tidyactuarial/reference/bond_ytm.md),
-[`present_value()`](https://julianfajardo1908.github.io/tidyactuarial/reference/present_value.md),
-[`a_angle()`](https://julianfajardo1908.github.io/tidyactuarial/reference/a_angle.md)
+\[stats::uniroot()\], \[irr_flow()\], \[irr_flow_multi()\],
+\[bond_ytm()\], \[present_value()\], \[a_angle()\]
 
 Other time-value:
 [`accumulation_factor()`](https://julianfajardo1908.github.io/tidyactuarial/reference/accumulation_factor.md),
@@ -208,4 +239,18 @@ solve_value(
   method = "newton"
 )
 #> [1] 1.414214
+
+# A term in years, allowing one cent of monetary residual
+solve_value(
+  fn = function(t) 1000 * 1.05^t,
+  solve_for = "t", target = 1500, interval = c(0, 20),
+  tol = 1e-10, residual_tol = 0.01, output = "audit"
+)
+#> # A tibble: 1 × 15
+#>   root_id function_name       solve_for solution target achieved residual method
+#>     <int> <chr>               <chr>        <dbl>  <dbl>    <dbl>    <dbl> <chr> 
+#> 1       1 function(t) 1000 *… t             8.31   1500    1500. 2.40e-10 uniro…
+#> # ℹ 7 more variables: converged <lgl>, n_iter <int>, interval_left <dbl>,
+#> #   interval_right <dbl>, interval_inferred <lgl>, n_expansions <int>,
+#> #   n_roots <int>
 ```

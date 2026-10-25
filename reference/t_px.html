@@ -13,7 +13,7 @@ actuarial assumptions."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,7 +99,7 @@ attribute (set by <code><a href="lifetable.html">lifetable</a></code>), that val
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Numeric vector of \({}_t p_x\), or a tibble if
-<code>tidy = TRUE</code>.</p>
+  <code>tidy = TRUE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -112,9 +112,17 @@ $${}_t p_x = {}_n p_x \times {}_s p_{x+n}$$</p>
 <p>The fractional-year factor \({}_s p_y\) depends on the assumption:</p><ul><li><p>UDD (Finan, Sec. 24.1): \({}_s p_y = 1 - s \times q_y\)</p></li>
 <li><p>CF (Finan, Sec. 24.2): \({}_s p_y = (p_y)^s\)</p></li>
 <li><p>Balducci (Finan, Sec. 24.3):
-\({}_s p_y = \frac{p_y}{1 - (1 - s) \times q_y}\)</p></li>
-</ul><p>If \(x + t &gt; \omega\) (the terminal age), the function returns 0
-since no survival is possible beyond the table's limiting age.</p>
+    \({}_s p_y = \frac{p_y}{1 - (1 - s) \times q_y}\)</p></li>
+</ul><p>Missing annual survival probabilities are derived directly from adjacent
+survivor counts, avoiding cancellation in \(1-q_y\). CF and Balducci
+retain logarithmic survival when that count ratio underflows. Supplied
+<code>px</code> values remain in use; input columns should describe a consistent
+annual life table.</p>
+<p>If \(x + t &gt; \omega\) (the terminal age), the function returns 0
+by the established table-horizon convention, including open tables.
+This is truncation, not inference about survival beyond observed ages;
+extend the table before evaluating a longer horizon. Interval tables with
+nonannual widths from <code>km_lifetable</code> require annual conversion first.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

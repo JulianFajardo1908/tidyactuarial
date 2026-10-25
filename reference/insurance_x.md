@@ -31,11 +31,11 @@ insurance_x(
 
 - x:
 
-  Integer actuarial age at issue.
+  Integer actuarial age at issue, or a vector of scenario ages.
 
 - i:
 
-  Numeric scalar. Annual interest-rate input.
+  Numeric annual interest-rate input, scalar or by scenario.
 
 - i_type:
 
@@ -63,12 +63,13 @@ insurance_x(
 
 - benefit:
 
-  Numeric scalar. Benefit amount.
+  Numeric benefit amount, scalar or by scenario. A vector represents
+  separate contracts, not a benefit schedule within one contract.
 
 - tidy:
 
   Logical scalar. If `FALSE`, returns a numeric APV. If `TRUE`, returns
-  a one-row tibble with intermediate quantities.
+  one tibble row per scenario with intermediate quantities.
 
 - ...:
 
@@ -78,12 +79,12 @@ insurance_x(
 
 ## Value
 
-If `tidy = FALSE`, a numeric scalar containing the actuarial present
-value.
+If `tidy = FALSE`, a numeric vector of actuarial present values, of
+length one for a single scenario.
 
-If `tidy = TRUE`, a one-row tibble with the main input values,
-equivalent interest rate, deferral factor, pure endowment factor,
-annuity-due value used in the standard identities, and APV.
+If `tidy = TRUE`, a tibble with one row per scenario, the main input
+values, equivalent interest rate, deferral factor, pure endowment
+factor, annuity-due value used in the standard identities, and APV.
 
 ## Details
 
@@ -113,6 +114,37 @@ age is computed over the available life-table horizon. For term and
 endowment insurance, the death benefit is computed over the first `n`
 years. Endowment insurance additionally includes the pure endowment
 component \$\$v^n\\{}\_np_x.\$\$
+
+**Scenarios.** `x`, `i`, `i_type`, `m`, `n`, `h`, `type`, and `benefit`
+may have a common positive length; only length-one arguments recycle.
+The table and `tidy` control are shared. Scenarios are paired by
+position, not expanded to a Cartesian product. Missing or invalid cases
+are rejected with the scenario number. Use the numeric result in
+[`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html),
+or request a tibble for intermediate values. Explicit interest arguments
+override contract defaults.
+
+**Valuation and scope.** For annual deaths in interval \\\[r,r+1)\\, the
+unconditional payment probability is \\(l\_{x+r}-l\_{x+r+1})/l_x\\. The
+benefit is discounted at \\r+1\\, not at the exact moment of death.
+Decrements are formed before division, and log ratios and original
+interest rates retain representable APVs when intermediate conditional
+values or discount factors overflow or underflow. Intermediate
+diagnostics may therefore be zero or infinite while APV is finite.
+Tables require an annual age grid, nonincreasing finite `lx`, and a
+positive count at issue. For compatibility the terminal count one year
+beyond the table is zero, even for an open input table. Extinct tails
+contribute zero. A zero-term endowment pays the benefit at time `h` on
+survival; zero-term death insurance pays nothing.
+
+Use
+[`insurance_variable_k`](https://julianfajardo1908.github.io/tidyactuarial/reference/insurance_variable_k.md)
+for benefits varying by subperiod, including level benefits paid at the
+end of the subperiod of death, and
+[`t_Ex`](https://julianfajardo1908.github.io/tidyactuarial/reference/t_Ex.md)
+for pure endowments. Continuous death-time insurance, fractional issue
+ages and time-varying interest curves require additional model
+specifications and are not implied by this annual contract.
 
 ## See also
 
@@ -199,6 +231,19 @@ insurance_x(
 #>       x   age     i  rate i_type   rate_type     m i_effective d_effective     n
 #>   <int> <int> <dbl> <dbl> <chr>    <chr>     <int>       <dbl>       <dbl> <int>
 #> 1    60    60  0.06  0.06 effecti… effective     1        0.06      0.0566     5
+#> # ℹ 13 more variables: term_years <int>, h <int>, deferral_years <int>,
+#> #   start_x <int>, start_age <int>, type <chr>, insurance_type <chr>,
+#> #   benefit <dbl>, deferment_factor <dbl>, annuity_due_value <dbl>,
+#> #   pure_endowment_factor <dbl>, value_at_start <dbl>, apv <dbl>
+
+# Parallel single-life scenarios with a shared mortality table
+insurance_x(lt, x = c(60, 61), i = 0.04, n = c(2, 3),
+            type = "term", benefit = c(10000, 20000), tidy = TRUE)
+#> # A tibble: 2 × 23
+#>       x   age     i  rate i_type   rate_type     m i_effective d_effective     n
+#>   <int> <int> <dbl> <dbl> <chr>    <chr>     <int>       <dbl>       <dbl> <int>
+#> 1    60    60  0.04  0.04 effecti… effective     1        0.04      0.0385     2
+#> 2    61    61  0.04  0.04 effecti… effective     1        0.04      0.0385     3
 #> # ℹ 13 more variables: term_years <int>, h <int>, deferral_years <int>,
 #> #   start_x <int>, start_age <int>, type <chr>, insurance_type <chr>,
 #> #   benefit <dbl>, deferment_factor <dbl>, annuity_due_value <dbl>,

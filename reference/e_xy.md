@@ -46,10 +46,11 @@ e_xy(
 
 - frac:
 
-  Fractional-age assumption for `type = "complete"`, passed to
+  Fractional-age assumption for `type = "complete"`, as in
   [`t_pxy`](https://julianfajardo1908.github.io/tidyactuarial/reference/t_pxy.md):
   `"UDD"`, `"CF"`, `"CML"`, or `"Balducci"`. If not specified and `lt`
-  carries a `frac` attribute, that value is used.
+  carries a `frac` attribute, that value is used. An inherited `"CML"`
+  attribute is normalized to `"CF"`.
 
 - cohort:
 
@@ -61,7 +62,8 @@ e_xy(
 
 - check:
 
-  Logical. If `TRUE`, performs basic input checks.
+  Logical. If `TRUE`, performs basic input checks. Table consistency and
+  scalar logical controls are always checked.
 
 - tol:
 
@@ -80,12 +82,25 @@ Numeric vector, or tibble if `tidy = TRUE`.
 **Complete expectation** (Finan, Section 56.4): \$\$\mathring{e}\_{xy} =
 \int_0^{\infty} {}\_tp\_{xy} \\ dt.\$\$
 
-The integral is decomposed year-by-year. Within each year, the survival
-integral for the two-life status is computed numerically via composite
-trapezoid (80-point grid), since closed-form expressions for joint/last
-survivor under fractional-age assumptions are complex.
+The integral is decomposed year-by-year and evaluated analytically under
+UDD, constant force, or Balducci, retaining small survival in log form.
+Observed annual `lx` ratios determine the fractional survival. Survival
+is always measured from the initial ages, conditional on both lives
+being alive at time zero. In particular, last-survivor survival at later
+times does not imply that both lives remain alive.
 
-**Key identity** (Finan, Example 57.4):
+Horizons end at the last recorded age: the older life limits joint-life
+expectation and the younger life limits last-survivor expectation.
+Survival beyond that age is taken as zero, as in `t_px`; an open table
+therefore gives a truncated expectation. Missing initial ages or zero
+initial survivors give `NA`, including when `t = 0`. Tables must have
+unique consecutive annual integer ages and finite, nonnegative,
+nonincreasing `lx`. Observed `px`/`qx` must be probabilities consistent
+with annual `lx` ratios within `1e-10`; unknown probabilities may be
+`NA`. The age tolerance `tol` does not relax this mortality consistency
+threshold.
+
+\*\*Key identity\*\* (Finan, Example 57.4):
 \$\$\mathring{e}\_{\overline{xy}} = \mathring{e}\_x + \mathring{e}\_y -
 \mathring{e}\_{xy}.\$\$
 
@@ -110,11 +125,11 @@ lt <- data.frame(
 
 # Curtate joint-life expectancy (Finan, Sec. 56.4)
 e_xy(lt, x = 60, y = 62, type = "curtate", cohort = "first")
-#> [1] NA
+#> [1] 3.601538
 
 # Curtate last-survivor expectancy (Finan, Sec. 57)
 e_xy(lt, x = 60, y = 62, type = "curtate", cohort = "last")
-#> [1] NA
+#> [1] 5.746923
 
 # Verify identity (Finan, Example 57.4):
 # e_{xy-bar} = e_x + e_y - e_xy
@@ -124,11 +139,11 @@ e_x_val <- e_x(lt, x = 60, type = "curtate")
 e_y_val <- e_x(lt, x = 62, type = "curtate")
 c(last_surv = e_last, sum_minus_joint = e_x_val + e_y_val - e_joint)
 #>       last_surv sum_minus_joint 
-#>              NA              NA 
+#>        5.746923        5.746923 
 
 # Complete joint-life expectancy under UDD
 e_xy(lt, x = 60, y = 62, type = "complete", frac = "UDD", cohort = "first")
-#> [1] NA
+#> [1] 3.691013
 
 # Temporary: 3-year curtate joint-life
 e_xy(lt, x = 60, y = 62, t = 3, type = "curtate", cohort = "first")
@@ -139,5 +154,5 @@ e_xy(lt, x = 60, y = 62, type = "curtate", cohort = "first", tidy = TRUE)
 #> # A tibble: 1 × 7
 #>       x     y     t type    frac  cohort    ex
 #>   <int> <int> <dbl> <chr>   <chr> <chr>  <dbl>
-#> 1    60    62    NA curtate UDD   first     NA
+#> 1    60    62    NA curtate UDD   first   3.60
 ```

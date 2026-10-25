@@ -17,7 +17,7 @@ reserve_xy."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,19 +69,19 @@ benchmark tests for life-contingency functions such as <code><a href="annuity_x.
     <p>A tibble with one row per integer age and the following columns:</p><dl><dt>x</dt>
 <dd><p>Integer actuarial age.</p></dd>
 
-<dt>lx</dt>
+  <dt>lx</dt>
 <dd><p>Number of lives surviving to exact age <code>x</code>.</p></dd>
 
-<dt>dx</dt>
+  <dt>dx</dt>
 <dd><p>Number of deaths between exact ages <code>x</code> and <code>x + 1</code>.</p></dd>
 
-<dt>qx</dt>
+  <dt>qx</dt>
 <dd><p>One-year probability of death between exact ages <code>x</code> and
-<code>x + 1</code>.</p></dd>
+  <code>x + 1</code>.</p></dd>
 
-<dt>px</dt>
+  <dt>px</dt>
 <dd><p>One-year probability of survival from exact age <code>x</code> to
-<code>x + 1</code>.</p></dd>
+  <code>x + 1</code>.</p></dd>
 
 
 </dl></div>
@@ -94,6 +94,7 @@ Bowers et al. (1997), <em>Actuarial Mathematics</em>, Appendix 2A.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>A tidy version of the Society of Actuaries illustrative life table commonly
 used in life-contingencies examples and benchmark calculations.</p>
+
 <p>The table is included as a convenient benchmark table for actuarial
 calculations. The build script in <code>data-raw/soa08lt.R</code> constructs this
 tidy dataset from the SOA illustrative actuarial table object distributed in

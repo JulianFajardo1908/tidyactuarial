@@ -9,7 +9,7 @@ compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,9 @@ are <code>"effective"</code>, <code>"nominal_interest"</code>,
 
 <dt id="arg-m">m<a class="anchor" aria-label="anchor" href="#arg-m"></a></dt>
 <dd><p>Positive integer vector giving the conversion frequency for nominal
-spot-rate inputs.</p></dd>
+spot-rate inputs.
+Observed values are validated as positive integers for every family,
+even when the conversion itself does not use <code>m</code>.</p></dd>
 
 
 <dt id="arg-tidy">tidy<a class="anchor" aria-label="anchor" href="#arg-tidy"></a></dt>
@@ -97,23 +99,30 @@ discount factors.</p>
 annual effective rate using <code><a href="standardize_interest.html">standardize_interest</a></code>. The discount
 factor is then computed as
 $$v(t) = (1+i)^{-t}.$$</p>
+
 <p>This function follows the compact actuarial notation used throughout
 <code>tidyactuarial</code>: <code>t</code> denotes time, <code>i</code> denotes the spot-rate
 input, <code>i_type</code> denotes the interest-rate type, and <code>m</code> denotes the
 conversion frequency for nominal rates.</p>
-<p>If \(t = 0\), the discount factor is 1.</p>
+<p>If \(t = 0\), the discount factor is 1.
+Valuation retains the original log accumulation rate. In tidy output, an
+extreme annual equivalent can round to -1 or overflow to Inf without
+invalidating a representable discount factor.</p>
 <p>Input vectors must have length 1 or a common length. Missing values are
 propagated.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="standardize_interest.html">standardize_interest</a></code>, <code><a href="present_value.html">present_value</a></code>,
-<code><a href="pv_flow.html">pv_flow</a></code></p>
+  <code><a href="pv_flow.html">pv_flow</a></code></p>
 <p>Other interest:
 <code><a href="accumulation_factor.html">accumulation_factor()</a></code>,
+<code><a href="bootstrap_spot_curve.html">bootstrap_spot_curve()</a></code>,
 <code><a href="discount_factor.html">discount_factor()</a></code>,
+<code><a href="forward_curve.html">forward_curve()</a></code>,
 <code><a href="forward_rate.html">forward_rate()</a></code>,
 <code><a href="interest_equivalents.html">interest_equivalents()</a></code>,
+<code><a href="par_rate.html">par_rate()</a></code>,
 <code><a href="standardize_interest.html">standardize_interest()</a></code>,
 <code><a href="yield_curve.html">yield_curve()</a></code></p></div>
     </div>

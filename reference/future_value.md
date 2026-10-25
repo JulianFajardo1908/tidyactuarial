@@ -30,7 +30,8 @@ future_value(C, i, i_type = "effective", m = 1, t, tidy = FALSE)
 - m:
 
   Positive integer vector giving the conversion frequency for nominal
-  rates. Ignored for `"effective"` and `"force"`.
+  rates. Observed values are validated as positive integers for all rate
+  families; only nominal conversions use their numeric value.
 
 - t:
 
@@ -66,6 +67,13 @@ The input interest rate may be supplied as:
 Internally, all rate specifications are first converted to the
 equivalent annual effective interest rate using
 [`standardize_interest`](https://julianfajardo1908.github.io/tidyactuarial/reference/standardize_interest.md).
+
+Valuation retains the log accumulation rate of the original
+specification. In tidy output, an extreme annual equivalent can round to
+-1 or overflow to Inf while the requested accumulation factor remains
+representable. Capital-factor products use log space when a separate
+factor loses range or precision. The product can be representable even
+when the factor is not.
 
 This function follows the compact actuarial notation used throughout
 `tidyactuarial`: `C` denotes the initial payment amount or capital, `t`

@@ -13,7 +13,7 @@ for \(\hat S(t)\), and constructs a discrete life table by evaluating
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,51 +112,66 @@ force), or <code>"Balducci"</code>.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list with two tibbles:</p><ul><li><p><code>km</code>: tibble with columns <code>time</code>, <code>n_risk</code>,
-<code>d</code>, <code>censored</code>, <code>S</code>, <code>varS</code>, <code>seS</code>,
-<code>ci_low</code>, <code>ci_high</code>.</p></li>
+    <code>d</code>, <code>censored</code>, <code>S</code>, <code>varS</code>, <code>seS</code>,
+    <code>ci_low</code>, <code>ci_high</code>.</p></li>
 <li><p><code>lifetable</code>: tibble with columns <code>x</code>, <code>x_next</code>,
-<code>width</code>, <code>lx</code>, <code>dx</code>, <code>qx</code>, <code>px</code>, <code>mx</code>,
-<code>ax</code>, <code>Lx</code>, <code>Tx</code>, <code>ex</code>. Carries class
-<code>"lifetable"</code> and standard attributes for compatibility with
-downstream functions.</p></li>
+    <code>width</code>, <code>lx</code>, <code>dx</code>, <code>qx</code>, <code>px</code>, <code>mx</code>,
+    <code>ax</code>, <code>Lx</code>, <code>Tx</code>, <code>ex</code>. Carries class
+    <code>"lifetable"</code> and standard attributes for compatibility with
+    downstream functions.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The resulting life table is intended for <em>experience-based</em> (empirical) life
+    <p>The resulting life table is intended for *experience-based* (empirical) life
 tables in actuarial/demographic contexts (e.g., cohort studies, population
 indicators). It is not a replacement for graduated/regulatory tables when
 smoothing, extrapolation, or product-specific selection effects are required.</p>
-<p><strong>Kaplan–Meier estimator.</strong> At each observed event time \(t_j\):
+
+<p>**Kaplan–Meier estimator.** At each observed event time \(t_j\):
 $$\hat S(t) = \prod_{t_j \le t} \left(1 - \frac{d_j}{n_j}\right)$$
 where \(n_j\) is the risk set size and \(d_j\) is the number of events.
 Greenwood's variance:
 $$\widehat{\mathrm{Var}}(\hat S(t)) = \hat S(t)^2 \sum_{t_j \le t}
 \frac{d_j}{n_j(n_j - d_j)}.$$
 Pointwise confidence intervals use the log(-log) transformation.</p>
-<p><strong>Life table mapping.</strong> For each interval \([x, x + \Delta)\):
+<p>**Life table mapping.** For each interval \([x, x + \Delta)\):
 $$\ell_x = \text{radix} \cdot \hat S(x), \quad d_x = \ell_x -
   \ell_{x+\Delta}, \quad q_x = d_x / \ell_x.$$</p>
 <p>Exposure \(L_x = \int_x^{x+\Delta} \ell(t)\,dt\) is computed using the
 selected fractional-age assumption (Finan, Section 24):</p><ul><li><p>UDD (Finan, Sec. 24.1):
-\(L_x \approx \tfrac{\ell_x + \ell_{x+\Delta}}{2} \Delta\)</p></li>
+    \(L_x \approx \tfrac{\ell_x + \ell_{x+\Delta}}{2} \Delta\)</p></li>
 <li><p>CF (constant force, Finan, Sec. 24.2):
-\(L_x = \Delta \cdot (\ell_x - \ell_{x+\Delta}) /
+    \(L_x = \Delta \cdot (\ell_x - \ell_{x+\Delta}) /
     \ln(\ell_x / \ell_{x+\Delta})\)</p></li>
 <li><p>Balducci (Finan, Sec. 24.3):
-\(L_x = \Delta \cdot \ell_x \ell_{x+\Delta} /
+    \(L_x = \Delta \cdot \ell_x \ell_{x+\Delta} /
     (\ell_x - \ell_{x+\Delta}) \cdot \ln(\ell_x / \ell_{x+\Delta})\)</p></li>
 </ul><p>Additional columns follow Finan, Sections 23.3, 23.8–23.9:</p><ul><li><p>\(T_x = \sum_{k \ge x} L_k\): total expected years lived after
-age \(x\) (Finan, Sec. 23.3).</p></li>
+    age \(x\) (Finan, Sec. 23.3).</p></li>
 <li><p>\(\mathring{e}_x = T_x / \ell_x\): complete life expectancy
-(Finan, Sec. 23.3).</p></li>
+    (Finan, Sec. 23.3).</p></li>
 <li><p>\(m_x = d_x / L_x\): central death rate (Finan, Sec. 23.9).</p></li>
-<li><p>\(a_x = (\ell_x \Delta - L_x) / d_x\): average fraction of the
-interval lived by those who die.</p></li>
-</ul></div>
+<li><p>\(a_x = (L_x - \ell_{x+\Delta}\Delta) / d_x\): mean time
+    lived within the interval by those who die, in years (not a fraction
+    when interval width differs from one). Undefined if there are no deaths.</p></li>
+</ul><p>Nonfinite time/entry rows are omitted with a warning; the remaining sample
+must be nonempty. Breaks are sorted and deduplicated. Beyond the last
+observation, the KM step is held constant (no tail extrapolation is fitted).
+CF/Balducci exposure at an interval ending at zero survival uses its zero
+limit; positive deaths with zero exposure give infinite central mortality.
+Confidence intervals remain undefined at survival zero or one.
+Standard errors and intervals use Greenwood sums directly, preserving
+small positive survival estimates without a fixed survival floor.
+For delayed entry the risk set uses the existing inclusive convention
+<code>entry &lt;= time</code>; this is a deliberate convention at tied entries/events.
+The lifetable component may have arbitrary interval widths: annual consumers
+such as <code>t_px</code> require conversion to an annual grid with the needed
+endpoint survivors; its class alone does not certify that conversion.</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="lifetable.html">lifetable</a></code> for building tables from known mortality
-inputs, <code><a href="plot_km.html">plot_km</a></code> for plotting the KM curve.</p></div>
+  inputs, <code><a href="plot_km.html">plot_km</a></code> for plotting the KM curve.</p></div>
     </div>
 
     <div class="section level2">
@@ -183,36 +198,36 @@ inputs, <code><a href="plot_km.html">plot_km</a></code> for plotting the KM curv
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 12</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       x x_next width      lx    dx     qx    px     mx    ax     Lx     Tx    ex</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     0      1     1 <span style="text-decoration: underline;">100</span>000  <span style="text-decoration: underline;">4</span>631. 0.046<span style="text-decoration: underline;">3</span> 0.954 0.047<span style="text-decoration: underline;">4</span> 0.500 <span style="text-decoration: underline;">97</span>684. 1.16<span style="color: #949494;">e</span>6  11.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     1      2     1  <span style="text-decoration: underline;">95</span>369. <span style="text-decoration: underline;">5</span>872. 0.061<span style="text-decoration: underline;">6</span> 0.938 0.063<span style="text-decoration: underline;">5</span> 0.500 <span style="text-decoration: underline;">92</span>433. 1.07<span style="color: #949494;">e</span>6  11.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     2      3     1  <span style="text-decoration: underline;">89</span>497. <span style="text-decoration: underline;">6</span>148. 0.068<span style="text-decoration: underline;">7</span> 0.931 0.071<span style="text-decoration: underline;">1</span> 0.5   <span style="text-decoration: underline;">86</span>423. 9.74<span style="color: #949494;">e</span>5  10.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     3      4     1  <span style="text-decoration: underline;">83</span>349. <span style="text-decoration: underline;">4</span>636. 0.055<span style="text-decoration: underline;">6</span> 0.944 0.057<span style="text-decoration: underline;">2</span> 0.500 <span style="text-decoration: underline;">81</span>031. 8.88<span style="color: #949494;">e</span>5  10.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     4      5     1  <span style="text-decoration: underline;">78</span>713. <span style="text-decoration: underline;">7</span>219. 0.091<span style="text-decoration: underline;">7</span> 0.908 0.096<span style="text-decoration: underline;">1</span> 0.500 <span style="text-decoration: underline;">75</span>103. 8.07<span style="color: #949494;">e</span>5  10.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     5      6     1  <span style="text-decoration: underline;">71</span>494. <span style="text-decoration: underline;">4</span>294. 0.060<span style="text-decoration: underline;">1</span> 0.940 0.061<span style="text-decoration: underline;">9</span> 0.500 <span style="text-decoration: underline;">69</span>347. 7.32<span style="color: #949494;">e</span>5  10.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     0      1     1 <span style="text-decoration: underline;">100</span>000  <span style="text-decoration: underline;">4</span>631. 0.046<span style="text-decoration: underline;">3</span> 0.954 0.047<span style="text-decoration: underline;">4</span>   0.5 <span style="text-decoration: underline;">97</span>684. 1.16<span style="color: #949494;">e</span>6  11.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     1      2     1  <span style="text-decoration: underline;">95</span>369. <span style="text-decoration: underline;">5</span>872. 0.061<span style="text-decoration: underline;">6</span> 0.938 0.063<span style="text-decoration: underline;">5</span>   0.5 <span style="text-decoration: underline;">92</span>433. 1.07<span style="color: #949494;">e</span>6  11.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     2      3     1  <span style="text-decoration: underline;">89</span>497. <span style="text-decoration: underline;">6</span>148. 0.068<span style="text-decoration: underline;">7</span> 0.931 0.071<span style="text-decoration: underline;">1</span>   0.5 <span style="text-decoration: underline;">86</span>423. 9.74<span style="color: #949494;">e</span>5  10.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     3      4     1  <span style="text-decoration: underline;">83</span>349. <span style="text-decoration: underline;">4</span>636. 0.055<span style="text-decoration: underline;">6</span> 0.944 0.057<span style="text-decoration: underline;">2</span>   0.5 <span style="text-decoration: underline;">81</span>031. 8.88<span style="color: #949494;">e</span>5  10.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     4      5     1  <span style="text-decoration: underline;">78</span>713. <span style="text-decoration: underline;">7</span>219. 0.091<span style="text-decoration: underline;">7</span> 0.908 0.096<span style="text-decoration: underline;">1</span>   0.5 <span style="text-decoration: underline;">75</span>103. 8.07<span style="color: #949494;">e</span>5  10.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     5      6     1  <span style="text-decoration: underline;">71</span>494. <span style="text-decoration: underline;">4</span>294. 0.060<span style="text-decoration: underline;">1</span> 0.940 0.061<span style="text-decoration: underline;">9</span>   0.5 <span style="text-decoration: underline;">69</span>347. 7.32<span style="color: #949494;">e</span>5  10.2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Tidy pipeline: filter high-mortality intervals</span></span></span>
 <span class="r-in"><span><span class="va">out</span><span class="op">$</span><span class="va">lifetable</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">qx</span> <span class="op">&gt;</span> <span class="fl">0.05</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 18 × 12</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        x x_next width     lx    dx     qx    px     mx    ax     Lx     Tx    ex</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1      2     1 <span style="text-decoration: underline;">95</span>369. <span style="text-decoration: underline;">5</span>872. 0.061<span style="text-decoration: underline;">6</span> 0.938 0.063<span style="text-decoration: underline;">5</span> 0.500 <span style="text-decoration: underline;">92</span>433. 1.07<span style="color: #949494;">e</span>6 11.2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2      3     1 <span style="text-decoration: underline;">89</span>497. <span style="text-decoration: underline;">6</span>148. 0.068<span style="text-decoration: underline;">7</span> 0.931 0.071<span style="text-decoration: underline;">1</span> 0.5   <span style="text-decoration: underline;">86</span>423. 9.74<span style="color: #949494;">e</span>5 10.9 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3      4     1 <span style="text-decoration: underline;">83</span>349. <span style="text-decoration: underline;">4</span>636. 0.055<span style="text-decoration: underline;">6</span> 0.944 0.057<span style="text-decoration: underline;">2</span> 0.500 <span style="text-decoration: underline;">81</span>031. 8.88<span style="color: #949494;">e</span>5 10.7 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4      5     1 <span style="text-decoration: underline;">78</span>713. <span style="text-decoration: underline;">7</span>219. 0.091<span style="text-decoration: underline;">7</span> 0.908 0.096<span style="text-decoration: underline;">1</span> 0.500 <span style="text-decoration: underline;">75</span>103. 8.07<span style="color: #949494;">e</span>5 10.3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5      6     1 <span style="text-decoration: underline;">71</span>494. <span style="text-decoration: underline;">4</span>294. 0.060<span style="text-decoration: underline;">1</span> 0.940 0.061<span style="text-decoration: underline;">9</span> 0.500 <span style="text-decoration: underline;">69</span>347. 7.32<span style="color: #949494;">e</span>5 10.2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6      7     1 <span style="text-decoration: underline;">67</span>200. <span style="text-decoration: underline;">3</span>935. 0.058<span style="text-decoration: underline;">6</span> 0.941 0.060<span style="text-decoration: underline;">3</span> 0.500 <span style="text-decoration: underline;">65</span>232. 6.62<span style="color: #949494;">e</span>5  9.86</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7      8     1 <span style="text-decoration: underline;">63</span>265. <span style="text-decoration: underline;">3</span>360. 0.053<span style="text-decoration: underline;">1</span> 0.947 0.054<span style="text-decoration: underline;">6</span> 0.5   <span style="text-decoration: underline;">61</span>585. 5.97<span style="color: #949494;">e</span>5  9.44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8      9     1 <span style="text-decoration: underline;">59</span>905. <span style="text-decoration: underline;">3</span>558. 0.059<span style="text-decoration: underline;">4</span> 0.941 0.061<span style="text-decoration: underline;">2</span> 0.5   <span style="text-decoration: underline;">58</span>126. 5.36<span style="color: #949494;">e</span>5  8.94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9     10     1 <span style="text-decoration: underline;">56</span>347. <span style="text-decoration: underline;">6</span>566. 0.117  0.883 0.124  0.5   <span style="text-decoration: underline;">53</span>064. 4.77<span style="color: #949494;">e</span>5  8.47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10     11     1 <span style="text-decoration: underline;">49</span>781. <span style="text-decoration: underline;">4</span>551. 0.091<span style="text-decoration: underline;">4</span> 0.909 0.095<span style="text-decoration: underline;">8</span> 0.5   <span style="text-decoration: underline;">47</span>505. 4.24<span style="color: #949494;">e</span>5  8.53</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span>    12     13     1 <span style="text-decoration: underline;">44</span>343. <span style="text-decoration: underline;">5</span>526. 0.125  0.875 0.133  0.5   <span style="text-decoration: underline;">41</span>580. 3.32<span style="color: #949494;">e</span>5  7.49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>    13     14     1 <span style="text-decoration: underline;">38</span>817. <span style="text-decoration: underline;">3</span>837. 0.098<span style="text-decoration: underline;">8</span> 0.901 0.104  0.500 <span style="text-decoration: underline;">36</span>899. 2.91<span style="color: #949494;">e</span>5  7.48</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span>    14     15     1 <span style="text-decoration: underline;">34</span>980. <span style="text-decoration: underline;">2</span>058. 0.058<span style="text-decoration: underline;">8</span> 0.941 0.060<span style="text-decoration: underline;">6</span> 0.5   <span style="text-decoration: underline;">33</span>951. 2.54<span style="color: #949494;">e</span>5  7.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span>    15     16     1 <span style="text-decoration: underline;">32</span>922. <span style="text-decoration: underline;">5</span>251. 0.159  0.841 0.173  0.5   <span style="text-decoration: underline;">30</span>297. 2.20<span style="color: #949494;">e</span>5  6.67</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span>    16     17     1 <span style="text-decoration: underline;">27</span>672. <span style="text-decoration: underline;">2</span>129. 0.076<span style="text-decoration: underline;">9</span> 0.923 0.080<span style="text-decoration: underline;">0</span> 0.5   <span style="text-decoration: underline;">26</span>608. 1.89<span style="color: #949494;">e</span>5  6.84</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span>    17     18     1 <span style="text-decoration: underline;">25</span>543. <span style="text-decoration: underline;">2</span>568. 0.101  0.899 0.106  0.5   <span style="text-decoration: underline;">24</span>259. 1.63<span style="color: #949494;">e</span>5  6.37</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">17</span>    18     19     1 <span style="text-decoration: underline;">22</span>975. <span style="text-decoration: underline;">3</span>282. 0.143  0.857 0.154  0.500 <span style="text-decoration: underline;">21</span>334. 1.39<span style="color: #949494;">e</span>5  6.03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">18</span>    24     25     1 <span style="text-decoration: underline;">19</span>693. <span style="text-decoration: underline;">1</span>969. 0.1    0.9   0.105  0.5   <span style="text-decoration: underline;">18</span>709. 1.87<span style="color: #949494;">e</span>4  0.95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1      2     1 <span style="text-decoration: underline;">95</span>369. <span style="text-decoration: underline;">5</span>872. 0.061<span style="text-decoration: underline;">6</span> 0.938 0.063<span style="text-decoration: underline;">5</span>   0.5 <span style="text-decoration: underline;">92</span>433. 1.07<span style="color: #949494;">e</span>6 11.2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2      3     1 <span style="text-decoration: underline;">89</span>497. <span style="text-decoration: underline;">6</span>148. 0.068<span style="text-decoration: underline;">7</span> 0.931 0.071<span style="text-decoration: underline;">1</span>   0.5 <span style="text-decoration: underline;">86</span>423. 9.74<span style="color: #949494;">e</span>5 10.9 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3      4     1 <span style="text-decoration: underline;">83</span>349. <span style="text-decoration: underline;">4</span>636. 0.055<span style="text-decoration: underline;">6</span> 0.944 0.057<span style="text-decoration: underline;">2</span>   0.5 <span style="text-decoration: underline;">81</span>031. 8.88<span style="color: #949494;">e</span>5 10.7 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4      5     1 <span style="text-decoration: underline;">78</span>713. <span style="text-decoration: underline;">7</span>219. 0.091<span style="text-decoration: underline;">7</span> 0.908 0.096<span style="text-decoration: underline;">1</span>   0.5 <span style="text-decoration: underline;">75</span>103. 8.07<span style="color: #949494;">e</span>5 10.3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5      6     1 <span style="text-decoration: underline;">71</span>494. <span style="text-decoration: underline;">4</span>294. 0.060<span style="text-decoration: underline;">1</span> 0.940 0.061<span style="text-decoration: underline;">9</span>   0.5 <span style="text-decoration: underline;">69</span>347. 7.32<span style="color: #949494;">e</span>5 10.2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6      7     1 <span style="text-decoration: underline;">67</span>200. <span style="text-decoration: underline;">3</span>935. 0.058<span style="text-decoration: underline;">6</span> 0.941 0.060<span style="text-decoration: underline;">3</span>   0.5 <span style="text-decoration: underline;">65</span>232. 6.62<span style="color: #949494;">e</span>5  9.86</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7      8     1 <span style="text-decoration: underline;">63</span>265. <span style="text-decoration: underline;">3</span>360. 0.053<span style="text-decoration: underline;">1</span> 0.947 0.054<span style="text-decoration: underline;">6</span>   0.5 <span style="text-decoration: underline;">61</span>585. 5.97<span style="color: #949494;">e</span>5  9.44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8      9     1 <span style="text-decoration: underline;">59</span>905. <span style="text-decoration: underline;">3</span>558. 0.059<span style="text-decoration: underline;">4</span> 0.941 0.061<span style="text-decoration: underline;">2</span>   0.5 <span style="text-decoration: underline;">58</span>126. 5.36<span style="color: #949494;">e</span>5  8.94</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9     10     1 <span style="text-decoration: underline;">56</span>347. <span style="text-decoration: underline;">6</span>566. 0.117  0.883 0.124    0.5 <span style="text-decoration: underline;">53</span>064. 4.77<span style="color: #949494;">e</span>5  8.47</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10     11     1 <span style="text-decoration: underline;">49</span>781. <span style="text-decoration: underline;">4</span>551. 0.091<span style="text-decoration: underline;">4</span> 0.909 0.095<span style="text-decoration: underline;">8</span>   0.5 <span style="text-decoration: underline;">47</span>505. 4.24<span style="color: #949494;">e</span>5  8.53</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span>    12     13     1 <span style="text-decoration: underline;">44</span>343. <span style="text-decoration: underline;">5</span>526. 0.125  0.875 0.133    0.5 <span style="text-decoration: underline;">41</span>580. 3.32<span style="color: #949494;">e</span>5  7.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>    13     14     1 <span style="text-decoration: underline;">38</span>817. <span style="text-decoration: underline;">3</span>837. 0.098<span style="text-decoration: underline;">8</span> 0.901 0.104    0.5 <span style="text-decoration: underline;">36</span>899. 2.91<span style="color: #949494;">e</span>5  7.48</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span>    14     15     1 <span style="text-decoration: underline;">34</span>980. <span style="text-decoration: underline;">2</span>058. 0.058<span style="text-decoration: underline;">8</span> 0.941 0.060<span style="text-decoration: underline;">6</span>   0.5 <span style="text-decoration: underline;">33</span>951. 2.54<span style="color: #949494;">e</span>5  7.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span>    15     16     1 <span style="text-decoration: underline;">32</span>922. <span style="text-decoration: underline;">5</span>251. 0.159  0.841 0.173    0.5 <span style="text-decoration: underline;">30</span>297. 2.20<span style="color: #949494;">e</span>5  6.67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span>    16     17     1 <span style="text-decoration: underline;">27</span>672. <span style="text-decoration: underline;">2</span>129. 0.076<span style="text-decoration: underline;">9</span> 0.923 0.080<span style="text-decoration: underline;">0</span>   0.5 <span style="text-decoration: underline;">26</span>608. 1.89<span style="color: #949494;">e</span>5  6.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span>    17     18     1 <span style="text-decoration: underline;">25</span>543. <span style="text-decoration: underline;">2</span>568. 0.101  0.899 0.106    0.5 <span style="text-decoration: underline;">24</span>259. 1.63<span style="color: #949494;">e</span>5  6.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">17</span>    18     19     1 <span style="text-decoration: underline;">22</span>975. <span style="text-decoration: underline;">3</span>282. 0.143  0.857 0.154    0.5 <span style="text-decoration: underline;">21</span>334. 1.39<span style="color: #949494;">e</span>5  6.03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">18</span>    24     25     1 <span style="text-decoration: underline;">19</span>693. <span style="text-decoration: underline;">1</span>969. 0.1    0.9   0.105    0.5 <span style="text-decoration: underline;">18</span>709. 1.87<span style="color: #949494;">e</span>4  0.95</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compare UDD vs CF assumptions</span></span></span>
 <span class="r-in"><span><span class="va">udd</span> <span class="op">&lt;-</span> <span class="fu">km_lifetable</span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span>, breaks <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">20</span>, assumption <span class="op">=</span> <span class="st">"UDD"</span><span class="op">)</span></span></span>
@@ -224,8 +239,6 @@ inputs, <code><a href="plot_km.html">plot_km</a></code> for plotting the KM curv
 <span class="r-in"><span><span class="co"># Plot the KM curve with plot_km</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot_km.html">plot_km</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">km</span>, time_col <span class="op">=</span> <span class="st">"time"</span>, surv_col <span class="op">=</span> <span class="st">"S"</span>,</span></span>
 <span class="r-in"><span>        lower_col <span class="op">=</span> <span class="st">"ci_low"</span>, upper_col <span class="op">=</span> <span class="st">"ci_high"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 10 rows containing missing values or values outside the scale range</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> (`geom_ribbon()`).</span>
 <span class="r-plt img"><img src="km_lifetable-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
