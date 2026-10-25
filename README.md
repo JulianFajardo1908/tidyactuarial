@@ -4,10 +4,11 @@
 
 `tidyactuarial` provides tools for financial mathematics, life contingencies, and collective risk in R. The package is designed so that the actuarial model remains visible: formulas, timing conventions, mortality assumptions, and valuation dates come first; computation is then used to reproduce, audit, and scale the calculation.
 
-The current stable release is **tidyactuarial 0.2.0**, published on CRAN
-on October 25, 2026. This repository and its reference website document
-the released features, including collective risk, insurance coverage,
-aggregate loss distributions, and tail risk measures.
+The stable release is **tidyactuarial 0.2.0**, published on CRAN on
+October 25, 2026. This `develop` branch is the **0.2.0.9000**
+development version. The public reference website documents the CRAN release,
+including collective risk, insurance coverage, aggregate loss distributions,
+and tail risk measures.
 
 ## Installation
 
