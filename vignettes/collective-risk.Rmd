@@ -300,4 +300,4 @@ reinsurance retention.
 
 Klugman, S. A., Panjer, H. H., and Willmot, G. E. (2019).
 *Loss Models: From Data to Decisions*, 5th edition. John Wiley & Sons.
-[Publisher information](https://www.wiley.com/en-gb/loss-models-from-data-to-decisions-5th-edition-p-9781119523758).
+
