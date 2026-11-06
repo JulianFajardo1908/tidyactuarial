@@ -1,0 +1,96 @@
+location_code,location,iso3,source_type,level,region,subregion
+32,Argentina,ARG,Country/Area,country,Latin America and the Caribbean,South America
+36,Australia,AUS,Country/Area,country,Oceania,Australia/New Zealand
+56,Belgium,BEL,Country/Area,country,Europe,Western Europe
+68,Bolivia (Plurinational State of),BOL,Country/Area,country,Latin America and the Caribbean,South America
+76,Brazil,BRA,Country/Area,country,Latin America and the Caribbean,South America
+90,Solomon Islands,SLB,Country/Area,country,Oceania,Melanesia
+120,Cameroon,CMR,Country/Area,country,Africa,Middle Africa
+124,Canada,CAN,Country/Area,country,Northern America,Northern America
+152,Chile,CHL,Country/Area,country,Latin America and the Caribbean,South America
+156,China,CHN,Country/Area,country,Asia,Eastern Asia
+170,Colombia,COL,Country/Area,country,Latin America and the Caribbean,South America
+180,Democratic Republic of the Congo,COD,Country/Area,country,Africa,Middle Africa
+188,Costa Rica,CRI,Country/Area,country,Latin America and the Caribbean,Central America
+192,Cuba,CUB,Country/Area,country,Latin America and the Caribbean,Caribbean
+208,Denmark,DNK,Country/Area,country,Europe,Northern Europe
+214,Dominican Republic,DOM,Country/Area,country,Latin America and the Caribbean,Caribbean
+218,Ecuador,ECU,Country/Area,country,Latin America and the Caribbean,South America
+222,El Salvador,SLV,Country/Area,country,Latin America and the Caribbean,Central America
+231,Ethiopia,ETH,Country/Area,country,Africa,Eastern Africa
+242,Fiji,FJI,Country/Area,country,Oceania,Melanesia
+246,Finland,FIN,Country/Area,country,Europe,Northern Europe
+250,France,FRA,Country/Area,country,Europe,Western Europe
+276,Germany,DEU,Country/Area,country,Europe,Western Europe
+288,Ghana,GHA,Country/Area,country,Africa,Western Africa
+300,Greece,GRC,Country/Area,country,Europe,Southern Europe
+320,Guatemala,GTM,Country/Area,country,Latin America and the Caribbean,Central America
+332,Haiti,HTI,Country/Area,country,Latin America and the Caribbean,Caribbean
+340,Honduras,HND,Country/Area,country,Latin America and the Caribbean,Central America
+356,India,IND,Country/Area,country,Asia,Southern Asia
+360,Indonesia,IDN,Country/Area,country,Asia,South-Eastern Asia
+380,Italy,ITA,Country/Area,country,Europe,Southern Europe
+388,Jamaica,JAM,Country/Area,country,Latin America and the Caribbean,Caribbean
+392,Japan,JPN,Country/Area,country,Asia,Eastern Asia
+404,Kenya,KEN,Country/Area,country,Africa,Eastern Africa
+410,Republic of Korea,KOR,Country/Area,country,Asia,Eastern Asia
+484,Mexico,MEX,Country/Area,country,Latin America and the Caribbean,Central America
+504,Morocco,MAR,Country/Area,country,Africa,Northern Africa
+528,Netherlands,NLD,Country/Area,country,Europe,Western Europe
+548,Vanuatu,VUT,Country/Area,country,Oceania,Melanesia
+554,New Zealand,NZL,Country/Area,country,Oceania,Australia/New Zealand
+558,Nicaragua,NIC,Country/Area,country,Latin America and the Caribbean,Central America
+566,Nigeria,NGA,Country/Area,country,Africa,Western Africa
+578,Norway,NOR,Country/Area,country,Europe,Northern Europe
+591,Panama,PAN,Country/Area,country,Latin America and the Caribbean,Central America
+598,Papua New Guinea,PNG,Country/Area,country,Oceania,Melanesia
+600,Paraguay,PRY,Country/Area,country,Latin America and the Caribbean,South America
+604,Peru,PER,Country/Area,country,Latin America and the Caribbean,South America
+608,Philippines,PHL,Country/Area,country,Asia,South-Eastern Asia
+616,Poland,POL,Country/Area,country,Europe,Eastern Europe
+620,Portugal,PRT,Country/Area,country,Europe,Southern Europe
+643,Russian Federation,RUS,Country/Area,country,Europe,Eastern Europe
+686,Senegal,SEN,Country/Area,country,Africa,Western Africa
+704,Viet Nam,VNM,Country/Area,country,Asia,South-Eastern Asia
+710,South Africa,ZAF,Country/Area,country,Africa,Southern Africa
+724,Spain,ESP,Country/Area,country,Europe,Southern Europe
+752,Sweden,SWE,Country/Area,country,Europe,Northern Europe
+756,Switzerland,CHE,Country/Area,country,Europe,Western Europe
+764,Thailand,THA,Country/Area,country,Asia,South-Eastern Asia
+776,Tonga,TON,Country/Area,country,Oceania,Polynesia
+780,Trinidad and Tobago,TTO,Country/Area,country,Latin America and the Caribbean,Caribbean
+804,Ukraine,UKR,Country/Area,country,Europe,Eastern Europe
+818,Egypt,EGY,Country/Area,country,Africa,Northern Africa
+826,United Kingdom,GBR,Country/Area,country,Europe,Northern Europe
+840,United States of America,USA,Country/Area,country,Northern America,Northern America
+858,Uruguay,URY,Country/Area,country,Latin America and the Caribbean,South America
+862,Venezuela (Bolivarian Republic of),VEN,Country/Area,country,Latin America and the Caribbean,South America
+882,Samoa,WSM,Country/Area,country,Oceania,Polynesia
+900,World,,World,world,World,
+903,Africa,,Geographic region,major,Africa,
+904,Latin America and the Caribbean,,Geographic region,major,Latin America and the Caribbean,
+905,Northern America,,Geographic region,major,Northern America,
+906,Eastern Asia,,Subregion,subregion,Asia,Eastern Asia
+908,Europe,,Geographic region,major,Europe,
+909,Oceania,,Geographic region,major,Oceania,
+910,Eastern Africa,,Subregion,subregion,Africa,Eastern Africa
+911,Middle Africa,,Subregion,subregion,Africa,Middle Africa
+912,Northern Africa,,Subregion,subregion,Africa,Northern Africa
+913,Southern Africa,,Subregion,subregion,Africa,Southern Africa
+914,Western Africa,,Subregion,subregion,Africa,Western Africa
+915,Caribbean,,Subregion,subregion,Latin America and the Caribbean,Caribbean
+916,Central America,,Subregion,subregion,Latin America and the Caribbean,Central America
+920,South-Eastern Asia,,Subregion,subregion,Asia,South-Eastern Asia
+922,Western Asia,,Subregion,subregion,Asia,Western Asia
+923,Eastern Europe,,Subregion,subregion,Europe,Eastern Europe
+924,Northern Europe,,Subregion,subregion,Europe,Northern Europe
+925,Southern Europe,,Subregion,subregion,Europe,Southern Europe
+926,Western Europe,,Subregion,subregion,Europe,Western Europe
+927,Australia/New Zealand,,Subregion,subregion,Oceania,Australia/New Zealand
+928,Melanesia,,Subregion,subregion,Oceania,Melanesia
+931,South America,,Subregion,subregion,Latin America and the Caribbean,South America
+935,Asia,,Geographic region,major,Asia,
+954,Micronesia,,Subregion,subregion,Oceania,Micronesia
+957,Polynesia,,Subregion,subregion,Oceania,Polynesia
+5500,Central Asia,,Subregion,subregion,Asia,Central Asia
+5501,Southern Asia,,Subregion,subregion,Asia,Southern Asia

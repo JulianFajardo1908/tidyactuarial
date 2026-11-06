@@ -7,3 +7,6 @@
 ^CONTRIBUTING[.]md$
 ^AGENTS[.]md$
 ^audit-.*[.]md$
+^data-raw$
+^DATASETS_021_(INCLUIDOS|PENDIENTES)[.]md$
+^cran-comments[.]md$
