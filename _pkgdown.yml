@@ -159,9 +159,11 @@ reference:
   - cash_flows_sample
   - loans_sample
   - mortality_colombia_tables
+  - mortality_regions
   - mortality_world_sample_2015_2023
   - mortality_world_sample_2023
   - multiple_decrement_sample
+  - pet_lifetables
   - soa08lt
 articles:
 - title: Financial Mathematics
@@ -172,5 +174,7 @@ articles:
   - bonds-duration-convexity-immunization
 - title: Life Contingencies
   navbar: ~
-  contents: life-contingencies
+  contents:
+  - life-contingencies
+  - working-with-datasets
 

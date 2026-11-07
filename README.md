@@ -292,6 +292,29 @@ soa08lt |>
 
 The pipe records the actuarial construction of the contract; it does not replace the underlying equation of equivalence.
 
+## Datasets
+
+The package includes selected 2023 period life tables from UN World
+Population Prospects 2024 in `mortality_regions`: 67 countries or areas
+and 28 geographic aggregates. To compute five-year survival at age 65
+using the published survivor counts for Colombia:
+
+```r
+col <- subset(mortality_regions, location_code == 170L & sex == "both",
+              select = c(x, lx))
+t_px(col, x = 65, t = 5)
+```
+
+The 100+ interval is open; it does not supply a one-year probability or
+an age of extinction. See `?mortality_regions` for units, source and
+licence. The existing mortality datasets are unchanged. The
+`working-with-datasets` vignette also illustrates competing risks using
+the external `MASS::Melanoma` dataset.
+
+`pet_lifetables` includes study-specific life tables for US dogs and cats
+and UK dogs. Each table retains its own denominator and open last age;
+see `?pet_lifetables` for the published quantities and limitations.
+
 ## Articles
 
 Four introductory articles develop complete workflows rather than isolated function calls:
