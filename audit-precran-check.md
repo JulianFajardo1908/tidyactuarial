@@ -1,5 +1,103 @@
 # Verificación local de paquete — 2026-10-16
 
+## Candidata integrada 0.2.1 — 7 de noviembre de 2026
+
+Base 157d034 de codex/data-0.2.1; integración de los commits multivida
+8d28d3e, d6b65bc y 92c2980 expresamente solicitada. Se conservan los
+datos WPP/mascotas de la rama del PR y se trasladan los cambios de NEWS
+a 0.2.1. La rama master no se modifica.
+
+devtools::document y devtools::test finales: 7618 expectativas aprobadas,
+sin fallos/advertencias/omisiones. devtools::check invoca build y
+R CMD check --as-cran --no-manual: **0 ERROR, 0 WARNING, 0 NOTE**.
+7618 instaladas aprobadas (108 s), ejemplos (28 s), cinco viñetas
+reconstruidas (16 s). R 4.6.1/Windows, biblioteca y Pandoc existentes,
+locale C; incoming desactivado por devtools. No certifica manual PDF
+nuevo ni CI remota de un commit diferente.
+
+427 archivos incluidos (también los diez objetos data/) coinciden con
+el checkout. El nuevo tarball pesa 3032579 bytes. SHA256:
+C10DFB9B4CEBC085749BF4F3522E48C49BA8D8F1AA18B31A5328A335836979E9.
+Artefactos: check-final/ bajo data-0.2.1 en esta sesión. Los cotejos
+adicionales de datos reales con sumas independientes dan e_joint WPP
+4,489449, e_last 4,985765 y anualidad conjunta de perros con edades
+0/5 y plazo 14 años 5,362857; data-multilife-integration.log.
+
+Alcance de fuentes cerrado y pendientes desplazados de la entrega:
+DATASETS_021_INCLUIDOS.md / DATASETS_021_PENDIENTES.md. Esta candidata
+integra mejoras de cálculo y datos; los checks anteriores separados
+se conservan como históricos. Solo se autoriza actualizar PR #6, sin
+merge, etiqueta, release ni envío a CRAN.
+
+## Suplemento C22/C23 annuity_multi — 6 de noviembre de 2026
+
+Base d6b65bc, audit/0.2.0-precran, versión 0.2.0 conservada. C22 y C23
+autorizadas por el usuario antes de implementar. Modelo, causa y límites
+en audit-single-life-contracts.md; decisiones en audit-api-review.md.
+24 comprobaciones nuevas, 176 dirigidas aprobadas; tres grupos abortaban
+con errores en la base. 72 valores ordinarios y formals previos idénticos.
+Inventario: 102 nombres, 976 parámetros y cero descripciones ausentes/vacías.
+
+Validación final: **7582 aprobadas** tanto en fuente como en el paquete
+instalado; cero fallos, advertencias u omisiones. Build --no-manual y
+R CMD check --as-cran --no-manual: salida 0, **Status: OK** (0 ERROR,
+0 WARNING, 0 NOTE). Ejemplos aprobados (26 s), suite instalada (81 s)
+y viñetas reconstruidas. Windows/R 4.6.1, locale C, biblioteca existente
+y Pandoc de RStudio; recepción remota CRAN desactivada.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/multilife-api-2026-11-05/c22-c23/.
+snapshot-verification.log coteja 405 archivos R/tests/man/vignettes/
+NEWS/NAMESPACE/DESCRIPTION, normalizando CRLF y espacios del build en
+DESCRIPTION; AGENTS/audit excluidos. SHA256 del archivo fuente:
+266E4D2379C7471BD16FFFD469EF06E36D459A20862FBECA6FC0A719EC3EA24B.
+Registros annuity-multi-before/local/final.log en el directorio padre.
+Sin manual PDF nuevo, sitio, nueva CI remota, prueba de R mínimo,
+cambio de versión ni push. Suplemento cerrado en el alcance autorizado.
+
+## Suplemento C21 e_xy — 5 de noviembre de 2026
+
+Base 607657e, audit/0.2.0-precran, DESCRIPTION 0.2.0 conservado. Propuesta
+registrada y autorizada expresamente por el usuario antes de implementar.
+Dos tablas opcionales, status añadido al final y compatibilidad cohort;
+matemática, causa y límites en audit-multilife-contingencies.md.
+
+test-e-xy-two-tables.R: 104 comprobaciones nuevas, con seis errores de
+grupo/cero aprobadas sobre la función 607657e (las excepciones abortan
+aserciones); no se contabilizan como 104 fallos independientes. Regresiones
+relacionadas finales: 503 aprobadas, cero fallos/advertencias/omisiones.
+192 objetos completos idénticos a la base con cohort/status/lista duplicada;
+todos los formals anteriores idénticos, status al final. Inventario:
+102 nombres exportados, 975 apariciones de parámetros, cero descripciones
+ausentes/vacías. Diff --check aprobado antes de fase integral.
+
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/multilife-api-2026-11-05/.
+diagnosis.md conserva la reproducción inicial; before.log, local.log,
+compatibility.R/log e inventory.log son evidencia dirigida. El verificador
+de compatibilidad se corrigió de pairlist/list antes de obtener el resultado
+definitivo; esa corrección no afectó el paquete. Sin nueva dependencia,
+cambio de versión o push.
+
+Validación definitiva: roxygen2 y suite fuente **7558 aprobadas, cero
+fallos, advertencias, omisiones o errores**. Build --no-manual y
+R CMD check --as-cran --no-manual: salida 0, **0 ERROR, 0 WARNING,
+0 NOTE (Status: OK)**. Suite instalada: **7558 aprobadas**, cero
+fallos/advertencias/omisiones (82 s). Ejemplos aprobados (22 s), cuatro
+viñetas aprobadas y reconstrucción aprobada (10 s). Informes: build.log,
+check.log, tidyactuarial.Rcheck/00check.log y tests/testthat.Rout.
+
+snapshot-verification.log coteja **404 archivos** R/tests/man/vignettes/
+NEWS/NAMESPACE/DESCRIPTION con el checkout, normalizando CRLF y espacios
+del build en los campos originales DESCRIPTION; AGENTS/audit excluidos.
+SHA256 del archivo tidyactuarial_0.2.0.tar.gz:
+311E09B86B6DC6F8BF01DB923BA8EF1092BC88103950BF96DABAF2BD18E4B9B1.
+Windows/R 4.6.1, biblioteca existente, locale C, Pandoc de RStudio,
+recepción remota CRAN desactivada. Una suite fuente integral y un
+build/check final sobre fuentes/ayudas/NEWS estables. Los registros audit
+actualizados después están excluidos del archivo y no exigen reconstruir.
+No se genera nuevo manual PDF, sitio o CI remota ni se prueba R mínimo.
+Los artefactos anteriores de esos productos no certifican este contenido.
+C21 cerrado en su alcance autorizado, preservando los límites documentados.
+
 ## Candidata 0.2.0 — cierre local recuperado el 24 de octubre de 2026
 
 Cambio de versión autorizado expresamente por el usuario. DESCRIPTION

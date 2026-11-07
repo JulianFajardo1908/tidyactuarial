@@ -1,5 +1,105 @@
 # B07 — contingencias multivida
 
+## Comprobación de las otras funciones bivariadas — 5 de noviembre de 2026
+
+Solicitud posterior del usuario: comprobar si el defecto de capacidad/API
+de e_xy también aparece en las otras funciones de dos vidas. Base 8d28d3e,
+Git inicialmente limpio, audit/0.2.0-precran, versión 0.2.0. Lectura dirigida
+de implementación/ayudas y 91 comprobaciones externas aprobadas, cero fallos;
+no se alteran fuentes, tests del paquete, ayudas ni contratos públicos.
+
+t_pxy, annuity_xy, insurance_xy, premium_xy y reserve_xy admiten
+list(lt_x,lt_y) y status joint/last. Oráculos: supervivencias marginales
+explícitas, productos/uniones, sumas descontadas de pagos y muertes,
+equivalencia de prima y reserva antes de prima desde ambas vidas vivas.
+Se examinan mortalidades/edades distintas, intercambio de tablas y vidas,
+tabla común frente a lista duplicada, renta diferida fraccionada k=1/2/4,
+seguro temporal/dotal, primas y reservas temporal/dotal/dotal puro, reservas
+prospectivas/recursivas y pago reversionario por estado de annuity_xy.
+Los cuatro valoradores aceptan cohort legado first/last y rechazan ambos
+selectores explícitos; t_pxy solo ofrece el selector canónico status.
+No se ha reproducido la limitación de una sola tabla en estas cinco funciones.
+
+annuity_multi, que también puede valorar dos vidas, acepta tabla por vida
+y su resultado coincide con la suma actuarial independiente en el caso
+comprobado. Conserva cohort first/last y no admite status. Su horizonte
+común conservador, min(omega_j)-max(ages), está documentado y puede rechazar
+tablas que sí tienen suficientes años desde cada edad inicial: tablas
+60:64 y 70:74 con edades 60/70 y n=3 se rechazan pese a disponer de cuatro
+años cada marginal. Esto se clasifica como limitación documentada y
+diferencia de API, sin cambiarla por analogía ni extender C21 a annuity_multi.
+
+Evidencia reproducible: check-other-functions.R y other-functions.log en
+los artefactos multilife-api-2026-11-05 de esta sesión. Las 91 comprobaciones
+son externas a la suite del paquete: no se añaden al recuento 7558 ni al
+acumulado B07. Solo se actualizan registros excluidos por .Rbuildignore;
+el contenido del archivo y la validación C21 anterior siguen vigentes.
+La revisión es dirigida al defecto comunicado, no una nueva auditoría
+exhaustiva de todos los productos, modalidades o parámetros.
+
+## Suplemento C21: e_xy con dos tablas y status (5 de noviembre de 2026)
+
+Base 607657e, audit/0.2.0-precran, versión real 0.2.0. El usuario detectó
+la limitación documentada de e_xy a una tabla y la inconsistencia del nombre
+cohort frente a status. La propuesta C21 se registró antes de la autorización
+expresa del usuario. No se presentan como incorrectas las esperanzas previas
+con mortalidad compartida; el cierre previo B07 no incluía esta ampliación.
+
+Modelo: dos vidas independientes, ambas vivas inicialmente. S_joint=Sx*Sy;
+S_last=Sx+Sy-Sx*Sy. Esperanza curtata sum(k=1..floor(t))S(k), completa
+integral(0..t)S(u)du. Cada marginal termina en Hx=max(lt_x$x)-x o
+Hy=max(lt_y$x)-y. La conjunta usa min(Hx,Hy), la de último superviviente
+max(Hx,Hy), con supervivencia marginal cero más allá de su propio horizonte.
+Se conserva la truncación de tablas abiertas, incluido su extremo entero
+observado; no se extrapola ni se identifica último superviviente con ambas
+vidas vivas después de una muerte.
+
+Causa: validación exclusiva de data.frame, horizonte sobre una sola tabla
+y construcción de la base con lt repetida. Diff acotado a e_xy: resolver
+tabla compartida/lista ordenada, validar ambas tablas, comprobar cada edad
+en su marginal, derivar horizontes separados y suministrar ambas al motor
+analítico existente. No se modifica el motor ni los otros valoradores.
+Herencia frac igual a t_pxy: CML se normaliza a CF, se hereda el único
+atributo válido disponible, dos válidos distintos requieren elección
+explícita y la ausencia de ambos usa UDD.
+
+API autorizada: status=c("joint","last") al final. Los formals anteriores
+y sus posiciones se conservan; cohort first/last sigue funcionando sin
+advertencia nueva. Ambos selectores explícitos producen error, incluso si
+son equivalentes. Salida tidy conserva x,y,t,type,frac,cohort,ex; no se añade
+columna duplicada. Se prefiere status en ejemplos nuevos. La retención de
+cohort es compatibilidad pública deliberada, no un nuevo concepto actuarial.
+
+Regresión nueva: test-e-xy-two-tables.R, 104 comprobaciones. En 607657e
+seis grupos terminan en error y cero aserciones pasan porque el nuevo
+selector/lista no existe; no se cuenta como 104 fallos independientes.
+Tras el cambio, las 104 y 399 comprobaciones relacionadas pasan (503 total).
+Oráculos independientes: sumas explícitas de supervivencias, integración
+numérica por tramos de interpolantes UDD, integrales exponenciales CF con
+fuerzas distintas y racionales Balducci 2/(2+t),5/(5+t). Se contrasta la
+identidad e_joint+e_last=e_x+e_y, ambos horizontes distintos, intercambio
+de vidas, cero plazo, edad inicial ausente/extinguida, horizonte cero con
+lx positivo, tabla inválida y atributos de interpolación. La tabla abierta
+prueba tanto el extremo curtato positivo como su integral truncada.
+
+192 objetos ordinarios completos son idénticos a 607657e al llamar con
+cohort, status y lista duplicada; los formals originales son idénticos.
+Artefactos: C:/Users/LENOVO/.codex/visualizations/2026/10/21/01a15fe2-c4db-7852-8822-b6e54b77fef0/multilife-api-2026-11-05/.
+before.log, local.log y compatibility.R/log conservan la evidencia dirigida.
+La primera ejecución de compatibility.R comparó pairlist con list y fue
+rechazada por el verificador; se corrigió solo el tipo en ese script antes
+de obtener las 192 igualdades, sin alterar el paquete.
+
+No se uniforman annuity_multi, MC o life_contract; no se cambia versión,
+dependencias, rama, independencia, restricciones de double ni las semánticas
+de reservas. La candidata anterior no valida este nuevo contenido; se
+construye y comprueba otro archivo. Sin push o publicación. Estado:
+cerrado en el alcance autorizado C21. Suite fuente e instalada: 7558
+aprobadas cada una, cero fallos/advertencias/omisiones; check Status: OK
+(0 ERROR, 0 WARNING, 0 NOTE). Ejemplos y cuatro viñetas aprobados.
+404 archivos cotejados; huella y límites en audit-precran-check.md.
+B07 acumula 806 comprobaciones nuevas incluyendo las 104 de este suplemento.
+
 ## B07-01: herencia CML en probabilidades y esperanzas (21 de octubre de 2026)
 
 Base 11eeb49, rama audit/0.2.0-precran, Git inicialmente limpio,

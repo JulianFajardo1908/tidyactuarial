@@ -1,5 +1,87 @@
 # Prompt maestro para continuar tidyactuarial
 
+## Integración final de 0.2.1 — 7 de noviembre de 2026
+
+El usuario pidió expresamente que los cambios multivida también queden
+en 0.2.1, junto con las bases que superen las verificaciones. Se integran
+8d28d3e, d6b65bc y 92c2980 en codex/data-0.2.1, preservando master,
+develop y la rama de auditoría. El PR es #6 y sigue sin autorización
+de merge, etiqueta, release o CRAN. Los permisos anteriores de no hacer
+push pertenecían a unidades históricas: este encargo autoriza actualizar
+la rama del PR.
+
+Alcance de datos cerrado: mortality_regions y pet_lifetables (57 filas
+de tres tablas con CC BY). Los otros ocho objetos quedan intactos.
+Los impedimentos externos de las demás bases están documentados en
+DATASETS_021_PENDIENTES.md y se desplazan fuera de esta entrega.
+Conjunto integrado validado: 7618 aprobadas en fuente e instaladas;
+R CMD check --as-cran --no-manual, 0 errores/advertencias/notas. 427
+archivos cotejados, tarball 3032579 bytes, huella en cran-comments.md.
+No atribuirle CI de las candidatas separadas: al actualizar el PR se
+debe identificar el commit nuevo. Límites de datos y dominio conservados.
+
+## Suplemento C22/C23 de annuity_multi — 6 de noviembre de 2026
+
+Base d6b65bc, versión 0.2.0, audit/0.2.0-precran, Git inicialmente limpio.
+Las otras cinco bivariadas no requieren cambio por el defecto comunicado.
+El usuario autorizó expresamente C22/C23. annuity_multi admite status
+joint/last al final con cohort legado, y usa el horizonte común
+min(omega_j-edad_j), sin extrapolación. El ejemplo antes rechazado o con
+cero devuelve .985 conjunta, 2.065 último superviviente y .675 reversionaria
+diferida, según la modalidad. Modelo y regresiones en
+audit-single-life-contracts.md; evidencia previa en
+annuity-multi-proposal.R y annuity-multi-proposal-before.log, dentro de
+multilife-api-2026-11-05. 24 comprobaciones nuevas, 176 dirigidas, 72
+comparaciones idénticas con la base; suite fuente 7582 aprobadas.
+Suite instalada 7582 aprobadas; check Status: OK, ejemplos y viñetas
+aprobados. 405 archivos cotejados y huella en audit-precran-check.md.
+C22/C23 cerradas en el alcance autorizado. Se conserva la versión, la
+rama y la restricción de no hacer push; no reutilizar CI ni productos
+de la candidata anterior para este nuevo contenido.
+
+## Revisión complementaria solicitada: otras funciones bivariadas — 5 de noviembre de 2026
+
+Base 8d28d3e, versión 0.2.0, misma rama y Git inicialmente limpio.
+91 comprobaciones externas pasan: t_pxy, annuity_xy, insurance_xy,
+premium_xy y reserve_xy admiten tablas distintas y status joint/last,
+aplicando correctamente las marginales en los casos examinados.
+annuity_multi también acepta tablas por vida, pero conserva cohort
+first/last, carece de status y usa el horizonte común conservador
+documentado. Una posible armonización requiere propuesta/decisión propia;
+C21 solo cubre e_xy. Detalle, límites y evidencia reproducible en
+audit-multilife-contingencies.md, sección superior, y artefactos
+multilife-api-2026-11-05/check-other-functions.R y other-functions.log.
+Sin cambios en el contenido del paquete: no repetir build/check por esta
+revisión documental ni sumar las 91 a las 7558 comprobaciones instaladas.
+
+## Suplemento multivida C21 autorizado — 5 de noviembre de 2026
+
+Estado real verificado: 607657e, audit/0.2.0-precran, DESCRIPTION 0.2.0,
+Git inicialmente limpio. Los estados de octubre más abajo son históricos.
+Diagnóstico previo: e_xy solo admitía una tabla y cohort first/last; t_pxy y los
+valoradores bivariados admiten dos y usan status joint/last. La limitación
+documentada no es un error demostrado de los resultados con tabla compartida.
+Se abre suplemento de capacidad/API; propuesta C21 en audit-api-review.md,
+autorizada expresamente con «autorizo». Implementado en e_xy, con 104
+comprobaciones nuevas y 399 relacionadas aprobadas. 192 objetos completos
+idénticos a 607657e y formals anteriores conservados. lt compartida o lista,
+status canónico añadido al final con
+compatibilidad explícita del cohort existente, conflicto de selectores
+rechazado y columnas tidy históricas conservadas. No uniformar contratos,
+annuity_multi ni las convenciones de pagos por analogía. Evidencia dirigida
+en multilife-api-2026-11-05/diagnosis.md de los artefactos de esta sesión.
+Validación final aprobada: suite fuente e instalada 7558 cada una,
+cero fallos/advertencias/omisiones; R CMD check --as-cran --no-manual
+Status: OK (0 ERROR/WARNING/NOTE), ejemplos y cuatro viñetas aprobados.
+404 archivos cotejados y SHA256 en audit-precran-check.md; artefactos en
+multilife-api-2026-11-05/. C21 cerrado dentro de su alcance autorizado.
+No atribuirle manual/PDF, sitio ni CI de la candidata anterior: si se
+necesitan productos de entrega, regenerarlos para este contenido y validar
+CI sobre su commit concreto con la autorización de envío correspondiente.
+No cambiar versión ni hacer push por inferencia. Conservar los cierres
+históricos de los bloques y C02-C04 opcionales, sin reiniciar la auditoría.
+Registro actuarial: audit-multilife-contingencies.md.
+
 ## Validación CI de la candidata solicitada — 24 de octubre de 2026
 
 El usuario pidió validar la candidata después de explicar que el siguiente

@@ -24,7 +24,7 @@ Las decisiones materiales de API se consultan antes de implementarse.
 | B04 | Bonos, curvas, sensibilidad e inmunización | 20 | Revisión cerrada: 20/20 dentro del alcance y límites de audit-bonds-curves-immunization.md; check final aprobado |
 | B05 | Tablas, mortalidad y probabilidades | 12 | Cierre histórico preservado y suplemento t_px/e_x cerrado: 113 comprobaciones nuevas; suite/check definitivos en audit-precran-check.md |
 | B06 | Contingencias de una vida y contratos | 14 | Revisión cerrada: 14/14 dentro del alcance y límites de audit-single-life-contracts.md; 638 comprobaciones nuevas, C12 autorizada y check final aprobado; gráfica previa preservada |
-| B07 | Contingencias multivida | 6 | Revisión cerrada: seis nombres dentro de los estados/identidades/límites documentados en B07-06; 702 comprobaciones nuevas, C13-C16 autorizadas y check final aprobado. Suplemento B05 posteriormente cerrado |
+| B07 | Contingencias multivida | 6 | Cierre B07-06 preservado; suplemento C21 cerrado para e_xy con dos tablas/status. 806 nuevas acumuladas, fuente/instaladas 7558 y check Status: OK; alcance y límites en audit-multilife-contingencies.md |
 | B08 | Simulación de vidas y Monte Carlo | 11 | Cerrado dentro de los modelos y límites de B08-07: once nombres conciliados, 1185 comprobaciones nuevas, firmas conservadas y C17-C20 autorizadas; validación final recuperada en audit-precran-check.md |
 | B09 | Riesgo colectivo, coberturas y colas | 19 | Evidencia previa conciliada: código sin cambios desde 7575fe4 y pruebas aprobadas en la última suite; sin defecto nuevo demostrado que justifique repetir la revisión. Alcance previo en audit-risk-coverage.md |
 
@@ -140,7 +140,7 @@ Sigue B06; esto no da por aprobados los bloques posteriores.
 | B06 | `reserve_x` | `R/reserve_x.R` | `test-reserve_x-v2.R` |
 | B06 | `plot_contingent_cash_flow` | `R/plot_contingent_cash_flow.R` | `test-plot-contingent-cash-flow.R` |
 | B07 | `annuity_xy` | `R/annuity_xy.R` | `test-annuity-multi-actuarial.R`, `test-annuity-xy-state-benefits.R`, `test-annuity_xy-v2.R`, `test-insurance-xy-identities.R`, `test-premium_xy-v2.R`, `test-reserve_xy-v2.R`, `test-soa08lt.R` |
-| B07 | `e_xy` | `R/e_xy.R` | `test-e-xy-regressions.R`, `test-multilife-survival-expectancy.R` |
+| B07 | `e_xy` | `R/e_xy.R` | `test-e-xy-regressions.R`, `test-multilife-survival-expectancy.R`, `test-e-xy-two-tables.R` |
 | B07 | `insurance_xy` | `R/insurance_xy.R` | `test-insurance-xy-deferred-conditioning.R`, `test-insurance-xy-identities.R`, `test-premium_xy-v2.R`, `test-reserve_xy-v2.R` |
 | B07 | `premium_xy` | `R/premium_xy.R` | `test-premium_gross-v2.R`, `test-premium_xy-v2.R`, `test-reserve_xy-v2.R`, `test-smoke.R` |
 | B07 | `reserve_xy` | `R/reserve_xy.R` | `test-reserve-xy-state-regressions.R`, `test-reserve_xy-two-tables.R`, `test-reserve_xy-v2.R` |

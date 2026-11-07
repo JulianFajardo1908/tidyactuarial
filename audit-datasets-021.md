@@ -116,3 +116,22 @@ de cinco viñetas (11 s) aprobados. Cotejo: 425 archivos iguales al checkout;
 tarball 3028467 bytes. Huella definitiva en cran-comments.md. Artefactos
 en check-pets/ de la carpeta de trabajo data-0.2.1 de esta sesión. Los
 productos de la primera candidata se conservan como históricos.
+
+## Cierre integrado con multivida
+
+El 7 de noviembre el usuario pidió incluir explícitamente los cambios
+multivida en 0.2.1. Se integraron los tres commits aprobados de la rama
+de auditoría, sin alterar los objetos de datos ni master. La candidata
+completa pasa 7618 expectativas en fuente y otras 7618 instaladas.
+R CMD check --as-cran --no-manual: Status OK (0 errores, advertencias,
+notas), ejemplos y cinco viñetas aprobados. Se cotejaron 427 archivos;
+tarball de 3032579 bytes. SHA en cran-comments.md y evidencia en
+check-final/ de la carpeta de trabajo de esta sesión.
+
+En datos reales, la esperanza curtata conjunta WPP de mujeres/hombres
+colombianos con edades 65/70 y t=5 es 4,489449, y la de último
+superviviente 4,985765. Las anualidades al 3% son 4,122035 y 4,567122.
+Las tablas de perros US/UK con edades 0/5 permiten un plazo observado
+de 14 años y dan 5,362857 al 3%. Estos cinco resultados se contrastaron
+con sumas independientes de marginales y pagos. Los intervalos abiertos
+no se usan para extrapolar la supervivencia.

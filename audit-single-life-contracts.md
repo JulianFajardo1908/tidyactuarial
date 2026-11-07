@@ -1,5 +1,43 @@
 # B06 — Contingencias de una vida y contratos
 
+## Suplemento annuity_multi C22/C23 — 6 de noviembre de 2026
+
+Base d6b65bc; versión 0.2.0; rama audit/0.2.0-precran. El usuario autorizó
+explícitamente ambos cambios propuestos en audit-api-review.md. Se preserva
+el cierre histórico B06-05 y se actualiza su límite de horizonte.
+
+Para una póliza con 1–3 vidas independientes inicialmente vivas, se mantiene
+el producto de supervivencias marginales para vida conjunta y el complemento
+del producto de probabilidades de fallecimiento para último superviviente.
+La reversionaria conserva
+`w = (1-alpha) * S_joint + alpha * S_last` en las mismas fechas y con los
+mismos pesos de pago 1/k. No se cambia la interpolación ni Woolhouse.
+La causa del rechazo era comparar edades absolutas de tablas distintas:
+`min(omega_j) - max(edad_j)`. El nuevo plazo común observado es
+`min(omega_j - edad_j)`; el plazo por defecto resta el diferimiento,
+acotado por cero. No se extrapolan marginales, ni se amplía el horizonte
+hasta el máximo para último superviviente. Woolhouse de segundo orden
+sigue exigiendo observaciones positivas en los bordes y el año siguiente.
+
+C22 añade status joint/last al final y conserva cohort first/last y
+llamadas posicionales; en la reversionaria se conserva alpha y se rechaza
+el nuevo selector explícito. C23 no altera resultados de plazos explícitos
+previamente válidos; un plazo implícito puede aumentar y se admiten
+plazos respaldados por todas las tablas antes rechazados.
+
+La reproducción previa muestra error o cero con edades 60/70 y cuatro
+años observados por vida. A tasa cero los valores de referencia son .985
+conjunta, 2.065 último superviviente y .675 reversionaria diferida.
+24 comprobaciones nuevas: tres grupos abortaban con errores antes del
+cambio; las 24 pasan después, junto con 152 regresiones relacionadas.
+Los oráculos son sumas descontadas, una unión de tres eventos y correcciones
+de Woolhouse para supervivencias exponenciales. Se cotejaron 72 valores
+ordinarios con d6b65bc: idénticos, también con status cuando corresponde;
+todos los argumentos previos se conservan. La evidencia final y los
+artefactos de validación están en audit-precran-check.md: 7582 aprobadas
+en cada suite integral, check Status: OK y 405 archivos cotejados.
+C22/C23 cerradas en su alcance autorizado.
+
 Objetivo 0.2.0, versión real 0.1.6.9000, rama audit/0.2.0-precran.
 Inicio sobre fdd2d1f, 18 de octubre de 2026. Se conserva toda la evidencia
 previa y el cierre de B03/B04/B05; este registro no reinicia la auditoría.

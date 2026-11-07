@@ -1,5 +1,105 @@
 # Interfaz tidyverse y firmas — revisión progresiva
 
+## C22 y C23 autorizadas: selector y horizonte de annuity_multi (6 de noviembre de 2026)
+
+El usuario autorizó ambas propuestas con «autorizo» en este chat. Se
+implementaron con el alcance siguiente y se probaron de forma dirigida.
+
+Base d6b65bc, Git inicialmente limpio, audit/0.2.0-precran, versión 0.2.0.
+Las otras funciones estrictamente bivariadas ya admiten dos tablas y
+status joint/last; la revisión dirigida anterior no justificó modificarlas.
+annuity_multi admite 1–3 vidas independientes y una tabla por vida, pero
+usa cohort y un horizonte común por edades absolutas. C21 solo cubre e_xy.
+
+- **C22 (API):** añadir `status = c("joint", "last")` al final de
+  `annuity_multi`, para `annuity = "cohort"`. Mantener las posiciones,
+  defaults y llamadas antiguas; `cohort = "first"` equivale a
+  `status = "joint"`, y `cohort = "last"` a `status = "last"`. Rechazar
+  los dos selectores explícitos juntos. Rechazar un `status` explícito
+  con `annuity = "reversionary"`, cuyo pago ya viene definido por `alpha`;
+  conservar el comportamiento histórico de `cohort` en esa modalidad.
+  Sin cambios en cálculo, calendario o retorno por esta decisión.
+- **C23 (dominio y plazo implícito):** calcular el horizonte común como
+  `H = min_j(omega_j - ages_j)` en lugar de `min_j(omega_j)-max(ages)`.
+  Para `n = NULL`, usar `max(0,H-h)`; con `n > 0`, exigir `h+n <= H`.
+  Se aplica a ambas modalidades y estados, y a 1–3 vidas. Mantiene el
+  requisito de observar todas las marginales en el plazo; no extiende
+  último superviviente hasta el mayor horizonte, ni extrapola o inventa
+  extinción. El caso de plazo cero y los requisitos de Woolhouse se
+  conservan. Los plazos explícitos ya aceptados no cambian de valor;
+  pueden admitirse plazos antes rechazados y aumentar el plazo por defecto.
+
+Reproducción: tablas 60:64 y 70:74 con edades iniciales 60 y 70 tienen
+cuatro años observados cada una. El límite antiguo es 64−70=−6:
+rechaza n=3 y devuelve 0 con n=NULL. A interés cero, pagos vencidos y
+supervivencias en años 1–3 (.8,.4,.1) y (.9,.6,.25), las sumas
+independientes son .985 conjunta y 2.065 último superviviente; el cuarto
+año es cero en este ejemplo cerrado. Reversionaria alpha=.5, h=1, n=2:
+sumar .5*(Sx+Sy) en años 2 y 3 da .675. n=5 seguirá rechazado.
+`status="last"` hoy produce argumento no usado incluso con tabla común
+y plazo válido. Reproducible en annuity-multi-proposal.R y su log previo
+en los artefactos multilife-api-2026-11-05.
+
+Regresiones previstas: sumas independientes para los dos estados, plazo
+implícito y explícito, diferimiento, horizonte desigual de 2/3 vidas,
+tablas abiertas sin extrapolación, modos exacto/Woolhouse en su dominio,
+compatibilidad de llamadas posicionales y reversionarias y errores de
+selectores. Estado: confirmado, autorizado, implementado y probado con
+24 comprobaciones nuevas y 152 relacionadas. Cerrado en alcance C22/C23
+tras validar 7582 en fuente e instaladas y check Status: OK; evidencia
+final en audit-precran-check.md.
+
+## C21 autorizada: e_xy con tablas distintas y selector status (5 de noviembre de 2026)
+
+El usuario autorizó expresamente esta propuesta con «autorizo» en este chat.
+Implementación y validación integral completadas: 7558 comprobaciones en
+fuente e instaladas y check Status: OK (0 ERROR/WARNING/NOTE).
+Se añade status=c("joint","last") al final, sin modificar los
+argumentos anteriores ni las columnas tidy. Registro matemático, evidencia
+y cierre de validación en audit-multilife-contingencies.md y
+audit-precran-check.md. El texto siguiente conserva diagnóstico y alcance.
+
+Base real 607657e, rama audit/0.2.0-precran, DESCRIPTION 0.2.0 y Git
+inicialmente limpio. Hallazgo comunicado por el usuario y reproducido:
+e_xy rechaza list(lt_x, lt_y) y status="joint", mientras t_pxy y los
+valoradores bivariados admiten tablas distintas y usan status. Es una
+limitación documentada de e_xy y una inconsistencia de capacidad/interfaz;
+no demuestra que el cálculo vigente con una tabla compartida sea incorrecto.
+El cierre B07 previo no certifica homogeneidad de API ni soporte de dos
+tablas en e_xy. Se abre este suplemento sin invalidar sus pruebas previas.
+
+Ejemplo independiente: edades 60:62, lx_x=(100,80,0), lx_y=(100,50,0).
+Las esperanzas curtatas son .8*.5=.4 para conjunta y .8+.5-.8*.5=.9
+para último superviviente. t_pxy(list(a,b),60,60,1,status=...) devuelve
+.4/.9; e_xy(list(a,b),60,60) produce `lt must be a data.frame`.
+e_xy(a,60,60,status="joint") produce argumento no usado. Con solo a,
+e_xy(cohort="first"/"last") devuelve .64/.96: otro modelo marginal.
+Causa: validación exclusiva de data.frame, horizonte sobre una sola tabla
+y llamada .two_life_survival_basis(lt,lt,xj,yj).
+
+Propuesta concreta para autorización: ampliar lt a tabla compartida o lista
+ordenada de dos tablas; usar status="joint"/"last" como selector canónico.
+Conservar la posición histórica de cohort y las llamadas existentes mediante
+compatibilidad explícita: añadir status al final, aceptar cohort first/last
+como selector legado, rechazar ambos selectores explícitos simultáneamente.
+No agregar columnas redundantes: conservar el esquema tidy histórico con
+cohort y documentar su correspondencia. El argumento legado se justifica
+solo por compatibilidad, igual que en los otros valoradores bivariados.
+No cambiar annuity_multi ni life_contract por analogía.
+
+Con dos tablas, comprobar edades/inicio por marginal, horizonte mínimo para
+conjunta y máximo para último superviviente, y resolución de frac coincidente
+con t_pxy (conflicto de atributos exige elección explícita). Preservar el
+contrato de truncación de tablas abiertas, vectorización, NA y retorno.
+Oráculos previstos: sumas de productos/uniones marginales, integrales UDD
+por tramos e identidad e_last=e_x+e_y-e_joint; tablas con horizontes distintos,
+intercambio de vidas, tabla compartida frente a lista duplicada y atributos
+frac. Comprobar regresiones antes/después y compatibilidad antes del cierre.
+
+Estado: confirmado, autorizado, implementado, probado y cerrado dentro
+del alcance C21; evidencia final y huella en audit-precran-check.md.
+Evidencia: artefacto multilife-api-2026-11-05/diagnosis.md de esta sesión.
+
 ## B08-07: resúmenes y conciliación (23 de octubre de 2026)
 
 Base 0030cef. A: momentos escalados y TVaR por masas sin desbordamiento
@@ -347,6 +447,9 @@ el significado actuarial de m ni se lo confunde con la frecuencia de pagos k.
 | C18 | C | mc_insurance pure_endowment al momento de muerte exige T>n, disjunto del temporal T<=n | Autorizada expresamente el 22 de octubre e implementada en B08-04; calendario anual y dotal mixto conservados |
 | C19 | C | mc_reserve aplica T>n al dotal puro al momento de muerte, conservando vigencia y calendario anual | Autorizada expresamente el 23 de octubre e implementada en B08-06 |
 | C20 | C | mc_reserve no reinterpreta su prima estimada internamente según premium_unit; unidades explícitas solo para primas suministradas | Autorizada expresamente el 23 de octubre e implementada en B08-06 |
+| C21 | C | e_xy admite dos tablas y status joint/last al final, conserva cohort y esquema tidy, rechaza ambos selectores explícitos | Autorizada expresamente el 5 de noviembre e implementada; validación final en audit-precran-check.md |
+| C22 | C | annuity_multi añade status joint/last al final para pagos por estado, conserva cohort y rechaza selectores incompatibles | Autorizada el 6 de noviembre e implementada |
+| C23 | C | annuity_multi usa min(omega_j-edad_j) para el horizonte común, sin extrapolar ni cambiar plazos explícitos ya válidos | Autorizada el 6 de noviembre e implementada |
 
 ## Mejoras compatibles y categorías A realizadas
 

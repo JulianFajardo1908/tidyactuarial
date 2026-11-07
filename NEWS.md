@@ -8,6 +8,19 @@
 * Add a short vignette on WPP survival calculations and competing risks
   with the external `MASS::Melanoma` example.
 
+* `annuity_multi()` accepts `status = "joint"` or `"last"` for status-based payments, with existing `cohort`
+  calls still supported. The common table horizon now uses years remaining
+  from each life’s issue age. This can admit previously rejected terms or
+  lengthen the default term when the tables cover different age ranges.
+
+* `e_xy()` now accepts either a shared life table or `list(lt_x, lt_y)`
+  for distinct marginal mortalities. The new `status = "joint"` or
+  `"last"` selector matches the other bivariate valuation functions.
+  Existing `cohort` calls, positional arguments and tidy columns remain
+  supported; explicitly supplying both selectors is an error. Each
+  marginal retains its own observed horizon and conflicting fractional
+  assumptions require an explicit `frac`.
+
 # tidyactuarial 0.2.0
 
 ## Life contingencies and Monte Carlo

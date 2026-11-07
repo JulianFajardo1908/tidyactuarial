@@ -1,5 +1,12 @@
 # Datos pendientes fuera de 0.2.1
 
+**Alcance de 0.2.1 cerrado el 7 de noviembre de 2026:** se incluyen los
+dos objetos nuevos WPP y mascotas que ya superaron fuente, licencia y
+cotejo. Los candidatos de esta lista se desplazan a 0.2.2 o a una entrega
+posterior; no bloquean la revisión de 0.2.1 ni se publican incompletos.
+La autorización del usuario para integrarlos no sustituye los términos
+de los titulares ni la verificación del original correspondiente.
+
 | Candidato | Impedimento y siguiente trabajo |
 |---|---|
 | WPP 2010/2019 y alcance mayor | Se prioriza 2023 para el paquete. Aplicar el mapeo por ID a otros años, con nueva verificación de cobertura, tamaño y períodos. |

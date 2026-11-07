@@ -34,7 +34,8 @@ la revisión integral de B08 permanece abierta.
 B07-06: seis firmas cotejadas con 4b0948e, sin cambios; 138 resultados
 ordinarios completos concuerdan a 1e-12. Contratos, estados y límites
 conciliados en audit-multilife-contingencies.md. Inventario vivo comprobado:
-102 nombres (101 funciones más el alias A_xj), 974 apariciones de parámetros.
+102 nombres (101 funciones más el alias A_xj), 976 apariciones de parámetros
+tras C21/C22 (status añadido al final de e_xy y de annuity_multi).
 
 Extracción de las 102 entradas de NAMESPACE sobre la rama audit/0.2.0-precran.
 Se conservan los nombres, orden y defaults reales de formals(). El alias A_xj
@@ -104,7 +105,7 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 | B06 | `A_xj (alias de insurance_xj)` | `A_xj(md, x, i, cause, type = c("whole", "term"), benefit = 1, n = NULL, h = 0L, i_type = "effective", m = 1L, tidy = FALSE, check = TRUE, tol = 1e-10)` | md primero; pipe posicional posible, revisar pertinencia | `tidy = FALSE` | Numeric vector of APVs, or a tibble if tidy = TRUE . |
 | B06 | `add_insurance` | `add_insurance(contract, type = c("whole", "term", "endowment", "pure_endowment", "variable_k"), benefit = 1, n = Inf, h = 0L, k = 1L, frac = c("UDD", "CF", "CML", "Balducci"))` | contract primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | The original contract with an `insurance` component. |
 | B06 | `add_premium_schedule` | `add_premium_schedule(contract, k = 1L, timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, woolhouse = c("none", "first", "second"), frac = NULL)` | contract primero; pipe posicional posible, revisar pertinencia | `Sin selector con esos nombres; ver retorno` | The original contract with a `premium_schedule` component. |
-| B06 | `annuity_multi` | `annuity_multi(lt, ages, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, annuity = c("cohort", "reversionary"), cohort = c("first", "last"), alpha = NULL, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac = c("UDD", "CF", "CML", "Balducci"))` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A single numeric value representing the APV. |
+| B06 | `annuity_multi` | `annuity_multi(lt, ages, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, annuity = c("cohort", "reversionary"), cohort = c("first", "last"), alpha = NULL, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac = c("UDD", "CF", "CML", "Balducci"), status = c("joint", "last"))` | lt primero; tabla común o tabla por vida | `Sin selector con esos nombres; ver retorno` | A single numeric value representing the APV. |
 | B06 | `annuity_x` | `annuity_x(lt, x, i, i_type = "effective", m = 1L, n = NULL, h = 0L, k = 1L, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac = NULL, tidy = FALSE)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric vector of actuarial present values, of length one for a single scenario. If tidy = TRUE , a tibble with one row per scenario, the main input values, equivalent interest rate, deferment factor, pure endowment factor, and APV. |
 | B06 | `apv_life_flow` | `apv_life_flow(lt, ages, t = NULL, date = NULL, date0 = NULL, cf, i, i_type = "effective", m = 1L, status = c("single", "first", "last", "reversionary"), alpha = NULL, plot = FALSE)` | lt primero; tabla/contrato según documentación | `Sin selector con esos nombres; ver retorno` | A tibble with one row per payment and columns: t , cf , surv_prob , discount , expected_cf , pv , and pv_cum . If date was provided, a date column is included. The total APV is stored as attr(result, "apv") . The contingency attribute identifies "survival" or "weighted" (reversionary benefit fraction) for plot_contingent_cash_flow() . |
 | B06 | `insurance_variable_k` | `insurance_variable_k(lt, x, i, benefit, n = NULL, h = 0, k = 12, i_type = "effective", m = 1L, frac, tidy = FALSE, check = TRUE, tol = 1e-10)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | A numeric actuarial present value, or a one-row tibble if tidy = TRUE . |
@@ -116,7 +117,7 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 | B06 | `premium_x` | `premium_x(lt, x, i, i_type = "effective", m = 1L, type = c("whole", "term", "endowment", "variable_k"), benefit = 1, n = Inf, h = 0L, k = 1L, frac = c("UDD", "CF", "CML", "Balducci"), timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, woolhouse = c("none", "first", "second"), output = c("value", "summary", "audit"), tidy = NULL, check = TRUE, ...)` | lt primero; tabla/contrato según documentación | `output = c("value", "summary", "audit"); tidy = NULL` | For output = "value" , a numeric scalar containing the annualized premium P^{(k)} . For output = "summary" , a one-row tibble with six columns: annualized premium, premium per payment, payment frequency, APV of benefits, APV of the premium annuity, and equivalence residual. For output = "audit" , a long-format tibble containing the principal inputs and calculated components. |
 | B06 | `reserve_x` | `reserve_x(lt, x, i, i_type = "effective", m = 1L, type = c("whole", "term", "endowment"), n = Inf, h = 0L, benefit = 1, P = NULL, k = 1L, frac = c("UDD", "CF", "CML", "Balducci"), timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, woolhouse = c("none", "first", "second"), t = NULL, method = c("prospective", "recursive"), output = c("summary", "value", "audit", "table"), tidy = NULL, check = TRUE, ...)` | lt primero; tabla/contrato según documentación | `output = c("summary", "value", "audit", "table"); tidy = NULL` | For output = "summary" , a tibble with at most six columns: duration, attained age, reserve, annualized premium, premium per payment, and method. For output = "value" , a named numeric vector. For output = "audit" , a long-format tibble containing future benefit APV, future premium APV, reserve, and premium amounts at each duration. |
 | B07 | `annuity_xy` | `annuity_xy(lt, x = NULL, y = NULL, i = NULL, i_type = "effective", m = 1L, status = c("joint", "last"), benefit = NULL, n = Inf, h = 0L, k = 1L, timing = c("immediate", "due"), woolhouse = c("none", "first", "second"), frac, tidy = FALSE, ...)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric scalar. If tidy = TRUE , a one-row tibble with input values, standardized interest rate, term used, and APV. |
-| B07 | `e_xy` | `e_xy(lt, x, y, t = NULL, type = c("curtate", "complete"), frac, cohort = c("first", "last"), tidy = FALSE, check = TRUE, tol = 1e-10)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | Numeric vector, or tibble if tidy = TRUE . |
+| B07 | `e_xy` | `e_xy(lt, x, y, t = NULL, type = c("curtate", "complete"), frac, cohort = c("first", "last"), tidy = FALSE, check = TRUE, tol = 1e-10, status = c("joint", "last"))` | lt primero; tabla compartida o lista ordenada de dos tablas | `tidy = FALSE` | Numeric vector or tibble; historical cohort column retained. |
 | B07 | `insurance_xy` | `insurance_xy(lt, x = NULL, y = NULL, i = NULL, i_type = "effective", m = 1L, type = c("whole", "term", "endowment"), status = c("joint", "last"), n = Inf, h = 0L, benefit = 1, frac, tidy = FALSE, ...)` | lt primero; tabla/contrato según documentación | `tidy = FALSE` | If tidy = FALSE , a numeric scalar. If tidy = TRUE , a one-row tibble with input values, standardized interest rate, deferment factor, unit APV, and APV. |
 | B07 | `premium_xy` | `premium_xy(lt, x = NULL, y = NULL, i = NULL, i_type = "effective", m = 1L, type = c("whole", "term", "endowment", "pure_endowment"), benefit = 1, n = Inf, h = 0L, k = 1L, frac = c("UDD", "CF", "CML", "Balducci"), timing = c("due", "immediate"), premium_start = c("issue", "deferred"), n_prem = NULL, status = c("joint", "last"), woolhouse = c("none", "first", "second"), output = c("value", "summary", "audit", "table"), tidy = NULL, check = TRUE, tol = 1e-10, ...)` | lt primero; tabla/contrato según documentación | `output = c("value", "summary", "audit", "table"); tidy = NULL` | For output = "value" , a numeric scalar containing the annualized premium P^{(k)} . For output = "summary" , a one-row tibble with six columns: annualized premium, premium per payment, payment frequency, APV of benefits, APV of the premium annuity, and equivalence residual. For output = "audit" , a long-format tibble. |
 | B07 | `reserve_xy` | `reserve_xy(lt, x = NULL, y = NULL, i = NULL, i_type = "effective", m = 1L, type = c("whole", "term", "endowment", "pure_endowment"), status = c("joint", "last"), n = Inf, h = 0L, benefit = 1, P = NULL, n_prem = NULL, k = 1L, timing = c("due", "immediate"), premium_start = c("issue", "deferred"), frac = c("UDD", "CF", "CML", "Balducci"), woolhouse = c("none", "first", "second"), t = NULL, method = c("prospective", "recursive"), output = c("summary", "value", "audit", "table"), tidy = NULL, check = TRUE, tol = 1e-10, ...)` | lt primero; tabla/contrato según documentación | `output = c("summary", "value", "audit", "table"); tidy = NULL` | A compact tibble, a named numeric vector, or a long audit tibble. |
@@ -155,7 +156,7 @@ La columna pipe describe la posición de entrada, no una prueba de ejecución.
 ## Cobertura de extracción
 
 - Entradas públicas: 102.
-- Apariciones de parámetros, incluyendo alias y ...: 974.
+- Apariciones de parámetros, incluyendo alias y ...: 976 (C21/C22).
 - Apariciones sin descripción Rd: 0.
 - Todas las apariciones tienen descripción; esto no garantiza dominio o unidades completos.
 
@@ -1072,7 +1073,8 @@ Documentación: `man/add_premium_schedule.Rd`. Semántica: revisión por bloque 
 
 ## B06 — annuity_multi
 
-Documentación: `man/annuity_multi.Rd`. Semántica: revisión por bloque pendiente salvo evidencia específica.
+Documentación: `man/annuity_multi.Rd`. C22/C23 autorizadas: selector
+status al final y horizonte común desde la edad de cada vida.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
@@ -1081,15 +1083,16 @@ Documentación: `man/annuity_multi.Rd`. Semántica: revisión por bloque pendien
 | `i` | `<obligatorio>` | Numeric scalar. Annual interest-rate input. |
 | `i_type` | `"effective"` | Character string indicating the interest-rate type. Allowed values are "effective" , "nominal_interest" , "nominal_discount" , and "force" . |
 | `m` | `1L` | Positive integer. Conversion frequency for nominal rates. Ignored for i_type = "effective" and i_type = "force" . In tidyactuarial , m is reserved for interest conversion frequency, not deferment. |
-| `n` | `NULL` | Integer term in years after deferment. If NULL , runs to the end of the available table horizon, conservatively based on the smallest omega across life tables. |
+| `n` | `NULL` | Integer term after deferment. NULL uses the remaining common duration, or zero if none remains. |
 | `h` | `0L` | Integer deferment period in years. |
 | `k` | `1L` | Integer payments per year. If k > 1 , Woolhouse approximations may be applied. |
-| `annuity` | `c("cohort", "reversionary")` | Type of annuity logic: "cohort" uses the status defined in cohort ; "reversionary" uses the \alpha fractional reduction. |
-| `cohort` | `c("first", "last")` | Survival status: "first" for joint-life, paying while all lives are alive, or "last" for last-survivor, paying while at least one life remains alive. Used only when annuity = "cohort" . |
+| `annuity` | `c("cohort", "reversionary")` | Status-based payments or joint-and-survivor payments weighted by alpha. |
+| `cohort` | `c("first", "last")` | Legacy selector: first = joint-life, last = last survivor. Prefer status in new calls. |
 | `alpha` | `NULL` | Reversionary fraction, typically 0 \le \alpha \le 1 . Used only when annuity = "reversionary" . Note: alpha = 0 matches joint-life; alpha = 1 matches last-survivor. |
 | `timing` | `c("immediate", "due")` | "immediate" or "due" . |
 | `woolhouse` | `c("none", "first", "second")` | "none" , "first" , or "second" . |
 | `frac` | `c("UDD", "CF", "CML", "Balducci")` | Fractional-age assumption for exact payments: "UDD" (default), "CF" , "CML" (alias of CF), or "Balducci" . |
+| `status` | `c("joint", "last")` | Canonical selector for annuity = "cohort"; omit with explicit cohort or with reversionary payments. |
 
 ## B06 — annuity_x
 
@@ -1326,6 +1329,11 @@ preservada y documentada; ver audit-multilife-contingencies.md.
 
 Documentación: `man/e_xy.Rd`. Semántica: conciliada en B07-06 dentro del alcance y límites documentados.
 
+C21 autorizada el 5 de noviembre de 2026: dos tablas opcionales y status
+canónico al final; posiciones/defaults anteriores y esquema tidy conservados.
+No suministrar cohort y status explícitos juntos. Evidencia y límites del
+suplemento en audit-multilife-contingencies.md.
+
 B07-01: el atributo CML se normaliza a CF; firma y esquema preservados.
 La revisión restante se concilió en B07-06; ver audit-multilife-contingencies.md.
 B07-02: coherencia de tabla anual siempre validada (umbral mortal 1e-10),
@@ -1333,16 +1341,17 @@ controles lógicos y tol finito no negativo; rango integer con check=TRUE.
 
 | Parámetro, en orden real | Default | Concepto, dominio y unidades documentados |
 |---|---|---|
-| `lt` | `<obligatorio>` | A life table data frame with columns x and lx . |
+| `lt` | `<obligatorio>` | Shared life table or ordered list(lt_x, lt_y), each with x and lx. |
 | `x` | `<obligatorio>` | Integer actuarial age for life 1. |
 | `y` | `<obligatorio>` | Integer actuarial age for life 2. |
-| `t` | `NULL` | Optional nonnegative numeric duration(s). If NULL , uses the maximum horizon allowed by the table. |
+| `t` | `NULL` | Optional nonnegative duration(s); otherwise the selected status horizon across the tables. |
 | `type` | `c("curtate", "complete")` | Character: "curtate" or "complete" . |
-| `frac` | `<obligatorio>` | Fractional-age assumption for type = "complete" , as in t_pxy : "UDD" , "CF" , "CML" , or "Balducci" . If not specified and lt carries a frac attribute, that value is used; inherited CML is normalized to CF. |
-| `cohort` | `c("first", "last")` | Two-life cohort: "first" (joint-life) or "last" (last survivor). |
+| `frac` | `<obligatorio>` | UDD/CF/CML/Balducci; valid attributes inherited as in t_pxy, normalized CML=CF, conflicting attributes require explicit choice, default UDD. |
+| `cohort` | `c("first", "last")` | Legacy selector: first=joint, last=last survivor; prefer status in new calls. |
 | `tidy` | `FALSE` | Logical. If TRUE , returns a tibble. |
 | `check` | `TRUE` | Logical. If TRUE , performs basic input checks. |
 | `tol` | `1e-10` | Numeric tolerance for integer checks. |
+| `status` | `c("joint", "last")` | Canonical survival-state selector appended under C21; joint by default, incompatible with an explicitly supplied cohort. |
 
 ## B07 — insurance_xy
 
