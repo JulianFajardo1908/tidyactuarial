@@ -3,6 +3,8 @@
 * Add `mortality_regions`: selected 2023 period life tables from UN WPP
   2024, with source precision and the open 100+ interval retained.
   Existing datasets are unchanged.
+* Add `pet_lifetables`: three attributed research tables for US dogs
+  and cats and UK dogs, with the published open ages retained.
 * Add a short vignette on WPP survival calculations and competing risks
   with the external `MASS::Melanoma` example.
 

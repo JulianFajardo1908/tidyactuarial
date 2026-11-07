@@ -67,7 +67,7 @@ clave oficial, nivel y sexo; 67 países + 28 agregados, 101 filas por
 tabla, edad 100+ explícita y comparación numérica con los originales.
 No se importan otras bases sin resolver derechos, fuente y semántica.
 
-## Selección final y compatibilidad
+## Primera selección y compatibilidad (commit 5779adf)
 
 Solo se añade mortality_regions (2023), una viñeta que refiere a
 MASS::Melanoma y MASS en Suggests; ningún motor de cálculo cambia.
@@ -76,7 +76,7 @@ a uno con residuo máximo 2,22e-16 en los 205 pacientes. No se incluyen
 registros clínicos. Los artefactos SFC/TES se conservan fuera de Git.
 Las bases no incluidas y motivos puntuales constan en DATASETS_021_PENDIENTES.md.
 
-## Validación de la candidata
+## Validación de la primera candidata (commit 5779adf)
 
 Los 259.065 valores numéricos seleccionados coinciden exactamente con
 los originales y con el objeto del tarball. Data/ crece de 1.266.968
@@ -88,3 +88,31 @@ Las suites fuente e instalada pasan 7476 comprobaciones cada una,
 sin fallos/advertencias/omisiones. devtools::check ejecutó build y
 R CMD check --as-cran --no-manual con Status: OK (0 ERROR, WARNING, NOTE).
 Ejemplos y cinco viñetas pasan. Huella y entorno en cran-comments.md.
+
+## Ampliación autorizada: mascotas
+
+El usuario autorizó incorporar las otras bases que superen los controles.
+Se extrajeron 57 filas directamente de XML de los artículos con CC BY 4.0:
+Montoya, tablas 3/4 (perros y gatos US), y Teng 2022, tabla 2 (perros UK).
+627 campos numéricos/faltantes coinciden con las transcripciones del kit y
+con el objeto final del archivo. XML, tamaño y huella en provenance.csv.
+Se preservan las edades abiertas, los denominadores distintos y los
+faltantes. No se incluye el estudio de gatos UK con licencia CC BY-NC.
+Resultados numéricos y límites en DATASETS_021_INCLUIDOS.md.
+
+Se amplió el diagnóstico de fuentes: el XLSX TES oficial tiene un corte
+al 2026-11-04, separa moneda y tasa cupón/tasa de valoración/precio limpio,
+y tiene versiones con unidades diferentes. No se confunde tasa de
+valoración con una curva spot ni duración publicada con bond_duration().
+Se verificaron los términos generales de MinHacienda, Banrep, SFC y DANE;
+su alcance respecto a cada archivo y el cotejo detallado siguen en
+DATASETS_021_PENDIENTES.md. La aprobación del usuario no sustituye esos
+términos ni el cotejo actuarial.
+
+La candidata ampliada pasa 7490 expectativas en fuente y 7490 instaladas,
+cero fallos/advertencias/omisiones. Check --as-cran --no-manual por devtools:
+0 ERROR, 0 WARNING, 0 NOTE. Ejemplos (23 s), tests (81 s) y reconstrucción
+de cinco viñetas (11 s) aprobados. Cotejo: 425 archivos iguales al checkout;
+tarball 3028467 bytes. Huella definitiva en cran-comments.md. Artefactos
+en check-pets/ de la carpeta de trabajo data-0.2.1 de esta sesión. Los
+productos de la primera candidata se conservan como históricos.

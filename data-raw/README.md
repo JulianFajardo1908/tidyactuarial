@@ -26,3 +26,19 @@ and identifies [CC BY 3.0 IGO](https://creativecommons.org/licenses/by/3.0/igo/)
 in its [data API](https://population.un.org/dataportalapi/index.html) and
 [WPP 2024 methodology](https://population.un.org/wpp/assets/Files/WPP2024_Methodology.pdf).
 See the installed COPYRIGHTS notice for attribution and changes.
+
+## Rebuilding the pet data
+
+Download the two Europe PMC XML originals listed in provenance.csv.
+The source tables are T3 and T4 in PMC9989186, and Tab2 in PMC9050668.
+The XML hashes pin the exact revisions. The extractor selects the
+published tables, without closing the open age or fabricating absent
+columns.
+
+~~~sh
+python data-raw/prepare-pet-lifetables.py /path/to/originals /path/to/pets.csv
+Rscript data-raw/build-pet-lifetables.R /path/to/pets.csv
+~~~
+
+The two articles allow reuse under CC BY 4.0 (see installed COPYRIGHTS).
+The 2024 UK cat study is not an input to this pipeline.

@@ -5,15 +5,28 @@
 | WPP 2010/2019 y alcance mayor | Se prioriza 2023 para el paquete. Aplicar el mapeo por ID a otros años, con nueva verificación de cobertura, tamaño y períodos. |
 | Colombia / invalidez (SFC) | La base instalada contiene seis tablas y se conservó. El [índice SFC](https://www.superfinanciera.gov.co/publicaciones/10103719/atencion-y-servicios-a-la-ciudadaniatramites-y-servicios-certificados-en-lineatablas-de-mortalidad-10103719/) identifica los actos 0996/1990, 1112/2007, 0110/2014, 1555/2010 y 0585/1994. Falta cotejo completo de anexos, población, unidad y autorización; el anexo de mortalidad de inválidos no es la incidencia de invalidez de activos. Para tasas por mil documentadas, convertir dividiendo por 1000. |
 | TES emisiones / curvas | Se descargó el [XLSX original del 4 de noviembre](https://www.irc.gov.co/documents/d/guest/20261104-emisiones-vigentes?download=true); [Banrep](https://suameca.banrep.gov.co/descarga-multiple-de-datos/) identifica curvas cero cupón. Falta extracción verificada y permiso. Conciliar fechas, cupón y periodicidad, precio limpio/sucio, YTM versus spot y unidades COP/UVR antes de contrastar duración. |
-| Perros y gatos | Las 78 transcripciones y 74 filas anuales truncadas del kit pasaron recuentos locales; verificaciones puntuales no sustituyen el cotejo íntegro. [Montoya (EE. UU.)](https://pmc.ncbi.nlm.nih.gov/articles/PMC9989186/) usa CC BY; [perros UK](https://pmc.ncbi.nlm.nih.gov/articles/PMC9050668/), CC BY 4.0; [gatos UK](https://doi.org/10.1177/1098612X241234556), CC BY-NC 4.0. Separar fuentes y resolver permiso para distribución sin restricción comercial de la tabla de gatos UK. Conservar el qx publicado por estudio y marcar la última edad abierta. |
+| Gatos Reino Unido y tabla derivada de mascotas | Las tres tablas con CC BY 4.0 se integraron tras cotejo íntegro. La tabla de [gatos UK](https://doi.org/10.1177/1098612X241234556) usa CC BY-NC 4.0; para distribuirla sin restricción comercial se necesita permiso o una fuente alternativa. La tabla derivada de 74 filas no es una tabla completa ni se incluye. |
 | DANE | Recuentos marginales del kit: 268.411 (2023), 275.778 (2024). No constituyen probabilidades. Falta cotejo externo/permiso de redistribución de marginales; para decrementos se necesita cruce edad-sexo-causa y exposición compatible. [Portal 2024](https://microdatos.dane.gov.co/index.php/catalog/878/get-microdata). |
 | SFC 290 / Fasecolda | Pendientes originales, esquema y derechos de redistribución. Son agregados de negocio, no registros de frecuencia/severidad individual. Se conservan enlaces de fuente, sin republicar archivos. |
 | SSA, EIOPA y triángulos | Futuro: revisar licencias y distinguir cohorte, curva normativa y desarrollo de siniestros antes de integrar. |
 
 El [registro de fuentes](data-raw/sources-pending.csv) permite retomar las
-descargas sin incorporar sus contenidos al paquete. Los originales WPP
-son los únicos datos nuevos incorporados; los ejemplos externos no
-copian observaciones.
+descargas sin incorporar sus contenidos al paquete. Se incluyen la
+selección WPP y las tres tablas de mascotas con CC BY 4.0; los ejemplos
+externos no copian observaciones.
+
+El [catálogo de datos abiertos de MinHacienda](https://www.minhacienda.gov.co/web/portal/transparencia/datos-abiertos/seccion-datos-abiertos)
+indica CC BY-SA 4.0 para sus conjuntos de datos abiertos, pero no se
+identificó una ficha que aplique esa licencia al XLSX específico del
+IRC. El [aviso de Banrep](https://www.banrep.gov.co/es/aviso-legal)
+distingue reproducción sin modificación de otras reutilizaciones.
+La [licencia abierta de SFC](https://www.superfinanciera.gov.co/publicaciones/10116019/licencia-abierta-y-condiciones-de-uso-para-datos-abiertos/)
+aplica a sus datos abiertos, sin cotejo todavía con los anexos ni
+el reporte específico. Los [términos de DANE](https://www.dane.gov.co/index.php/servicios-al-ciudadano/tramites/transparencia-y-acceso-a-la-informacion-publica/terminos-y-condiciones)
+permiten uso y transformación con cita; no se verificó una licencia
+de redistribución para el extracto del kit. Los [totales definitivos](https://www.dane.gov.co/files/operaciones/EEVV/2026/6-feb-2026/bol-EEVV-Isem2025pr.pdf)
+sí coinciden con los dos totales anotados; eso no valida cada marginal
+ni provee exposición.
 
 Originales guardados para cotejo local, fuera de Git:
 

@@ -311,6 +311,10 @@ licence. The existing mortality datasets are unchanged. The
 `working-with-datasets` vignette also illustrates competing risks using
 the external `MASS::Melanoma` dataset.
 
+`pet_lifetables` includes study-specific life tables for US dogs and cats
+and UK dogs. Each table retains its own denominator and open last age;
+see `?pet_lifetables` for the published quantities and limitations.
+
 ## Articles
 
 Four introductory articles develop complete workflows rather than isolated function calls:

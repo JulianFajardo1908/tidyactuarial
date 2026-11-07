@@ -163,6 +163,7 @@ reference:
   - mortality_world_sample_2015_2023
   - mortality_world_sample_2023
   - multiple_decrement_sample
+  - pet_lifetables
   - soa08lt
 articles:
 - title: Financial Mathematics

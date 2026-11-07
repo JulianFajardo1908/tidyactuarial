@@ -65,3 +65,34 @@ los ocho objetos anteriores sin modificar.
 La viñeta usa `MASS::Melanoma` de forma opcional para incidencia
 acumulada con censura. No se redistribuyen los 205 registros ni se
 interpretan como decrementos anuales por edad.
+
+## pet_lifetables
+
+**57 filas, 17 columnas, tres tablas.** Montoya et al. (2023), tablas 3
+y 4: perros y gatos de EE. UU., 18 edades cada uno, datos clínicos
+2013–2019, radix hipotético de 100.000. Teng et al. (2022), tabla 2:
+21 edades de perros del Reino Unido, defunciones entre enero de 2016
+y julio de 2020, denominador inicial de 30.563. No se combinan poblaciones,
+ni se usa como tabla tarifaria para mascotas aseguradas.
+
+Ambos originales tienen **CC BY 4.0**, confirmado en los avisos de los
+artículos [Montoya](https://pmc.ncbi.nlm.nih.gov/articles/PMC9989186/) y
+[Teng](https://pmc.ncbi.nlm.nih.gov/articles/PMC9050668/). Atribución en
+inst/COPYRIGHTS. XML de Europe PMC consultados el 2026-11-06; URL y SHA
+fijados en [provenance.csv](data-raw/provenance.csv).
+
+| Tabla | Edades | qx al final (publicado) | lx al final | ex a edad 0 |
+|---|---|---:|---:|---:|
+| Perros EE. UU. | 0–16, 17+ | 0,4166 | 13.204 | 12,69 |
+| Gatos EE. UU. | 0–16, 17+ | 0,4015 | 13.168 | 11,18 |
+| Perros Reino Unido | 0–19, 20+ | 1 | 23 | 11,23 |
+
+Se cotejaron las 57 filas y los 627 campos numéricos o faltantes contra
+las transcripciones del kit: cero diferencias. Los campos no publicados
+quedan ausentes; se normaliza solo la puntuación de intervalos. El
+residuo máximo en `1 - lx_siguiente/lx - qx` antes de la última fila
+es 0,00049942, compatible con el redondeo; el de `Tx/lx - ex` es
+0,0049505 años. No se extrapola ni se impone un qx de cierre uniforme.
+Los recuentos de muerte en EE. UU. son de la población del estudio,
+no decrementos del radix hipotético. Usar `x,lx` de una sola tabla
+para `t_px()` con plazo observado; perros EE. UU. de 0 a 5: 0,93223.
