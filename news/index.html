@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,6 +22,7 @@
     <li><a class="dropdown-item" href="../articles/loans-amortization-general-schedules.html">Loans, Amortization, and General Payment Schedules</a></li>
     <li><a class="dropdown-item" href="../articles/bonds-duration-convexity-immunization.html">Bonds, Duration, Convexity, and Immunization</a></li>
     <li><a class="dropdown-item" href="../articles/life-contingencies.html">Life Contingencies with tidyactuarial</a></li>
+    <li><a class="dropdown-item" href="../articles/working-with-datasets.html">Working with mortality and competing-risks data</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -39,6 +40,14 @@
       <small>Source: <a href="https://github.com/JulianFajardo1908/tidyactuarial/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.1" id="tidyactuarial-021">tidyactuarial 0.2.1<a class="anchor" aria-label="anchor" href="#tidyactuarial-021"></a></h2>
+<ul><li><p>Add <code>mortality_regions</code>: selected 2023 period life tables from UN WPP 2024, with source precision and the open 100+ interval retained. Existing datasets are unchanged.</p></li>
+<li><p>Add <code>pet_lifetables</code>: three attributed research tables for US dogs and cats and UK dogs, with the published open ages retained.</p></li>
+<li><p>Add a short vignette on WPP survival calculations and competing risks with the external <code><a href="https://rdrr.io/pkg/MASS/man/Melanoma.html" class="external-link">MASS::Melanoma</a></code> example.</p></li>
+<li><p><code><a href="../reference/annuity_multi.html">annuity_multi()</a></code> accepts <code>status = "joint"</code> or <code>"last"</code> for status-based payments, with existing <code>cohort</code> calls still supported. The common table horizon now uses years remaining from each life’s issue age. This can admit previously rejected terms or lengthen the default term when the tables cover different age ranges.</p></li>
+<li><p><code><a href="../reference/e_xy.html">e_xy()</a></code> now accepts either a shared life table or <code>list(lt_x, lt_y)</code> for distinct marginal mortalities. The new <code>status = "joint"</code> or <code>"last"</code> selector matches the other bivariate valuation functions. Existing <code>cohort</code> calls, positional arguments and tidy columns remain supported; explicitly supplying both selectors is an error. Each marginal retains its own observed horizon and conflicting fractional assumptions require an explicit <code>frac</code>.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="tidyactuarial-020">tidyactuarial 0.2.0<a class="anchor" aria-label="anchor" href="#tidyactuarial-020"></a></h2><p class="text-muted">CRAN release: 2026-10-25</p>
 <div class="section level3">

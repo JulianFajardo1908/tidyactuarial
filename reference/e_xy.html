@@ -11,7 +11,7 @@ last-survivor (second death)."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,6 +26,7 @@ last-survivor (second death)."></head><body>
     <li><a class="dropdown-item" href="../articles/loans-amortization-general-schedules.html">Loans, Amortization, and General Payment Schedules</a></li>
     <li><a class="dropdown-item" href="../articles/bonds-duration-convexity-immunization.html">Bonds, Duration, Convexity, and Immunization</a></li>
     <li><a class="dropdown-item" href="../articles/life-contingencies.html">Life Contingencies with tidyactuarial</a></li>
+    <li><a class="dropdown-item" href="../articles/working-with-datasets.html">Working with mortality and competing-risks data</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -62,7 +63,8 @@ last-survivor (second death).</p>
 <span>  cohort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first"</span>, <span class="st">"last"</span><span class="op">)</span>,</span>
 <span>  tidy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  check <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  tol <span class="op">=</span> <span class="fl">1e-10</span></span>
+<span>  tol <span class="op">=</span> <span class="fl">1e-10</span>,</span>
+<span>  status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"joint"</span>, <span class="st">"last"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -71,7 +73,9 @@ last-survivor (second death).</p>
 
 
 <dl><dt id="arg-lt">lt<a class="anchor" aria-label="anchor" href="#arg-lt"></a></dt>
-<dd><p>A life table data frame with columns <code>x</code> and <code>lx</code>.</p></dd>
+<dd><p>A life table data frame shared by both lives, or a list of two
+life tables <code>list(lt_x, lt_y)</code>, one for each life in that order.
+Each table must contain columns <code>x</code> and <code>lx</code>.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
@@ -84,7 +88,7 @@ last-survivor (second death).</p>
 
 <dt id="arg-t">t<a class="anchor" aria-label="anchor" href="#arg-t"></a></dt>
 <dd><p>Optional nonnegative numeric duration(s). If <code>NULL</code>, uses
-the maximum horizon allowed by the table.</p></dd>
+the maximum horizon allowed by the tables and selected status.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
@@ -94,14 +98,16 @@ the maximum horizon allowed by the table.</p></dd>
 <dt id="arg-frac">frac<a class="anchor" aria-label="anchor" href="#arg-frac"></a></dt>
 <dd><p>Fractional-age assumption for <code>type = "complete"</code>,
 as in <code><a href="t_pxy.html">t_pxy</a></code>: <code>"UDD"</code>, <code>"CF"</code>,
-<code>"CML"</code>, or <code>"Balducci"</code>. If not specified and <code>lt</code>
-carries a <code>frac</code> attribute, that value is used.
-An inherited <code>"CML"</code> attribute is normalized to <code>"CF"</code>.</p></dd>
+<code>"CML"</code>, or <code>"Balducci"</code>. If omitted, valid <code>frac</code>
+attributes are inherited from the tables, defaulting to <code>"UDD"</code>.
+Inherited <code>"CML"</code> is normalized to <code>"CF"</code>; conflicting
+attributes require an explicit <code>frac</code>, as in <code>t_pxy</code>.</p></dd>
 
 
 <dt id="arg-cohort">cohort<a class="anchor" aria-label="anchor" href="#arg-cohort"></a></dt>
-<dd><p>Two-life cohort: <code>"first"</code> (joint-life) or
-<code>"last"</code> (last survivor).</p></dd>
+<dd><p>Legacy survival-state selector: <code>"first"</code> means
+joint-life and <code>"last"</code> means last survivor. Prefer <code>status</code>
+in new calls. Supply only one of <code>cohort</code> and <code>status</code>.</p></dd>
 
 
 <dt id="arg-tidy">tidy<a class="anchor" aria-label="anchor" href="#arg-tidy"></a></dt>
@@ -116,10 +122,19 @@ Table consistency and scalar logical controls are always checked.</p></dd>
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
 <dd><p>Numeric tolerance for integer checks.</p></dd>
 
+
+<dt id="arg-status">status<a class="anchor" aria-label="anchor" href="#arg-status"></a></dt>
+<dd><p>Survival status: <code>"joint"</code> (first death) or
+<code>"last"</code> (last survivor). Defaults to joint-life when neither
+selector is supplied. Appended to preserve existing positional calls.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Numeric vector, or tibble if <code>tidy = TRUE</code>.</p>
+    <p>Numeric vector, or tibble if <code>tidy = TRUE</code>. The tibble
+  retains its existing columns, including <code>cohort</code>: <code>"first"</code>
+  for joint-life and <code>"last"</code> for last survivor, also when the
+  selection is made using <code>status</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -135,10 +150,13 @@ Survival is always
 measured from the initial ages, conditional on both lives being alive
 at time zero. In particular, last-survivor survival at later times does
 not imply that both lives remain alive.</p>
-<p>Horizons end at the last recorded age: the older life limits joint-life
-expectation and the younger life limits last-survivor expectation.
-Survival beyond that age is taken as zero, as in <code>t_px</code>; an open
-table therefore gives a truncated expectation. Missing initial ages or
+<p>Each marginal horizon ends at its own table's last recorded age minus
+its initial age. Joint-life expectation uses the smaller horizon and
+last-survivor expectation the larger. With a shared table, these are
+the horizons of the older and younger life, respectively.
+Survival beyond each marginal horizon is taken as zero, as in
+<code>t_px</code>; open tables therefore give truncated expectations.
+Missing initial ages or
 zero initial survivors give <code>NA</code>, including when <code>t = 0</code>.
 Tables must have unique consecutive annual integer ages and finite,
 nonnegative, nonincreasing <code>lx</code>. Observed <code>px</code>/<code>qx</code> must
@@ -165,17 +183,17 @@ $$\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Curtate joint-life expectancy (Finan, Sec. 56.4)</span></span></span>
-<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, status <span class="op">=</span> <span class="st">"joint"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.601538</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Curtate last-survivor expectancy (Finan, Sec. 57)</span></span></span>
-<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"last"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, status <span class="op">=</span> <span class="st">"last"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5.746923</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Verify identity (Finan, Example 57.4):</span></span></span>
 <span class="r-in"><span><span class="co"># e_{xy-bar} = e_x + e_y - e_xy</span></span></span>
-<span class="r-in"><span><span class="va">e_joint</span> <span class="op">&lt;-</span> <span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">e_last</span>  <span class="op">&lt;-</span> <span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"last"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">e_joint</span> <span class="op">&lt;-</span> <span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, status <span class="op">=</span> <span class="st">"joint"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">e_last</span>  <span class="op">&lt;-</span> <span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, status <span class="op">=</span> <span class="st">"last"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">e_x_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="e_x.html">e_x</a></span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, type <span class="op">=</span> <span class="st">"curtate"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">e_y_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="e_x.html">e_x</a></span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>last_surv <span class="op">=</span> <span class="va">e_last</span>, sum_minus_joint <span class="op">=</span> <span class="va">e_x_val</span> <span class="op">+</span> <span class="va">e_y_val</span> <span class="op">-</span> <span class="va">e_joint</span><span class="op">)</span></span></span>
@@ -183,19 +201,27 @@ $$\mathring{e}_{\overline{xy}} = \mathring{e}_x + \mathring{e}_y
 <span class="r-out co"><span class="r-pr">#&gt;</span>        5.746923        5.746923 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Complete joint-life expectancy under UDD</span></span></span>
-<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"complete"</span>, frac <span class="op">=</span> <span class="st">"UDD"</span>, cohort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"complete"</span>, frac <span class="op">=</span> <span class="st">"UDD"</span>, status <span class="op">=</span> <span class="st">"joint"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.691013</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Temporary: 3-year curtate joint-life</span></span></span>
-<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, t <span class="op">=</span> <span class="fl">3</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, t <span class="op">=</span> <span class="fl">3</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, status <span class="op">=</span> <span class="st">"joint"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.781231</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Tidy output</span></span></span>
-<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, cohort <span class="op">=</span> <span class="st">"first"</span>, tidy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="va">lt</span>, x <span class="op">=</span> <span class="fl">60</span>, y <span class="op">=</span> <span class="fl">62</span>, type <span class="op">=</span> <span class="st">"curtate"</span>, status <span class="op">=</span> <span class="st">"joint"</span>, tidy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       x     y     t type    frac  cohort    ex</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>    60    62    <span style="color: #BB0000;">NA</span> curtate UDD   first   3.60</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Distinct mortality tables, applied to the corresponding lives</span></span></span>
+<span class="r-in"><span><span class="va">lt_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">60</span><span class="op">:</span><span class="fl">62</span>, lx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">80</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">lt_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">60</span><span class="op">:</span><span class="fl">62</span>, lx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">lt_x</span>, <span class="va">lt_y</span><span class="op">)</span>, <span class="fl">60</span>, <span class="fl">60</span>, status <span class="op">=</span> <span class="st">"joint"</span><span class="op">)</span> <span class="co"># 0.4</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4</span>
+<span class="r-in"><span><span class="fu">e_xy</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">lt_x</span>, <span class="va">lt_y</span><span class="op">)</span>, <span class="fl">60</span>, <span class="fl">60</span>, status <span class="op">=</span> <span class="st">"last"</span><span class="op">)</span>  <span class="co"># 0.9</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

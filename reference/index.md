@@ -289,11 +289,15 @@ Reproducible datasets for financial and actuarial examples.
   : Sample loan contracts for amortization examples
 - [`mortality_colombia_tables`](https://julianfajardo1908.github.io/tidyactuarial/reference/mortality_colombia_tables.md)
   : Colombian mortality tables
+- [`mortality_regions`](https://julianfajardo1908.github.io/tidyactuarial/reference/mortality_regions.md)
+  : UN World Population Prospects 2024 period life tables for 2023
 - [`mortality_world_sample_2015_2023`](https://julianfajardo1908.github.io/tidyactuarial/reference/mortality_world_sample_2015_2023.md)
   : World mortality sample panel, 2015–2023
 - [`mortality_world_sample_2023`](https://julianfajardo1908.github.io/tidyactuarial/reference/mortality_world_sample_2023.md)
   : World mortality sample, 2023
 - [`multiple_decrement_sample`](https://julianfajardo1908.github.io/tidyactuarial/reference/multiple_decrement_sample.md)
   : Sample multiple decrement probabilities
+- [`pet_lifetables`](https://julianfajardo1908.github.io/tidyactuarial/reference/pet_lifetables.md)
+  : Published life tables for companion dogs and cats
 - [`soa08lt`](https://julianfajardo1908.github.io/tidyactuarial/reference/soa08lt.md)
   : SOA Illustrative Life Table

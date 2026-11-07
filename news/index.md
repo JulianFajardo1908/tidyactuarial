@@ -1,5 +1,35 @@
 # Changelog
 
+## tidyactuarial 0.2.1
+
+- Add `mortality_regions`: selected 2023 period life tables from UN WPP
+  2024, with source precision and the open 100+ interval retained.
+  Existing datasets are unchanged.
+
+- Add `pet_lifetables`: three attributed research tables for US dogs and
+  cats and UK dogs, with the published open ages retained.
+
+- Add a short vignette on WPP survival calculations and competing risks
+  with the external
+  [`MASS::Melanoma`](https://rdrr.io/pkg/MASS/man/Melanoma.html)
+  example.
+
+- [`annuity_multi()`](https://julianfajardo1908.github.io/tidyactuarial/reference/annuity_multi.md)
+  accepts `status = "joint"` or `"last"` for status-based payments, with
+  existing `cohort` calls still supported. The common table horizon now
+  uses years remaining from each life’s issue age. This can admit
+  previously rejected terms or lengthen the default term when the tables
+  cover different age ranges.
+
+- [`e_xy()`](https://julianfajardo1908.github.io/tidyactuarial/reference/e_xy.md)
+  now accepts either a shared life table or `list(lt_x, lt_y)` for
+  distinct marginal mortalities. The new `status = "joint"` or `"last"`
+  selector matches the other bivariate valuation functions. Existing
+  `cohort` calls, positional arguments and tidy columns remain
+  supported; explicitly supplying both selectors is an error. Each
+  marginal retains its own observed horizon and conflicting fractional
+  assumptions require an explicit `frac`.
+
 ## tidyactuarial 0.2.0
 
 CRAN release: 2026-10-25

@@ -13,3 +13,5 @@
 
 - [Life Contingencies with
   tidyactuarial](https://julianfajardo1908.github.io/tidyactuarial/articles/life-contingencies.md):
+- [Working with mortality and competing-risks
+  data](https://julianfajardo1908.github.io/tidyactuarial/articles/working-with-datasets.md):

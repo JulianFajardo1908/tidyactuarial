@@ -9,7 +9,7 @@ lives using compact actuarial notation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">tidyactuarial</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,6 +24,7 @@ lives using compact actuarial notation."></head><body>
     <li><a class="dropdown-item" href="../articles/loans-amortization-general-schedules.html">Loans, Amortization, and General Payment Schedules</a></li>
     <li><a class="dropdown-item" href="../articles/bonds-duration-convexity-immunization.html">Bonds, Duration, Convexity, and Immunization</a></li>
     <li><a class="dropdown-item" href="../articles/life-contingencies.html">Life Contingencies with tidyactuarial</a></li>
+    <li><a class="dropdown-item" href="../articles/working-with-datasets.html">Working with mortality and competing-risks data</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -63,7 +64,8 @@ lives using compact actuarial notation.</p>
 <span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"immediate"</span>, <span class="st">"due"</span><span class="op">)</span>,</span>
 <span>  woolhouse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"first"</span>, <span class="st">"second"</span><span class="op">)</span>,</span>
-<span>  frac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UDD"</span>, <span class="st">"CF"</span>, <span class="st">"CML"</span>, <span class="st">"Balducci"</span><span class="op">)</span></span>
+<span>  frac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UDD"</span>, <span class="st">"CF"</span>, <span class="st">"CML"</span>, <span class="st">"Balducci"</span><span class="op">)</span>,</span>
+<span>  status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"joint"</span>, <span class="st">"last"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -101,9 +103,8 @@ frequency, not deferment.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>Integer term in years after deferment. If <code>NULL</code>, runs to the
-end of the available table horizon, conservatively based on the smallest
-omega across life tables.</p></dd>
+<dd><p>Integer term in years after deferment. If <code>NULL</code>, uses the
+remaining common horizon after deferment, or zero if none remains.</p></dd>
 
 
 <dt id="arg-h">h<a class="anchor" aria-label="anchor" href="#arg-h"></a></dt>
@@ -116,15 +117,16 @@ approximations may be applied.</p></dd>
 
 
 <dt id="arg-annuity">annuity<a class="anchor" aria-label="anchor" href="#arg-annuity"></a></dt>
-<dd><p>Type of annuity logic: <code>"cohort"</code> uses the status
-defined in <code>cohort</code>; <code>"reversionary"</code> uses the \(\alpha\)
+<dd><p>Type of annuity logic: <code>"cohort"</code> uses the selected
+survival status; <code>"reversionary"</code> uses the \(\alpha\)
 fractional reduction.</p></dd>
 
 
 <dt id="arg-cohort">cohort<a class="anchor" aria-label="anchor" href="#arg-cohort"></a></dt>
-<dd><p>Survival status: <code>"first"</code> for joint-life, paying while
+<dd><p>Legacy selector: <code>"first"</code> for joint-life, paying while
 all lives are alive, or <code>"last"</code> for last-survivor, paying while at
-least one life remains alive. Used only when <code>annuity = "cohort"</code>.</p></dd>
+least one life remains alive. Used only when <code>annuity = "cohort"</code>.
+Prefer <code>status</code> in new calls.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
@@ -144,6 +146,13 @@ matches joint-life; <code>alpha = 1</code> matches last-survivor.</p></dd>
 <dt id="arg-frac">frac<a class="anchor" aria-label="anchor" href="#arg-frac"></a></dt>
 <dd><p>Fractional-age assumption for exact payments: <code>"UDD"</code>
 (default), <code>"CF"</code>, <code>"CML"</code> (alias of CF), or <code>"Balducci"</code>.</p></dd>
+
+
+<dt id="arg-status">status<a class="anchor" aria-label="anchor" href="#arg-status"></a></dt>
+<dd><p><code>"joint"</code> or <code>"last"</code> for <code>annuity = "cohort"</code>.
+If neither selector is supplied, uses joint-life. Supply only one of
+<code>status</code> and <code>cohort</code>. Omit <code>status</code> for reversionary
+payments, which are determined by <code>alpha</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -191,8 +200,11 @@ Positive supported weights at both borders and the following year are
 required for second-order approximation. This is a smoothness approximation,
 not exact fractional valuation under <code>frac</code>; negative approximations
 produce a warning. Immediate subtracts \([F(h)-F(h+n)]/k\) from due.
-Exact valuation requires consecutive annual ages and retains the documented
-conservative common-age horizon; it does not extrapolate unobserved lives.</p>
+Valuation requires consecutive annual ages. For each life, subtract the
+age at issue from the last observed age in its own table. The common
+horizon is the smallest of these durations; a positive term must end
+within it, including for last-survivor and reversionary payments.
+The calculation does not extrapolate unobserved lives.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -228,7 +240,7 @@ conservative common-age horizon; it does not extrapolate unobserved lives.</p>
 <span class="r-in"><span>  ages <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">62</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  i <span class="op">=</span> <span class="fl">0.05</span>,</span></span>
 <span class="r-in"><span>  n <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>  cohort <span class="op">=</span> <span class="st">"first"</span>,</span></span>
+<span class="r-in"><span>  status <span class="op">=</span> <span class="st">"joint"</span>,</span></span>
 <span class="r-in"><span>  timing <span class="op">=</span> <span class="st">"due"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.979153</span>
@@ -243,7 +255,7 @@ conservative common-age horizon; it does not extrapolate unobserved lives.</p>
 <span class="r-in"><span>  ages <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">62</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  i <span class="op">=</span> <span class="fl">0.05</span>,</span></span>
 <span class="r-in"><span>  n <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>  cohort <span class="op">=</span> <span class="st">"last"</span>,</span></span>
+<span class="r-in"><span>  status <span class="op">=</span> <span class="st">"last"</span>,</span></span>
 <span class="r-in"><span>  timing <span class="op">=</span> <span class="st">"due"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4.515572</span>

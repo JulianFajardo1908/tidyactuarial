@@ -20,7 +20,8 @@ annuity_multi(
   alpha = NULL,
   timing = c("immediate", "due"),
   woolhouse = c("none", "first", "second"),
-  frac = c("UDD", "CF", "CML", "Balducci")
+  frac = c("UDD", "CF", "CML", "Balducci"),
+  status = c("joint", "last")
 )
 ```
 
@@ -56,9 +57,8 @@ annuity_multi(
 
 - n:
 
-  Integer term in years after deferment. If `NULL`, runs to the end of
-  the available table horizon, conservatively based on the smallest
-  omega across life tables.
+  Integer term in years after deferment. If `NULL`, uses the remaining
+  common horizon after deferment, or zero if none remains.
 
 - h:
 
@@ -71,14 +71,15 @@ annuity_multi(
 
 - annuity:
 
-  Type of annuity logic: `"cohort"` uses the status defined in `cohort`;
+  Type of annuity logic: `"cohort"` uses the selected survival status;
   `"reversionary"` uses the \\\alpha\\ fractional reduction.
 
 - cohort:
 
-  Survival status: `"first"` for joint-life, paying while all lives are
+  Legacy selector: `"first"` for joint-life, paying while all lives are
   alive, or `"last"` for last-survivor, paying while at least one life
-  remains alive. Used only when `annuity = "cohort"`.
+  remains alive. Used only when `annuity = "cohort"`. Prefer `status` in
+  new calls.
 
 - alpha:
 
@@ -98,6 +99,13 @@ annuity_multi(
 
   Fractional-age assumption for exact payments: `"UDD"` (default),
   `"CF"`, `"CML"` (alias of CF), or `"Balducci"`.
+
+- status:
+
+  `"joint"` or `"last"` for `annuity = "cohort"`. If neither selector is
+  supplied, uses joint-life. Supply only one of `status` and `cohort`.
+  Omit `status` for reversionary payments, which are determined by
+  `alpha`.
 
 ## Value
 
@@ -150,9 +158,12 @@ force. Positive supported weights at both borders and the following year
 are required for second-order approximation. This is a smoothness
 approximation, not exact fractional valuation under `frac`; negative
 approximations produce a warning. Immediate subtracts
-\\\[F(h)-F(h+n)\]/k\\ from due. Exact valuation requires consecutive
-annual ages and retains the documented conservative common-age horizon;
-it does not extrapolate unobserved lives.
+\\\[F(h)-F(h+n)\]/k\\ from due. Valuation requires consecutive annual
+ages. For each life, subtract the age at issue from the last observed
+age in its own table. The common horizon is the smallest of these
+durations; a positive term must end within it, including for
+last-survivor and reversionary payments. The calculation does not
+extrapolate unobserved lives.
 
 ## See also
 
@@ -191,7 +202,7 @@ annuity_multi(
   ages = c(60, 62),
   i = 0.05,
   n = 5,
-  cohort = "first",
+  status = "joint",
   timing = "due"
 )
 #> [1] 3.979153
@@ -206,7 +217,7 @@ annuity_multi(
   ages = c(60, 62),
   i = 0.05,
   n = 5,
-  cohort = "last",
+  status = "last",
   timing = "due"
 )
 #> [1] 4.515572
